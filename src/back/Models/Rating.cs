@@ -1,5 +1,8 @@
-﻿namespace back.Models
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace back.Models
 {
+    [PrimaryKey(nameof(RaterId), nameof(RatedId))]
     public class Rating
     {
         public int RaterId { get; set; }

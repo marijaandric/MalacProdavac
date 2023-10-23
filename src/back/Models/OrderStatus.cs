@@ -2,7 +2,7 @@
 
 namespace back.Models
 {
-    public class NotificationType
+    public class OrderStatus
     {
         [Key]
         public int Id { get; set; }

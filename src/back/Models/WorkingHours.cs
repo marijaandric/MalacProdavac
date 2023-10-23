@@ -1,5 +1,8 @@
-﻿namespace back.Models
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace back.Models
 {
+    [PrimaryKey(nameof(ShopId), nameof(Day))]
     public class WorkingHours
     {
         public int ShopId { get; set; }

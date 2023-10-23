@@ -1,5 +1,8 @@
-﻿namespace back.Models
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace back.Models
 {
+    [PrimaryKey(nameof(OrderId), nameof(ProductId))]
     public class OrderItem
     {
         public int OrderId { get; set; }

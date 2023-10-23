@@ -1,7 +1,10 @@
-﻿namespace back.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace back.Models
 {
     public class Card
     {
+        [Key]
         public int Id { get; set; }
         public string? Fullname { get; set; }
         public string? CardNumber { get; set; }
