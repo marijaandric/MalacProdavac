@@ -41,3 +41,10 @@ fun GreetingPreview() {
         Greeting("Android")
     }
 }
+
+    @Composable
+    @Preview(showBackground = true)
+    fun SplashScreenAndIntro() {
+        SplashScreen().Navigation()
+    }
+
