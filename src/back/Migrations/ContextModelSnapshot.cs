@@ -695,11 +695,11 @@ namespace back.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Password")
-                        .HasColumnType("TEXT");
+                    b.Property<byte[]>("Password")
+                        .HasColumnType("BLOB");
 
-                    b.Property<string>("PasswordSalt")
-                        .HasColumnType("TEXT");
+                    b.Property<byte[]>("PasswordSalt")
+                        .HasColumnType("BLOB");
 
                     b.Property<int>("RoleId")
                         .HasColumnType("INTEGER");

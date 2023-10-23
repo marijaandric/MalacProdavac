@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using back.DAL.Repositories;
 using back.DAL.Contexts;
 
 #nullable disable
@@ -12,7 +11,7 @@ using back.DAL.Contexts;
 namespace back.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20231023121243__initial")]
+    [Migration("20231023202359__initial")]
     partial class _initial
     {
         /// <inheritdoc />
@@ -699,11 +698,11 @@ namespace back.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Password")
-                        .HasColumnType("TEXT");
+                    b.Property<byte[]>("Password")
+                        .HasColumnType("BLOB");
 
-                    b.Property<string>("PasswordSalt")
-                        .HasColumnType("TEXT");
+                    b.Property<byte[]>("PasswordSalt")
+                        .HasColumnType("BLOB");
 
                     b.Property<int>("RoleId")
                         .HasColumnType("INTEGER");
