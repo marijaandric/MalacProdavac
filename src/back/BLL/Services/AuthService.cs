@@ -70,7 +70,7 @@ namespace back.BLL.Services
             user.Username = CreateUsername(user.Name, user.Lastname);
             user.Email = userDto.Email;
             user.Address = userDto.Address;
-            user.RoleId = (await _authRepository.GetRole("Customer")).Id;
+            user.RoleId = userDto.RoleId;
             user.LoggedIn = true;
             user.LightTheme = true;
             user.CreatedOn = DateTime.Now;
