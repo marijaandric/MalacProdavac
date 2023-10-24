@@ -41,6 +41,18 @@ namespace back.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ChosenCategories",
+                columns: table => new
+                {
+                    UserId = table.Column<int>(type: "INTEGER", nullable: false),
+                    CategoryId = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ChosenCategories", x => new { x.UserId, x.CategoryId });
+                });
+
+            migrationBuilder.CreateTable(
                 name: "DeliveryMethods",
                 columns: table => new
                 {
@@ -238,25 +250,6 @@ namespace back.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_WorkingHours", x => new { x.ShopId, x.Day });
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ChosenCategories",
-                columns: table => new
-                {
-                    UserId = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    CategoryId = table.Column<int>(type: "INTEGER", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ChosenCategories", x => x.UserId);
-                    table.ForeignKey(
-                        name: "FK_ChosenCategories_Categories_CategoryId",
-                        column: x => x.CategoryId,
-                        principalTable: "Categories",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -657,11 +650,6 @@ namespace back.Migrations
                 name: "IX_Carts_UserId",
                 table: "Carts",
                 column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ChosenCategories_CategoryId",
-                table: "ChosenCategories",
-                column: "CategoryId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_DeliveryRequests_OrderId",

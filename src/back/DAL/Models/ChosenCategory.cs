@@ -1,16 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace back.Models
 {
+    [PrimaryKey(nameof(UserId), nameof(CategoryId))]
     public class ChosenCategory
     {
-        [Key]
         public int UserId { get; set; }
-        [ForeignKey("Category")]
         public int CategoryId { get; set; }
-
-        public Category Category { get; set; }
 
     }
 }

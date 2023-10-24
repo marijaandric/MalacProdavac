@@ -87,7 +87,7 @@ namespace back.BLL.Services
             user.Password = passwordHash;
             user.PasswordSalt = passwordSalt;
 
-            if (System.IO.File.Exists(defaultImagePath))
+            if (File.Exists(defaultImagePath))
             {
                 using (var stream = new FileStream(defaultImagePath, FileMode.Open))
                 {

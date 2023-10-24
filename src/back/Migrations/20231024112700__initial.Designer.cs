@@ -11,7 +11,7 @@ using back.DAL.Contexts;
 namespace back.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20231023202359__initial")]
+    [Migration("20231024112700__initial")]
     partial class _initial
     {
         /// <inheritdoc />
@@ -108,15 +108,12 @@ namespace back.Migrations
             modelBuilder.Entity("back.Models.ChosenCategory", b =>
                 {
                     b.Property<int>("UserId")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("CategoryId")
                         .HasColumnType("INTEGER");
 
-                    b.HasKey("UserId");
-
-                    b.HasIndex("CategoryId");
+                    b.HasKey("UserId", "CategoryId");
 
                     b.ToTable("ChosenCategories");
                 });
@@ -772,17 +769,6 @@ namespace back.Migrations
                     b.Navigation("Product");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("back.Models.ChosenCategory", b =>
-                {
-                    b.HasOne("back.Models.Category", "Category")
-                        .WithMany()
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Category");
                 });
 
             modelBuilder.Entity("back.Models.DeliveryRequest", b =>
