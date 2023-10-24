@@ -15,7 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.TabRowDefaults.Indicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -28,14 +28,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.front.ui.theme.FrontTheme
 import kotlinx.coroutines.delay
 
 class SplashScreen {
@@ -60,6 +58,16 @@ class SplashScreen {
             {
                 Intro("Welcome to MalacProdavac","","intro1",0,navController = navController)
             }
+            composable("intro2")
+            {
+                val desc = "Showcase your products and engage with local customers! Increase your visibility and sales."
+                Intro("Business owners",desc,"intro2",1,navController = navController)
+            }
+            composable("intro3")
+            {
+                val desc = "Explore a wide range of local products and services. Support your community."
+                Intro("Customers",desc,"image_removebg_preview__3_",2,navController = navController)
+            }
         }
     }
 
@@ -80,7 +88,7 @@ class SplashScreen {
                     }
                 )
             )
-            delay(3000L)
+            delay(2500L)
             navController.navigate("intro1")
         }
         Box(
@@ -134,19 +142,19 @@ class SplashScreen {
                 fontSize = 30.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.padding(top = 50.dp),
+                modifier = Modifier.padding(top = 60.dp, start = 10.dp, end = 10.dp, bottom = 15.dp),
                 lineHeight = 35.sp
             )
 
             Text(
                 text = title2,
-                fontSize = 20.sp,
+                fontSize = 16.sp,
                 fontWeight = FontWeight.Normal,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.padding(top = 2.dp),
-                lineHeight = 35.sp
+                modifier = Modifier.padding(top = 2.dp, start = 10.dp, end = 10.dp),
+                lineHeight = 20.sp
             )
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.weight(3.5f))
 
             val context = LocalContext.current // Dobijanje trenutnog konteksta
 
@@ -159,15 +167,34 @@ class SplashScreen {
                 contentDescription = "Intro1",
                 modifier = Modifier.scale(scale.value)
                     .padding(top = 8.dp, bottom = 10.dp)
+                    //.size(200.dp, 200.dp)
             )
 
-            val buttons = Buttons()
-            buttons.MediumBlueButton(
-                text = "Next",
-                onClick = {
+            Spacer(modifier = Modifier.weight(0.8f))
+            Row()
+            {
+                val NextButton = UIElements()
+                NextButton.MediumBlueButton(
+                    text = "Skip",
+                    onClick = {
 
-                }
-            )
+                    },0.45f
+                )
+                val Skipbutton = UIElements()
+                Skipbutton.MediumBlueButton(
+                    text = "Next",
+                    onClick = {
+                        if(currentPage == 0)
+                        {
+                            navController.navigate("intro2")
+                        }
+                        if(currentPage == 1)
+                        {
+                            navController.navigate("intro3")
+                        }
+                    },0.8f
+                )
+            }
 
             Spacer(modifier = Modifier.weight(1f))
             Row(
@@ -175,11 +202,9 @@ class SplashScreen {
                 modifier = Modifier.padding(bottom = 8.dp)
             ) {
                 repeat(4) { index ->
-                    Indicator(selected = index == currentPage) // Postavite `selected` prema trenutnoj stranici
+                    Indicator(selected = index == currentPage)
                 }
             }
-
-
 
         }
     }
@@ -189,8 +214,10 @@ class SplashScreen {
     // indikator da li su popunjene one tackice
     @Composable
     fun Indicator(selected: Boolean) {
+        val primaryColor = MaterialTheme.colorScheme.primary
+        val lightColor = MaterialTheme.colorScheme.tertiary
         val indicatorSize = 8.dp
-        val indicatorColor = if (selected) Color.Blue else Color.Gray
+        val indicatorColor = if (selected) primaryColor else lightColor
 
         Box(
             modifier = Modifier
