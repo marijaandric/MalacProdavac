@@ -1,8 +1,6 @@
 ﻿using back.BLL.Dtos;
 using back.DAL.Repositories;
 using back.Models;
-using Microsoft.AspNetCore.Identity;
-using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -17,12 +15,12 @@ namespace back.BLL.Services
             _authRepository = authRepository;
         }
 
-        public string defaultImagePath = Path.Combine("images/default.png", AppDomain.CurrentDomain.BaseDirectory);
+        public string defaultImagePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..\\..\\..\\images\\default.png");
 
         #region registrationHelperMethods
         public string CreateUsername(string name, string lastname)
         {
-            string username = name + "." + lastname;
+            string username = name.ToLower() + "." + lastname.ToLower();
             int count = _authRepository.CountUsers(username);
             if (count > 0) username += count;
 
@@ -56,10 +54,10 @@ namespace back.BLL.Services
         public async Task<int> Register(UserDto userDto)
         {
             #region validation
-            string checkEmail = CheckEmail(userDto.Email);
+            string checkEmail = CheckEmail(userDto.Email.ToLower());
             string checkPassword = CheckPassword(userDto.Password);
 
-            if (!checkEmail.Equals("")) throw new ArgumentException(checkPassword);
+            if (!checkEmail.Equals("")) throw new ArgumentException(checkEmail);
             if (!checkPassword.Equals("")) throw new ArgumentException(checkPassword);
             #endregion
 
@@ -68,7 +66,7 @@ namespace back.BLL.Services
             user.Name = userDto.Name;
             user.Lastname = userDto.Lastname;
             user.Username = CreateUsername(user.Name, user.Lastname);
-            user.Email = userDto.Email;
+            user.Email = userDto.Email.ToLower();
             user.Address = userDto.Address;
             user.RoleId = userDto.RoleId;
             user.LoggedIn = true;
@@ -89,6 +87,7 @@ namespace back.BLL.Services
 
             if (File.Exists(defaultImagePath))
             {
+
                 using (var stream = new FileStream(defaultImagePath, FileMode.Open))
                 {
                     var bytes = new byte[stream.Length];
@@ -102,14 +101,14 @@ namespace back.BLL.Services
             return -1;
         }
 
-        public async Task<int> Login(string username, string password)
+        public async Task<int> Login(LoginDto loginDto)
         {
-            User user = await _authRepository.GetUser(username);
+            User user = await _authRepository.GetUser(loginDto.username);
             if (user == null) throw new ArgumentException("Invalid username.");
 
             using (var hmac = new HMACSHA512(user.PasswordSalt))
             {
-                var hashPass = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
+                var hashPass = hmac.ComputeHash(Encoding.UTF8.GetBytes(loginDto.password));
 
                 if (!hashPass.SequenceEqual(user.Password)) throw new ArgumentException("Invalid password");
             }

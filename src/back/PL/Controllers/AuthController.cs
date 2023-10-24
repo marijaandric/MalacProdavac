@@ -31,11 +31,11 @@ namespace back.PL.Controllers
         }
 
         [HttpPost("Login")]
-        public async Task<IActionResult> Login(string username, string password)
+        public async Task<IActionResult> Login(LoginDto loginDto)
         {
             try
             {
-                int userId = await _authService.Login(username, password);
+                int userId = await _authService.Login(loginDto);
                 if (userId != -1) return Ok(userId);
                 else return BadRequest("Unknown error.");
             }
