@@ -42,6 +42,7 @@ import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.delay
 
 class SplashScreen {
+
     @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
     @Composable
     fun Navigation() {
@@ -59,8 +60,11 @@ class SplashScreen {
                 val desc = "Showcase your products and engage with local customers! Increase your visibility and sales."
                 val desc2 = "Showcase your products and engage with local customers! Increase your visibility and sales."
                 val desc3 = "Efficiently manage your delivery schedule. Connect with local businesses and earn more."
+                val pagerState = rememberPagerState(
+                    initialPageOffsetFraction = 0f
+                )
                 Scaffold() {
-                    HorizontalPager(pageCount = 4) { page ->
+                    HorizontalPager(pageCount = 4, state = pagerState) { page ->
                         val pageContent = when (page) {
                             0 -> Intro("Welcome to MalacProdavac","","intro1",0,navController = navController)
                             1 -> Intro("Business owners", desc,"intro2", 1, navController = navController)
@@ -79,10 +83,12 @@ class SplashScreen {
                 val desc2 = "Showcase your products and engage with local customers! Increase your visibility and sales."
                 val desc3 = "Efficiently manage your delivery schedule. Connect with local businesses and earn more."
                 val pagerState = rememberPagerState(
-                    initialPage = 1
+                    initialPage = 1,
+                    initialPageOffsetFraction = 0f
                 )
+
                 Scaffold() {
-                    HorizontalPager(pageCount = 4, state = pagerState) { page->
+                    HorizontalPager(pageCount = 4,state = pagerState) { page->
                         val pageContent = when (page) {
                             0 -> Intro("Welcome to MalacProdavac","","intro1",0,navController = navController)
                             1 -> Intro("Business owners", desc,"intro2", 1, navController = navController)
@@ -101,10 +107,11 @@ class SplashScreen {
                 val desc2 = "Showcase your products and engage with local customers! Increase your visibility and sales."
                 val desc3 = "Efficiently manage your delivery schedule. Connect with local businesses and earn more."
                 val pagerState = rememberPagerState(
-                    initialPage = 2
+                    initialPage = 2,
+                    initialPageOffsetFraction = 0f
                 )
                 Scaffold() {
-                    HorizontalPager(pageCount = 4, state = pagerState) { page->
+                    HorizontalPager(pageCount = 4,state = pagerState) { page->
                         val pageContent = when (page) {
                             0 -> Intro("Welcome to MalacProdavac","","intro1",0,navController = navController)
                             1 -> Intro("Business owners", desc,"intro2", 1, navController = navController)
@@ -211,7 +218,7 @@ class SplashScreen {
             )
             Spacer(modifier = Modifier.weight(3.5f))
 
-            val context = LocalContext.current // Dobijanje trenutnog konteksta
+            val context = LocalContext.current
 
             val imageResId = context.resources.getIdentifier(
                 imageString, "drawable", context.packageName
@@ -298,7 +305,5 @@ class SplashScreen {
                 .background(indicatorColor, CircleShape)
         )
     }
-
-
 
 }
