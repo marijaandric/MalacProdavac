@@ -216,7 +216,7 @@ class SplashScreen {
                 modifier = Modifier.padding(top = 2.dp, start = 10.dp, end = 10.dp),
                 lineHeight = 20.sp
             )
-            Spacer(modifier = Modifier.weight(3.5f))
+            Spacer(modifier = Modifier.weight(4.5f))
 
             val context = LocalContext.current
 
@@ -233,7 +233,7 @@ class SplashScreen {
                     //.size(200.dp, 200.dp)
             )
 
-            Spacer(modifier = Modifier.weight(0.8f))
+            Spacer(modifier = Modifier.weight(1.5f))
             if(currentPage != 3)
             {
                 Row()
@@ -276,7 +276,7 @@ class SplashScreen {
                 )
             }
 
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.weight(0.5f))
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.padding(bottom = 8.dp)
