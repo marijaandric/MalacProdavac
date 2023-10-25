@@ -25,5 +25,19 @@ namespace back.BLL.Services
             if (!await _repository.SaveChosenCategories(categoriesDto.UserId, categoriesDto.CategoryIds)) throw new ArgumentException("Database error!");
             return true;
         }
+
+        public async Task<List<Category>> GetChosenCategories(int id)
+        {
+            List<Category> categories = await _repository.GetChosenCategories(id);
+            if (categories.Count == 0) throw new ArgumentException("No categories found!");
+            return categories;
+        }
+
+        public async Task<List<Product>> GetHomeProducts(int id)
+        {
+            List<Product> products = await _repository.GetHomeProducts(id);
+            if (products.Count == 0) throw new ArgumentException("No categories found!");
+            return products;
+        }
     }
 }

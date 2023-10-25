@@ -39,5 +39,31 @@ namespace back.PL.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpGet("GetChosenCategories")]
+        public async Task<IActionResult> GetChosenCategories(int id)
+        {
+            try
+            {
+                return Ok(await _service.GetChosenCategories(id));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("GetHomeProducts")]
+        public async Task<IActionResult> GetHomeProducts(int id)
+        {
+            try
+            {
+                return Ok(await _service.GetHomeProducts(id));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }
