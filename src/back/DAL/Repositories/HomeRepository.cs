@@ -4,10 +4,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace back.DAL.Repositories
 {
-    public class ProductRepository : IProductRepository
+    public class HomeRepository : IHomeRepository
     {
         Context _context;
-        public ProductRepository(Context context)
+        public HomeRepository(Context context)
         {
             _context = context;
         }
@@ -43,9 +43,25 @@ namespace back.DAL.Repositories
         public async Task<List<Product>> GetHomeProducts(int id)
         {
             List<Category> categories = await GetChosenCategories(id);
-            if (categories.Count > 6) return categories.SelectMany(category => _context.Products.Where(x => x.Category == category).Take(2)).ToList();
-            return categories.SelectMany(category => _context.Products.Where(x => x.Category == category).Take(2)).ToList();
+            int take;
+
+            if (categories.Count > 6) take = 1;
+            else take = 2;
+
+            return categories.SelectMany(category => _context.Products.Where(x => x.Category == category).Take(take)).ToList();
         }
 
+        public async Task<List<Shop>> GetHomeShops(int id)
+        {
+            List<int> categories = (await GetChosenCategories(id)).Select(x => x.Id).ToList();
+            int take;
+
+            if (categories.Count > 6) take = 1;
+            else take = 2;
+
+            List<int> shopIds = categories.SelectMany(category => _context.ShopCategories.Where(x => x.CategoryId == category).Take(take)).Select(x => x.ShopId).Distinct().ToList();
+            return _context.Shop.Where(x => shopIds.Contains(x.Id)).ToList();
+
+        }
     }
 }

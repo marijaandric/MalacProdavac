@@ -4,10 +4,10 @@ using back.Models;
 
 namespace back.BLL.Services
 {
-    public class ProductService : IProductService
+    public class HomeService : IHomeService
     {
-        IProductRepository _repository;
-        public ProductService(IProductRepository repository)
+        IHomeRepository _repository;
+        public HomeService(IHomeRepository repository)
         {
             _repository = repository;
         }
@@ -36,8 +36,15 @@ namespace back.BLL.Services
         public async Task<List<Product>> GetHomeProducts(int id)
         {
             List<Product> products = await _repository.GetHomeProducts(id);
-            if (products.Count == 0) throw new ArgumentException("No categories found!");
+            if (products.Count == 0) throw new ArgumentException("No products found!");
             return products;
+        }
+
+        public async Task<List<Shop>> GetHomeShops(int id)
+        {
+            List<Shop> shops = await _repository.GetHomeShops(id);
+            if (shops.Count == 0) throw new ArgumentException("No shops found!");
+            return shops;
         }
     }
 }

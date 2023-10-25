@@ -6,10 +6,10 @@ namespace back.PL.Controllers
 {
     [Route("back/[controller]")]
     [ApiController]
-    public class ProductController : Controller
+    public class HomeController : Controller
     {
-        IProductService _service;
-        public ProductController(IProductService productService)
+        IHomeService _service;
+        public HomeController(IHomeService productService)
         {
             _service = productService;
         }
@@ -59,6 +59,19 @@ namespace back.PL.Controllers
             try
             {
                 return Ok(await _service.GetHomeProducts(id));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("GetHomeShops")]
+        public async Task<IActionResult> GetHomeShops(int id)
+        {
+            try
+            {
+                return Ok(await _service.GetHomeShops(id));
             }
             catch (Exception ex)
             {
