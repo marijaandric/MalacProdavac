@@ -38,14 +38,6 @@ import kotlinx.coroutines.delay
 
 class SplashScreen {
     @Composable
-    fun Greeting(name: String, modifier: Modifier = Modifier) {
-        Text(
-            text = "Hello $name!",
-            modifier = modifier
-        )
-    }
-
-    @Composable
     fun Navigation() {
         val navController = rememberNavController()
         NavHost(navController = navController, startDestination = "splash_screen")
@@ -66,7 +58,12 @@ class SplashScreen {
             composable("intro3")
             {
                 val desc = "Explore a wide range of local products and services. Support your community."
-                Intro("Customers",desc,"image_removebg_preview__3_",2,navController = navController)
+                Intro("Customers",desc,"intro3",2,navController = navController)
+            }
+            composable("intro4")
+            {
+                val desc = "Efficiently manage your delivery schedule. Connect with local businesses and earn more."
+                Intro("Delivery people",desc,"intro4",3,navController = navController)
             }
         }
     }
@@ -171,27 +168,43 @@ class SplashScreen {
             )
 
             Spacer(modifier = Modifier.weight(0.8f))
-            Row()
+            if(currentPage != 3)
             {
+                Row()
+                {
+                    val NextButton = UIElements()
+                    NextButton.MediumBlueButton(
+                        text = "Skip",
+                        onClick = {
+                            //navigacija ka login strani
+                        },0.45f
+                    )
+                    val Skipbutton = UIElements()
+                    Skipbutton.MediumBlueButton(
+                        text = "Next",
+                        onClick = {
+                            if(currentPage == 0)
+                            {
+                                navController.navigate("intro2")
+                            }
+                            if(currentPage == 1)
+                            {
+                                navController.navigate("intro3")
+                            }
+                            if(currentPage == 2)
+                            {
+                                navController.navigate("intro4")
+                            }
+                        },0.8f
+                    )
+                }
+            }
+            else{
                 val NextButton = UIElements()
                 NextButton.MediumBlueButton(
-                    text = "Skip",
+                    text = "Get started",
                     onClick = {
-
-                    },0.45f
-                )
-                val Skipbutton = UIElements()
-                Skipbutton.MediumBlueButton(
-                    text = "Next",
-                    onClick = {
-                        if(currentPage == 0)
-                        {
-                            navController.navigate("intro2")
-                        }
-                        if(currentPage == 1)
-                        {
-                            navController.navigate("intro3")
-                        }
+                        //navigacija ka login strani
                     },0.8f
                 )
             }

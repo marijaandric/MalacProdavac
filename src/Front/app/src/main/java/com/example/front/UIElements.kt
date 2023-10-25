@@ -1,6 +1,7 @@
 package com.example.front
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -21,8 +22,8 @@ class UIElements {
             onClick = onClick,
             modifier = Modifier
                 .fillMaxWidth(width)
-                .padding(8.dp),
-                //.background(Color.Blue)
+                .padding(8.dp)
+                .height(45.dp),
             colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
             shape = RoundedCornerShape(20)
         ) {
