@@ -75,4 +75,7 @@ dependencies {
     implementation("androidx.navigation:navigation-dynamic-features-fragment:$nav_version")
     androidTestImplementation("androidx.navigation:navigation-testing:$nav_version")
     implementation("androidx.navigation:navigation-compose:$nav_version")
+
+    // pager
+    implementation("androidx.compose.foundation:foundation:1.4.0")
 }

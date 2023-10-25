@@ -3,6 +3,7 @@ package com.example.front
 import android.view.animation.OvershootInterpolator
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -13,9 +14,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -37,9 +42,11 @@ import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.delay
 
 class SplashScreen {
+    @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
     @Composable
     fun Navigation() {
         val navController = rememberNavController()
+
         NavHost(navController = navController, startDestination = "splash_screen")
         {
             composable("splash_screen")
@@ -49,21 +56,71 @@ class SplashScreen {
             composable("intro1")
             {
                 Intro("Welcome to MalacProdavac","","intro1",0,navController = navController)
+                val desc = "Showcase your products and engage with local customers! Increase your visibility and sales."
+                val desc2 = "Showcase your products and engage with local customers! Increase your visibility and sales."
+                val desc3 = "Efficiently manage your delivery schedule. Connect with local businesses and earn more."
+                Scaffold() {
+                    HorizontalPager(pageCount = 4) { page ->
+                        val pageContent = when (page) {
+                            0 -> Intro("Welcome to MalacProdavac","","intro1",0,navController = navController)
+                            1 -> Intro("Business owners", desc,"intro2", 1, navController = navController)
+                            2 -> Intro("Customers",desc2,"intro3",2,navController = navController)
+                            3 -> Intro("Delivery people",desc3,"intro4",3,navController = navController)
+                            else -> error("Invalid page: $page")
+                        }
+                        pageContent
+                    }
+                }
             }
             composable("intro2")
             {
                 val desc = "Showcase your products and engage with local customers! Increase your visibility and sales."
                 Intro("Business owners",desc,"intro2",1,navController = navController)
+                val desc2 = "Showcase your products and engage with local customers! Increase your visibility and sales."
+                val desc3 = "Efficiently manage your delivery schedule. Connect with local businesses and earn more."
+                val pagerState = rememberPagerState(
+                    initialPage = 1
+                )
+                Scaffold() {
+                    HorizontalPager(pageCount = 4, state = pagerState) { page->
+                        val pageContent = when (page) {
+                            0 -> Intro("Welcome to MalacProdavac","","intro1",0,navController = navController)
+                            1 -> Intro("Business owners", desc,"intro2", 1, navController = navController)
+                            2 -> Intro("Customers",desc2,"intro3",2,navController = navController)
+                            3 -> Intro("Delivery people",desc3,"intro4",3,navController = navController)
+                            else -> error("Invalid page: $page")
+                        }
+                        pageContent
+                    }
+                }
             }
             composable("intro3")
             {
                 val desc = "Explore a wide range of local products and services. Support your community."
                 Intro("Customers",desc,"intro3",2,navController = navController)
+                val desc2 = "Showcase your products and engage with local customers! Increase your visibility and sales."
+                val desc3 = "Efficiently manage your delivery schedule. Connect with local businesses and earn more."
+                val pagerState = rememberPagerState(
+                    initialPage = 2
+                )
+                Scaffold() {
+                    HorizontalPager(pageCount = 4, state = pagerState) { page->
+                        val pageContent = when (page) {
+                            0 -> Intro("Welcome to MalacProdavac","","intro1",0,navController = navController)
+                            1 -> Intro("Business owners", desc,"intro2", 1, navController = navController)
+                            2 -> Intro("Customers",desc2,"intro3",2,navController = navController)
+                            3 -> Intro("Delivery people",desc3,"intro4",3,navController = navController)
+                            else -> error("Invalid page: $page")
+                        }
+                        pageContent
+                    }
+                }
             }
             composable("intro4")
             {
                 val desc = "Efficiently manage your delivery schedule. Connect with local businesses and earn more."
                 Intro("Delivery people",desc,"intro4",3,navController = navController)
+                // Dodati HorizontalPager za login
             }
         }
     }
@@ -128,7 +185,8 @@ class SplashScreen {
             Animatable(1.5f)
         }
         Column (
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
                 .padding(6.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
@@ -162,7 +220,8 @@ class SplashScreen {
             Image(
                 painter = painterResource(id = imageResId),
                 contentDescription = "Intro1",
-                modifier = Modifier.scale(scale.value)
+                modifier = Modifier
+                    .scale(scale.value)
                     .padding(top = 8.dp, bottom = 10.dp)
                     //.size(200.dp, 200.dp)
             )
@@ -200,6 +259,7 @@ class SplashScreen {
                 }
             }
             else{
+                Spacer(modifier = Modifier.weight(0.3f))
                 val NextButton = UIElements()
                 NextButton.MediumBlueButton(
                     text = "Get started",
