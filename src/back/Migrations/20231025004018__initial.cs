@@ -41,18 +41,6 @@ namespace back.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ChosenCategories",
-                columns: table => new
-                {
-                    UserId = table.Column<int>(type: "INTEGER", nullable: false),
-                    CategoryId = table.Column<int>(type: "INTEGER", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ChosenCategories", x => new { x.UserId, x.CategoryId });
-                });
-
-            migrationBuilder.CreateTable(
                 name: "DeliveryMethods",
                 columns: table => new
                 {
@@ -63,30 +51,6 @@ namespace back.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_DeliveryMethods", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "LikedProducts",
-                columns: table => new
-                {
-                    ProductId = table.Column<int>(type: "INTEGER", nullable: false),
-                    UserId = table.Column<int>(type: "INTEGER", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_LikedProducts", x => new { x.ProductId, x.UserId });
-                });
-
-            migrationBuilder.CreateTable(
-                name: "LikedShops",
-                columns: table => new
-                {
-                    ShopId = table.Column<int>(type: "INTEGER", nullable: false),
-                    UserId = table.Column<int>(type: "INTEGER", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_LikedShops", x => new { x.ShopId, x.UserId });
                 });
 
             migrationBuilder.CreateTable(
@@ -116,20 +80,6 @@ namespace back.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "OrderItems",
-                columns: table => new
-                {
-                    OrderId = table.Column<int>(type: "INTEGER", nullable: false),
-                    ProductId = table.Column<int>(type: "INTEGER", nullable: false),
-                    Quantity = table.Column<int>(type: "INTEGER", nullable: false),
-                    Price = table.Column<float>(type: "REAL", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_OrderItems", x => new { x.OrderId, x.ProductId });
-                });
-
-            migrationBuilder.CreateTable(
                 name: "OrderStatuses",
                 columns: table => new
                 {
@@ -156,37 +106,6 @@ namespace back.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ProductReviews",
-                columns: table => new
-                {
-                    ReviewerId = table.Column<int>(type: "INTEGER", nullable: false),
-                    ProductId = table.Column<int>(type: "INTEGER", nullable: false),
-                    Rating = table.Column<float>(type: "REAL", nullable: false),
-                    Comment = table.Column<string>(type: "TEXT", nullable: true),
-                    PostedOn = table.Column<DateTime>(type: "TEXT", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ProductReviews", x => new { x.ReviewerId, x.ProductId });
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Ratings",
-                columns: table => new
-                {
-                    RaterId = table.Column<int>(type: "INTEGER", nullable: false),
-                    RatedId = table.Column<int>(type: "INTEGER", nullable: false),
-                    Communication = table.Column<float>(type: "REAL", nullable: false),
-                    Reliability = table.Column<float>(type: "REAL", nullable: false),
-                    OverallExperience = table.Column<float>(type: "REAL", nullable: false),
-                    Average = table.Column<float>(type: "REAL", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Ratings", x => new { x.RaterId, x.RatedId });
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Roles",
                 columns: table => new
                 {
@@ -197,59 +116,6 @@ namespace back.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Roles", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ShopCategories",
-                columns: table => new
-                {
-                    ShopId = table.Column<int>(type: "INTEGER", nullable: false),
-                    CategoryId = table.Column<int>(type: "INTEGER", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ShopCategories", x => new { x.ShopId, x.CategoryId });
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ShopReviews",
-                columns: table => new
-                {
-                    ReviewerId = table.Column<int>(type: "INTEGER", nullable: false),
-                    ShopId = table.Column<int>(type: "INTEGER", nullable: false),
-                    Rating = table.Column<float>(type: "REAL", nullable: false),
-                    Comment = table.Column<string>(type: "TEXT", nullable: true),
-                    PostedOn = table.Column<DateTime>(type: "TEXT", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ShopReviews", x => new { x.ReviewerId, x.ShopId });
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ShopSubcategories",
-                columns: table => new
-                {
-                    ShopId = table.Column<int>(type: "INTEGER", nullable: false),
-                    SubcategoryId = table.Column<int>(type: "INTEGER", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ShopSubcategories", x => new { x.ShopId, x.SubcategoryId });
-                });
-
-            migrationBuilder.CreateTable(
-                name: "WorkingHours",
-                columns: table => new
-                {
-                    ShopId = table.Column<int>(type: "INTEGER", nullable: false),
-                    Day = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    OpeningHours = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    ClosingHours = table.Column<DateTime>(type: "TEXT", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_WorkingHours", x => new { x.ShopId, x.Day });
                 });
 
             migrationBuilder.CreateTable(
@@ -300,6 +166,30 @@ namespace back.Migrations
                         name: "FK_Users_Roles_RoleId",
                         column: x => x.RoleId,
                         principalTable: "Roles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ChosenCategories",
+                columns: table => new
+                {
+                    UserId = table.Column<int>(type: "INTEGER", nullable: false),
+                    CategoryId = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ChosenCategories", x => new { x.UserId, x.CategoryId });
+                    table.ForeignKey(
+                        name: "FK_ChosenCategories_Categories_CategoryId",
+                        column: x => x.CategoryId,
+                        principalTable: "Categories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ChosenCategories_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -366,6 +256,34 @@ namespace back.Migrations
                     table.ForeignKey(
                         name: "FK_Orders_Users_UserId",
                         column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Ratings",
+                columns: table => new
+                {
+                    RaterId = table.Column<int>(type: "INTEGER", nullable: false),
+                    RatedId = table.Column<int>(type: "INTEGER", nullable: false),
+                    Communication = table.Column<float>(type: "REAL", nullable: false),
+                    Reliability = table.Column<float>(type: "REAL", nullable: false),
+                    OverallExperience = table.Column<float>(type: "REAL", nullable: false),
+                    Average = table.Column<float>(type: "REAL", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Ratings", x => new { x.RaterId, x.RatedId });
+                    table.ForeignKey(
+                        name: "FK_Ratings_Users_RatedId",
+                        column: x => x.RatedId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Ratings_Users_RaterId",
+                        column: x => x.RaterId,
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -458,6 +376,30 @@ namespace back.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "LikedShops",
+                columns: table => new
+                {
+                    ShopId = table.Column<int>(type: "INTEGER", nullable: false),
+                    UserId = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LikedShops", x => new { x.ShopId, x.UserId });
+                    table.ForeignKey(
+                        name: "FK_LikedShops_Shop_ShopId",
+                        column: x => x.ShopId,
+                        principalTable: "Shop",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_LikedShops_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ProductDisplays",
                 columns: table => new
                 {
@@ -529,6 +471,101 @@ namespace back.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ShopCategories",
+                columns: table => new
+                {
+                    ShopId = table.Column<int>(type: "INTEGER", nullable: false),
+                    CategoryId = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ShopCategories", x => new { x.ShopId, x.CategoryId });
+                    table.ForeignKey(
+                        name: "FK_ShopCategories_Categories_CategoryId",
+                        column: x => x.CategoryId,
+                        principalTable: "Categories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ShopCategories_Shop_ShopId",
+                        column: x => x.ShopId,
+                        principalTable: "Shop",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ShopReviews",
+                columns: table => new
+                {
+                    ReviewerId = table.Column<int>(type: "INTEGER", nullable: false),
+                    ShopId = table.Column<int>(type: "INTEGER", nullable: false),
+                    Rating = table.Column<float>(type: "REAL", nullable: false),
+                    Comment = table.Column<string>(type: "TEXT", nullable: true),
+                    PostedOn = table.Column<DateTime>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ShopReviews", x => new { x.ReviewerId, x.ShopId });
+                    table.ForeignKey(
+                        name: "FK_ShopReviews_Shop_ShopId",
+                        column: x => x.ShopId,
+                        principalTable: "Shop",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ShopReviews_Users_ReviewerId",
+                        column: x => x.ReviewerId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ShopSubcategories",
+                columns: table => new
+                {
+                    ShopId = table.Column<int>(type: "INTEGER", nullable: false),
+                    SubcategoryId = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ShopSubcategories", x => new { x.ShopId, x.SubcategoryId });
+                    table.ForeignKey(
+                        name: "FK_ShopSubcategories_Shop_ShopId",
+                        column: x => x.ShopId,
+                        principalTable: "Shop",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ShopSubcategories_Subcategories_SubcategoryId",
+                        column: x => x.SubcategoryId,
+                        principalTable: "Subcategories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "WorkingHours",
+                columns: table => new
+                {
+                    ShopId = table.Column<int>(type: "INTEGER", nullable: false),
+                    Day = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    OpeningHours = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ClosingHours = table.Column<DateTime>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WorkingHours", x => new { x.ShopId, x.Day });
+                    table.ForeignKey(
+                        name: "FK_WorkingHours_Shop_ShopId",
+                        column: x => x.ShopId,
+                        principalTable: "Shop",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Carts",
                 columns: table => new
                 {
@@ -551,6 +588,56 @@ namespace back.Migrations
                         name: "FK_Carts_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "LikedProducts",
+                columns: table => new
+                {
+                    ProductId = table.Column<int>(type: "INTEGER", nullable: false),
+                    UserId = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LikedProducts", x => new { x.ProductId, x.UserId });
+                    table.ForeignKey(
+                        name: "FK_LikedProducts_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_LikedProducts_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "OrderItems",
+                columns: table => new
+                {
+                    OrderId = table.Column<int>(type: "INTEGER", nullable: false),
+                    ProductId = table.Column<int>(type: "INTEGER", nullable: false),
+                    Quantity = table.Column<int>(type: "INTEGER", nullable: false),
+                    Price = table.Column<float>(type: "REAL", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OrderItems", x => new { x.OrderId, x.ProductId });
+                    table.ForeignKey(
+                        name: "FK_OrderItems_Orders_OrderId",
+                        column: x => x.OrderId,
+                        principalTable: "Orders",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_OrderItems_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -598,6 +685,33 @@ namespace back.Migrations
                     table.ForeignKey(
                         name: "FK_ProductQuestions_Users_PosterId",
                         column: x => x.PosterId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ProductReviews",
+                columns: table => new
+                {
+                    ReviewerId = table.Column<int>(type: "INTEGER", nullable: false),
+                    ProductId = table.Column<int>(type: "INTEGER", nullable: false),
+                    Rating = table.Column<float>(type: "REAL", nullable: false),
+                    Comment = table.Column<string>(type: "TEXT", nullable: true),
+                    PostedOn = table.Column<DateTime>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProductReviews", x => new { x.ReviewerId, x.ProductId });
+                    table.ForeignKey(
+                        name: "FK_ProductReviews_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ProductReviews_Users_ReviewerId",
+                        column: x => x.ReviewerId,
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -652,6 +766,11 @@ namespace back.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ChosenCategories_CategoryId",
+                table: "ChosenCategories",
+                column: "CategoryId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_DeliveryRequests_OrderId",
                 table: "DeliveryRequests",
                 column: "OrderId");
@@ -672,9 +791,24 @@ namespace back.Migrations
                 column: "DeliveryPersonId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_LikedProducts_UserId",
+                table: "LikedProducts",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LikedShops_UserId",
+                table: "LikedShops",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Notifications_UserId",
                 table: "Notifications",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OrderItems_ProductId",
+                table: "OrderItems",
+                column: "ProductId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Orders_UserId",
@@ -712,6 +846,11 @@ namespace back.Migrations
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ProductReviews_ProductId",
+                table: "ProductReviews",
+                column: "ProductId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Products_CategoryId",
                 table: "Products",
                 column: "CategoryId");
@@ -732,9 +871,29 @@ namespace back.Migrations
                 column: "SubcategoryId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Ratings_RatedId",
+                table: "Ratings",
+                column: "RatedId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Shop_OwnerId",
                 table: "Shop",
                 column: "OwnerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ShopCategories_CategoryId",
+                table: "ShopCategories",
+                column: "CategoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ShopReviews_ShopId",
+                table: "ShopReviews",
+                column: "ShopId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ShopSubcategories_SubcategoryId",
+                table: "ShopSubcategories",
+                column: "SubcategoryId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Subcategories_CategoryId",

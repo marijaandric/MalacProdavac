@@ -11,7 +11,7 @@ using back.DAL.Contexts;
 namespace back.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20231024112700__initial")]
+    [Migration("20231025004018__initial")]
     partial class _initial
     {
         /// <inheritdoc />
@@ -115,6 +115,8 @@ namespace back.Migrations
 
                     b.HasKey("UserId", "CategoryId");
 
+                    b.HasIndex("CategoryId");
+
                     b.ToTable("ChosenCategories");
                 });
 
@@ -197,6 +199,8 @@ namespace back.Migrations
 
                     b.HasKey("ProductId", "UserId");
 
+                    b.HasIndex("UserId");
+
                     b.ToTable("LikedProducts");
                 });
 
@@ -209,6 +213,8 @@ namespace back.Migrations
                         .HasColumnType("INTEGER");
 
                     b.HasKey("ShopId", "UserId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("LikedShops");
                 });
@@ -312,6 +318,8 @@ namespace back.Migrations
                         .HasColumnType("INTEGER");
 
                     b.HasKey("OrderId", "ProductId");
+
+                    b.HasIndex("ProductId");
 
                     b.ToTable("OrderItems");
                 });
@@ -519,6 +527,8 @@ namespace back.Migrations
 
                     b.HasKey("ReviewerId", "ProductId");
 
+                    b.HasIndex("ProductId");
+
                     b.ToTable("ProductReviews");
                 });
 
@@ -543,6 +553,8 @@ namespace back.Migrations
                         .HasColumnType("REAL");
 
                     b.HasKey("RaterId", "RatedId");
+
+                    b.HasIndex("RatedId");
 
                     b.ToTable("Ratings");
                 });
@@ -602,6 +614,8 @@ namespace back.Migrations
 
                     b.HasKey("ShopId", "CategoryId");
 
+                    b.HasIndex("CategoryId");
+
                     b.ToTable("ShopCategories");
                 });
 
@@ -624,6 +638,8 @@ namespace back.Migrations
 
                     b.HasKey("ReviewerId", "ShopId");
 
+                    b.HasIndex("ShopId");
+
                     b.ToTable("ShopReviews");
                 });
 
@@ -636,6 +652,8 @@ namespace back.Migrations
                         .HasColumnType("INTEGER");
 
                     b.HasKey("ShopId", "SubcategoryId");
+
+                    b.HasIndex("SubcategoryId");
 
                     b.ToTable("ShopSubcategories");
                 });
@@ -771,6 +789,25 @@ namespace back.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("back.Models.ChosenCategory", b =>
+                {
+                    b.HasOne("back.Models.Category", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("back.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("back.Models.DeliveryRequest", b =>
                 {
                     b.HasOne("back.Models.Order", "Order")
@@ -809,6 +846,44 @@ namespace back.Migrations
                     b.Navigation("DeliveryPerson");
                 });
 
+            modelBuilder.Entity("back.Models.LikedProducts", b =>
+                {
+                    b.HasOne("back.Models.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("back.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("back.Models.LikedShops", b =>
+                {
+                    b.HasOne("back.Models.Shop", "Shop")
+                        .WithMany()
+                        .HasForeignKey("ShopId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("back.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Shop");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("back.Models.Notification", b =>
                 {
                     b.HasOne("back.Models.User", "User")
@@ -829,6 +904,25 @@ namespace back.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("back.Models.OrderItem", b =>
+                {
+                    b.HasOne("back.Models.Order", "Order")
+                        .WithMany()
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("back.Models.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+
+                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("back.Models.Product", b =>
@@ -926,6 +1020,44 @@ namespace back.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("back.Models.ProductReview", b =>
+                {
+                    b.HasOne("back.Models.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("back.Models.User", "Reviewer")
+                        .WithMany()
+                        .HasForeignKey("ReviewerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+
+                    b.Navigation("Reviewer");
+                });
+
+            modelBuilder.Entity("back.Models.Rating", b =>
+                {
+                    b.HasOne("back.Models.User", "Rated")
+                        .WithMany()
+                        .HasForeignKey("RatedId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("back.Models.User", "Rater")
+                        .WithMany()
+                        .HasForeignKey("RaterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Rated");
+
+                    b.Navigation("Rater");
+                });
+
             modelBuilder.Entity("back.Models.Shop", b =>
                 {
                     b.HasOne("back.Models.User", "Owner")
@@ -935,6 +1067,63 @@ namespace back.Migrations
                         .IsRequired();
 
                     b.Navigation("Owner");
+                });
+
+            modelBuilder.Entity("back.Models.ShopCategory", b =>
+                {
+                    b.HasOne("back.Models.Category", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("back.Models.Shop", "Shop")
+                        .WithMany()
+                        .HasForeignKey("ShopId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+
+                    b.Navigation("Shop");
+                });
+
+            modelBuilder.Entity("back.Models.ShopReview", b =>
+                {
+                    b.HasOne("back.Models.User", "Reviewer")
+                        .WithMany()
+                        .HasForeignKey("ReviewerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("back.Models.Shop", "Shop")
+                        .WithMany()
+                        .HasForeignKey("ShopId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Reviewer");
+
+                    b.Navigation("Shop");
+                });
+
+            modelBuilder.Entity("back.Models.ShopSubcategory", b =>
+                {
+                    b.HasOne("back.Models.Shop", "Shop")
+                        .WithMany()
+                        .HasForeignKey("ShopId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("back.Models.Subcategory", "Subcategory")
+                        .WithMany()
+                        .HasForeignKey("SubcategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Shop");
+
+                    b.Navigation("Subcategory");
                 });
 
             modelBuilder.Entity("back.Models.Subcategory", b =>
@@ -957,6 +1146,17 @@ namespace back.Migrations
                         .IsRequired();
 
                     b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("back.Models.WorkingHours", b =>
+                {
+                    b.HasOne("back.Models.Shop", "Shop")
+                        .WithMany()
+                        .HasForeignKey("ShopId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Shop");
                 });
 #pragma warning restore 612, 618
         }
