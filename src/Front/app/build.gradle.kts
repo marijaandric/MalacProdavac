@@ -63,4 +63,22 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
+
+    // -- DODATI --
+    val nav_version = "2.6.0"
+
+    // navigation
+    implementation("androidx.navigation:navigation-fragment:$nav_version")
+    implementation("androidx.navigation:navigation-ui:$nav_version")
+    implementation("androidx.navigation:navigation-fragment-ktx:$nav_version")
+    implementation("androidx.navigation:navigation-ui-ktx:$nav_version")
+    implementation("androidx.navigation:navigation-dynamic-features-fragment:$nav_version")
+    androidTestImplementation("androidx.navigation:navigation-testing:$nav_version")
+    implementation("androidx.navigation:navigation-compose:$nav_version")
+
+    // pager
+    implementation("androidx.compose.foundation:foundation:1.4.0")
+
+    //okhttp3
+    implementation("com.squareup.okhttp3:okhttp:4.11.0")
 }
