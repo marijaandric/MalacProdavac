@@ -78,4 +78,7 @@ dependencies {
 
     // pager
     implementation("androidx.compose.foundation:foundation:1.4.0")
+
+    //okhttp3
+    implementation("com.squareup.okhttp3:okhttp:4.11.0")
 }
