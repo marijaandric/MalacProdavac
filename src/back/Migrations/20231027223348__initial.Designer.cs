@@ -11,7 +11,7 @@ using back.DAL.Contexts;
 namespace back.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20231025004018__initial")]
+    [Migration("20231027223348__initial")]
     partial class _initial
     {
         /// <inheritdoc />
@@ -385,9 +385,6 @@ namespace back.Migrations
                     b.Property<int>("ShopId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("Stock")
-                        .HasColumnType("INTEGER");
-
                     b.Property<int>("SubcategoryId")
                         .HasColumnType("INTEGER");
 
@@ -571,6 +568,23 @@ namespace back.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Roles");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Customer"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Seller"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Delivery Person"
+                        });
                 });
 
             modelBuilder.Entity("back.Models.Shop", b =>

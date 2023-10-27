@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace back.Migrations
 {
     /// <inheritdoc />
@@ -433,7 +435,6 @@ namespace back.Migrations
                     Name = table.Column<string>(type: "TEXT", nullable: true),
                     Description = table.Column<string>(type: "TEXT", nullable: true),
                     Price = table.Column<float>(type: "REAL", nullable: false),
-                    Stock = table.Column<int>(type: "INTEGER", nullable: false),
                     MetricId = table.Column<int>(type: "INTEGER", nullable: false),
                     CategoryId = table.Column<int>(type: "INTEGER", nullable: false),
                     SubcategoryId = table.Column<int>(type: "INTEGER", nullable: false),
@@ -743,6 +744,16 @@ namespace back.Migrations
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.InsertData(
+                table: "Roles",
+                columns: new[] { "Id", "Name" },
+                values: new object[,]
+                {
+                    { 1, "Customer" },
+                    { 2, "Seller" },
+                    { 3, "Delivery Person" }
                 });
 
             migrationBuilder.CreateIndex(

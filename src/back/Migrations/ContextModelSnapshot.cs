@@ -382,9 +382,6 @@ namespace back.Migrations
                     b.Property<int>("ShopId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("Stock")
-                        .HasColumnType("INTEGER");
-
                     b.Property<int>("SubcategoryId")
                         .HasColumnType("INTEGER");
 
@@ -568,6 +565,23 @@ namespace back.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Roles");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Customer"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Seller"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Delivery Person"
+                        });
                 });
 
             modelBuilder.Entity("back.Models.Shop", b =>
