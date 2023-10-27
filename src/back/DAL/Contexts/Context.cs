@@ -50,6 +50,6 @@ public class Context : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        
+        modelBuilder.Entity<Role>().HasData(new Role { Id = 1, Name = "Customer"}, new Role { Id = 2, Name = "Seller" }, new Role { Id = 3, Name = "Delivery Person" });
     }
 }

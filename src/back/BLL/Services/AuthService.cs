@@ -1,6 +1,8 @@
 ﻿using back.BLL.Dtos;
 using back.DAL.Repositories;
 using back.Models;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -49,6 +51,38 @@ namespace back.BLL.Services
 
             return "";
         }
+
+        public bool CheckAddress(string address)
+        {
+            string pattern = @"^[^,]+, [^,]+, [^,]+$";
+
+            Regex regex = new Regex(pattern);
+
+            if (regex.IsMatch(address)) return true;
+
+            return false;
+        }
+
+        public async Task<(double, double)> GetCoordinates(string address)
+        {
+            var bingMapsApiKey = "Aj_nYJhXf_C_QoPf7gOQch6KOhTJo2iX2VIyvOlwb7hDpGCtS8rOhyQYp5kAbR54";
+
+            var urlBuilder = new UriBuilder("http://dev.virtualearth.net/REST/v1/Locations");
+            urlBuilder.Query = $"q={Uri.EscapeDataString(address)}&key={bingMapsApiKey}";
+            var url = urlBuilder.ToString();
+
+            HttpClient _httpClient = new HttpClient();
+
+            var response = await _httpClient.GetAsync(url);
+            var responseString = await response.Content.ReadAsStringAsync();
+
+            var data = JObject.Parse(responseString);
+            var latitude = data["resourceSets"][0]["resources"][0]["point"]["coordinates"][0].Value<double>();
+            var longitude = data["resourceSets"][0]["resources"][0]["point"]["coordinates"][1].Value<double>();
+
+
+            return (latitude, longitude);
+        }
         #endregion
 
         public async Task<int> Register(UserDto userDto)
@@ -59,6 +93,7 @@ namespace back.BLL.Services
 
             if (!checkEmail.Equals("")) throw new ArgumentException(checkEmail);
             if (!checkPassword.Equals("")) throw new ArgumentException(checkPassword);
+            if (!CheckAddress(userDto.Address)) throw new ArgumentException("Invalid form. \nRequired form: Street, City, Country");
             #endregion
 
             User user = new User();
@@ -96,6 +131,10 @@ namespace back.BLL.Services
                     user.Image = Convert.ToBase64String(bytes);
                 }
             }
+
+            var coordinates = await GetCoordinates(userDto.Address);
+            user.Latitude = (float)coordinates.Item1;
+            user.Longitude = (float)coordinates.Item2;
 
             if (await _authRepository.InsertUser(user)) return user.Id;
             return -1;
