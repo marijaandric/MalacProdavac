@@ -31,6 +31,8 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -205,7 +207,8 @@ class SplashScreen {
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(top = 60.dp, start = 10.dp, end = 10.dp, bottom = 15.dp),
-                lineHeight = 35.sp
+                lineHeight = 35.sp,
+                fontFamily = FontFamily(Font(R.font.lexend))
             )
 
             Text(
@@ -214,7 +217,8 @@ class SplashScreen {
                 fontWeight = FontWeight.Normal,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(top = 2.dp, start = 10.dp, end = 10.dp),
-                lineHeight = 20.sp
+                lineHeight = 20.sp,
+                fontFamily = FontFamily(Font(R.font.lexend))
             )
             Spacer(modifier = Modifier.weight(4.5f))
 

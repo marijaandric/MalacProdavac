@@ -19,14 +19,18 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             FrontTheme {
-                LoginScreen(viewModel = loginViewModel)
+                //LoginScreen(viewModel = loginViewModel)
             }
         }
     }
 }
 @Composable
-@Preview(showBackground = true)
 fun SplashScreenAndIntro() {
     SplashScreen().Navigation()
 }
 
+    @Preview
+    @Composable
+    fun Nesto() {
+        RegistrationCategories()
+    }
