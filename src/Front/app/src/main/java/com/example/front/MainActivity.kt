@@ -15,10 +15,12 @@ import com.example.front.ui.theme.FrontTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        val loginViewModel by viewModels<LoginViewModel>()
         super.onCreate(savedInstanceState)
         setContent {
             FrontTheme {
-
+                //LoginScreen(viewModel = loginViewModel)
+                RegistrationCategories()
             }
         }
     }
@@ -26,10 +28,4 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun SplashScreenAndIntro() {
     SplashScreen().Navigation()
-}
-
-@Preview
-@Composable
-fun Nesto() {
-    RegistrationCategories()
 }
