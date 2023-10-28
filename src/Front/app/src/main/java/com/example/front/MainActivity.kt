@@ -20,6 +20,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             FrontTheme {
                 //LoginScreen(viewModel = loginViewModel)
+                RegistrationCategories()
             }
         }
     }
@@ -28,9 +29,3 @@ class MainActivity : ComponentActivity() {
 fun SplashScreenAndIntro() {
     SplashScreen().Navigation()
 }
-
-    @Preview
-    @Composable
-    fun Nesto() {
-        RegistrationCategories()
-    }

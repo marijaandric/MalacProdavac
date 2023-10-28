@@ -242,15 +242,14 @@ class SplashScreen {
             {
                 Row()
                 {
-                    val NextButton = UIElements()
-                    NextButton.MediumBlueButton(
+                    MediumBlueButton(
                         text = "Skip",
                         onClick = {
                             //navigacija ka login strani
                         },0.45f
                     )
-                    val Skipbutton = UIElements()
-                    Skipbutton.MediumBlueButton(
+
+                    MediumBlueButton(
                         text = "Next",
                         onClick = {
                             if(currentPage == 0)
@@ -271,8 +270,7 @@ class SplashScreen {
             }
             else{
                 Spacer(modifier = Modifier.weight(0.3f))
-                val NextButton = UIElements()
-                NextButton.MediumBlueButton(
+                MediumBlueButton(
                     text = "Get started",
                     onClick = {
                         //navigacija ka login strani
