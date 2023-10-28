@@ -1,8 +1,10 @@
 ﻿using back.BLL.Dtos;
 using back.DAL.Repositories;
 using back.Models;
-using Newtonsoft.Json;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Linq;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -12,9 +14,11 @@ namespace back.BLL.Services
     public class AuthService : IAuthService
     {
         IAuthRepository _authRepository;
-        public AuthService(IAuthRepository authRepository)
+        private readonly IConfiguration _config;
+        public AuthService(IAuthRepository authRepository, IConfiguration config)
         {
             _authRepository = authRepository;
+            _config = config;
         }
 
         public string defaultImagePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..\\..\\..\\images\\default.png");
@@ -82,6 +86,39 @@ namespace back.BLL.Services
 
 
             return (latitude, longitude);
+        }
+
+        public async Task<string> CreateToken(User user)
+        {
+            List<Claim> claims = new List<Claim>
+            {
+                new Claim("name", user.Username),
+                new Claim("role", user.RoleId.ToString()),
+                new Claim("sub", user.Id.ToString())
+
+            };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.GetSection("AppSettings:Key").Value));
+            var cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
+            var token = new JwtSecurityToken(
+                issuer: _config.GetSection("AppSettings:Issuer").Value,
+                audience: _config.GetSection("AppSettings:Audience").Value,
+                claims: claims, expires: DateTime.Now.AddMinutes(int.Parse(_config.GetSection("AppSettings:AccessTokenValidity").Value)),
+                signingCredentials: cred
+            );
+            var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+
+            return jwt;
+        }
+
+        public RefreshToken GenerateRefreshToken()
+        {
+            return new RefreshToken
+            {
+                Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
+                Created = DateTime.Now,
+                Expires = DateTime.Now.AddDays(int.Parse(_config.GetSection("AppSettings:RefreshTokenValidity").Value))
+            };
         }
         #endregion
 
