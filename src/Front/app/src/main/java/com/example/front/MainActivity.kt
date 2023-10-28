@@ -15,7 +15,6 @@ import com.example.front.ui.theme.FrontTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        val loginViewModel by viewModels<LoginViewModel>()
         super.onCreate(savedInstanceState)
         setContent {
             FrontTheme {
