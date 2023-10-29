@@ -1,4 +1,4 @@
-package com.example.front
+ package com.example.front
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image

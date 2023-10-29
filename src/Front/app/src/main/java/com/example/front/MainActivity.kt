@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.example.front.app.PostOfficeApp
 import com.example.front.model.LoginDTO
 import com.example.front.repository.Repository
 import com.example.front.ui.theme.FrontTheme
@@ -28,12 +29,10 @@ import com.example.front.viewmodels.login.MainViewModelFacotry
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            FrontTheme {
-                //LoginScreen(viewModel = loginViewModel)
-            }
+            PostOfficeApp();
             val repository = Repository()
-            val viewModelFacotry = MainViewModelFacotry(repository)
-            viewModel = ViewModelProvider(this,viewModelFacotry).get(LoginViewModel::class.java)
+            val viewModelFactory = MainViewModelFacotry(repository)
+            viewModel = ViewModelProvider(this,viewModelFactory).get(LoginViewModel::class.java)
             var data = LoginDTO("marija.andric","MejoSmrdi123!")
             viewModel.getLoginnInfo(data)
             val response = viewModel.myResponse.value

@@ -21,10 +21,11 @@ val Typography = Typography(
         ),
         titleLarge = TextStyle(
                 lineHeight = 35.sp,
+                fontSize = 30.sp,
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Bold,
                 fontFamily = FontFamily(Font(R.font.lexend)),
-                color = Color.White
+                color = Black
         )
 
 
