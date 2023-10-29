@@ -21,7 +21,7 @@ import com.example.front.views.SplashScreen
         setContent {
             FrontTheme {
                 //LoginScreen(viewModel = loginViewModel)
-                RegistrationCategories()
+                //RegistrationCategories()
             }
             val repository = Repository()
             val viewModelFacotry = MainViewModelFacotry(repository)

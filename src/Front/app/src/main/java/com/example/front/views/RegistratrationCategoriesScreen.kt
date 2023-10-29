@@ -46,7 +46,6 @@ import com.example.front.R
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-@Preview
 fun RegistrationCategories() {
     LazyColumn(
         modifier = Modifier
@@ -88,14 +87,14 @@ fun Title() {
         Text(
             text = "Choose at least 2 categories:",
             fontSize = 25.sp,
-            //style = MaterialTheme.typography.titleLarge,
+            style = MaterialTheme.typography.titleLarge,
             modifier = Modifier
-                .padding(top = 50.dp, start = 20.dp, end = 20.dp, bottom = 15.dp),
-            lineHeight = 37.sp,
-            textAlign = TextAlign.Center,
-            fontWeight = FontWeight.Bold,
-            fontFamily = FontFamily(Font(R.font.lexend)),
-            color = Color.White
+                .padding(top = 50.dp, start = 25.dp, end = 25.dp, bottom = 15.dp),
+//            lineHeight = 37.sp,
+//            textAlign = TextAlign.Center,
+//            fontWeight = FontWeight.Bold,
+//            fontFamily = FontFamily(Font(R.font.lexend)),
+//            color = Color.White
         )
     }
 }

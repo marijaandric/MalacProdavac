@@ -24,7 +24,8 @@ val Typography = Typography(
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Bold,
                 fontFamily = FontFamily(Font(R.font.lexend)),
-                color = Color.White
+                color = Color.White,
+                fontSize = 25.sp
         )
 
 

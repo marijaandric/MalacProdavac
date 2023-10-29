@@ -70,8 +70,13 @@ fun FrontTheme(
 //            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
 //        }
 //    }
+        var colorScheme = LightColorScheme
+        if(darkTheme)
+        {
+                colorScheme = DarkColorScheme
+        }
 
-    val colorScheme = LightColorScheme
+
 
     MaterialTheme(
             colorScheme = colorScheme,
