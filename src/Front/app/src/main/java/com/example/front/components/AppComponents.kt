@@ -36,25 +36,25 @@ fun TitleTextComponent(value:String){
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyTextField(labelValue: String, painterResource: Painter){
-    val textValue = remember {
-        mutableStateOf("")
-    }
+fun MyTextField(
+    labelValue: String,
+    painterResource: Painter,
+    value: String,
+    onValueChange: (String) -> Unit
+) {
     OutlinedTextField(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(5.dp)),
-        label = { Text(text = labelValue)},
+        label = { Text(text = labelValue) },
         colors = TextFieldDefaults.outlinedTextFieldColors(
             focusedBorderColor = LightBlue,
             focusedLabelColor = LightBlue,
             cursorColor = LightBlue
         ),
         keyboardOptions = KeyboardOptions.Default,
-        value = textValue.value,
-        onValueChange = {
-            textValue.value = it
-        },
+        value = value,
+        onValueChange = onValueChange,
         leadingIcon = {
             Icon(
                 painter = painterResource,
@@ -64,6 +64,7 @@ fun MyTextField(labelValue: String, painterResource: Painter){
         }
     )
 }
+
 
 @Composable
 fun HeaderImage(painterResource: Painter) {

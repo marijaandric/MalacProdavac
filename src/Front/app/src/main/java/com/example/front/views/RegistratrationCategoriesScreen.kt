@@ -1,5 +1,4 @@
 package com.example.front.views
- package com.example.front
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
