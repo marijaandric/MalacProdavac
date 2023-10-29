@@ -4,24 +4,15 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.front.model.LoginDTO
 import com.example.front.repository.Repository
 import com.example.front.ui.theme.FrontTheme
 import com.example.front.viewmodels.login.LoginViewModel
 import com.example.front.viewmodels.login.MainViewModelFacotry
+import com.example.front.views.RegistrationCategories
+import com.example.front.views.SplashScreen
 
     class MainActivity : ComponentActivity() {
     private lateinit var viewModel: LoginViewModel
@@ -30,6 +21,7 @@ import com.example.front.viewmodels.login.MainViewModelFacotry
         setContent {
             FrontTheme {
                 //LoginScreen(viewModel = loginViewModel)
+                RegistrationCategories()
             }
             val repository = Repository()
             val viewModelFacotry = MainViewModelFacotry(repository)
