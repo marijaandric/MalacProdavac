@@ -1,4 +1,4 @@
-package com.example.front
+package com.example.front.views
 
 import android.view.animation.OvershootInterpolator
 import androidx.compose.animation.core.Animatable
@@ -28,9 +28,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -39,6 +40,8 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.front.MediumBlueButton
+import com.example.front.R
 import kotlinx.coroutines.delay
 
 class SplashScreen {
@@ -205,7 +208,8 @@ class SplashScreen {
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(top = 60.dp, start = 10.dp, end = 10.dp, bottom = 15.dp),
-                lineHeight = 35.sp
+                lineHeight = 35.sp,
+                fontFamily = FontFamily(Font(R.font.lexend))
             )
 
             Text(
@@ -214,7 +218,8 @@ class SplashScreen {
                 fontWeight = FontWeight.Normal,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(top = 2.dp, start = 10.dp, end = 10.dp),
-                lineHeight = 20.sp
+                lineHeight = 20.sp,
+                fontFamily = FontFamily(Font(R.font.lexend))
             )
             Spacer(modifier = Modifier.weight(4.5f))
 
@@ -238,15 +243,14 @@ class SplashScreen {
             {
                 Row()
                 {
-                    val NextButton = UIElements()
-                    NextButton.MediumBlueButton(
+                    MediumBlueButton(
                         text = "Skip",
                         onClick = {
                             //navigacija ka login strani
                         },0.45f
                     )
-                    val Skipbutton = UIElements()
-                    Skipbutton.MediumBlueButton(
+
+                    MediumBlueButton(
                         text = "Next",
                         onClick = {
                             if(currentPage == 0)
@@ -267,8 +271,7 @@ class SplashScreen {
             }
             else{
                 Spacer(modifier = Modifier.weight(0.3f))
-                val NextButton = UIElements()
-                NextButton.MediumBlueButton(
+                MediumBlueButton(
                     text = "Get started",
                     onClick = {
                         //navigacija ka login strani

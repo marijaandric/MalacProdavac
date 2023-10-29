@@ -12,7 +12,6 @@ namespace back.Models
         public string? Name { get; set; }
         public string? Description { get; set; }
         public float Price { get; set; }
-        public int Stock {  get; set; }
         [ForeignKey("Metric")]
         public int MetricId { get; set; }
         [ForeignKey("Category")]

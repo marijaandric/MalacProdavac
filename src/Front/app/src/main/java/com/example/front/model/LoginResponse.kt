@@ -1,0 +1,7 @@
+package com.example.front.model
+
+import com.google.gson.annotations.SerializedName
+
+data class LoginResponse (
+    @SerializedName("id") val status: Int = -1
+)

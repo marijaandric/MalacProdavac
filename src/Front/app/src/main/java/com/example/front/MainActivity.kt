@@ -1,32 +1,33 @@
     package com.example.front
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.front.ui.theme.FrontTheme
+import androidx.lifecycle.ViewModelProvider
+import com.example.front.app.PostOfficeApp
+import com.example.front.model.LoginDTO
+import com.example.front.repository.Repository
+import com.example.front.viewmodels.login.LoginViewModel
+import com.example.front.viewmodels.login.MainViewModelFacotry
+import com.example.front.views.SplashScreen
 
-class MainActivity : ComponentActivity() {
+    class MainActivity : ComponentActivity() {
+    private lateinit var viewModel: LoginViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
-        val loginViewModel by viewModels<LoginViewModel>()
         super.onCreate(savedInstanceState)
         setContent {
-            FrontTheme {
-                LoginScreen(viewModel = loginViewModel)
-            }
+            val repository = Repository()
+            val viewModelFactory = MainViewModelFacotry(repository)
+            viewModel = ViewModelProvider(this,viewModelFactory).get(LoginViewModel::class.java)
+            PostOfficeApp(viewModel);
         }
     }
 }
+
+
 @Composable
-@Preview(showBackground = true)
 fun SplashScreenAndIntro() {
     SplashScreen().Navigation()
 }
-
