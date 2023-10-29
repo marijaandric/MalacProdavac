@@ -6,7 +6,7 @@ import retrofit2.http.Body
 import retrofit2.http.Headers
 import retrofit2.http.POST
 
-interface LoginApi {
+interface Api {
     @Headers("Content-Type: application/json")
     @POST("back/Auth/Login")
     suspend fun getLoginInfo(
