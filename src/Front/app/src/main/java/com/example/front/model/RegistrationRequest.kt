@@ -1,4 +1,4 @@
-package com.example.front.models
+package com.example.front.model
 
 data class RegistrationRequest(
     val name: String,

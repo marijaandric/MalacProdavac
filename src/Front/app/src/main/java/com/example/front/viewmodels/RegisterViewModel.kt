@@ -1,7 +1,7 @@
 package com.example.front.viewmodels
 
 import androidx.lifecycle.ViewModel
-import com.example.front.models.RegistrationRequest
+import com.example.front.model.RegistrationRequest
 
 class RegisterViewModel : ViewModel(){
 

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.BasicTextField
@@ -40,6 +41,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.front.R
 import com.example.front.components.HeaderImage
+import com.example.front.components.LogoImage
+import com.example.front.components.MyTextField
 import com.example.front.components.TitleTextComponent
 import com.example.front.viewmodels.RegisterViewModel
 
@@ -54,6 +57,7 @@ fun RegisterScreen() {
     var lastName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var passwordConfirm by remember { mutableStateOf("") }
     var address by remember { mutableStateOf("") }
 
     Surface(
@@ -67,54 +71,59 @@ fun RegisterScreen() {
                 .fillMaxSize()
         ){
             HeaderImage(painterResource(id = R.drawable.loginheaderimage))
+            LogoImage(
+                painterResource(id = R.drawable.logowithwhitebackground),
+                modifier = Modifier.offset(y = (-16.dp))
+            )
 
             Column(
                 modifier = Modifier
                     .padding(28.dp)
+                    .padding(top = 42.dp)
                     .align(Alignment.Center)
             ){
                 TitleTextComponent("Registracija")
 
-                BasicTextField(
+                MyTextField(
+                    labelValue = "First name",
+                    painterResource = painterResource(id = R.drawable.user),
                     value = name,
-                    onValueChange = { name = it },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color.hsl(0f, 0f, 0.95f))
-                    //            label = { Text("Ime") }
+                    onValueChange = { name = it }
                 )
 
-                OutlinedTextField(
+                MyTextField(
+                    labelValue = "Last name",
+                    painterResource = painterResource(id = R.drawable.user),
                     value = lastName,
-                    onValueChange = { lastName = it },
-                    label = { Text("Prezime") },
-                    modifier = Modifier.fillMaxWidth()
+                    onValueChange = { lastName = it }
                 )
 
-                OutlinedTextField(
+                MyTextField(
+                    labelValue = "Email",
+                    painterResource = painterResource(id = R.drawable.mail),
                     value = email,
-                    onValueChange = { email = it },
-                    label = { Text("Email") },
-                    modifier = Modifier.fillMaxWidth()
+                    onValueChange = { email = it }
                 )
 
-                OutlinedTextField(
+                MyTextField(
+                    labelValue = "Password",
+                    painterResource = painterResource(id = R.drawable.padlock),
                     value = password,
-                    onValueChange = { password = it },
-                    label = { Text("Šifra") },
-                    visualTransformation = PasswordVisualTransformation(),
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        imeAction = ImeAction.Done,
-                        keyboardType = KeyboardType.Password
-                    ),
-                    modifier = Modifier.fillMaxWidth()
+                    onValueChange = { password = it }
                 )
 
-                OutlinedTextField(
+                MyTextField(
+                    labelValue = "Confirm password",
+                    painterResource = painterResource(id = R.drawable.padlock),
+                    value = passwordConfirm,
+                    onValueChange = { passwordConfirm = it }
+                )
+
+                MyTextField(
+                    labelValue = "Address",
+                    painterResource = painterResource(id = R.drawable.home),
                     value = address,
-                    onValueChange = { address = it },
-                    label = { Text("Adresa") },
-                    modifier = Modifier.fillMaxWidth()
+                    onValueChange = { address = it }
                 )
 
                 Button(
