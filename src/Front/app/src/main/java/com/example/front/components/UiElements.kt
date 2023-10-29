@@ -1,4 +1,4 @@
-package com.example.front
+package com.example.front.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
