@@ -35,9 +35,9 @@ namespace back.PL.Controllers
         {
             try
             {
-                int userId = await _authService.Login(loginDto);
-                if (userId != -1) return Ok(userId);
-                else return BadRequest("Unknown error.");
+                //treba token da vraca
+                string token = await _authService.Login(loginDto);
+                return Ok(token);
             }
             catch (Exception ex)
             {

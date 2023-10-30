@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -23,6 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color.Companion.Gray
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
@@ -73,6 +76,27 @@ fun MyTextField(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SearchTextField(valuee: String,placeh:String, onValueChangee: (String) -> Unit) {
+    var value = valuee
+
+    OutlinedTextField(value = value,
+        placeholder  = { Text(text = placeh) },
+        colors = TextFieldDefaults.outlinedTextFieldColors(
+            cursorColor = MaterialTheme.colorScheme.onSurface,
+            containerColor = Color.White),
+        leadingIcon = {
+            Icon(
+                imageVector = Icons.Default.Search,
+                contentDescription = "Search icon"
+            )
+        },
+        onValueChange = onValueChangee,
+        shape = RoundedCornerShape(15.dp)
+    )
+}
+
 
 @Composable
 fun HeaderImage(painterResource: Painter) {
@@ -88,7 +112,8 @@ fun LogoImage(painterResource: Painter, modifier: Modifier = Modifier) {
     Image(
         painter = painterResource,
         contentDescription = "",
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
             .size(200.dp)
             .then(modifier) // Combine the existing modifier with the one passed as an argument
     )

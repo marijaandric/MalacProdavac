@@ -177,7 +177,8 @@ namespace back.BLL.Services
             return -1;
         }
 
-        public async Task<int> Login(LoginDto loginDto)
+        //treba da vraca string
+        public async Task<string> Login(LoginDto loginDto)
         {
             User user = await _authRepository.GetUser(loginDto.username);
             if (user == null) throw new ArgumentException("Invalid username.");
@@ -189,7 +190,7 @@ namespace back.BLL.Services
                 if (!hashPass.SequenceEqual(user.Password)) throw new ArgumentException("Invalid password");
             }
 
-            return user.Id;
+            return await CreateToken(user);
         }
     }
 }

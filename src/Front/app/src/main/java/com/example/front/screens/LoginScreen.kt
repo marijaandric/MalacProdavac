@@ -2,6 +2,7 @@ package com.example.front.screens
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -17,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.front.components.MediumBlueButton
 import com.example.front.R
 import com.example.front.components.BigBlueButton
 import com.example.front.components.HeaderImage
@@ -69,6 +71,8 @@ fun LoginScreen(viewModel: LoginViewModel) {
                     value = passwordInput, // Bind password input to the state
                     onValueChange = { passwordInput = it } // Update the state on value change
                 )
+                Spacer(modifier = Modifier.weight(1f))
+                MediumBlueButton(
                 BigBlueButton(
                     text = "Login",
                     onClick = {
@@ -76,6 +80,7 @@ fun LoginScreen(viewModel: LoginViewModel) {
                         viewModel.getLoginnInfo(data)
                         val response = viewModel.myResponse.value
                     },
+                    width = 1f
                     width = 150f,
                     modifier = Modifier.offset(y = 150.dp)
                 )
