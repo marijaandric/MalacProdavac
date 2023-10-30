@@ -115,3 +115,15 @@ fun LogoImage(painterResource: Painter, modifier: Modifier = Modifier) {
             .then(modifier) // Combine the existing modifier with the one passed as an argument
     )
 }
+
+@Composable
+fun ErrorTextComponent(text: String) {
+    Text(
+        text = text,
+        color = Color(0xFFD50505),
+        modifier = Modifier
+            .padding(bottom = 4.dp, start = 6.dp),
+        fontFamily = FontFamily(Font(R.font.lexend)),
+        fontWeight = FontWeight(200)
+    )
+}

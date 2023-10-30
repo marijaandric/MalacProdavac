@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -41,18 +42,28 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.front.R
+import com.example.front.components.ErrorTextComponent
 import com.example.front.components.HeaderImage
 import com.example.front.components.LogoImage
 import com.example.front.components.MyTextField
 import com.example.front.components.TitleTextComponent
 import com.example.front.model.RegistrationRequest
+import com.example.front.repository.Repository
 import com.example.front.viewmodels.RegisterViewModel
+import com.example.front.viewmodels.login.LoginViewModel
 
-
+fun isValidEmail(email: String): Boolean {
+    return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+}
+fun isValidPassword(password: String): String {
+    val regex = Regex("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-\\.]).{8,}$")
+    if (regex.matches(password))
+        return ""
+    return "Password must have at least 8 characters and contain at least one of the following: upper case letter, lower case letter, number, symbol"
+}
 
 @Composable
-fun RegisterScreen() {
-    val registerViewModel: RegisterViewModel = viewModel()
+fun RegisterScreen(viewModel: RegisterViewModel) {
 
     var name by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
@@ -60,6 +71,14 @@ fun RegisterScreen() {
     var password by remember { mutableStateOf("") }
     var passwordConfirm by remember { mutableStateOf("") }
     var address by remember { mutableStateOf("") }
+
+    // greske pri unosu
+    var nameError by remember { mutableStateOf("") }
+    var lastNameError by remember { mutableStateOf("") }
+    var emailError by remember { mutableStateOf("") }
+    var passwordError by remember { mutableStateOf("") }
+    var confirmPasswordError by remember { mutableStateOf("") }
+    var addressError by remember { mutableStateOf("") }
 
     Surface(
         color = Color.White,
@@ -91,6 +110,9 @@ fun RegisterScreen() {
                     value = name,
                     onValueChange = { name = it }
                 )
+                if(nameError.isNotEmpty()) {
+                    ErrorTextComponent(nameError)
+                }
 
                 MyTextField(
                     labelValue = "Last name",
@@ -98,6 +120,9 @@ fun RegisterScreen() {
                     value = lastName,
                     onValueChange = { lastName = it }
                 )
+                if(lastNameError.isNotEmpty()) {
+                    ErrorTextComponent(lastNameError)
+                }
 
                 MyTextField(
                     labelValue = "Email",
@@ -105,6 +130,9 @@ fun RegisterScreen() {
                     value = email,
                     onValueChange = { email = it }
                 )
+                if(emailError.isNotEmpty()) {
+                    ErrorTextComponent(emailError)
+                }
 
                 MyTextField(
                     labelValue = "Password",
@@ -113,6 +141,9 @@ fun RegisterScreen() {
                     onValueChange = { password = it },
                     isPassword = true
                 )
+                if(passwordError.isNotEmpty()) {
+                    ErrorTextComponent(passwordError)
+                }
 
                 MyTextField(
                     labelValue = "Confirm password",
@@ -121,6 +152,9 @@ fun RegisterScreen() {
                     onValueChange = { passwordConfirm = it },
                     isPassword = true
                 )
+                if(confirmPasswordError.isNotEmpty()) {
+                    ErrorTextComponent(confirmPasswordError)
+                }
 
                 MyTextField(
                     labelValue = "Address",
@@ -128,15 +162,48 @@ fun RegisterScreen() {
                     value = address,
                     onValueChange = { address = it }
                 )
+                if(addressError.isNotEmpty()) {
+                    ErrorTextComponent(addressError)
+                }
 
                 Button(
                     onClick = {
-                        //da proveri da li je sifra i potvrdi isto
-                        //da proveri email, sifru,....
-                        var data = RegistrationRequest(name, lastName, email, password, address, 1)
-                        registerViewModel.performRegistration(data)
-                        val response = registerViewModel.myResponse.value
-                        Log.e("RESPONSE", response.toString())
+                        nameError = ""
+                        lastNameError = ""
+                        emailError = ""
+                        passwordError = ""
+                        confirmPasswordError = ""
+                        addressError = ""
+
+                        if (name.isEmpty()) {
+                            nameError = "First name is required"
+                        }
+                        if (lastName.isEmpty()) {
+                            lastNameError = "Last name is required"
+                        }
+                        if (!isValidEmail(email)) {
+                            emailError = "Email is not valid"
+                        }
+                        passwordError = isValidPassword(password)
+                        if(password != passwordConfirm) {
+                            confirmPasswordError = "Passwords don't match"
+                        }
+                        if (address.isEmpty()) {
+                            addressError = "Address is required"
+                        }
+
+                        if (nameError.isEmpty() &&
+                            lastNameError.isEmpty() &&
+                            emailError.isEmpty() &&
+                            passwordError.isEmpty() &&
+                            confirmPasswordError.isEmpty() &&
+                            addressError.isEmpty()
+                            ) {
+                            val data = RegistrationRequest(name, lastName, email, password, address, 1)
+                            viewModel.performRegistration(data)
+                            val response = viewModel.myResponse.value
+                            Log.e("RESPONSE", response.toString())
+                        }
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -169,5 +236,5 @@ fun RegisterScreen() {
 @Preview
 @Composable
 fun prikaziRegister(){
-    RegisterScreen()
+    RegisterScreen(RegisterViewModel(Repository()))
 }
