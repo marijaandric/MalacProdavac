@@ -1,13 +1,11 @@
     package com.example.front
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModelProvider
 import com.example.front.app.PostOfficeApp
-import com.example.front.model.LoginDTO
 import com.example.front.repository.Repository
 import com.example.front.viewmodels.login.LoginViewModel
 import com.example.front.viewmodels.login.MainViewModelFacotry

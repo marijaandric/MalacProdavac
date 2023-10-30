@@ -40,7 +40,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.front.MediumBlueButton
+import com.example.front.components.MediumBlueButton
 import com.example.front.R
 import kotlinx.coroutines.delay
 
@@ -248,6 +248,7 @@ class SplashScreen {
                         onClick = {
                             //navigacija ka login strani
                         },0.45f
+                        , modifier = Modifier
                     )
 
                     MediumBlueButton(
@@ -266,6 +267,7 @@ class SplashScreen {
                                 navController.navigate("intro4")
                             }
                         },0.8f
+                        , modifier =  Modifier
                     )
                 }
             }
@@ -276,6 +278,7 @@ class SplashScreen {
                     onClick = {
                         //navigacija ka login strani
                     },0.8f
+                    , modifier =  Modifier
                 )
             }
 

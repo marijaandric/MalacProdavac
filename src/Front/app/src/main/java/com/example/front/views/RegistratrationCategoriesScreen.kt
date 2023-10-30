@@ -41,8 +41,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.front.MediumBlueButton
 import com.example.front.R
+import com.example.front.components.MediumBlueButton
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -65,7 +65,7 @@ fun RegistrationCategories() {
                 )
                 {
                     Spacer(modifier = Modifier.height(20.dp))
-                    MediumBlueButton(text = "Continue", onClick = { /*TODO*/ }, width = 0.90f)
+                    MediumBlueButton(text = "Continue", onClick = { /*TODO*/ }, width = 0.90f, modifier = Modifier)
                 }
 
             //}

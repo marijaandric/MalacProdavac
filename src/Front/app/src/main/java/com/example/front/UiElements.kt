@@ -13,18 +13,3 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
-@Composable
-fun MediumBlueButton(text:String,onClick: () -> Unit,width:Float) {
-    val primaryColor = MaterialTheme.colorScheme.primary
-    Button(
-        onClick = onClick,
-        modifier = Modifier
-            .fillMaxWidth(width)
-            .padding(8.dp)
-            .height(48.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
-        shape = RoundedCornerShape(20)
-    ) {
-        Text(text = text)
-    }
-}
