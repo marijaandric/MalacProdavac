@@ -42,7 +42,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.front.components.MediumBlueButton
 import com.example.front.R
-import com.example.front.app.PostOfficeApp
 import com.example.front.repository.Repository
 import com.example.front.viewmodels.login.LoginViewModel
 import kotlinx.coroutines.delay
@@ -151,12 +150,6 @@ class SplashScreen {
                         pageContent
                     }
                 }
-            }
-            composable("login")
-            {
-                val repository = Repository()
-                val viewModel = LoginViewModel(repository)
-                PostOfficeApp(viewModel);
             }
         }
     }

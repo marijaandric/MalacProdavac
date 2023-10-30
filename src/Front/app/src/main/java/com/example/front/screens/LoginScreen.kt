@@ -18,7 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.example.front.components.MediumBlueButton
+import androidx.navigation.NavHostController
 import com.example.front.R
 import com.example.front.components.BigBlueButton
 import com.example.front.components.HeaderImage
@@ -26,15 +26,24 @@ import com.example.front.components.LogoImage
 import com.example.front.components.MyTextField
 import com.example.front.components.TitleTextComponent
 import com.example.front.model.LoginDTO
+import com.example.front.navigation.Screen
+import com.example.front.repository.Repository
 import com.example.front.viewmodels.login.LoginViewModel
+import com.example.front.viewmodels.login.MainViewModelFactory
 
 
 @Composable
-fun LoginScreen(viewModel: LoginViewModel) {
-    // Define a mutable state for the user input
+fun LoginScreen(
+    navController:NavHostController
+) {
     var userInput by remember { mutableStateOf("") }
     var passwordInput by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
+
+    lateinit var viewModel: LoginViewModel
+    val repository = Repository() // Create a Repository instance
+    val viewModelFactory = MainViewModelFactory(repository)
+    viewModel = viewModelFactory.create(LoginViewModel::class.java)
 
     Surface(
         color = Color.White,
@@ -50,13 +59,12 @@ fun LoginScreen(viewModel: LoginViewModel) {
             // Logo Image
             LogoImage(
                 painterResource(id = R.drawable.logowithwhitebackground),
-                modifier = Modifier.offset(y = 75.dp)
             )
 
             Column(
                 modifier = Modifier
-                    .padding(28.dp)
                     .align(Alignment.Center)
+                    .padding(20.dp)
             ) {
                 TitleTextComponent(value = stringResource(id = R.string.login_title))
                 MyTextField(
@@ -71,18 +79,16 @@ fun LoginScreen(viewModel: LoginViewModel) {
                     value = passwordInput, // Bind password input to the state
                     onValueChange = { passwordInput = it } // Update the state on value change
                 )
-                Spacer(modifier = Modifier.weight(1f))
-                MediumBlueButton(
                 BigBlueButton(
                     text = "Login",
                     onClick = {
-                        var data = LoginDTO(userInput, passwordInput)
-                        viewModel.getLoginnInfo(data)
-                        val response = viewModel.myResponse.value
+//                        var data = LoginDTO(userInput, passwordInput)
+//                        viewModel.getLoginnInfo(data)
+//                        val response = viewModel.myResponse.value
+                        navController.navigate(route = Screen.Home.route)
                     },
-                    width = 1f
                     width = 150f,
-                    modifier = Modifier.offset(y = 150.dp)
+                    modifier = Modifier.offset(y = 100.dp)
                 )
             }
         }
