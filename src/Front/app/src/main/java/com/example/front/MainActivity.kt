@@ -5,6 +5,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.front.app.PostOfficeApp
 import com.example.front.repository.Repository
 import com.example.front.screens.HomePage
@@ -28,7 +30,8 @@ import com.example.front.viewmodels.categories.CategoriesViewModel
             //PostOfficeApp(viewModel);
             //HomePage()
             FrontTheme {
-                RegistrationCategories()
+                //RegistrationCategories()
+                SplashScreenAndIntro()
             }
         }
     }

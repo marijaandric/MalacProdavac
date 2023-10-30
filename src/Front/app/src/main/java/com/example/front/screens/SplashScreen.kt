@@ -42,6 +42,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.front.components.MediumBlueButton
 import com.example.front.R
+import com.example.front.app.PostOfficeApp
+import com.example.front.repository.Repository
+import com.example.front.viewmodels.login.LoginViewModel
 import kotlinx.coroutines.delay
 
 class SplashScreen {
@@ -130,7 +133,30 @@ class SplashScreen {
             {
                 val desc = "Efficiently manage your delivery schedule. Connect with local businesses and earn more."
                 Intro("Delivery people",desc,"intro4",3,navController = navController)
-                // Dodati HorizontalPager za login
+                val pagerState = rememberPagerState(
+                    initialPage = 3,
+                    initialPageOffsetFraction = 0f
+                )
+                val desc2 = "Showcase your products and engage with local customers! Increase your visibility and sales."
+                val desc3 = "Efficiently manage your delivery schedule. Connect with local businesses and earn more."
+                Scaffold() {
+                    HorizontalPager(pageCount = 4,state = pagerState) { page->
+                        val pageContent = when (page) {
+                            0 -> Intro("Welcome to MalacProdavac","","intro1",0,navController = navController)
+                            1 -> Intro("Business owners", desc,"intro2", 1, navController = navController)
+                            2 -> Intro("Customers",desc2,"intro3",2,navController = navController)
+                            3 -> Intro("Delivery people",desc3,"intro4",3,navController = navController)
+                            else -> error("Invalid page: $page")
+                        }
+                        pageContent
+                    }
+                }
+            }
+            composable("login")
+            {
+                val repository = Repository()
+                val viewModel = LoginViewModel(repository)
+                PostOfficeApp(viewModel);
             }
         }
     }
@@ -246,7 +272,7 @@ class SplashScreen {
                     MediumBlueButton(
                         text = "Skip",
                         onClick = {
-                            //navigacija ka login strani
+                            navController.navigate("login")
                         },0.45f
                     )
 
@@ -274,7 +300,7 @@ class SplashScreen {
                 MediumBlueButton(
                     text = "Get started",
                     onClick = {
-                        //navigacija ka login strani
+                        navController.navigate("login")
                     },0.8f
                 )
             }
