@@ -3,41 +3,42 @@
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.example.front.app.PostOfficeApp
+import com.example.front.repository.Repository
+import com.example.front.screens.HomePage
+import com.example.front.screens.RegistrationCategories
+import com.example.front.viewmodels.login.LoginViewModel
+import com.example.front.viewmodels.login.MainViewModelFacotry
+import com.example.front.screens.SplashScreen
 import com.example.front.ui.theme.FrontTheme
+import com.example.front.viewmodels.categories.CategoriesMainViewModelFactory
+import com.example.front.viewmodels.categories.CategoriesViewModel
 
-class MainActivity : ComponentActivity() {
+    class MainActivity : ComponentActivity() {
+    private lateinit var viewModel: LoginViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+//            val repository = Repository()
+//            val viewModelFactory = CategoriesMainViewModelFactory(repository)
+//            viewModel = ViewModelProvider(this,viewModelFactory).get(CategoriesViewModel::class.java)
+//            viewModel.getCategoriesInfo()
+            //PostOfficeApp(viewModel);
+            //HomePage()
             FrontTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-                    Greeting("Android")
-                }
+                //RegistrationCategories()
+                SplashScreenAndIntro()
             }
         }
     }
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-            text = "Hello $name!",
-            modifier = modifier
-    )
-}
 
-@Preview(showBackground = true)
 @Composable
-fun GreetingPreview() {
-    FrontTheme {
-        Greeting("Android")
-    }
+fun SplashScreenAndIntro() {
+    SplashScreen().Navigation()
 }
