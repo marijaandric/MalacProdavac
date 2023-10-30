@@ -17,6 +17,7 @@ interface Api {
 
 
     @GET("back/Home/GetCategories")
-    suspend fun getCategories(): Response<List<CategoriesDTO>>
-    ): Response<LoginResponse>
+    suspend fun getCategories(
+
+    ): Response<List<CategoriesDTO>>
 }
