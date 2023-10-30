@@ -1,12 +1,12 @@
 package com.example.front.model
 
-data class RegistrationRequest(
-    val name: String,
-    val lastName: String,
-    val email: String,
-    val password: String,
-    val address: String,
-    val roleId: Int
-)
+import com.google.gson.annotations.SerializedName
 
-data class RegistrationResponse(val userId: Int)
+data class RegistrationRequest(
+    @SerializedName("name") val name: String,
+    @SerializedName("lastName") val lastName: String,
+    @SerializedName("email") val email: String,
+    @SerializedName("password") val password: String,
+    @SerializedName("address") val address: String,
+    @SerializedName("roleId") val roleId: Int
+)

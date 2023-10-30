@@ -36,6 +36,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -60,7 +61,8 @@ fun MyTextField(
     labelValue: String,
     painterResource: Painter,
     value: String,
-    onValueChange: (String) -> Unit
+    onValueChange: (String) -> Unit,
+    isPassword: Boolean = false
 ) {
     OutlinedTextField(
         modifier = Modifier
@@ -72,11 +74,6 @@ fun MyTextField(
             focusedLabelColor = LightBlue,
             cursorColor = LightBlue
         ),
-        visualTransformation = PasswordVisualTransformation(),
-        keyboardOptions = KeyboardOptions.Default.copy(
-            imeAction = ImeAction.Done,
-            keyboardType = KeyboardType.Password
-        ),
         value = value,
         onValueChange = onValueChange,
         leadingIcon = {
@@ -85,6 +82,15 @@ fun MyTextField(
                 contentDescription = "",
                 modifier = Modifier.size(25.dp)
             )
+        },
+        visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
+        keyboardOptions = if (isPassword) {
+            KeyboardOptions.Default.copy(
+                imeAction = ImeAction.Done,
+                keyboardType = KeyboardType.Password
+            )
+        } else {
+            KeyboardOptions.Default
         }
     )
 }

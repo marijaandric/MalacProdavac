@@ -1,47 +1,31 @@
 package com.example.front.viewmodels
 
+import android.util.Log
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.front.model.RegistrationRequest
-
-class RegisterViewModel : ViewModel(){
-
-    fun performRegistration(
-        name: String,
-        lastName: String,
-        email: String,
-        password: String,
-        address: String
-    ) {
-        val registrationRequest = RegistrationRequest(
-            name,
-            lastName,
-            email,
-            password,
-            address,
-            roleId = 1
-        )
+import com.example.front.repository.Repository
+import kotlinx.coroutines.launch
+import retrofit2.Response
 
 
-//        val retrofit = Retrofit.Builder()
-//            .baseUrl("https://localhost:7058/")
-//            .addConverterFactory(GsonConverterFactory.create())
-//            .build()
-//
-//        val apiService = retrofit.create(ApiService::class.java)
-
-//        viewModelScope.launch {
-//            try {
-//
-//                val response = apiService.register(registrationRequest)
-//
-//                if (response.isExecuted) {
-//                    Log.d("MyApp", "IF")
-//                } else {
-//                    Log.d("MyApp", "ELSE")
-//                }
-//            } catch (e: Exception) {
-//                Log.d("MyApp", "CATCH")
-//            }
-//        }
+class RegisterViewModel(private val repository: Repository) : ViewModel(){
+    val myResponse: MutableLiveData<Response<Int>> = MutableLiveData()
+    fun performRegistration(registrationRequest: RegistrationRequest) {
+        viewModelScope.launch {
+            try {
+                val response = repository.register(registrationRequest)
+                Log.d("RESPONSE",response.toString())
+                myResponse.value = response
+                if (response.isSuccessful) {
+                    Log.d("MyApp", "IF")
+                } else {
+                    Log.d("MyApp", "ELSE")
+                }
+            } catch (e: Exception) {
+                Log.d("MyApp", "CATCH")
+            }
+        }
     }
 }

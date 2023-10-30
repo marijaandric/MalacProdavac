@@ -1,5 +1,6 @@
 package com.example.front.screens
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -44,11 +45,11 @@ import com.example.front.components.HeaderImage
 import com.example.front.components.LogoImage
 import com.example.front.components.MyTextField
 import com.example.front.components.TitleTextComponent
+import com.example.front.model.RegistrationRequest
 import com.example.front.viewmodels.RegisterViewModel
 
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen() {
     val registerViewModel: RegisterViewModel = viewModel()
@@ -79,7 +80,7 @@ fun RegisterScreen() {
             Column(
                 modifier = Modifier
                     .padding(28.dp)
-                    .padding(top = 42.dp)
+                    .padding(top = 70.dp)
                     .align(Alignment.Center)
             ){
                 TitleTextComponent("Registracija")
@@ -109,14 +110,16 @@ fun RegisterScreen() {
                     labelValue = "Password",
                     painterResource = painterResource(id = R.drawable.padlock),
                     value = password,
-                    onValueChange = { password = it }
+                    onValueChange = { password = it },
+                    isPassword = true
                 )
 
                 MyTextField(
                     labelValue = "Confirm password",
                     painterResource = painterResource(id = R.drawable.padlock),
                     value = passwordConfirm,
-                    onValueChange = { passwordConfirm = it }
+                    onValueChange = { passwordConfirm = it },
+                    isPassword = true
                 )
 
                 MyTextField(
@@ -128,13 +131,17 @@ fun RegisterScreen() {
 
                 Button(
                     onClick = {
-                        registerViewModel.performRegistration(name, lastName, email, password, address)
+                        //da proveri da li je sifra i potvrdi isto
+                        //da proveri email, sifru,....
+                        var data = RegistrationRequest(name, lastName, email, password, address, 1)
+                        registerViewModel.performRegistration(data)
+                        val response = registerViewModel.myResponse.value
+                        Log.e("RESPONSE", response.toString())
                     },
                     modifier = Modifier
                         .fillMaxWidth()
                         .heightIn(min = 53.dp)
                         .padding(top = 14.dp, bottom = 14.dp),
-
                     colors = ButtonDefaults
                         .buttonColors(
                             containerColor = Color
