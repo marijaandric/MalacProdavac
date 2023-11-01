@@ -29,8 +29,31 @@ namespace back.DAL.Repositories
             }
         }
 
-        public async Task<List<Product>> GetProducts(List<int> categories, int rating, bool open, int range, string location, int sort, string search)
+        public static double CalculateDistance(float lat1, float lon1, float lat2, float lon2)
         {
+            const double radiusOfEarth = 6371;
+
+            // degrees -> radians
+            double dLat = Math.PI / 180.0 * (lat2 - lat1);
+            double dLon = Math.PI / 180.0 * (lon2 - lon1);
+
+            // Haversine formula
+            double a = Math.Sin(dLat / 2) * Math.Sin(dLat / 2) +
+                Math.Cos(Math.PI / 180.0 * lat1) * Math.Cos(Math.PI / 180.0 * lat2) *
+                Math.Sin(dLon / 2) * Math.Sin(dLon / 2);
+            double c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+
+            double distance = radiusOfEarth * c;
+
+            return distance;
+        }
+
+        public async Task<List<Product>> GetProducts(int userId, List<int> categories, int rating, bool open, int range, string location, int sort, string search)
+        {
+            User currentUser = _context.Users.FirstOrDefault(x => x.Id == userId);
+            float currLat = currentUser.Latitude;
+            float currLong = currentUser.Longitude;
+
             if (categories.Count == 0) categories = await _context.Categories.Select(x => x.Id).ToListAsync();
             
             List<Product> products = await _context.Products.Where(x => categories.Contains(x.CategoryId) && x.Name.ToLower().Contains(search.Trim().ToLower()))
@@ -46,6 +69,15 @@ namespace back.DAL.Repositories
                 products = products
                         .Join(_context.Shop.Join(_context.WorkingHours.Where(x => x.Day.Day == DateTime.Now.Day && x.OpeningHours.TimeOfDay <= DateTime.Now.TimeOfDay && x.ClosingHours.TimeOfDay >= DateTime.Now.TimeOfDay), s => s.Id, w => w.ShopId, (s, w) => s), p => p.ShopId, s => s.Id, (p, s) => p)
                         .ToList();
+            }
+
+            if (location.Trim().Length > 0 && location != "none")
+            {
+                products = products.Join(_context.Shop.Where(x => x.Address.Trim().ToLower().Contains(location.Trim().ToLower())), p => p.ShopId, s => s.Id, (p, s) => p).ToList();
+            }
+            else if (range > 0)
+            {
+                products = products.Join(_context.Shop, p => p.ShopId, s => s.Id, (p, s) => (p, s)).Where(x => CalculateDistance((float)x.s.Latitude, (float)x.s.Longitude, currLat, currLong) <= range).Select(x => x.p).ToList();
             }
 
             products = SortProducts(sort, products);
