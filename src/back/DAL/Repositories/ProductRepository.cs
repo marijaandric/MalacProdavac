@@ -12,6 +12,7 @@ namespace back.DAL.Repositories
             _context = context;
         }
 
+        #region filterHelp
         public List<Product> SortProducts(int sort, List<Product> products)
         {
             switch (sort)
@@ -48,7 +49,9 @@ namespace back.DAL.Repositories
             return distance;
         }
 
-        public async Task<List<Product>> GetProducts(int userId, List<int> categories, int rating, bool open, int range, string location, int sort, string search)
+        #endregion
+
+        public async Task<List<Product>> GetProducts(int userId, List<int> categories, int rating, bool open, int range, string location, int sort, string search, int numberOfItems, int page)
         {
             User currentUser = _context.Users.FirstOrDefault(x => x.Id == userId);
             float currLat = currentUser.Latitude;
@@ -81,7 +84,8 @@ namespace back.DAL.Repositories
             }
 
             products = SortProducts(sort, products);
-            return products;
+
+            return products.Skip((page-1) * numberOfItems).Take(numberOfItems).ToList();
         }
     }
 }

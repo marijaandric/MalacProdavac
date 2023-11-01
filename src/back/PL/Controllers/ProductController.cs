@@ -15,11 +15,11 @@ namespace back.PL.Controllers
         }
 
         [HttpGet("GetProducts")]
-        public async Task<IActionResult> GetProducts(int userId, [FromQuery] List<int> categories, int rating, bool open, int range, string location, int sort, string search)
+        public async Task<IActionResult> GetProducts(int userId, [FromQuery] List<int> categories, int rating, bool open, int range, string location, int sort, string search, int numberOfItems, int page)
         {
             try
             {
-                return Ok(await _service.GetProducts(userId, categories, rating, open, range, location, sort, search));
+                return Ok(await _service.GetProducts(userId, categories, rating, open, range, location, sort, search, numberOfItems, page));
             }
             catch (Exception ex)
             {
