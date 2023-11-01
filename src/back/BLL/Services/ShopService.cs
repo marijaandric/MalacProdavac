@@ -11,9 +11,11 @@ namespace back.BLL.Services
             _repository = repository;
         }
 
-        public Task<List<Shop>> GetShops(int userId, List<int> categories, int rating, bool open, int range, string location, int sort, string search, int page)
+        public async Task<List<Shop>> GetShops(int userId, List<int> categories, int rating, bool open, int range, string location, int sort, string search, int page)
         {
-            throw new NotImplementedException();
+            List<Shop> shops = await _repository.GetShops(userId, categories, rating, open, range, location, sort, search, page);
+            if (shops.Count == 0) throw new ArgumentException("No shops found.");
+            return shops;
         }
 
         public int ShopPages()

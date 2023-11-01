@@ -13,6 +13,19 @@ namespace back.PL.Controllers
             _service = service;
         }
 
+        [HttpGet("GetShops")]
+        public async Task<IActionResult> GetShops(int userId, [FromQuery] List<int> categories, int rating, bool open, int range, string location, int sort, string search, int page)
+        {
+            try
+            {
+                return Ok(await _service.GetShops(userId, categories, rating, open, range, location, sort, search, page));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { ErrorMessage = ex.Message });
+            }
+        }
+
         [HttpGet("ShopPages")]
         public IActionResult ShopPages() 
         {
