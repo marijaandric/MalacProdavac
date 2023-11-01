@@ -4,6 +4,6 @@ namespace back.DAL.Repositories
 {
     public interface IProductRepository
     {
-        public Task<List<Product>> GetProducts(List<int> categories, int rating, bool open, int range, string location);
+        public Task<List<Product>> GetProducts(List<int> categories, int rating, bool open, int range, string location, int sort, string search);
     }
 }

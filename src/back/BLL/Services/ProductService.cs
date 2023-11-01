@@ -13,9 +13,9 @@ namespace back.BLL.Services
             _repository = repository;
         }
 
-        public async Task<List<Product>> GetProducts(List<int> categories, int rating, bool open, int range, string location)
+        public async Task<List<Product>> GetProducts(List<int> categories, int rating, bool open, int range, string location, int sort, string search)
         {
-            List<Product> products = await _repository.GetProducts(categories, rating, open, range, location);
+            List<Product> products = await _repository.GetProducts(categories, rating, open, range, location, sort, search);
             if (products.Count == 0) throw new ArgumentException("No products found.");
             return products;
         }
