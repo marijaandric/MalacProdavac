@@ -13,11 +13,19 @@ namespace back.BLL.Services
             _repository = repository;
         }
 
-        public async Task<List<Product>> GetProducts(int userId, List<int> categories, int rating, bool open, int range, string location, int sort, string search, int numberOfItems, int page)
+        public async Task<List<Product>> GetProducts(int userId, List<int> categories, int rating, bool open, int range, string location, int sort, string search, int page)
         {
-            List<Product> products = await _repository.GetProducts(userId, categories, rating, open, range, location, sort, search, numberOfItems, page);
+            List<Product> products = await _repository.GetProducts(userId, categories, rating, open, range, location, sort, search, page);
             if (products.Count == 0) throw new ArgumentException("No products found.");
             return products;
+        }
+
+        public int ProductPages()
+        {
+            int total = _repository.ProductPages();
+            if (total == 0) throw new ArgumentException("No pages.");
+
+            return total;
         }
     }
 }

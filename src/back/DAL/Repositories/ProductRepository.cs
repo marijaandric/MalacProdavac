@@ -7,6 +7,7 @@ namespace back.DAL.Repositories
     public class ProductRepository : IProductRepository
     {
         Context _context;
+        int numberOfItems = 10;
         public ProductRepository(Context context)
         {
             _context = context;
@@ -51,7 +52,7 @@ namespace back.DAL.Repositories
 
         #endregion
 
-        public async Task<List<Product>> GetProducts(int userId, List<int> categories, int rating, bool open, int range, string location, int sort, string search, int numberOfItems, int page)
+        public async Task<List<Product>> GetProducts(int userId, List<int> categories, int rating, bool open, int range, string location, int sort, string search, int page)
         {
             User currentUser = _context.Users.FirstOrDefault(x => x.Id == userId);
             float currLat = currentUser.Latitude;
@@ -86,6 +87,11 @@ namespace back.DAL.Repositories
             products = SortProducts(sort, products);
 
             return products.Skip((page-1) * numberOfItems).Take(numberOfItems).ToList();
+        }
+
+        public int ProductPages()
+        {
+            return (int)Math.Ceiling((double)_context.Products.Count()/numberOfItems);
         }
     }
 }
