@@ -1,5 +1,6 @@
 package com.example.front.screens
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -30,8 +31,12 @@ import com.example.front.navigation.Screen
 import com.example.front.repository.Repository
 import com.example.front.viewmodels.login.LoginViewModel
 import com.example.front.viewmodels.login.MainViewModelFactory
+import androidx.compose.material.*
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun LoginScreen(
     navController:NavHostController
@@ -45,52 +50,72 @@ fun LoginScreen(
     val viewModelFactory = MainViewModelFactory(repository)
     viewModel = viewModelFactory.create(LoginViewModel::class.java)
 
+    var scaffoldState: ScaffoldState = rememberScaffoldState()
+    val coroutineScope = rememberCoroutineScope()
+
     Surface(
         color = Color.White,
         modifier = Modifier.fillMaxSize()
     ) {
-        Box(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            HeaderImage(
-                painterResource(id = R.drawable.loginheaderimage),
-            )
-
-            // Logo Image
-            LogoImage(
-                painterResource(id = R.drawable.logowithwhitebackground),
-            )
-
-            Column(
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .padding(20.dp)
+        Scaffold(scaffoldState = scaffoldState, content = {
+            Box(
+                modifier = Modifier.fillMaxSize()
             ) {
-                TitleTextComponent(value = stringResource(id = R.string.login_title))
-                MyTextField(
-                    labelValue = "Username",
-                    painterResource = painterResource(id = R.drawable.user),
-                    value = userInput, // Bind user input to the state
-                    onValueChange = { userInput = it } // Update the state on value change
+                HeaderImage(
+                    painterResource(id = R.drawable.loginheaderimage),
                 )
-                MyTextField(
-                    labelValue = "Password",
-                    painterResource = painterResource(id = R.drawable.padlock),
-                    value = passwordInput, // Bind password input to the state
-                    onValueChange = { passwordInput = it } // Update the state on value change
+
+                // Logo Image
+                LogoImage(
+                    painterResource(id = R.drawable.logowithwhitebackground),
                 )
-                BigBlueButton(
-                    text = "Login",
-                    onClick = {
-//                        var data = LoginDTO(userInput, passwordInput)
-//                        viewModel.getLoginnInfo(data)
-//                        val response = viewModel.myResponse.value
-                        navController.navigate(route = Screen.Home.route)
-                    },
-                    width = 150f,
-                    modifier = Modifier.offset(y = 100.dp)
-                )
+
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .padding(20.dp)
+                ) {
+                    TitleTextComponent(value = stringResource(id = R.string.login_title))
+                    MyTextField(
+                        labelValue = "Username",
+                        painterResource = painterResource(id = R.drawable.user),
+                        value = userInput, // Bind user input to the state
+                        onValueChange = { userInput = it } // Update the state on value change
+                    )
+                    MyTextField(
+                        labelValue = "Password",
+                        painterResource = painterResource(id = R.drawable.padlock),
+                        value = passwordInput, // Bind password input to the state
+                        onValueChange = { passwordInput = it } // Update the state on value change
+                    )
+                    BigBlueButton(
+                        text = "Login",
+                        onClick = {
+                            var data = LoginDTO(userInput, passwordInput)
+                            viewModel.getLoginInfo(data)
+                            val token = viewModel.jwtToken.value
+                            val errorMess = viewModel.errorMessage.value
+                            if (token != null && errorMess == null)
+                                navController.navigate(route = Screen.Home.route)
+                            else {
+                                if (errorMess != null) { // Check if errorMessage is not null
+                                    coroutineScope.launch {
+                                        scaffoldState.snackbarHostState.showSnackbar(
+                                            message = errorMess.toString(),
+                                            actionLabel = "Try again",
+                                            duration = SnackbarDuration.Indefinite
+                                        )
+                                    }
+                                }
+                            }
+                        },
+                        width = 150f,
+                        modifier = Modifier.offset(y = 100.dp)
+                    )
+
+                }
             }
-        }
+        })
     }
 }
+

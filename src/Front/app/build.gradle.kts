@@ -89,4 +89,7 @@ dependencies {
     // retroit
     implementation ("com.squareup.retrofit2:retrofit:2.7.2")
     implementation ("com.squareup.retrofit2:converter-gson:2.7.2")
+
+    //material za snackbar
+    implementation("androidx.compose.material:material:1.0.3")
 }

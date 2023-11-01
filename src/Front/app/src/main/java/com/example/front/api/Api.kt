@@ -2,6 +2,7 @@ package com.example.front.api
 
 import com.example.front.model.CategoriesDTO
 import com.example.front.model.LoginDTO
+import com.example.front.model.LoginResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -13,7 +14,7 @@ interface Api {
     @POST("back/Auth/Login")
     suspend fun getLoginInfo(
         @Body login:LoginDTO
-    ): Response<Int>
+    ): Response<LoginResponse>
 
 
     @GET("back/Home/GetCategories")
