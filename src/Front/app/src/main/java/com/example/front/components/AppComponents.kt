@@ -14,9 +14,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -26,6 +30,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color.Companion.Gray
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
@@ -42,6 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.front.R
 import com.example.front.ui.theme.LightBlue
+import com.example.front.ui.theme.MainBlue
 import com.example.front.ui.theme.Typography
 
 @Composable
@@ -92,6 +98,28 @@ fun MyTextField(
         } else {
             KeyboardOptions.Default
         }
+        shape = RoundedCornerShape(20.dp)
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SearchTextField(valuee: String,placeh:String, onValueChangee: (String) -> Unit) {
+    var value = valuee
+
+    OutlinedTextField(value = value,
+        placeholder  = { Text(text = placeh) },
+        colors = TextFieldDefaults.outlinedTextFieldColors(
+            cursorColor = MaterialTheme.colorScheme.onSurface,
+            containerColor = Color.White),
+        leadingIcon = {
+            Icon(
+                imageVector = Icons.Default.Search,
+                contentDescription = "Search icon"
+            )
+        },
+        onValueChange = onValueChangee,
+        shape = RoundedCornerShape(15.dp)
     )
 }
 
@@ -110,7 +138,8 @@ fun LogoImage(painterResource: Painter, modifier: Modifier = Modifier) {
     Image(
         painter = painterResource,
         contentDescription = "",
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
             .size(200.dp)
             .then(modifier) // Combine the existing modifier with the one passed as an argument
     )
@@ -126,4 +155,37 @@ fun ErrorTextComponent(text: String) {
         fontFamily = FontFamily(Font(R.font.lexend)),
         fontWeight = FontWeight(200)
     )
+}
+fun MediumBlueButton(text:String,onClick: () -> Unit,width:Float,modifier: Modifier) {
+    val primaryColor = MainBlue
+    Button(
+        onClick = onClick,
+        modifier = Modifier
+            .fillMaxWidth(width)
+            .padding(8.dp)
+            .height(48.dp).
+            then(modifier),
+        colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
+        shape = RoundedCornerShape(20)
+    ) {
+        Text(text = text,
+            style = Typography.bodyLarge)
+    }
+}
+@Composable
+fun BigBlueButton(text:String,onClick: () -> Unit,width:Float,modifier: Modifier) {
+    val primaryColor = MainBlue
+    Button(
+        onClick = onClick,
+        modifier = Modifier
+            .fillMaxWidth(width)
+            .padding(8.dp)
+            .height(58.dp).
+            then(modifier),
+        colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
+        shape = RoundedCornerShape(30)
+    ) {
+        Text(text = text,
+            style = Typography.bodyLarge)
+    }
 }
