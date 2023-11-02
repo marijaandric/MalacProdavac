@@ -3,6 +3,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.serialization") version "1.8.0"
     kotlin("kapt")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -86,10 +87,24 @@ dependencies {
     //okhttp3
     implementation("com.squareup.okhttp3:okhttp:4.11.0")
 
-    // retroit
+    // retrofit
     implementation ("com.squareup.retrofit2:retrofit:2.7.2")
     implementation ("com.squareup.retrofit2:converter-gson:2.7.2")
 
-    //material za snackbar
+    // material za snackbar
     implementation("androidx.compose.material:material:1.0.3")
+
+    // hilt
+    implementation("com.google.dagger:hilt-android:2.44")
+    kapt("com.google.dagger:hilt-android-compiler:2.44")
+
+    // nesto za state
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.2")
+    implementation("androidx.compose.runtime:runtime-rxjava2:1.5.2")
+    implementation("androidx.compose.runtime:runtime-livedata:1.5.2")
+    implementation("androidx.compose.runtime:runtime-rxjava3:1.5.2")
+}
+
+kapt {
+    correctErrorTypes = true
 }

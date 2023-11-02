@@ -119,6 +119,8 @@ fun LogoImage(painterResource: Painter, modifier: Modifier = Modifier) {
     )
 }
 
+
+// -- BUTTONS --
 @Composable
 fun MediumBlueButton(text:String,onClick: () -> Unit,width:Float,modifier: Modifier) {
     val primaryColor = MainBlue
@@ -153,3 +155,4 @@ fun BigBlueButton(text:String,onClick: () -> Unit,width:Float,modifier: Modifier
             style = Typography.bodyLarge)
     }
 }
+

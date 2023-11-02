@@ -26,7 +26,8 @@ val Typography = Typography(
                 fontWeight = FontWeight.Bold,
                 fontFamily = FontFamily(Font(R.font.lexend)),
                 color = Black
-        )
+        ),
+
 
 
 
