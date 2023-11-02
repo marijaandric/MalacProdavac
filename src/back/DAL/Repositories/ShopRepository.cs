@@ -20,6 +20,10 @@ namespace back.DAL.Repositories
         {
             switch (sort)
             {
+                case 1:
+                    return shops.OrderBy(x => x.Rating).ToList();
+                case 2:
+                    return shops.OrderByDescending(x => x.Rating).ToList();
                 case 3:
                     return shops.OrderBy(x => x.Name).ToList();
                 case 4:

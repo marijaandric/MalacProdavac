@@ -27,6 +27,10 @@ namespace back.DAL.Repositories
                     return products.OrderBy(x => x.Name).ToList();
                 case 4:
                     return products.OrderByDescending(x => x.Name).ToList();
+                case 5:
+                    return products.OrderBy(x => x.Rating).ToList();
+                case 6:
+                    return products.OrderByDescending(x => x.Rating).ToList();
                 default:
                     return products.OrderBy(x => x.Id).ToList();
             }

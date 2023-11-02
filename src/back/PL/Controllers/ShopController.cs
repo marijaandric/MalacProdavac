@@ -26,6 +26,19 @@ namespace back.PL.Controllers
             }
         }
 
+        [HttpGet("SortingOptions")]
+        public IActionResult SortingOptions()
+        {
+            return Ok(new Dictionary<int, string>
+            {
+                { 0 , "Default" },
+                { 1 , "Rating (lowest first)" },
+                { 2 , "Rating (highest first)" },
+                { 3 , "Alphabetically (ascending)" },
+                { 4 , "Alphabetically (descending)" }
+            });
+        }
+
         [HttpGet("ShopPages")]
         public IActionResult ShopPages() 
         {

@@ -36,6 +36,8 @@ namespace back.PL.Controllers
                 { 2 , "Price (highest first)" },
                 { 3 , "Alphabetically (ascending)" },
                 { 4 , "Alphabetically (descending)" },
+                { 5 , "Rating (lowest first)" },
+                { 6 , "Rating (highest first)" }
             });
         }
 
