@@ -54,19 +54,28 @@ namespace back.DAL.Repositories
 
         public async Task<List<Product>> GetProducts(int userId, List<int> categories, int rating, bool open, int range, string location, int sort, string search, int page)
         {
+            List<Product> products;
             User currentUser = _context.Users.FirstOrDefault(x => x.Id == userId);
             float currLat = currentUser.Latitude;
             float currLong = currentUser.Longitude;
 
             if (categories.Count == 0) categories = await _context.Categories.Select(x => x.Id).ToListAsync();
             
-            List<Product> products = await _context.Products.Where(x => categories.Contains(x.CategoryId) && x.Name.ToLower().Contains(search.Trim().ToLower()))
+            if (rating > 0)
+            {
+                products = await _context.Products.Where(x => categories.Contains(x.CategoryId) && x.Name.ToLower().Contains(search.Trim().ToLower()))
                                     .Join(_context.ProductReviews.GroupBy(x => x.ProductId).Select(group => new
                                     {
                                         ProductId = group.Key,
                                         avg = group.Average(x => x.Rating)
                                     }).Where(x => x.avg >= rating), p => p.Id, pr => pr.ProductId, (p, pr) => p)
                                     .ToListAsync();
+            }
+            else
+            {
+                products = await _context.Products.Where(x => categories.Contains(x.CategoryId) && x.Name.ToLower().Contains(search.Trim().ToLower())).ToListAsync();
+            }
+            
 
             if (open)
             {
