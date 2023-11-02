@@ -22,7 +22,7 @@ namespace back.PL.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { ErrorMessage = ex.Message });
+                return BadRequest(new { Error = ex.Message });
             }
         }
 
@@ -35,7 +35,7 @@ namespace back.PL.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { ErrorMessage = ex.Message });
+                return BadRequest(new { Error = ex.Message });
             }
         }
     }

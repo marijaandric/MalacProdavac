@@ -1,4 +1,5 @@
-﻿using back.DAL.Contexts;
+﻿using back.BLL.Dtos;
+using back.DAL.Contexts;
 using back.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,7 +16,7 @@ namespace back.DAL.Repositories
         }
 
         #region filterHelp
-        public List<Shop> SortShops(int sort, List<Shop> shops)
+        public List<ShopCard> SortShops(int sort, List<ShopCard> shops)
         {
             switch (sort)
             {
@@ -49,32 +50,34 @@ namespace back.DAL.Repositories
 
         #endregion
 
-        public async Task<List<Shop>> GetShops(int userId, List<int> categories, int rating, bool open, int range, string location, int sort, string search, int page)
+        public async Task<List<ShopCard>> GetShops(int userId, List<int> categories, int rating, bool open, int range, string location, int sort, string search, int page)
         {
-            List<Shop> shops;
             User currentUser = _context.Users.FirstOrDefault(x => x.Id == userId);
             float currLat = currentUser.Latitude;
             float currLong = currentUser.Longitude;
 
             if (categories.Count == 0) categories = await _context.Categories.Select(x => x.Id).ToListAsync();
 
-            if (rating > 0)
-            {
-                shops = await _context.Shop.Where(x => x.Name.ToLower().Contains(search.Trim().ToLower()))  //kategorije, search
-                        .Join(_context.ShopReviews.GroupBy(x => x.ShopId).Select(group => new         //rejting
-                        {
-                            ShopId = group.Key,
-                            avg = group.Average(x => x.Rating)
-                        }).Where(x => x.avg >= rating), s => s.Id, sr => sr.ShopId, (s, sr) => s)
-                        .Join(_context.ShopCategories.Where(x => categories.Contains(x.CategoryId)), s => s.Id, sr => sr.ShopId, (s, sr) => s).Distinct()
-                        .ToListAsync();
-            }
-            else
-            {
-                shops = await _context.Shop.Where(x => x.Name.ToLower().Contains(search.Trim().ToLower()))  //kategorije, search
-                        .Join(_context.ShopCategories.Where(x => categories.Contains(x.CategoryId)), s => s.Id, sr => sr.ShopId, (s, sr) => s).Distinct()
-                        .ToListAsync();
-            }
+            List<ShopCard>  shops = await _context.Shop
+                    .Where(x => x.Name.ToLower().Contains(search.Trim().ToLower()))
+                    .GroupJoin(_context.ShopReviews.GroupBy(x => x.ShopId).Select(group => new
+                    {
+                        ShopId = group.Key,
+                        AvgRating = group.Average(x => x.Rating)
+                    }), s => s.Id, sr => sr.ShopId, (s, sr) => new ShopCard
+                    {
+                        Id = s.Id,
+                        OwnerId = s.OwnerId,
+                        Name = s.Name,
+                        Address = s.Address,
+                        Latitude = s.Latitude,
+                        Longitude = s.Longitude,
+                        Image = s.Image,
+                        Rating = sr.DefaultIfEmpty().Select(x => x.AvgRating).FirstOrDefault()
+                    })
+                .Where(x => x.Rating >= rating)
+                .Join(_context.ShopCategories.Where(x => categories.Contains(x.CategoryId)), s => s.Id, sr => sr.ShopId, (s, sr) => s).Distinct()
+                .ToListAsync();
             
 
             if (open)

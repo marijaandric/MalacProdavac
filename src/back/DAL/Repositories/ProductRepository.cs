@@ -1,4 +1,5 @@
-﻿using back.DAL.Contexts;
+﻿using back.BLL.Dtos;
+using back.DAL.Contexts;
 using back.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,7 +15,7 @@ namespace back.DAL.Repositories
         }
 
         #region filterHelp
-        public List<Product> SortProducts(int sort, List<Product> products)
+        public List<ProductCard> SortProducts(int sort, List<ProductCard> products)
         {
             switch (sort)
             {
@@ -52,29 +53,36 @@ namespace back.DAL.Repositories
 
         #endregion
 
-        public async Task<List<Product>> GetProducts(int userId, List<int> categories, int rating, bool open, int range, string location, int sort, string search, int page)
+        public async Task<List<ProductCard>> GetProducts(int userId, List<int> categories, int rating, bool open, int range, string location, int sort, string search, int page)
         {
-            List<Product> products;
             User currentUser = _context.Users.FirstOrDefault(x => x.Id == userId);
             float currLat = currentUser.Latitude;
             float currLong = currentUser.Longitude;
 
             if (categories.Count == 0) categories = await _context.Categories.Select(x => x.Id).ToListAsync();
-            
-            if (rating > 0)
-            {
-                products = await _context.Products.Where(x => categories.Contains(x.CategoryId) && x.Name.ToLower().Contains(search.Trim().ToLower()))
-                                    .Join(_context.ProductReviews.GroupBy(x => x.ProductId).Select(group => new
-                                    {
-                                        ProductId = group.Key,
-                                        avg = group.Average(x => x.Rating)
-                                    }).Where(x => x.avg >= rating), p => p.Id, pr => pr.ProductId, (p, pr) => p)
-                                    .ToListAsync();
-            }
-            else
-            {
-                products = await _context.Products.Where(x => categories.Contains(x.CategoryId) && x.Name.ToLower().Contains(search.Trim().ToLower())).ToListAsync();
-            }
+
+            List<ProductCard> products = await _context.Products.Where(x => categories.Contains(x.CategoryId) && x.Name.ToLower().Contains(search.Trim().ToLower()))
+                                .GroupJoin(_context.ProductReviews.GroupBy(x => x.ProductId).Select(group => new
+                                {
+                                    ProductId = group.Key,
+                                    avg = group.Average(x => x.Rating)
+                                }), p => p.Id, pr => pr.ProductId, (p, pr) => new ProductCard
+                                {
+                                    Id = p.Id,
+                                    ShopId = p.ShopId,
+                                    Name = p.Name,
+                                    Description = p.Description,
+                                    Price = p.Price,
+                                    MetricId = p.MetricId,
+                                    CategoryId = p.CategoryId,
+                                    SubcategoryId = p.SubcategoryId,
+                                    SalePercentage = p.SalePercentage,
+                                    SaleMinQuantity = p.SaleMinQuantity,
+                                    SaleMessage = p.SaleMessage,
+                                    Rating = pr.DefaultIfEmpty().Select(x => x.avg).FirstOrDefault()
+                                })
+                                .Where(x => x.Rating >= rating)
+                                .ToListAsync();
             
 
             if (open)
