@@ -97,7 +97,7 @@ fun MyTextField(
             )
         } else {
             KeyboardOptions.Default
-        }
+        },
         shape = RoundedCornerShape(20.dp)
     )
 }
@@ -156,6 +156,7 @@ fun ErrorTextComponent(text: String) {
         fontWeight = FontWeight(200)
     )
 }
+@Composable
 fun MediumBlueButton(text:String,onClick: () -> Unit,width:Float,modifier: Modifier) {
     val primaryColor = MainBlue
     Button(
