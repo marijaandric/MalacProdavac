@@ -82,7 +82,6 @@ fun SearchTextField(valuee: String,placeh:String, onValueChangee: (String) -> Un
     var value = valuee
 
     OutlinedTextField(value = value,
-        placeholder  = { Text(text = placeh) },
         colors = TextFieldDefaults.outlinedTextFieldColors(
             cursorColor = MaterialTheme.colorScheme.onSurface,
             containerColor = Color.White),
@@ -93,7 +92,9 @@ fun SearchTextField(valuee: String,placeh:String, onValueChangee: (String) -> Un
             )
         },
         onValueChange = onValueChangee,
-        shape = RoundedCornerShape(15.dp)
+        shape = RoundedCornerShape(50.dp),
+        modifier = Modifier.height(50.dp),
+        placeholder  = { Text(text = placeh) }
     )
 }
 

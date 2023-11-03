@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.front.navigation.SetupNavGraph
+import com.example.front.screens.SplashScreen
 import com.example.front.screens.categories.RegistrationCategories
 import com.example.front.ui.theme.FrontTheme
 
@@ -20,8 +21,9 @@ import com.example.front.ui.theme.FrontTheme
         super.onCreate(savedInstanceState)
         setContent {
             FrontTheme {
-                Surface(modifier = Modifier.fillMaxSize()
-                    .background(color=MaterialTheme.colorScheme.background)) {
+                Surface(modifier = Modifier
+                    .fillMaxSize()
+                    .background(color = MaterialTheme.colorScheme.background)) {
                     navController = rememberNavController()
                     //SetupNavGraph(navController =
                     RegistrationCategories()

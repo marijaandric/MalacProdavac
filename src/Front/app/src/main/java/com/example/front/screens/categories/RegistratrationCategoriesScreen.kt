@@ -1,8 +1,15 @@
 package com.example.front.screens.categories
 
 import android.util.Log
+import android.view.animation.OvershootInterpolator
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -30,12 +37,14 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -45,6 +54,7 @@ import com.example.front.components.MediumBlueButton
 import com.example.front.R
 import com.example.front.repository.Repository
 import com.example.front.viewmodels.categories.CategoriesViewModel
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -104,22 +114,26 @@ data class CardData(val image: Int, val description: String, val idCat : Int)
 @Composable
 fun Cards(viewModel: CategoriesViewModel) {
 
-    val progressAnimation by animateFloatAsState(
-        targetValue = 0f,
-        animationSpec = tween(durationMillis = 1500, easing = FastOutSlowInEasing), label = ""
-    )
-
     val state = viewModel.state.value
     if(state.isLoading)
     {
         Spacer(modifier = Modifier.height(40.dp))
 
+        val rotationState by rememberInfiniteTransition().animateFloat(
+            initialValue = 0f,
+            targetValue = 360f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(2500, easing = LinearEasing),
+                repeatMode = RepeatMode.Restart
+            )
+        )
+
         CircularProgressIndicator(
             modifier = Modifier
                 .size(70.dp)
-                .padding(8.dp),
-            strokeWidth = 4.dp,
-            progress = progressAnimation
+                .padding(8.dp)
+                .rotate(rotationState),
+            strokeWidth = 4.dp
         )
 
     }// ne bi bilo lose dodati ekran za prikaz greske
