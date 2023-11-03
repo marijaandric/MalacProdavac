@@ -87,7 +87,10 @@ namespace back.DAL.Repositories
             if (open)
             {
                 shops = shops
-                        .Join(_context.WorkingHours.Where(x => x.Day.Day == DateTime.Now.Day && x.OpeningHours.TimeOfDay <= DateTime.Now.TimeOfDay && x.ClosingHours.TimeOfDay >= DateTime.Now.TimeOfDay), s => s.Id, w => w.ShopId, (s, w) => s)
+                        .Join(_context.WorkingHours, s => s.Id, w => w.ShopId, (s, w) => new { s , w })
+                        .ToList()
+                        .Where(x => x.w.Day == DateTime.Now.DayOfWeek && x.w.OpeningHours <= DateTime.Now.TimeOfDay && x.w.ClosingHours >= DateTime.Now.TimeOfDay)
+                        .Select(x => x.s)
                         .ToList();
             }
 

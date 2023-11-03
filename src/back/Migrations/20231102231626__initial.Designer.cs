@@ -11,7 +11,7 @@ using back.DAL.Contexts;
 namespace back.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20231027223348__initial")]
+    [Migration("20231102231626__initial")]
     partial class _initial
     {
         /// <inheritdoc />
@@ -751,13 +751,13 @@ namespace back.Migrations
                     b.Property<int>("ShopId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime>("Day")
+                    b.Property<int>("Day")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<TimeSpan>("ClosingHours")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("ClosingHours")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("OpeningHours")
+                    b.Property<TimeSpan>("OpeningHours")
                         .HasColumnType("TEXT");
 
                     b.HasKey("ShopId", "Day");

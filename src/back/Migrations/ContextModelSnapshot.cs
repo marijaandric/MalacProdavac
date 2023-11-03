@@ -748,13 +748,13 @@ namespace back.Migrations
                     b.Property<int>("ShopId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime>("Day")
+                    b.Property<int>("Day")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<TimeSpan>("ClosingHours")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("ClosingHours")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("OpeningHours")
+                    b.Property<TimeSpan>("OpeningHours")
                         .HasColumnType("TEXT");
 
                     b.HasKey("ShopId", "Day");
