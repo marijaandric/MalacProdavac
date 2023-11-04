@@ -10,10 +10,12 @@ namespace back.BLL.Dtos
         public string Category { get; set; }
         public string Subcategory { get; set; }
         public bool Liked { get; set; }
+        public bool Bought { get; set; }
         public List<WorkingHours> WorkingHours { get; set; }
         public List<ProductReview> Reviews { get; set; }
         public List<(ProductQuestion, ProductAnswer)> QuestionsAndAnswers { get; set; }
         public Dictionary<string, int> Sizes { get; set; }
+        public List<string> Images { get; set; }
 
     }
 }

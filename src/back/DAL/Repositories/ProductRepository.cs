@@ -132,6 +132,7 @@ namespace back.DAL.Repositories
                                                             (q, a) => (q.q, a)
                                                         ).ToList(); 
             Dictionary<string, int> sizes = await _context.ProductSizes.Where(x => x.ProductId == productId).Join(_context.Sizes, ps => ps.SizeId, s => s.Id, (ps, s) => new { s.Name, ps.Stock }).ToDictionaryAsync(key => key.Name, value => value.Stock);
+            List<string> images = await _context.ProductImages.Where(x => x.ProductId == productId).Select(x => x.Image).ToListAsync();
 
             return new ProductInfo
             {
@@ -148,10 +149,12 @@ namespace back.DAL.Repositories
                 SaleMinQuantity = product.SaleMinQuantity,
                 SaleMessage = product.SaleMessage,
                 Liked = _context.LikedProducts.Any(x => x.ProductId == productId && x.UserId == userId),
+                Bought = _context.Orders.Join(_context.OrderItems, o => o.Id, oi => oi.OrderId, (o, oi) => new { o, oi }).Any(x => x.oi.ProductId == productId && x.o.UserId == userId),
                 WorkingHours = workingHours,
                 Reviews = reviews,
                 QuestionsAndAnswers = qna,
-                Sizes = sizes
+                Sizes = sizes,
+                Images = images
             };
 
         }
