@@ -11,7 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.front.screens.HomePage
+import com.example.front.screens.home.HomePage
 import com.example.front.screens.Intro
 import com.example.front.screens.LoginScreen
 import com.example.front.screens.SplashScreen
