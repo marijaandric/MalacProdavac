@@ -16,9 +16,14 @@ class TokenManager(context: Context) {
     private val dataStore: DataStore<Preferences> = context.dataStore
 
     suspend fun saveToken(token: String) {
-        val dataStoreKey = stringPreferencesKey("jwt_token")
-        dataStore.edit { preferences ->
-            preferences[dataStoreKey] = token
+        try {
+            val dataStoreKey = stringPreferencesKey("jwt_token")
+            dataStore.edit { preferences ->
+                preferences[dataStoreKey] = token
+            }
+        } catch (e: Exception) {
+            // Handle the exception here (e.g., log or display an error message).
+            e.printStackTrace()
         }
     }
 

@@ -36,6 +36,7 @@ import androidx.compose.material.*
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import com.example.front.helper.LoginHandler
 import com.example.front.helper.TokenManager
 import com.example.front.viewmodels.categories.CategoriesViewModel
@@ -57,8 +58,6 @@ fun LoginScreen(
 
     var scaffoldState: ScaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
-
-    val context = LocalContext.current
 
     val loginHandler = LoginHandler(LocalContext.current)
 
@@ -101,18 +100,23 @@ fun LoginScreen(
                         text = "Login",
                         onClick = {
                             coroutineScope.launch {
-                                val success = loginHandler.performLogin(userInput, passwordInput)
-                                if (success) {
-                                    navController.navigate(route = Screen.Home.route)
-                                } else {
-                                    val errorMess = viewModel.errorMessage.value
-                                    if (errorMess != null) {
-                                        scaffoldState.snackbarHostState.showSnackbar(
-                                            message = errorMess.toString(),
-                                            actionLabel = "Try again",
-                                            duration = SnackbarDuration.Indefinite
-                                        )
+                                try {
+                                    val success = loginHandler.performLogin(userInput, passwordInput)
+                                    if (success) {
+                                        navController.navigate(route = Screen.Home.route)
+                                    } else {
+                                        val errorMess = viewModel.errorMessage.value
+                                        if (errorMess != null) {
+                                            scaffoldState.snackbarHostState.showSnackbar(
+                                                message = errorMess.toString(),
+                                                actionLabel = "Try again",
+                                                duration = SnackbarDuration.Indefinite
+                                            )
+                                        }
                                     }
+                                } catch (e: Exception) {
+                                    // Handle the exception here (e.g., log or display an error message).
+                                    e.printStackTrace()
                                 }
                             }
                         },

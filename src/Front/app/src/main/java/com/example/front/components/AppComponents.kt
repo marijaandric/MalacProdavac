@@ -142,6 +142,17 @@ fun HeaderImage(painterResource: Painter) {
         contentScale = ContentScale.FillWidth
     )
 }
+
+@Composable
+fun ProductImage(painterResource: Painter) {
+    Image(
+        painter = painterResource,
+        contentDescription = "",
+        modifier = Modifier.fillMaxWidth(),
+        contentScale = ContentScale.FillWidth
+    )
+}
+
 @Composable
 fun LogoImage(painterResource: Painter, modifier: Modifier = Modifier) {
     Image(

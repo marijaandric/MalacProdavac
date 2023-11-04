@@ -21,17 +21,22 @@ class LoginHandler(private val context: Context) {
 
     suspend fun performLogin(
         userInput: String,
-        passwordInput: String,
+        passwordInput: String
     ): Boolean {
-        val data = LoginDTO(userInput, passwordInput)
-        viewModel.getLoginInfo(data)
-        val token = viewModel.jwtToken.value
-        val errorMess = viewModel.errorMessage.value
+        try {
+            val data = LoginDTO(userInput, passwordInput)
+            viewModel.getLoginInfo(data)
+            val token = viewModel.jwtToken.value
+            val errorMess = viewModel.errorMessage.value
 
-        if (token != null && errorMess == null) {
-            val tokenManager = TokenManager(context)
-            tokenManager.saveToken(token)
-            return true
+            if (token != null && errorMess == null) {
+//                val tokenManager = DataStoreManager(context)
+//                tokenManager.storeToken(token)
+                return true
+            }
+        } catch (e: Exception) {
+            // Handle the exception here (e.g., log or display an error message).
+            e.printStackTrace()
         }
         return false
     }
