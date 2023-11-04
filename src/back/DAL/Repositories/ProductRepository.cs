@@ -119,7 +119,7 @@ namespace back.DAL.Repositories
             return (int)Math.Ceiling((double)_context.Products.Count()/numberOfItems);
         }
 
-        public async Task<ProductInfo> ProductDetails(int productId)
+        public async Task<ProductInfo> ProductDetails(int productId, int userId)
         {
             Product product = await _context.Products.FirstOrDefaultAsync(x => x.Id == productId);
             List<WorkingHours> workingHours = await _context.WorkingHours.Where(x => x.ShopId == product.ShopId).ToListAsync();
@@ -147,6 +147,7 @@ namespace back.DAL.Repositories
                 SalePercentage = product.SalePercentage,
                 SaleMinQuantity = product.SaleMinQuantity,
                 SaleMessage = product.SaleMessage,
+                Liked = _context.LikedProducts.Any(x => x.ProductId == productId && x.UserId == userId),
                 WorkingHours = workingHours,
                 Reviews = reviews,
                 QuestionsAndAnswers = qna,
