@@ -52,7 +52,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.front.R
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.front.ui.theme.LightBlue
@@ -223,24 +222,23 @@ fun BigBlueButton(text:String,onClick: () -> Unit,width:Float,modifier: Modifier
 }
 
 
-
-@C
+@Composable
+fun SellerCard(title: String, author: String, imageResource: Int) {
+    Card(
+        modifier = Modifier
+            .width(320.dp)
+            .clip(RoundedCornerShape(20.dp))
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Image(
+                painter = painterResource(id = imageResource),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(150.dp)omposable
-                        fun SellerCard(title: String, author: String, imageResource: Int) {
-                            Card(
-                                modifier = Modifier
-                                    .width(320.dp)
-                                    .clip(RoundedCornerShape(20.dp))
-                            ) {
-                                Column(
-                                    modifier = Modifier.fillMaxWidth()
-                                ) {
-                                    Image(
-                                        painter = painterResource(id = imageResource),
-                                        contentDescription = null,
-                                        contentScale = ContentScale.Crop,
+                    .height(150.dp)
                     .padding(13.dp)
                     .clip(RoundedCornerShape(10.dp))
             )
@@ -263,6 +261,7 @@ fun BigBlueButton(text:String,onClick: () -> Unit,width:Float,modifier: Modifier
         }
     }
 }
+
 
 
 @Composable
