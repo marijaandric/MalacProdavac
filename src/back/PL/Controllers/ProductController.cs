@@ -53,5 +53,18 @@ namespace back.PL.Controllers
                 return BadRequest(new { ErrorMessage = ex.Message });
             }
         }
+
+        [HttpGet("ProductDetails")]
+        public async Task<IActionResult> ProductDetails(int productId)
+        {
+            try
+            {
+                return Ok(new { Details = await _service.ProductDetails(productId) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { ErrorMessage = ex.Message });
+            }
+        }
     }
 }

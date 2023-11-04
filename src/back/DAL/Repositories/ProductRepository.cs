@@ -117,5 +117,39 @@ namespace back.DAL.Repositories
         {
             return (int)Math.Ceiling((double)_context.Products.Count()/numberOfItems);
         }
+
+        public async Task<ProductInfo> ProductDetails(int productId)
+        {
+            Product product = await _context.Products.FirstOrDefaultAsync(x => x.Id == productId);
+            List<WorkingHours> workingHours = await _context.WorkingHours.Where(x => x.ShopId == product.ShopId).ToListAsync();
+            List<ProductReview> reviews = await _context.ProductReviews.Where(x => x.ProductId == productId).ToListAsync();
+            List<ProductQuestion> questions = await _context.ProductQuestions.Where(x => x.ProductId == productId).ToListAsync();
+            List<ProductAnswer> answers = await _context.ProductAnswers.Where(x => questions.Select(x => x.Id).Contains(x.QuestionId)).ToListAsync();
+            List<(ProductQuestion, ProductAnswer)> qna = questions.GroupJoin(answers, q => q.Id, a => a.QuestionId, (q, a) => (q, a))
+                                                        .SelectMany(
+                                                            q => q.a.DefaultIfEmpty(),
+                                                            (q, a) => (q.q, a)
+                                                        ).ToList(); 
+
+            return new ProductInfo
+            {
+                Id = productId,
+                ShopId = product.ShopId,
+                ShopName = _context.Shop.FirstOrDefault(x => x.Id == product.ShopId).Name,
+                Name = product.Name,
+                Description = product.Description,
+                Price = product.Price,
+                Metric = _context.Metrics.FirstOrDefault(x => x.Id == product.MetricId).Name,
+                Category = _context.Categories.FirstOrDefault(x => x.Id == product.CategoryId).Name,
+                Subcategory = _context.Subcategories.FirstOrDefault(x => x.Id == product.SubcategoryId).Name,
+                SalePercentage = product.SalePercentage,
+                SaleMinQuantity = product.SaleMinQuantity,
+                SaleMessage = product.SaleMessage,
+                WorkingHours = workingHours,
+                Reviews = reviews,
+                QuestionsAndAnswers = qna
+            };
+
+        }
     }
 }

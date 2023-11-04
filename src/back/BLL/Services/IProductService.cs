@@ -1,6 +1,4 @@
 ﻿using back.BLL.Dtos;
-using back.DAL.Repositories;
-using back.Models;
 
 namespace back.BLL.Services
 {
@@ -8,5 +6,6 @@ namespace back.BLL.Services
     {
         public Task<List<ProductCard>> GetProducts(int userId, List<int> categories, int rating, bool open, int range, string location, int sort, string search, int page);
         public int ProductPages();
+        public Task<ProductInfo> ProductDetails(int productId);
     }
 }
