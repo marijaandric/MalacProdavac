@@ -13,6 +13,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.front.navigation.SetupNavGraph
 import com.example.front.screens.SplashScreen
 import com.example.front.screens.categories.RegistrationCategories
+import com.example.front.screens.home.HomePage
 import com.example.front.ui.theme.FrontTheme
 
     class MainActivity : ComponentActivity() {
@@ -26,7 +27,7 @@ import com.example.front.ui.theme.FrontTheme
                     .background(color = MaterialTheme.colorScheme.background)) {
                     navController = rememberNavController()
                     //SetupNavGraph(navController =
-                    RegistrationCategories()
+                    HomePage()
                 }
             }
         }

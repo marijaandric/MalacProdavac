@@ -27,7 +27,12 @@ val Typography = Typography(
                 fontFamily = FontFamily(Font(R.font.lexend)),
                 color = Black
         ),
-
+        labelSmall = TextStyle(
+                fontFamily = FontFamily(Font(R.font.lexend)),
+                fontWeight = FontWeight.Bold,
+                fontSize = 13.sp,
+                letterSpacing = 0.5.sp
+        )
 
 
 

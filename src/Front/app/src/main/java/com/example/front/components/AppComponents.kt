@@ -2,17 +2,22 @@ package com.example.front.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -28,7 +33,10 @@ import androidx.compose.ui.graphics.Color.Companion.Gray
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.front.ui.theme.LightBlue
 import com.example.front.ui.theme.MainBlue
 import com.example.front.ui.theme.Typography
@@ -139,6 +147,25 @@ fun MediumBlueButton(text:String,onClick: () -> Unit,width:Float,modifier: Modif
             style = Typography.bodyLarge)
     }
 }
+
+@Composable
+fun CardButton(text:String,onClick: () -> Unit,width:Float,modifier: Modifier,color : Color) {
+    val primaryColor = MainBlue
+    Button(
+        onClick = onClick,
+        modifier = Modifier
+            .fillMaxWidth(width)
+            .height(38.dp).
+            then(modifier),
+        colors = ButtonDefaults.buttonColors(containerColor = color),
+        shape = RoundedCornerShape(20)
+    ) {
+        Text(text = text,
+            style = Typography.bodyLarge)
+    }
+}
+
+
 @Composable
 fun BigBlueButton(text:String,onClick: () -> Unit,width:Float,modifier: Modifier) {
     val primaryColor = MainBlue
@@ -153,7 +180,53 @@ fun BigBlueButton(text:String,onClick: () -> Unit,width:Float,modifier: Modifier
         shape = RoundedCornerShape(30)
     ) {
         Text(text = text,
-            style = Typography.bodyLarge)
+            style = Typography.labelSmall)
     }
 }
 
+
+
+@Composable
+fun SellerCard(title: String, author: String, imageResource: Int) {
+    Card(
+        modifier = Modifier
+            .width(320.dp)
+            .clip(RoundedCornerShape(20.dp))
+    ) {
+        Box(
+//            modifier = Modifier.background(color = MaterialTheme.colorScheme.surface)
+        )
+        {
+            Column(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Image(
+                    painter = painterResource(id = imageResource),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(150.dp)
+                        .padding(13.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                )
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 16.dp, bottom = 16.dp, end = 16.dp)
+                ) {
+                    Text(text = title, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                    Text(text = author, fontSize = 10.sp)
+                    Row(
+                        modifier = Modifier.padding(top = 10.dp)
+                    )
+                    {
+                        CardButton(text = "More info", onClick = { /*TODO*/ }, width = 0.52f, modifier = Modifier.padding(end=8.dp), color = MaterialTheme.colorScheme.secondary)
+                        CardButton(text = "Products", onClick = { /*TODO*/ }, width = 1f, modifier = Modifier, color = MaterialTheme.colorScheme.primary)
+                    }
+                }
+            }
+        }
+    }
+}
