@@ -1,10 +1,13 @@
 package com.example.front.screens
 
 import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,8 +16,10 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -29,6 +34,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Paint
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -40,6 +49,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -89,27 +99,36 @@ fun RegisterScreen(navController: NavHostController) {
     var confirmPasswordError by remember { mutableStateOf("") }
     var addressError by remember { mutableStateOf("") }
 
+    val scrollState = rememberScrollState()
+
     Surface(
         color = Color.White,
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
     ){
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
+                .verticalScroll(state = scrollState)
         ){
-            HeaderImage(painterResource(id = R.drawable.loginheaderimage))
-            LogoImage(
-                painterResource(id = R.drawable.logowithwhitebackground),
-                modifier = Modifier.offset(y = (-16).dp)
-            )
+            Box {
+                HeaderImage(painterResource(id = R.drawable.loginheaderimage))
+
+                LogoImage(
+                    painterResource(id = R.drawable.logowithwhitebackground),
+                    modifier = Modifier.offset(y = (-16).dp)
+                )
+            }
 
             Column(
                 modifier = Modifier
                     .padding(28.dp)
-                    .padding(top = 70.dp)
-                    .align(Alignment.Center)
+//                    .padding(top = 70.dp)
+                    .padding(top = 0.dp, bottom = 0.dp)
+                    .offset(y = (-40).dp)
+//                    .align(Alignment.Center)
+//                    .verticalScroll(state = scrollState)
             ){
                 TitleTextComponent("Registracija")
 
@@ -239,9 +258,15 @@ fun RegisterScreen(navController: NavHostController) {
 
                 Text(
                     text = "Already have an account? Login.",
-                    modifier = Modifier.clickable {
-                        navController.navigate(Screen.Login.route)
-                    }
+                    modifier = Modifier
+                        .clickable {
+                            navController.navigate(Screen.Login.route)
+                        }
+                        .fillMaxWidth(),
+                    textAlign = TextAlign.Center,
+                    color = Color(0xFF005F8B),
+                    fontWeight = FontWeight(600),
+                    fontSize = 16.sp
                 )
             }
 

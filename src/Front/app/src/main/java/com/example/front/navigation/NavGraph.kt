@@ -14,6 +14,7 @@ import androidx.navigation.compose.composable
 import com.example.front.screens.HomePage
 import com.example.front.screens.Intro
 import com.example.front.screens.LoginScreen
+import com.example.front.screens.RegisterScreen
 import com.example.front.screens.SplashScreen
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -36,6 +37,11 @@ fun SetupNavGraph(
             route = Screen.Login.route
         ){
             LoginScreen(navController = navController)
+        }
+        composable(
+            route = Screen.Register.route
+        ){
+            RegisterScreen(navController = navController)
         }
         composable(
             route = Screen.Home.route

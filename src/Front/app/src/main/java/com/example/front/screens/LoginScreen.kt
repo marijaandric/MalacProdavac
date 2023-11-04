@@ -2,10 +2,13 @@ package com.example.front.screens
 
 import android.annotation.SuppressLint
 import android.content.Context
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Surface
@@ -33,9 +36,13 @@ import com.example.front.repository.Repository
 import com.example.front.viewmodels.login.LoginViewModel
 import com.example.front.viewmodels.login.MainViewModelFactory
 import androidx.compose.material.*
+import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.sp
 import com.example.front.helper.LoginHandler
 import com.example.front.helper.TokenManager
 import com.example.front.viewmodels.categories.CategoriesViewModel
@@ -97,6 +104,7 @@ fun LoginScreen(
                         value = passwordInput, // Bind password input to the state
                         onValueChange = { passwordInput = it } // Update the state on value change
                     )
+                    Spacer(modifier = Modifier.height(100.dp))
                     BigBlueButton(
                         text = "Login",
                         onClick = {
@@ -117,7 +125,19 @@ fun LoginScreen(
                             }
                         },
                         width = 150f,
-                        modifier = Modifier.offset(y = 100.dp)
+                        modifier = Modifier
+                    )
+                    Text(
+                        text = "Don't have an account? Register now.",
+                        modifier = Modifier
+                            .clickable {
+                                navController.navigate(Screen.Register.route)
+                            }
+                            .fillMaxWidth(),
+                        textAlign = TextAlign.Center,
+                        color = Color(0xFF005F8B),
+                        fontWeight = FontWeight(600),
+                        fontSize = 16.sp
                     )
                 }
             }
