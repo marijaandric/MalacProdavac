@@ -13,6 +13,7 @@ namespace back.Models
         public string? Text { get; set; }
         public int TypeId { get; set; }
         public DateTime? CreatedOn { get; set; }
+        public bool Read {  get; set; }
 
         public User User { get; set; }
     }

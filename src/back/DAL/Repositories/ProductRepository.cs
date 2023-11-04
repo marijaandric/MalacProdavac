@@ -1,5 +1,6 @@
 ﻿using back.BLL.Dtos;
 using back.DAL.Contexts;
+using back.DAL.Models;
 using back.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -130,6 +131,7 @@ namespace back.DAL.Repositories
                                                             q => q.a.DefaultIfEmpty(),
                                                             (q, a) => (q.q, a)
                                                         ).ToList(); 
+            Dictionary<string, int> sizes = await _context.ProductSizes.Where(x => x.ProductId == productId).Join(_context.Sizes, ps => ps.SizeId, s => s.Id, (ps, s) => new { s.Name, ps.Stock }).ToDictionaryAsync(key => key.Name, value => value.Stock);
 
             return new ProductInfo
             {
@@ -147,7 +149,8 @@ namespace back.DAL.Repositories
                 SaleMessage = product.SaleMessage,
                 WorkingHours = workingHours,
                 Reviews = reviews,
-                QuestionsAndAnswers = qna
+                QuestionsAndAnswers = qna,
+                Sizes = sizes
             };
 
         }

@@ -1,4 +1,5 @@
-﻿using back.Models;
+﻿using back.DAL.Models;
+using back.Models;
 
 namespace back.BLL.Dtos
 {
@@ -11,7 +12,7 @@ namespace back.BLL.Dtos
         public List<WorkingHours> WorkingHours { get; set; }
         public List<ProductReview> Reviews { get; set; }
         public List<(ProductQuestion, ProductAnswer)> QuestionsAndAnswers { get; set; }
-
+        public Dictionary<string, int> Sizes { get; set; }
 
     }
 }
