@@ -1,6 +1,7 @@
 package com.example.front.screens
 
 import android.annotation.SuppressLint
+import android.content.Context
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -32,7 +33,12 @@ import com.example.front.repository.Repository
 import com.example.front.viewmodels.login.LoginViewModel
 import com.example.front.viewmodels.login.MainViewModelFactory
 import androidx.compose.material.*
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
+import com.example.front.helper.LoginHandler
+import com.example.front.helper.TokenManager
+import com.example.front.viewmodels.categories.CategoriesViewModel
 import kotlinx.coroutines.launch
 
 
@@ -47,11 +53,14 @@ fun LoginScreen(
 
     lateinit var viewModel: LoginViewModel
     val repository = Repository() // Create a Repository instance
-    val viewModelFactory = MainViewModelFactory(repository)
-    viewModel = viewModelFactory.create(LoginViewModel::class.java)
+    viewModel = LoginViewModel(repository)
 
     var scaffoldState: ScaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
+
+    val context = LocalContext.current
+
+    val loginHandler = LoginHandler(LocalContext.current)
 
     Surface(
         color = Color.White,
@@ -91,15 +100,13 @@ fun LoginScreen(
                     BigBlueButton(
                         text = "Login",
                         onClick = {
-                            var data = LoginDTO(userInput, passwordInput)
-                            viewModel.getLoginInfo(data)
-                            val token = viewModel.jwtToken.value
-                            val errorMess = viewModel.errorMessage.value
-                            if (token != null && errorMess == null)
-                                navController.navigate(route = Screen.Home.route)
-                            else {
-                                if (errorMess != null) { // Check if errorMessage is not null
-                                    coroutineScope.launch {
+                            coroutineScope.launch {
+                                val success = loginHandler.performLogin(userInput, passwordInput)
+                                if (success) {
+                                    navController.navigate(route = Screen.Home.route)
+                                } else {
+                                    val errorMess = viewModel.errorMessage.value
+                                    if (errorMess != null) {
                                         scaffoldState.snackbarHostState.showSnackbar(
                                             message = errorMess.toString(),
                                             actionLabel = "Try again",
@@ -112,7 +119,6 @@ fun LoginScreen(
                         width = 150f,
                         modifier = Modifier.offset(y = 100.dp)
                     )
-
                 }
             }
         })

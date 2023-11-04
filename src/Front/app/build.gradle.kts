@@ -93,4 +93,8 @@ dependencies {
 
     //material za snackbar
     implementation("androidx.compose.material:material:1.0.3")
+
+    //datastore
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
+
 }

@@ -551,9 +551,9 @@ namespace back.Migrations
                 columns: table => new
                 {
                     ShopId = table.Column<int>(type: "INTEGER", nullable: false),
-                    Day = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    OpeningHours = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    ClosingHours = table.Column<DateTime>(type: "TEXT", nullable: false)
+                    Day = table.Column<int>(type: "INTEGER", nullable: false),
+                    OpeningHours = table.Column<TimeSpan>(type: "TEXT", nullable: false),
+                    ClosingHours = table.Column<TimeSpan>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {

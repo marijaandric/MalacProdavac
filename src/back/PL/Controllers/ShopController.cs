@@ -22,8 +22,21 @@ namespace back.PL.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { ErrorMessage = ex.Message });
+                return BadRequest(new { Error = ex.Message });
             }
+        }
+
+        [HttpGet("SortingOptions")]
+        public IActionResult SortingOptions()
+        {
+            return Ok(new Dictionary<int, string>
+            {
+                { 0 , "Default" },
+                { 1 , "Rating (lowest first)" },
+                { 2 , "Rating (highest first)" },
+                { 3 , "Alphabetically (ascending)" },
+                { 4 , "Alphabetically (descending)" }
+            });
         }
 
         [HttpGet("ShopPages")]
@@ -35,7 +48,7 @@ namespace back.PL.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { ErrorMessage = ex.Message });
+                return BadRequest(new { Error = ex.Message });
             }
         }
     }

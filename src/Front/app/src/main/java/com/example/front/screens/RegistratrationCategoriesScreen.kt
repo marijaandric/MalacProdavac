@@ -147,7 +147,6 @@ fun Cards() {
             )
         }
     }
-
 }
 
 @Composable
@@ -198,6 +197,5 @@ fun ClickableCard(
         )
         Spacer(modifier = Modifier.height(2.dp))
     }
-
 }
 

@@ -37,11 +37,11 @@ namespace back.PL.Controllers
             {
                 //treba token da vraca
                 string token = await _authService.Login(loginDto);
-                return Ok(token);
+                return Ok(new { Token = token });
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { Error = ex.Message });
             }
         }
     }

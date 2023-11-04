@@ -1,5 +1,5 @@
-﻿using back.DAL.Repositories;
-using back.Models;
+﻿using back.BLL.Dtos;
+using back.DAL.Repositories;
 
 namespace back.BLL.Services
 {
@@ -11,9 +11,9 @@ namespace back.BLL.Services
             _repository = repository;
         }
 
-        public async Task<List<Shop>> GetShops(int userId, List<int> categories, int rating, bool open, int range, string location, int sort, string search, int page)
+        public async Task<List<ShopCard>> GetShops(int userId, List<int> categories, int rating, bool open, int range, string location, int sort, string search, int page)
         {
-            List<Shop> shops = await _repository.GetShops(userId, categories, rating, open, range, location, sort, search, page);
+            List<ShopCard> shops = await _repository.GetShops(userId, categories, rating, open, range, location, sort, search, page);
             if (shops.Count == 0) throw new ArgumentException("No shops found.");
             return shops;
         }

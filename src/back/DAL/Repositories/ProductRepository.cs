@@ -1,4 +1,5 @@
-﻿using back.DAL.Contexts;
+﻿using back.BLL.Dtos;
+using back.DAL.Contexts;
 using back.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,7 +15,7 @@ namespace back.DAL.Repositories
         }
 
         #region filterHelp
-        public List<Product> SortProducts(int sort, List<Product> products)
+        public List<ProductCard> SortProducts(int sort, List<ProductCard> products)
         {
             switch (sort)
             {
@@ -26,6 +27,10 @@ namespace back.DAL.Repositories
                     return products.OrderBy(x => x.Name).ToList();
                 case 4:
                     return products.OrderByDescending(x => x.Name).ToList();
+                case 5:
+                    return products.OrderBy(x => x.Rating).ToList();
+                case 6:
+                    return products.OrderByDescending(x => x.Rating).ToList();
                 default:
                     return products.OrderBy(x => x.Id).ToList();
             }
@@ -52,26 +57,45 @@ namespace back.DAL.Repositories
 
         #endregion
 
-        public async Task<List<Product>> GetProducts(int userId, List<int> categories, int rating, bool open, int range, string location, int sort, string search, int page)
+        public async Task<List<ProductCard>> GetProducts(int userId, List<int> categories, int rating, bool open, int range, string location, int sort, string search, int page)
         {
             User currentUser = _context.Users.FirstOrDefault(x => x.Id == userId);
             float currLat = currentUser.Latitude;
             float currLong = currentUser.Longitude;
 
             if (categories.Count == 0) categories = await _context.Categories.Select(x => x.Id).ToListAsync();
+
+            List<ProductCard> products = await _context.Products.Where(x => categories.Contains(x.CategoryId) && x.Name.ToLower().Contains(search.Trim().ToLower()))
+                                .GroupJoin(_context.ProductReviews.GroupBy(x => x.ProductId).Select(group => new
+                                {
+                                    ProductId = group.Key,
+                                    avg = group.Average(x => x.Rating)
+                                }), p => p.Id, pr => pr.ProductId, (p, pr) => new ProductCard
+                                {
+                                    Id = p.Id,
+                                    ShopId = p.ShopId,
+                                    Name = p.Name,
+                                    Description = p.Description,
+                                    Price = p.Price,
+                                    MetricId = p.MetricId,
+                                    CategoryId = p.CategoryId,
+                                    SubcategoryId = p.SubcategoryId,
+                                    SalePercentage = p.SalePercentage,
+                                    SaleMinQuantity = p.SaleMinQuantity,
+                                    SaleMessage = p.SaleMessage,
+                                    Rating = pr.DefaultIfEmpty().Select(x => x.avg).FirstOrDefault()
+                                })
+                                .Where(x => x.Rating >= rating)
+                                .ToListAsync();
             
-            List<Product> products = await _context.Products.Where(x => categories.Contains(x.CategoryId) && x.Name.ToLower().Contains(search.Trim().ToLower()))
-                                    .Join(_context.ProductReviews.GroupBy(x => x.ProductId).Select(group => new
-                                    {
-                                        ProductId = group.Key,
-                                        avg = group.Average(x => x.Rating)
-                                    }).Where(x => x.avg >= rating), p => p.Id, pr => pr.ProductId, (p, pr) => p)
-                                    .ToListAsync();
 
             if (open)
             {
                 products = products
-                        .Join(_context.Shop.Join(_context.WorkingHours.Where(x => x.Day.Day == DateTime.Now.Day && x.OpeningHours.TimeOfDay <= DateTime.Now.TimeOfDay && x.ClosingHours.TimeOfDay >= DateTime.Now.TimeOfDay), s => s.Id, w => w.ShopId, (s, w) => s), p => p.ShopId, s => s.Id, (p, s) => p)
+                        .Join(_context.Shop.Join(_context.WorkingHours, s => s.Id, w => w.ShopId, (s, w) => w), p => p.ShopId, w => w.ShopId, (p, w) => new {p, w})
+                        .ToList()
+                        .Where(x => x.w.Day == DateTime.Now.DayOfWeek && x.w.OpeningHours <= DateTime.Now.TimeOfDay && x.w.ClosingHours >= DateTime.Now.TimeOfDay)
+                        .Select(x => x.p)
                         .ToList();
             }
 
