@@ -28,9 +28,9 @@ namespace back.BLL.Services
             return total;
         }
 
-        public async Task<ProductInfo> ProductDetails(int productId)
+        public async Task<ProductInfo> ProductDetails(int productId, int userId)
         {
-            ProductInfo productInfo = await _repository.ProductDetails(productId);
+            ProductInfo productInfo = await _repository.ProductDetails(productId, userId);
             if (productInfo == null) throw new ArgumentException("No product found!");
 
             return productInfo;
