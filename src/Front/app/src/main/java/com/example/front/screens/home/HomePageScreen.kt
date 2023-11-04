@@ -3,15 +3,19 @@ package com.example.front.screens.home
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Arrangement.Bottom
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -43,6 +47,7 @@ import androidx.compose.ui.unit.sp
 import com.example.front.R
 import com.example.front.components.CardButton
 import com.example.front.components.MediumBlueButton
+import com.example.front.components.ProductCard
 import com.example.front.components.SearchTextField
 import com.example.front.components.SellerCard
 import com.example.front.components.TitleTextComponent
@@ -50,14 +55,20 @@ import com.example.front.components.TitleTextComponent
 @Preview
 @Composable
 fun HomePage() {
-    // Search i slika
-    //
-    Column(
+    LazyColumn(
         modifier = Modifier.background(MaterialTheme.colorScheme.background)
     ) {
-        Search()
-        Sellers()
+        item {
+            Search()
+        }
+        item {
+            Sellers()
+        }
+        item {
+            Products()
+        }
     }
+
 
 }
 
@@ -66,6 +77,44 @@ data class CardData(
     val description: String,
     val imageResource: Int
 )
+
+@Composable
+fun Products() {
+    val products = listOf(
+        CardData(
+            title = "Vocnjak Brkit0",
+            description = "Adresa 1",
+            imageResource = R.drawable.jabuke
+        ),
+        CardData(
+            title = "Radionica Onjo",
+            description = "Adresa 2",
+            imageResource = R.drawable.jabuke
+        ),
+        CardData(
+            title = "Comine drangulije",
+            description = "Adresa 3",
+            imageResource = R.drawable.jabuke
+        )
+    )
+    Column (
+        modifier = Modifier
+            .padding(16.dp, end = 0.dp, top = 20.dp)
+    ){
+        Text(text = "Recommended products", modifier = Modifier.padding(bottom = 10.dp))
+        LazyColumn(
+            modifier = Modifier.heightIn(100.dp, 600.dp)
+        ){
+            items(products) { cardData ->
+                ProductCard(
+                    title = cardData.title,
+                    price = cardData.description,
+                    imageResource = cardData.imageResource,
+                )
+            }
+        }
+    }
+}
 
 @Composable
 fun Sellers() {
@@ -91,7 +140,9 @@ fun Sellers() {
             .padding(16.dp, end = 0.dp)
     ){
         Text(text = "Recommended sellers", modifier = Modifier.padding(bottom = 10.dp))
-        LazyRow {
+        LazyRow(
+            modifier = Modifier.heightIn(100.dp, 600.dp)
+        ) {
             items(sellers) { cardData ->
                 SellerCard(
                     title = cardData.title,
@@ -149,6 +200,7 @@ fun Search() {
         }
     }
 }
+
 
 
 

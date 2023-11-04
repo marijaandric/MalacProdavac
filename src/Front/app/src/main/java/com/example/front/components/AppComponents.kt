@@ -29,6 +29,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color.Companion.Gray
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
@@ -186,47 +187,78 @@ fun BigBlueButton(text:String,onClick: () -> Unit,width:Float,modifier: Modifier
 
 
 
-@Composable
-fun SellerCard(title: String, author: String, imageResource: Int) {
-    Card(
-        modifier = Modifier
-            .width(320.dp)
-            .clip(RoundedCornerShape(20.dp))
-    ) {
-        Box(
-//            modifier = Modifier.background(color = MaterialTheme.colorScheme.surface)
-        )
-        {
-            Column(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Image(
-                    painter = painterResource(id = imageResource),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(150.dp)
-                        .padding(13.dp)
-                        .clip(RoundedCornerShape(10.dp))
-                )
+@C
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(150.dp)omposable
+                        fun SellerCard(title: String, author: String, imageResource: Int) {
+                            Card(
+                                modifier = Modifier
+                                    .width(320.dp)
+                                    .clip(RoundedCornerShape(20.dp))
+                            ) {
+                                Column(
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Image(
+                                        painter = painterResource(id = imageResource),
+                                        contentDescription = null,
+                                        contentScale = ContentScale.Crop,
+                    .padding(13.dp)
+                    .clip(RoundedCornerShape(10.dp))
+            )
 
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 16.dp, bottom = 16.dp, end = 16.dp)
-                ) {
-                    Text(text = title, fontWeight = FontWeight.Bold, fontSize = 15.sp)
-                    Text(text = author, fontSize = 10.sp)
-                    Row(
-                        modifier = Modifier.padding(top = 10.dp)
-                    )
-                    {
-                        CardButton(text = "More info", onClick = { /*TODO*/ }, width = 0.52f, modifier = Modifier.padding(end=8.dp), color = MaterialTheme.colorScheme.secondary)
-                        CardButton(text = "Products", onClick = { /*TODO*/ }, width = 1f, modifier = Modifier, color = MaterialTheme.colorScheme.primary)
-                    }
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, bottom = 16.dp, end = 16.dp)
+            ) {
+                Text(text = title, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                Text(text = author, fontSize = 10.sp)
+                Row(
+                    modifier = Modifier.padding(top = 10.dp)
+                )
+                {
+                    CardButton(text = "More info", onClick = { /*TODO*/ }, width = 0.52f, modifier = Modifier.padding(end=8.dp), color = MaterialTheme.colorScheme.secondary)
+                    CardButton(text = "Products", onClick = { /*TODO*/ }, width = 1f, modifier = Modifier, color = MaterialTheme.colorScheme.primary)
                 }
             }
         }
+    }
+}
+
+
+@Composable
+fun ProductCard(title: String, price: String, imageResource: Int) {
+    Card(
+        modifier = Modifier
+            .width(350.dp)
+            .clip(RoundedCornerShape(20.dp))
+            .padding(bottom = 15.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Image(
+                painter = painterResource(id = imageResource),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(120.dp)
+                    .padding(10.dp)
+                    .clip(RoundedCornerShape(10.dp))
+            )
+
+            Column(
+                modifier = Modifier.padding(8.dp)
+            ) {
+                Text(text = title, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                Text(text = price, fontSize = 10.sp, modifier = Modifier.padding(bottom=25.dp))
+                CardButton(text = "Add to cart", onClick = { /*TODO*/ }, width = 0.9f, modifier = Modifier, color = MaterialTheme.colorScheme.secondary)
+            }
+
+        }
+
+
     }
 }
