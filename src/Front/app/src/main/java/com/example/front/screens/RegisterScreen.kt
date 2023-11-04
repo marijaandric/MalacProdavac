@@ -2,6 +2,7 @@ package com.example.front.screens
 
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -28,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -41,6 +43,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import com.example.front.R
 import com.example.front.components.ErrorTextComponent
 import com.example.front.components.HeaderImage
@@ -48,9 +51,11 @@ import com.example.front.components.LogoImage
 import com.example.front.components.MyTextField
 import com.example.front.components.TitleTextComponent
 import com.example.front.model.RegistrationRequest
+import com.example.front.navigation.Screen
 import com.example.front.repository.Repository
 import com.example.front.viewmodels.RegisterViewModel
 import com.example.front.viewmodels.login.LoginViewModel
+import com.example.front.viewmodels.login.MainViewModelFactory
 
 fun isValidEmail(email: String): Boolean {
     return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
@@ -63,7 +68,11 @@ fun isValidPassword(password: String): String {
 }
 
 @Composable
-fun RegisterScreen(viewModel: RegisterViewModel) {
+fun RegisterScreen(navController: NavHostController) {
+    lateinit var viewModel: RegisterViewModel
+    val repository = Repository()
+    val viewModelFactory = MainViewModelFactory(repository)
+    viewModel = viewModelFactory.create(RegisterViewModel::class.java)
 
     var name by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
@@ -93,7 +102,7 @@ fun RegisterScreen(viewModel: RegisterViewModel) {
             HeaderImage(painterResource(id = R.drawable.loginheaderimage))
             LogoImage(
                 painterResource(id = R.drawable.logowithwhitebackground),
-                modifier = Modifier.offset(y = (-16.dp))
+                modifier = Modifier.offset(y = (-16).dp)
             )
 
             Column(
@@ -227,6 +236,13 @@ fun RegisterScreen(viewModel: RegisterViewModel) {
                         )
                     )
                 }
+
+                Text(
+                    text = "Already have an account? Login.",
+                    modifier = Modifier.clickable {
+                        navController.navigate(Screen.Login.route)
+                    }
+                )
             }
 
         }
@@ -236,5 +252,5 @@ fun RegisterScreen(viewModel: RegisterViewModel) {
 @Preview
 @Composable
 fun prikaziRegister(){
-    RegisterScreen(RegisterViewModel(Repository()))
+    RegisterScreen(navController = NavHostController(context = LocalContext.current))
 }
