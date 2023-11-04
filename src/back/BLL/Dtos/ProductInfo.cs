@@ -11,6 +11,7 @@ namespace back.BLL.Dtos
         public string Subcategory { get; set; }
         public bool Liked { get; set; }
         public bool Bought { get; set; }
+        public float Rating { get; set; }
         public List<WorkingHours> WorkingHours { get; set; }
         public List<ProductReview> Reviews { get; set; }
         public List<(ProductQuestion, ProductAnswer)> QuestionsAndAnswers { get; set; }
