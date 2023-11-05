@@ -11,6 +11,7 @@ import com.example.front.model.ChosenCategoriesDTO
 import com.example.front.repository.Repository
 import com.example.front.screens.categories.CategoriesState
 import com.example.front.screens.home.HomeProductsState
+import com.example.front.screens.home.HomeShopState
 import kotlinx.coroutines.launch
 import retrofit2.Response
 
@@ -18,6 +19,11 @@ class HomeViewModel(private val repository: Repository) : ViewModel() {
 
     private val _state = mutableStateOf(HomeProductsState())
     var state : State<HomeProductsState> = _state;
+
+    private val _stateShop = mutableStateOf(HomeShopState())
+    var stateShop : State<HomeShopState> = _stateShop;
+
+
     fun getHomeProducts(id: Int)
     {
         viewModelScope.launch {
@@ -37,6 +43,29 @@ class HomeViewModel(private val repository: Repository) : ViewModel() {
             catch (e:Exception)
             {
                 _state.value.error = e.message.toString()
+            }
+        }
+    }
+
+    fun getHomeShops(id: Int)
+    {
+        viewModelScope.launch {
+            try{
+                val response = repository.getHomeShops(id)
+                Log.d("RESPONSE",response.toString())
+
+                if (response.isSuccessful) {
+                    val responseBody = response.body()
+
+                    _stateShop.value = _stateShop.value.copy(
+                        isLoading = false,
+                        shops = response.body()
+                    )
+                }
+            }
+            catch (e:Exception)
+            {
+                _stateShop.value.error = e.message.toString()
             }
         }
     }

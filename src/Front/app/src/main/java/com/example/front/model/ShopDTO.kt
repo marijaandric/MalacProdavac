@@ -10,5 +10,5 @@ data class ShopDTO (
     @SerializedName("latitude") val latitude: Float,
     @SerializedName("longitude") val longitude: Float,
     @SerializedName("image") val image: String,
-    @SerializedName("owner") val owner: String // promena u user
+    @SerializedName("owner") val owner: UserDTO
 )

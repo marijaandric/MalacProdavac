@@ -7,6 +7,7 @@ import com.example.front.model.HomeProduct
 import com.example.front.model.LoginDTO
 import com.example.front.model.RegistrationRequest
 import com.example.front.model.LoginResponse
+import com.example.front.model.ShopDTO
 import retrofit2.Response
 
 class Repository {
@@ -24,5 +25,8 @@ class Repository {
     }
     suspend fun getHomeProducts(id:Int):Response<List<HomeProduct>>{
         return RetrofitInstance.api.getHomeProducts(id)
+    }
+    suspend fun getHomeShops(id:Int):Response<List<ShopDTO>>{
+        return RetrofitInstance.api.getHomeShops(id)
     }
 }

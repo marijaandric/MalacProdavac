@@ -296,7 +296,7 @@ fun SellerCard(title: String, author: String, imageResource: Int) {
                     .padding(start = 16.dp, bottom = 16.dp, end = 16.dp)
             ) {
                 Text(text = title, fontWeight = FontWeight.Bold, fontSize = 15.sp)
-                Text(text = author, fontSize = 10.sp)
+                Text(text = author, fontSize = 13.sp)
                 Row(
                     modifier = Modifier.padding(top = 10.dp)
                 )
@@ -335,7 +335,7 @@ fun ProductCard(title: String, price: String, imageResource: Int) {
             Column(
                 modifier = Modifier.padding(8.dp)
             ) {
-                Text(text = title, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                Text(text = title, fontWeight = FontWeight.Bold, fontSize = 17.sp)
                 Text(text = price, fontWeight = FontWeight.Bold,fontSize = 15.sp, modifier = Modifier.padding(bottom=25.dp,top=5.dp), color = MaterialTheme.colorScheme.secondary)
                 CardButton(text = "Add to cart", onClick = { /*TODO*/ }, width = 0.9f, modifier = Modifier, color = MaterialTheme.colorScheme.secondary)
             }

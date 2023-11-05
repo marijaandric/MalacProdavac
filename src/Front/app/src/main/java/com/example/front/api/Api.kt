@@ -6,6 +6,7 @@ import com.example.front.model.HomeProduct
 import com.example.front.model.LoginDTO
 import com.example.front.model.RegistrationRequest
 import com.example.front.model.LoginResponse
+import com.example.front.model.ShopDTO
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -40,4 +41,9 @@ interface Api {
     suspend fun getHomeProducts(
         @Query("id") id: Int
     ): Response<List<HomeProduct>>
+
+    @GET("back/Home/GetHomeShops")
+    suspend fun getHomeShops(
+        @Query("id") id: Int
+    ): Response<List<ShopDTO>>
 }

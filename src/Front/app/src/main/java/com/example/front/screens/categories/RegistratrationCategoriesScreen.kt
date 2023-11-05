@@ -122,7 +122,7 @@ fun Cards(viewModel: CategoriesViewModel, navController: NavHostController) {
 
     if(statePost.isLoading == false)
     {
-        navController.navigate(Screen.Login.route)
+        navController.navigate(Screen.Home.route)
     }
 
     if(state.isLoading)

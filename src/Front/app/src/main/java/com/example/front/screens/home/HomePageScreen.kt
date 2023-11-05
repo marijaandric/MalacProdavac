@@ -32,6 +32,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.example.front.R
 import com.example.front.components.ProductCard
 import com.example.front.components.SearchTextField
@@ -40,14 +42,15 @@ import com.example.front.repository.Repository
 import com.example.front.viewmodels.categories.CategoriesViewModel
 import com.example.front.viewmodels.home.HomeViewModel
 
-@Preview
 @Composable
-fun HomePage() {
+fun HomePage(navController: NavHostController) {
     val id = 1;
     var viewModel: HomeViewModel
     val repository = Repository()
     viewModel = HomeViewModel(repository)
     viewModel.getHomeProducts(id)
+    viewModel.getHomeShops(id)
+
     LazyColumn(
         modifier = Modifier.background(MaterialTheme.colorScheme.background)
     ) {
@@ -55,7 +58,7 @@ fun HomePage() {
             Search()
         }
         item {
-            Sellers()
+            Sellers(viewModel)
         }
         item {
             Products(viewModel)
@@ -110,24 +113,18 @@ fun Products(viewModel: HomeViewModel) {
 }
 
 @Composable
-fun Sellers() {
-    val sellers = listOf(
+fun Sellers(viewModel: HomeViewModel) {
+    val state = viewModel.stateShop.value
+
+    val sellers = state.shops?.mapIndexed { index, shopState ->
         CardData(
-            title = "Vocnjak Brkit0",
-            description = "Adresa 1",
-            imageResource = R.drawable.jabuke
-        ),
-        CardData(
-            title = "Radionica Onjo",
-            description = "Adresa 2",
-            imageResource = R.drawable.jabuke
-        ),
-        CardData(
-            title = "Comine drangulije",
-            description = "Adresa 3",
+            title = shopState.name,
+            description = shopState.address,
             imageResource = R.drawable.jabuke
         )
-    )
+    }?.toList() ?: emptyList()
+
+
     Column (
         modifier = Modifier
             .padding(16.dp, end = 0.dp)
@@ -136,13 +133,19 @@ fun Sellers() {
         LazyRow(
             modifier = Modifier.heightIn(100.dp, 600.dp)
         ) {
-            items(sellers) { cardData ->
-                SellerCard(
-                    title = cardData.title,
-                    author = cardData.description,
-                    imageResource = cardData.imageResource,
-                )
-                Spacer(modifier = Modifier.width(16.dp))
+            if(viewModel.stateShop.value.isLoading)
+            {
+
+            }
+            else{
+                items(sellers) { cardData ->
+                    SellerCard(
+                        title = cardData.title,
+                        author = cardData.description,
+                        imageResource = cardData.imageResource,
+                    )
+                    Spacer(modifier = Modifier.width(16.dp))
+                }
             }
         }
     }

@@ -41,7 +41,7 @@ fun SetupNavGraph(
         composable(
             route = Screen.Home.route
         ){
-            HomePage()
+            HomePage(navController = navController)
         }
         composable(
             route=Screen.Categories.route

@@ -27,9 +27,7 @@ import com.example.front.ui.theme.FrontTheme
                     .fillMaxSize()
                     .background(color = MaterialTheme.colorScheme.background)) {
                     navController = rememberNavController()
-//                    SetupNavGraph(navController = navController)
-                    //ProductPage()
-                    HomePage()
+                    SetupNavGraph(navController = navController)
                 }
             }
         }
