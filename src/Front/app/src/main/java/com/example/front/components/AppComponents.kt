@@ -1,9 +1,11 @@
 package com.example.front.components
 
+import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.Box
@@ -45,6 +47,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color.Companion.Gray
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
@@ -62,9 +65,13 @@ import com.example.front.R
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.front.model.ImageData
 import com.example.front.ui.theme.LightBlue
 import com.example.front.ui.theme.MainBlue
 import com.example.front.ui.theme.Typography
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
+import kotlin.random.Random
 
 @Composable
 fun TitleTextComponent(value:String){
@@ -339,53 +346,29 @@ fun ProductCard(title: String, price: String, imageResource: Int) {
     }
 }
 
-data class ImageData(val id: Int, val base64Image: String)
+
 
 @Composable
-fun GalleryComponent(images: List<ImageData>) {
-    LazyRow {
+fun GalleryComponent(images: List<ImageData>, modifier: Modifier) {
+    LazyRow(
+        modifier = Modifier.fillMaxWidth().then(modifier), // Use Modifier to set the width of the LazyRow
+        horizontalArrangement = Arrangement.spacedBy(8.dp) // Adjust the spacing as needed
+    ) {
         items(images) { image ->
             ImageItem(image)
         }
     }
 }
 
+@OptIn(ExperimentalEncodingApi::class)
 @Composable
-fun ImageItem(imageData: ImageData) {
-    val imageBitmap = remember { mutableStateOf<ImageBitmap?>(null) }
-
-    LaunchedEffect(imageData.base64Image) {
-        // Decode the Base64 string into a ByteArray
-        val byteArray = Base64.decode(imageData.base64Image, Base64.DEFAULT)
-
-        // Convert the ByteArray to an ImageBitmap
-        imageBitmap.value = ImageBitmap.makeFromEncoded(byteArray)
-    }
-
-    Card(
+fun ImageItem(image:ImageData){
+    val byteArray = Base64.decode(image.base64Image)
+    val bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
+    Image(bitmap = bitmap.asImageBitmap(),
+        contentDescription = null,
         modifier = Modifier
-            .width(200.dp)
-            .height(200.dp)
-            .padding(8.dp),
-        shape = RoundedCornerShape(8.dp)
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .clickable { /* Handle image click here */ }
-        ) {
-            if (imageBitmap.value != null) {
-                Image(
-                    painter = rememberImagePainter(data = imageData.base64Image),
-                    contentDescription = null, // Provide an appropriate content description
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize(),
-                )
-            } else {
-                // You can display a placeholder or loading indicator here while the image is being loaded
-            }
-        }
-    }
+            .size(50.dp)
+            .clip(RoundedCornerShape(5.dp))
+    )
 }
-
-
