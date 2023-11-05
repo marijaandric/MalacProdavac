@@ -47,5 +47,25 @@ namespace back.BLL.Services
             if (!await _repository.DislikeProduct(productId, userId)) throw new ArgumentException("Product could not be disliked!");
             return true;
         }
+
+        public async Task<bool> AddToCart(int productId, int userId, int quantity)
+        {
+            var item = await _repository.GetCartItem(productId, userId);
+            
+            if (item != null)
+            {
+                if (await _repository.UpdateCart(productId, userId, quantity)) return true;
+                throw new ArgumentException("Quantity could not be updated!");
+            }
+
+            if (await _repository.AddToCart(productId, userId, quantity)) return true;
+            throw new ArgumentException("Item could not be added!");
+        }
+
+        public async Task<bool> RemoveFromCart(int productId, int userId)
+        {
+            if (await _repository.RemoveFromCart(productId, userId)) return true;
+            throw new ArgumentException("Item could not be removed!");
+        }
     }
 }

@@ -8,5 +8,7 @@ namespace back.BLL.Services
         public int ProductPages();
         public Task<ProductInfo> ProductDetails(int productId, int userId);
         public Task<bool> ToggleLike(int productId, int userId);
+        public Task<bool> AddToCart(int productId, int userId, int quantity);
+        public Task<bool> RemoveFromCart(int productId, int userId);
     }
 }

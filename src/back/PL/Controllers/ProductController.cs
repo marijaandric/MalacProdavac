@@ -79,5 +79,31 @@ namespace back.PL.Controllers
                 return BadRequest(new { Error = ex.Message });
             }
         }
+
+        [HttpPost("AddToCart")]
+        public async Task<IActionResult> AddToCart(int productId, int userId, int quantity)
+        {
+            try
+            {
+                return Ok(new { success = await _service.AddToCart(productId, userId, quantity) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
+
+        [HttpPost("RemoveFromCart")]
+        public async Task<IActionResult> RemoveFromCart(int productId, int userId)
+        {
+            try
+            {
+                return Ok(new { success = await _service.RemoveFromCart(productId, userId) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
     }
 }

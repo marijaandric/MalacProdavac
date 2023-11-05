@@ -11,5 +11,9 @@ namespace back.DAL.Repositories
         public Task<bool> LikeProduct(int productId, int userId);
         public Task<bool> DislikeProduct(int productId, int userId);
         public Task<LikedProducts> GetLike(int productId, int userId);
+        public Task<bool> AddToCart(int productId, int userId, int quantity);
+        public Task<bool> RemoveFromCart(int productId, int userId);
+        public Task<Cart> GetCartItem(int productId, int userId);
+        public Task<bool> UpdateCart(int productId, int userId, int quantity);
     }
 }

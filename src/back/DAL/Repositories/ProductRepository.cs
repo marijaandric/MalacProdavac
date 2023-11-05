@@ -208,6 +208,7 @@ namespace back.DAL.Repositories
 
         }
 
+        #region likes
         public async Task<LikedProducts> GetLike(int productId, int userId)
         {
             return await _context.LikedProducts.FirstOrDefaultAsync(x => x.ProductId == productId && x.UserId == userId);
@@ -224,5 +225,35 @@ namespace back.DAL.Repositories
             _context.LikedProducts.Remove(await GetLike(productId, userId));
             return await _context.SaveChangesAsync() > 0;
         }
+
+        #endregion
+
+        #region cart
+
+        public async Task<Cart> GetCartItem(int productId, int userId)
+        {
+            return await _context.Carts.FirstOrDefaultAsync(x => x.ProductId == productId && x.UserId == userId);
+        }
+
+        public async Task<bool> AddToCart(int productId, int userId, int quantity)
+        {
+            await _context.Carts.AddAsync(new Cart { ProductId = productId, UserId = userId, Quantity = quantity });
+            return await _context.SaveChangesAsync() > 0;
+        }
+
+        public async Task<bool> RemoveFromCart(int productId, int userId)
+        {
+            _context.Carts.Remove(await GetCartItem(productId, userId));
+            return await _context.SaveChangesAsync() > 0;
+        }
+
+        public async Task<bool> UpdateCart(int productId, int userId, int quantity)
+        {
+            Cart item = await GetCartItem(productId, userId);
+            item.Quantity += quantity;
+            return await _context.SaveChangesAsync() > 0;
+        }
+
+        #endregion
     }
 }
