@@ -18,7 +18,7 @@ namespace back.PL.Controllers
         {
             try
             {
-                return Ok(await _service.GetProducts(userId, categories, rating, open, range, location, sort, search, page));
+                return Ok(await _service.GetProducts(userId, categories, rating, open, range, location, sort, search, page, -1));
             }
             catch (Exception ex)
             {

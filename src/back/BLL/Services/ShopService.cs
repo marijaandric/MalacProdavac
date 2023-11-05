@@ -25,5 +25,13 @@ namespace back.BLL.Services
 
             return total;
         }
+
+        public async Task<ShopInfo> ShopDetails(int shopId, int userId)
+        {
+            ShopInfo shop = await _repository.ShopDetails(shopId, userId);
+            if (shop == null) throw new ArgumentException("No shop found!");
+
+            return shop;
+        }
     }
 }
