@@ -66,5 +66,18 @@ namespace back.PL.Controllers
                 return BadRequest(new { ErrorMessage = ex.Message });
             }
         }
+
+        [HttpPost("ToggleLike")]
+        public async Task<IActionResult> ToggleLike(int productId, int userId)
+        {
+            try
+            {
+                return Ok(new { success = await _service.ToggleLike(productId, userId) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
     }
 }

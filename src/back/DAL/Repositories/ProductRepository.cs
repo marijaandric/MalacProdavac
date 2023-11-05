@@ -207,5 +207,22 @@ namespace back.DAL.Repositories
             };
 
         }
+
+        public async Task<LikedProducts> GetLike(int productId, int userId)
+        {
+            return await _context.LikedProducts.FirstOrDefaultAsync(x => x.ProductId == productId && x.UserId == userId);
+        }
+
+        public async Task<bool> LikeProduct(int productId, int userId)
+        {
+            await _context.LikedProducts.AddAsync(new LikedProducts { ProductId = productId, UserId = userId });
+            return await _context.SaveChangesAsync() > 0;
+        }
+
+        public async Task<bool> DislikeProduct(int productId, int userId)
+        {
+            _context.LikedProducts.Remove(await GetLike(productId, userId));
+            return await _context.SaveChangesAsync() > 0;
+        }
     }
 }

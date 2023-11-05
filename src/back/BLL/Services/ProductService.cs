@@ -35,5 +35,17 @@ namespace back.BLL.Services
 
             return productInfo;
         }
+
+        public async Task<bool> ToggleLike(int productId, int userId)
+        {
+            if (await _repository.GetLike(productId, userId) == null)
+            {
+                if (!await _repository.LikeProduct(productId, userId)) throw new ArgumentException("Product could not be liked!");
+                return true;
+            }
+
+            if (!await _repository.DislikeProduct(productId, userId)) throw new ArgumentException("Product could not be disliked!");
+            return true;
+        }
     }
 }
