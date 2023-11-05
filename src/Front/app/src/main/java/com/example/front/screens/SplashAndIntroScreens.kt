@@ -66,7 +66,7 @@ import kotlinx.coroutines.delay
                 )
             )
             delay(2500L)
-            navController.navigate("intro1")
+            navController.navigate("intro")
         }
         Box(
             contentAlignment = Alignment.Center,
@@ -159,7 +159,11 @@ import kotlinx.coroutines.delay
                     MediumBlueButton(
                         text = "Skip",
                         onClick = {
-                            navController.navigate("login_screen")
+                            navController.navigate("auth") {
+                                popUpTo("intro") {
+                                    inclusive = true
+                                }
+                            }
                         },0.45f
                         , modifier = Modifier
                     )
@@ -189,7 +193,11 @@ import kotlinx.coroutines.delay
                 MediumBlueButton(
                     text = "Get started",
                     onClick = {
-                        navController.navigate("login_screen")
+                        navController.navigate("auth") {
+                            popUpTo("intro") {
+                                inclusive = true
+                            }
+                        }
                     },0.8f
                     , modifier =  Modifier
                 )

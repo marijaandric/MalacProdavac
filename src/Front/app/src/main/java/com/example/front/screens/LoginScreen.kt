@@ -1,7 +1,6 @@
 package com.example.front.screens
 
 import android.annotation.SuppressLint
-import android.content.Context
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,7 +8,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -30,11 +28,9 @@ import com.example.front.components.HeaderImage
 import com.example.front.components.LogoImage
 import com.example.front.components.MyTextField
 import com.example.front.components.TitleTextComponent
-import com.example.front.model.LoginDTO
 import com.example.front.navigation.Screen
 import com.example.front.repository.Repository
 import com.example.front.viewmodels.login.LoginViewModel
-import com.example.front.viewmodels.login.MainViewModelFactory
 import androidx.compose.material.*
 import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect

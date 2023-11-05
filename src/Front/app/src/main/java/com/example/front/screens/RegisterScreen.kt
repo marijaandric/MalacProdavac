@@ -260,7 +260,7 @@ fun RegisterScreen(navController: NavHostController) {
                     text = "Already have an account? Login.",
                     modifier = Modifier
                         .clickable {
-                            navController.navigate(Screen.Login.route)
+                            navController.popBackStack()
                         }
                         .fillMaxWidth(),
                     textAlign = TextAlign.Center,
