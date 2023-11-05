@@ -48,8 +48,9 @@ fun ProductPage(){
                 .background(Color.White)
                 .align(Alignment.Center)
                 .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+                .border(1.dp,Color.Black)
         ) {
-            // Add your content here
+            
         }
     }
 }

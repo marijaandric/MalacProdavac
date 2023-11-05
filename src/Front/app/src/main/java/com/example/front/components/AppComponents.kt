@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
@@ -31,6 +33,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,6 +44,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color.Companion.Gray
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
@@ -211,8 +215,8 @@ fun MediumBlueButton(text:String,onClick: () -> Unit,width:Float,modifier: Modif
         modifier = Modifier
             .fillMaxWidth(width)
             .padding(8.dp)
-            .height(48.dp).
-            then(modifier),
+            .height(48.dp)
+            .then(modifier),
         colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
         shape = RoundedCornerShape(20)
     ) {
@@ -228,8 +232,8 @@ fun CardButton(text:String,onClick: () -> Unit,width:Float,modifier: Modifier,co
         onClick = onClick,
         modifier = Modifier
             .fillMaxWidth(width)
-            .height(38.dp).
-            then(modifier),
+            .height(38.dp)
+            .then(modifier),
         colors = ButtonDefaults.buttonColors(containerColor = color),
         shape = RoundedCornerShape(20)
     ) {
@@ -247,8 +251,8 @@ fun BigBlueButton(text:String,onClick: () -> Unit,width:Float,modifier: Modifier
         modifier = Modifier
             .fillMaxWidth(width)
             .padding(8.dp)
-            .height(58.dp).
-            then(modifier),
+            .height(58.dp)
+            .then(modifier),
         colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
         shape = RoundedCornerShape(30)
     ) {
@@ -334,3 +338,54 @@ fun ProductCard(title: String, price: String, imageResource: Int) {
 
     }
 }
+
+data class ImageData(val id: Int, val base64Image: String)
+
+@Composable
+fun GalleryComponent(images: List<ImageData>) {
+    LazyRow {
+        items(images) { image ->
+            ImageItem(image)
+        }
+    }
+}
+
+@Composable
+fun ImageItem(imageData: ImageData) {
+    val imageBitmap = remember { mutableStateOf<ImageBitmap?>(null) }
+
+    LaunchedEffect(imageData.base64Image) {
+        // Decode the Base64 string into a ByteArray
+        val byteArray = Base64.decode(imageData.base64Image, Base64.DEFAULT)
+
+        // Convert the ByteArray to an ImageBitmap
+        imageBitmap.value = ImageBitmap.makeFromEncoded(byteArray)
+    }
+
+    Card(
+        modifier = Modifier
+            .width(200.dp)
+            .height(200.dp)
+            .padding(8.dp),
+        shape = RoundedCornerShape(8.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .clickable { /* Handle image click here */ }
+        ) {
+            if (imageBitmap.value != null) {
+                Image(
+                    painter = rememberImagePainter(data = imageData.base64Image),
+                    contentDescription = null, // Provide an appropriate content description
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize(),
+                )
+            } else {
+                // You can display a placeholder or loading indicator here while the image is being loaded
+            }
+        }
+    }
+}
+
+
