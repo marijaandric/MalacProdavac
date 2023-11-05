@@ -181,7 +181,6 @@ fun Cards(viewModel: CategoriesViewModel, navController: NavHostController) {
                     image = card.image,
                     description = card.description,
                     onClick = {
-                        Log.d("Taaaaaaaaaag", selectedCategories.toString())
                         if (selectedCategories.contains(card.idCat)) {
                             selectedCategories.remove(card.idCat)
                         } else {
@@ -205,6 +204,7 @@ fun Cards(viewModel: CategoriesViewModel, navController: NavHostController) {
 
 fun ButtonClick(chosenCategories: List<Int>, viewModel: CategoriesViewModel)
 {
+    // staviti neki alert
     val id = 2;
     val chosenCategoriesDTO = ChosenCategoriesDTO(userId = id, categoryIds = chosenCategories)
     viewModel.postCategories(chosenCategoriesDTO)

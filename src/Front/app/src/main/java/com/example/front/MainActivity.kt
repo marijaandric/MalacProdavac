@@ -26,10 +26,10 @@ import com.example.front.ui.theme.FrontTheme
                 Surface(modifier = Modifier
                     .fillMaxSize()
                     .background(color = MaterialTheme.colorScheme.background)) {
-//                    navController = rememberNavController()
+                    navController = rememberNavController()
 //                    SetupNavGraph(navController = navController)
                     //ProductPage()
-                    RegistrationCategories()
+                    HomePage()
                 }
             }
         }

@@ -3,6 +3,7 @@ package com.example.front.repository
 import com.example.front.api.RetrofitInstance
 import com.example.front.model.CategoriesDTO
 import com.example.front.model.ChosenCategoriesDTO
+import com.example.front.model.HomeProduct
 import com.example.front.model.LoginDTO
 import com.example.front.model.RegistrationRequest
 import com.example.front.model.LoginResponse
@@ -20,5 +21,8 @@ class Repository {
     }
     suspend fun postCategories(categories: ChosenCategoriesDTO): Response<Boolean>{
         return RetrofitInstance.api.saveChosenCategories(categories)
+    }
+    suspend fun getHomeProducts(id:Int):Response<List<HomeProduct>>{
+        return RetrofitInstance.api.getHomeProducts(id)
     }
 }

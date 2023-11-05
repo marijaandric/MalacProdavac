@@ -336,7 +336,7 @@ fun ProductCard(title: String, price: String, imageResource: Int) {
                 modifier = Modifier.padding(8.dp)
             ) {
                 Text(text = title, fontWeight = FontWeight.Bold, fontSize = 15.sp)
-                Text(text = price, fontSize = 10.sp, modifier = Modifier.padding(bottom=25.dp))
+                Text(text = price, fontWeight = FontWeight.Bold,fontSize = 15.sp, modifier = Modifier.padding(bottom=25.dp,top=5.dp), color = MaterialTheme.colorScheme.secondary)
                 CardButton(text = "Add to cart", onClick = { /*TODO*/ }, width = 0.9f, modifier = Modifier, color = MaterialTheme.colorScheme.secondary)
             }
 

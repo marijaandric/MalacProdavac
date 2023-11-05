@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -35,10 +36,18 @@ import com.example.front.R
 import com.example.front.components.ProductCard
 import com.example.front.components.SearchTextField
 import com.example.front.components.SellerCard
+import com.example.front.repository.Repository
+import com.example.front.viewmodels.categories.CategoriesViewModel
+import com.example.front.viewmodels.home.HomeViewModel
 
 @Preview
 @Composable
 fun HomePage() {
+    val id = 1;
+    var viewModel: HomeViewModel
+    val repository = Repository()
+    viewModel = HomeViewModel(repository)
+    viewModel.getHomeProducts(id)
     LazyColumn(
         modifier = Modifier.background(MaterialTheme.colorScheme.background)
     ) {
@@ -49,7 +58,7 @@ fun HomePage() {
             Sellers()
         }
         item {
-            Products()
+            Products(viewModel)
         }
     }
 
@@ -63,40 +72,40 @@ data class CardData(
 )
 
 @Composable
-fun Products() {
-    val products = listOf(
+fun Products(viewModel: HomeViewModel) {
+    val state = viewModel.state.value
+
+    val products = state.products?.mapIndexed { index, productsState ->
         CardData(
-            title = "Vocnjak Brkit0",
-            description = "Adresa 1",
-            imageResource = R.drawable.jabuke
-        ),
-        CardData(
-            title = "Radionica Onjo",
-            description = "Adresa 2",
-            imageResource = R.drawable.jabuke
-        ),
-        CardData(
-            title = "Comine drangulije",
-            description = "Adresa 3",
+            title = productsState.name,
+            description = productsState.price.toString()+" din",
             imageResource = R.drawable.jabuke
         )
-    )
+    }?.toList() ?: emptyList()
+
     Column (
         modifier = Modifier
             .padding(16.dp, end = 0.dp, top = 20.dp)
     ){
         Text(text = "Recommended products", modifier = Modifier.padding(bottom = 10.dp))
-        LazyColumn(
-            modifier = Modifier.heightIn(100.dp, 600.dp)
-        ){
-            items(products) { cardData ->
-                ProductCard(
-                    title = cardData.title,
-                    price = cardData.description,
-                    imageResource = cardData.imageResource,
-                )
+        if(viewModel.state.value.isLoading)
+        {
+            CircularProgressIndicator()
+        }
+        else{
+            LazyColumn(
+                modifier = Modifier.heightIn(100.dp, 600.dp)
+            ){
+                items(products) { cardData ->
+                    ProductCard(
+                        title = cardData.title,
+                        price = cardData.description,
+                        imageResource = cardData.imageResource,
+                    )
+                }
             }
         }
+
     }
 }
 
