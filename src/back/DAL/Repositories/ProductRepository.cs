@@ -1,6 +1,5 @@
 ﻿using back.BLL.Dtos;
 using back.DAL.Contexts;
-using back.DAL.Models;
 using back.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -158,13 +157,15 @@ namespace back.DAL.Repositories
                                                     ClosingHours = wh.ClosingHours,
                                                     Shop = null
                                                 }).ToListAsync();
-            List<ProductReview> reviews = await _context.ProductReviews.Where(x => x.ProductId == productId).Select(pr => new ProductReview
+            List<ProductReviewExtended> reviews = await _context.ProductReviews.Where(x => x.ProductId == productId).Select(pr => new ProductReviewExtended
                                                 {
                                                     ReviewerId = pr.ReviewerId,
                                                     ProductId = pr.ProductId,
                                                     Rating = pr.Rating,
                                                     Comment = pr.Comment,
                                                     PostedOn = pr.PostedOn,
+                                                    Username = _context.Users.FirstOrDefault(x => x.Id == pr.ReviewerId).Username,
+                                                    Image = _context.Users.FirstOrDefault(x => x.Id == pr.ReviewerId).Image,
                                                     Product = null 
                                                 }).ToListAsync();
             List<ProductQuestion> questions = await _context.ProductQuestions.Where(x => x.ProductId == productId).ToListAsync();
@@ -175,7 +176,7 @@ namespace back.DAL.Repositories
                                                             (q, a) => (q.q, a)
                                                         ).ToList(); 
             Dictionary<string, int> sizes = await _context.ProductSizes.Where(x => x.ProductId == productId).Join(_context.Sizes, ps => ps.SizeId, s => s.Id, (ps, s) => new { s.Name, ps.Stock }).ToDictionaryAsync(key => key.Name, value => value.Stock);
-            List<string> images = await _context.ProductImages.Where(x => x.ProductId == productId).Select(x => x.Image).ToListAsync();
+            Dictionary<int,string> images = await _context.ProductImages.Where(x => x.ProductId == productId).ToDictionaryAsync(key => key.Id, value => value.Image);
             float average = 0;
             if (reviews.Count > 0) average = reviews.Select(x => x.Rating).Average();
 

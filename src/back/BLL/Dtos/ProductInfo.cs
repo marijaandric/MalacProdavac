@@ -15,10 +15,10 @@ namespace back.BLL.Dtos
         public bool IsOwner { get; set; }
         public float Rating { get; set; }
         public List<WorkingHours> WorkingHours { get; set; }
-        public List<ProductReview> Reviews { get; set; }
+        public List<ProductReviewExtended> Reviews { get; set; }
         public List<(ProductQuestion, ProductAnswer)> QuestionsAndAnswers { get; set; }
         public Dictionary<string, int> Sizes { get; set; }
-        public List<string> Images { get; set; }
+        public Dictionary<int, string> Images { get; set; }
 
     }
 }

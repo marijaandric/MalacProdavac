@@ -116,16 +116,26 @@ namespace back.DAL.Repositories
         public async Task<ShopInfo> ShopDetails(int shopId, int userId)
         {
             Shop shop = await _context.Shop.FirstOrDefaultAsync(x => x.Id == shopId);
-            List<ShopReview> reviews = await _context.ShopReviews.Where(x => x.ShopId == shopId).ToListAsync();
+            List<ShopReviewExtended> reviews = await _context.ShopReviews.Where(x => x.ShopId == shopId).Select(x => new ShopReviewExtended
+                                    {
+                                        ReviewerId = x.ReviewerId,
+                                        ShopId = x.ShopId,
+                                        Rating = x.Rating,
+                                        Comment = x.Comment,
+                                        PostedOn = x.PostedOn,
+                                        Username = _context.Users.FirstOrDefault(u => u.Id == x.ReviewerId).Username,
+                                        Image = _context.Users.FirstOrDefault(i => i.Id == x.ReviewerId).Image,
+                                        Shop = null
+                                    }).ToListAsync();
             List<string> categories = await _context.ShopCategories.Where(x => x.ShopId == shopId).Join(_context.Categories, sc => sc.CategoryId, c => c.Id, (sc, c) => c).Select(x => x.Name).ToListAsync();
             List<string> subcategories = await _context.ShopSubcategories.Where(x => x.ShopId == shopId).Join(_context.Subcategories, sc => sc.SubcategoryId, c => c.Id, (sc, c) => c).Select(x => x.Name).ToListAsync();
             List<WorkingHours> workingHours = await _context.WorkingHours.Where(x => x.ShopId == shopId).Select(wh => new WorkingHours
-            {
-                Day = wh.Day,
-                OpeningHours = wh.OpeningHours,
-                ClosingHours = wh.ClosingHours,
-                Shop = null
-            }).ToListAsync();
+                                {
+                                    Day = wh.Day,
+                                    OpeningHours = wh.OpeningHours,
+                                    ClosingHours = wh.ClosingHours,
+                                    Shop = null
+                                }).ToListAsync();
 
             float avg = 0;
             if (reviews.Count > 0) avg = reviews.Average(x => x.Rating);
