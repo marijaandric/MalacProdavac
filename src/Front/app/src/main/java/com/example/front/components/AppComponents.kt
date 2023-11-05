@@ -3,6 +3,7 @@ package com.example.front.components
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.Box
@@ -30,8 +31,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
@@ -152,6 +156,27 @@ fun ProductImage(painterResource: Painter) {
         contentScale = ContentScale.FillWidth
     )
 }
+
+@Composable
+fun ToggleImageButton(modifier:Modifier) {
+    var isToggled by remember { mutableStateOf(false) }
+
+    val currentImage = if (isToggled) painterResource(id = R.drawable.srcefull)
+    else painterResource(id = R.drawable.srce)
+
+    Image(
+        painter = currentImage,
+        contentDescription = "",
+        modifier = Modifier
+            .size(50.dp)
+            .padding(5.dp)
+            .then(modifier)
+            .clickable {
+                isToggled = !isToggled
+            }
+    )
+}
+
 
 @Composable
 fun LogoImage(painterResource: Painter, modifier: Modifier = Modifier) {
