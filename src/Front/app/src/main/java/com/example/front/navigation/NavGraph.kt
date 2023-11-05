@@ -15,6 +15,7 @@ import com.example.front.screens.home.HomePage
 import com.example.front.screens.Intro
 import com.example.front.screens.LoginScreen
 import com.example.front.screens.SplashScreen
+import com.example.front.screens.categories.RegistrationCategories
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
@@ -41,6 +42,12 @@ fun SetupNavGraph(
             route = Screen.Home.route
         ){
             HomePage()
+        }
+        composable(
+            route=Screen.Categories.route
+        )
+        {
+            RegistrationCategories(navController = navController)
         }
 
 

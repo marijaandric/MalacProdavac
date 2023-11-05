@@ -240,7 +240,7 @@ fun RegisterScreen(navController: NavHostController) {
                 Text(
                     text = "Already have an account? Login.",
                     modifier = Modifier.clickable {
-                        navController.navigate(Screen.Login.route)
+                        navController.navigate(Screen.Categories.route)
                     }
                 )
             }

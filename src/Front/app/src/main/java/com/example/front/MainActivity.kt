@@ -28,7 +28,8 @@ import com.example.front.ui.theme.FrontTheme
                     .background(color = MaterialTheme.colorScheme.background)) {
 //                    navController = rememberNavController()
 //                    SetupNavGraph(navController = navController)
-                    ProductPage()
+                    //ProductPage()
+                    RegistrationCategories()
                 }
             }
         }

@@ -1,6 +1,7 @@
 package com.example.front.api
 
 import com.example.front.model.CategoriesDTO
+import com.example.front.model.ChosenCategoriesDTO
 import com.example.front.model.LoginDTO
 import com.example.front.model.RegistrationRequest
 import com.example.front.model.LoginResponse
@@ -27,4 +28,9 @@ interface Api {
     suspend fun getCategories(
 
     ): Response<List<CategoriesDTO>>
+
+    @POST("/back/Home/SaveChosenCategories")
+    suspend fun saveChosenCategories(
+        @Body chosenCategories:ChosenCategoriesDTO
+    ): Response<Boolean>
 }

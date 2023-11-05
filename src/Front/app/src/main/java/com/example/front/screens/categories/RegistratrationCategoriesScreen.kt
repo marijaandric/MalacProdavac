@@ -50,15 +50,18 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.example.front.components.MediumBlueButton
 import com.example.front.R
+import com.example.front.model.ChosenCategoriesDTO
+import com.example.front.navigation.Screen
 import com.example.front.repository.Repository
 import com.example.front.viewmodels.categories.CategoriesViewModel
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun RegistrationCategories() {
+fun RegistrationCategories(navController: NavHostController) {
 
     var viewModel: CategoriesViewModel
     val repository = Repository()
@@ -78,7 +81,7 @@ fun RegistrationCategories() {
         }
         item{
             //FlowRow {
-                Cards(viewModel)
+                Cards(viewModel,navController)
             //}
         }
     }
@@ -112,9 +115,16 @@ data class CardData(val image: Int, val description: String, val idCat : Int)
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun Cards(viewModel: CategoriesViewModel) {
-
+fun Cards(viewModel: CategoriesViewModel, navController: NavHostController) {
+    var selectedCategories by remember { mutableStateOf(mutableListOf<Int>()) }
     val state = viewModel.state.value
+    val statePost = viewModel.stateChosenCategories.value
+
+    if(statePost.isLoading == false)
+    {
+        navController.navigate(Screen.Login.route)
+    }
+
     if(state.isLoading)
     {
         Spacer(modifier = Modifier.height(40.dp))
@@ -153,7 +163,6 @@ fun Cards(viewModel: CategoriesViewModel) {
             R.drawable.healthicon,
             R.drawable.dotsicon
         )
-        Log.d("Taaaaaaaaaag", state.categories.toString())
         val cardData = state.categories?.mapIndexed { index, categoriesState ->
             CardData(
                 image = icons.get(index),
@@ -172,7 +181,12 @@ fun Cards(viewModel: CategoriesViewModel) {
                     image = card.image,
                     description = card.description,
                     onClick = {
-
+                        Log.d("Taaaaaaaaaag", selectedCategories.toString())
+                        if (selectedCategories.contains(card.idCat)) {
+                            selectedCategories.remove(card.idCat)
+                        } else {
+                            selectedCategories.add(card.idCat)
+                        }
                     }
                 )
             }
@@ -184,13 +198,19 @@ fun Cards(viewModel: CategoriesViewModel) {
         )
         {
             Spacer(modifier = Modifier.height(20.dp))
-            MediumBlueButton(text = "Continue", onClick = { /*TODO*/ }, width = 0.90f, modifier = Modifier)
+            MediumBlueButton(text = "Continue", onClick = { ButtonClick(selectedCategories, viewModel) }, width = 0.90f, modifier = Modifier)
         }
-
-
     }
-
 }
+
+fun ButtonClick(chosenCategories: List<Int>, viewModel: CategoriesViewModel)
+{
+    val id = 2;
+    val chosenCategoriesDTO = ChosenCategoriesDTO(userId = id, categoryIds = chosenCategories)
+    viewModel.postCategories(chosenCategoriesDTO)
+}
+
+
 
 @Composable
 fun ClickableCard(
@@ -210,6 +230,7 @@ fun ClickableCard(
                 .padding(2.dp)
                 .clickable {
                     isCardClicked = !isCardClicked
+                    onClick()
                 }
                 .height(80.dp)
                 .width(80.dp)
