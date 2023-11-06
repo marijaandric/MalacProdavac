@@ -1,10 +1,9 @@
 package com.example.front.screens
 
 import android.annotation.SuppressLint
-import android.content.Context
+import android.media.session.MediaSession.Token
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -27,19 +26,15 @@ import com.example.front.components.HeaderImage
 import com.example.front.components.LogoImage
 import com.example.front.components.MyTextField
 import com.example.front.components.TitleTextComponent
-import com.example.front.model.LoginDTO
 import com.example.front.navigation.Screen
 import com.example.front.repository.Repository
 import com.example.front.viewmodels.login.LoginViewModel
-import com.example.front.viewmodels.login.MainViewModelFactory
 import androidx.compose.material.*
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalView
+import com.example.front.helper.DataStoreManager
 import com.example.front.helper.LoginHandler
 import com.example.front.helper.TokenManager
-import com.example.front.viewmodels.categories.CategoriesViewModel
 import kotlinx.coroutines.launch
 
 
@@ -48,8 +43,8 @@ import kotlinx.coroutines.launch
 fun LoginScreen(
     navController:NavHostController
 ) {
-    var userInput by remember { mutableStateOf("") }
-    var passwordInput by remember { mutableStateOf("") }
+    var userInput by remember { mutableStateOf("marija.andric") }
+    var passwordInput by remember { mutableStateOf("MejoSmrdi123!") }
     var errorMessage by remember { mutableStateOf("") }
 
     lateinit var viewModel: LoginViewModel
@@ -59,7 +54,8 @@ fun LoginScreen(
     var scaffoldState: ScaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
 
-    val loginHandler = LoginHandler(LocalContext.current)
+    val context = LocalContext.current
+    val loginHandler = LoginHandler(context)
 
     Surface(
         color = Color.White,
@@ -94,7 +90,8 @@ fun LoginScreen(
                         labelValue = "Password",
                         painterResource = painterResource(id = R.drawable.padlock),
                         value = passwordInput, // Bind password input to the state
-                        onValueChange = { passwordInput = it } // Update the state on value change
+                        onValueChange = { passwordInput = it }, // Update the state on value change
+                        isPassword = true
                     )
                     BigBlueButton(
                         text = "Login",

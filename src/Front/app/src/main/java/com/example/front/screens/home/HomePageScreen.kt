@@ -22,6 +22,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,6 +30,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -38,9 +40,12 @@ import com.example.front.R
 import com.example.front.components.ProductCard
 import com.example.front.components.SearchTextField
 import com.example.front.components.SellerCard
+import com.example.front.helper.DataStoreManager
+import com.example.front.helper.TokenManager
 import com.example.front.repository.Repository
 import com.example.front.viewmodels.categories.CategoriesViewModel
 import com.example.front.viewmodels.home.HomeViewModel
+import javax.inject.Inject
 
 @Composable
 fun HomePage(navController: NavHostController) {
@@ -50,6 +55,7 @@ fun HomePage(navController: NavHostController) {
     viewModel = HomeViewModel(repository)
     viewModel.getHomeProducts(id)
     viewModel.getHomeShops(id)
+
 
     LazyColumn(
         modifier = Modifier.background(MaterialTheme.colorScheme.background)
@@ -150,12 +156,11 @@ fun Sellers(viewModel: HomeViewModel) {
         }
     }
 }
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Search() {
     var value by remember {mutableStateOf("") }
-
+    val context = LocalContext.current
     Box(
         contentAlignment = Alignment.TopCenter
     ) {
@@ -192,6 +197,16 @@ fun Search() {
                     .align(Alignment.CenterHorizontally)
                     .padding(top = 35.dp)
 
+            )
+            var username by remember { mutableStateOf("") }
+
+
+            // Use LaunchedEffect to call the suspend function getUsernameFromToken
+            LaunchedEffect(Unit) {
+                username = TokenManager().getUsernameFromToken().toString()
+            }
+            Text(
+                text = username
             )
         }
     }

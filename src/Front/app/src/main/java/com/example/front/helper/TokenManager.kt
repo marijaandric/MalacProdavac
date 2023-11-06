@@ -1,45 +1,46 @@
 package com.example.front.helper
 
-import android.content.Context
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.datastore.preferences.preferencesDataStore
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.runBlocking
+import com.auth0.jwt.JWT
+import com.auth0.jwt.algorithms.Algorithm
+import javax.inject.Inject
 
-class TokenManager(context: Context) {
-    private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "token_datastore")
-    private val dataStore: DataStore<Preferences> = context.dataStore
 
-    suspend fun saveToken(token: String) {
+class TokenManager() {
+
+    @Inject
+    lateinit var dataStoreManager: DataStoreManager
+
+    val JWT_SECRET = "10e13609875c047a26c74fcba54bde5b"
+
+    // Function to retrieve and decode the token
+    suspend fun getUsernameFromToken(): String? {
+        // Retrieve the token from the DataStoreManager
+        val token = dataStoreManager.tokenFlow.first()
+
+        // Decode the token and extract the username (you need to implement your decoding logic here)
+        val username = decodeTokenAndGetUsername(token)
+
+        return username
+    }
+
+    // You need to implement your own token decoding logic here
+    private fun decodeTokenAndGetUsername(token: String?): String? {
+        if (token.isNullOrBlank()) {
+            return null
+        }
+
         try {
-            val dataStoreKey = stringPreferencesKey("jwt_token")
-            dataStore.edit { preferences ->
-                preferences[dataStoreKey] = token
-            }
+            val algorithm = Algorithm.HMAC256(JWT_SECRET)
+            val verifier = JWT.require(algorithm).build()
+            val decodedJWT = verifier.verify(token)
+
+            // Extract the "name" claim from the decoded JWT
+            return decodedJWT.getClaim("name").asString()
         } catch (e: Exception) {
-            // Handle the exception here (e.g., log or display an error message).
+            // Handle any exceptions that may occur during decoding
             e.printStackTrace()
-        }
-    }
-
-    fun getTokenFlow(): Flow<String?> {
-        val dataStoreKey = stringPreferencesKey("jwt_token")
-        return dataStore.data.map { preferences ->
-            preferences[dataStoreKey]
-        }
-    }
-
-    fun getToken(): String {
-        return runBlocking {
-            val dataStoreKey = stringPreferencesKey("jwt_token")
-            dataStore.data.map { preferences ->
-                preferences[dataStoreKey]
-            }.first() ?: ""
+            return null
         }
     }
 }

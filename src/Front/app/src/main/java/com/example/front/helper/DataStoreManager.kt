@@ -7,10 +7,12 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 
-class DataStoreManager(context: Context) {
+class DataStoreManager @Inject constructor(@ApplicationContext context: Context) {
     private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "token_datastore")
     private val dataStore: DataStore<Preferences> = context.dataStore
 
@@ -29,4 +31,3 @@ class DataStoreManager(context: Context) {
         preferences[TOKEN_KEY]
     }
 }
-

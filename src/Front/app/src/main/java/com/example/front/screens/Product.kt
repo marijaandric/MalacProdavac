@@ -166,6 +166,7 @@ fun ProductPage(){
                     ) {
                         Text(
                             text = "-",
+                            style = Typography.bodyLarge
                         )
                     }
                     Text(
@@ -183,6 +184,7 @@ fun ProductPage(){
                     ) {
                         Text(
                             text = "+",
+                            style = Typography.bodyLarge,
                         )
                     }
                 }
