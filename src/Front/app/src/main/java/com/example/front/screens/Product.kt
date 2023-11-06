@@ -3,8 +3,10 @@ package com.example.front.screens
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -12,14 +14,17 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Button
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.front.R
@@ -67,6 +72,104 @@ fun ProductPage(){
                     .padding(5.dp),
                 style = Typography.titleMedium,
                     )
+            Box(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = "Domacinstvo Jovanovic",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(5.dp),
+                    style = Typography.titleSmall,
+                    textAlign = TextAlign.Center
+                )
+                Image(
+                    painter = painterResource(R.drawable.strelica),
+                    contentDescription = "",
+                    modifier = Modifier
+                        .size(29.dp)
+                        .align(Alignment.Center)
+                        .offset(x = 90.dp)
+                )
+            }
+            Box(){
+                Text(
+                    text = "120,00 din/kg",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(20.dp),
+                    style = Typography.titleLarge,
+                    textAlign = TextAlign.Center
+                )
+            }
+            Box(){
+                Text(
+                    text = "*10% off on orders over 15kg",
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    style = Typography.titleMedium,
+                    textAlign = TextAlign.Center
+                )
+            }
+            Box(){
+                Text(
+                    text = "Jabuke zlatni delišes, brane 2-3 dana pre " +
+                            "dostave. Popust na porudzbinu preko 15kg.",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp),
+                    style = Typography.bodySmall,
+                    textAlign = TextAlign.Center
+                )
+            }
+            Divider(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.dp) // Adjust the height as needed
+                    .padding(horizontal = 16.dp), // Adjust the padding as needed
+                color = Color.Gray // You can set the color of the divider
+            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "Pick up time",
+                    style = Typography.titleSmall,
+                )
+
+                Text(
+                    text = "Mon - Fri   9:00 - 18:00",
+                    style = Typography.titleSmall,
+                )
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "Quantity",
+                    style = Typography.titleSmall,
+                )
+                Button(
+                    onClick = {},
+                    modifier = Modifier
+                        .height(10.dp)
+                        .clip(RoundedCornerShape(5.dp))
+                        .border(1.dp,Color.Black)
+                ) {
+                    Text(
+                        text = "-",
+                        style = Typography.bodyLarge,
+                        color = Color.Black
+                    )
+                }
+
+            }
         }
     }
 }
