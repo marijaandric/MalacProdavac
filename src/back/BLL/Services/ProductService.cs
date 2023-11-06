@@ -67,5 +67,11 @@ namespace back.BLL.Services
             if (await _repository.RemoveFromCart(productId, userId)) return true;
             throw new ArgumentException("Item could not be removed!");
         }
+
+        public async Task<bool> LeaveReview(ReviewDto review)
+        {
+            if (await _repository.LeaveReview(review)) return true;
+            throw new ArgumentException("Product could not be reviewed!");
+        }
     }
 }

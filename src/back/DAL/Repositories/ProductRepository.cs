@@ -255,5 +255,19 @@ namespace back.DAL.Repositories
         }
 
         #endregion
+
+        public async Task<bool> LeaveReview(ReviewDto review)
+        {
+            _context.ProductReviews.AddAsync(new ProductReview
+            {
+                ReviewerId = review.UserId,
+                ProductId = review.Id,
+                Rating = review.Rating,
+                Comment = review.Comment,
+                PostedOn = DateTime.Now
+            });
+
+            return _context.SaveChanges() > 0;
+        }
     }
 }

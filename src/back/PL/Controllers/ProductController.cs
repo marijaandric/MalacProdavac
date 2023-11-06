@@ -1,4 +1,6 @@
-﻿using back.BLL.Services;
+﻿using back.BLL.Dtos;
+using back.BLL.Services;
+using back.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace back.PL.Controllers
@@ -99,6 +101,19 @@ namespace back.PL.Controllers
             try
             {
                 return Ok(new { success = await _service.RemoveFromCart(productId, userId) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
+
+        [HttpPost("Review")]
+        public async Task<IActionResult> LeaveReview(ReviewDto review)
+        {
+            try
+            {
+                return Ok(new { success = await _service.LeaveReview(review) });
             }
             catch (Exception ex)
             {
