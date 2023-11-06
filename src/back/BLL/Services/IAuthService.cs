@@ -6,6 +6,6 @@ namespace back.BLL.Services
     {
         //string treba
         public Task<string> Login(LoginDto loginDto);
-        public Task<int> Register(UserDto userDto);
+        public Task<string> Register(UserDto userDto);
     }
 }

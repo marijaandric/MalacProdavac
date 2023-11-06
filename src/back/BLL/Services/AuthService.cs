@@ -122,7 +122,7 @@ namespace back.BLL.Services
         }
         #endregion
 
-        public async Task<int> Register(UserDto userDto)
+        public async Task<string> Register(UserDto userDto)
         {
             #region validation
             string checkEmail = CheckEmail(userDto.Email.ToLower());
@@ -173,8 +173,8 @@ namespace back.BLL.Services
             user.Latitude = (float)coordinates.Item1;
             user.Longitude = (float)coordinates.Item2;
 
-            if (await _authRepository.InsertUser(user)) return user.Id;
-            return -1;
+            if (await _authRepository.InsertUser(user)) return await CreateToken(user);
+            return "";
         }
 
         //treba da vraca string

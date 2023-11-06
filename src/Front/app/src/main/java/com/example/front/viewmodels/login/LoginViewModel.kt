@@ -5,30 +5,61 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.front.model.LoginDTO
+import com.example.front.model.LoginResponse
 import com.example.front.repository.Repository
+import com.google.gson.Gson
 import kotlinx.coroutines.launch
+import org.json.JSONException
+import org.json.JSONObject
 import retrofit2.Response
 
 
-class LoginViewModel(private val repository: Repository): ViewModel() {
-    val myResponse:MutableLiveData<Response<Int>> = MutableLiveData()
-    fun getLoginnInfo(login:LoginDTO)
-    {
+class LoginViewModel(private val repository: Repository) : ViewModel() {
+    val jwtToken: MutableLiveData<String?> = MutableLiveData()
+    val errorMessage: MutableLiveData<String> = MutableLiveData()
+
+    fun getLoginInfo(login: LoginDTO) {
         viewModelScope.launch {
             try {
                 val response = repository.getLogin(login)
-                Log.d("RESPONSE",response.toString())
-                myResponse.value = response
+
                 if (response.isSuccessful) {
-                    val responseBody = response.body()
-                    Log.d("DOBIJEN ID:",responseBody.toString())
+                    val responseBody = response.body()!!.token
+                    if (responseBody != null)
+                        jwtToken.value = responseBody
+
+                    else {
+                        errorMessage.value = "Response body is null"
+                    }
                 }
 
-            }
-            catch (e:Exception)
-            {
-                Log.d("GRESKA",e.message.toString())
+                else {
+                    if (response.code() == 400) {
+                        val errorResponse = response.errorBody()?.string()
+                        if (errorResponse != null) {
+                            try {
+                                val errorJson = JSONObject(errorResponse)
+                                val errorMess = errorJson.optString("error")
+                                if (errorMess.isNotEmpty()) {
+                                    errorMessage.value = errorMess
+                                } else {
+                                    errorMessage.value = "Bad Request: An unknown error occurred 1"
+                                }
+                            } catch (e: JSONException) {
+                                errorMessage.value = "Bad Request: An unknown error occurred 2"
+                            }
+                        } else {
+                            errorMessage.value = "Bad Request: An unknown error occurred 3"
+                        }
+                    } else {
+                        // Handle other errors
+                        errorMessage.value = "Error: ${response.message()}"
+                    }
+                }
+            } catch (e: Exception) {
+                errorMessage.value = "An error occurred: ${e.message}"
             }
         }
     }
+
 }

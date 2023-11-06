@@ -8,9 +8,9 @@ namespace back.Models
     {
         [ForeignKey("Shop")]
         public int ShopId { get; set; }
-        public DateTime Day {  get; set; }
-        public DateTime OpeningHours { get; set; }
-        public DateTime ClosingHours { get; set;}
+        public DayOfWeek Day {  get; set; }
+        public TimeSpan OpeningHours { get; set; }
+        public TimeSpan ClosingHours { get; set;}
 
         public Shop Shop { get; set; }
     }

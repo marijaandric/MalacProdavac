@@ -3,6 +3,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.serialization") version "1.8.0"
     kotlin("kapt")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -54,6 +55,7 @@ dependencies {
 
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
+    implementation("androidx.lifecycle:lifecycle-viewmodel:2.6.2")
     implementation("androidx.activity:activity-compose:1.7.0")
     implementation(platform("androidx.compose:compose-bom:2023.03.00"))
     implementation("androidx.compose.ui:ui")
@@ -83,10 +85,38 @@ dependencies {
     // pager
     implementation("androidx.compose.foundation:foundation:1.4.0")
 
+
     //okhttp3
     implementation("com.squareup.okhttp3:okhttp:4.11.0")
 
-    // retroit
+    // retrofit
     implementation ("com.squareup.retrofit2:retrofit:2.7.2")
     implementation ("com.squareup.retrofit2:converter-gson:2.7.2")
+
+    //material za snackbar
+    implementation("androidx.compose.material:material:1.0.3")
+
+    //datastore
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
+    implementation("androidx.datastore:datastore-preferences-rxjava2:1.0.0")
+    implementation("androidx.datastore:datastore-preferences-rxjava3:1.0.0")
+
+    //hilt
+    implementation("com.google.dagger:hilt-android:2.44")
+    kapt("com.google.dagger:hilt-android-compiler:2.44")
+
+    // hilt
+    implementation("com.google.dagger:hilt-android:2.44")
+    kapt("com.google.dagger:hilt-android-compiler:2.44")
+
+    // nesto za state
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.2")
+    implementation("androidx.compose.runtime:runtime-rxjava2:1.5.2")
+    implementation("androidx.compose.runtime:runtime-livedata:1.5.2")
+    implementation("androidx.compose.runtime:runtime-rxjava3:1.5.2")
 }
+
+kapt {
+    correctErrorTypes = true
+}
+
