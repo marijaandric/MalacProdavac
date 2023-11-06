@@ -41,6 +41,12 @@ val Typography = Typography(
                 fontWeight = FontWeight.Bold,
                 fontSize = 13.sp,
                 letterSpacing = 0.5.sp
+        ),
+        displaySmall = TextStyle(
+                fontFamily = FontFamily(Font(R.font.lexend)),
+                fontWeight = FontWeight.Bold,
+                fontSize = 8.sp,
+                letterSpacing = 0.5.sp
         )
 
 

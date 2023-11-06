@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.Surface
@@ -55,7 +56,7 @@ fun ProductPage(){
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .offset(y = 350.dp)
+                .offset(y = 300.dp)
                 .background(Color.White)
                 .align(Alignment.Center)
                 .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
@@ -148,27 +149,61 @@ fun ProductPage(){
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(20.dp),
+                    .padding(10.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
                     text = "Quantity",
                     style = Typography.titleSmall,
                 )
+                Row(){
+                    Button(
+                        onClick = {},
+                        modifier = Modifier
+                            .height(40.dp)
+                            .border(1.dp, Color.Black),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+                    ) {
+                        Text(
+                            text = "-",
+                        )
+                    }
+                    Text(
+                        text  = "1",
+                        modifier = Modifier
+                            .padding(20.dp),
+                        textAlign = TextAlign.Justify
+                    )
+                    Button(
+                        onClick = {},
+                        modifier = Modifier
+                            .height(40.dp)
+                            .border(1.dp, Color.Black),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+                    ) {
+                        Text(
+                            text = "+",
+                        )
+                    }
+                }
+            }
+            Row(
+                modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(20.dp),
+                horizontalArrangement = Arrangement.Center
+            ){
                 Button(
                     onClick = {},
                     modifier = Modifier
-                        .height(10.dp)
-                        .clip(RoundedCornerShape(5.dp))
-                        .border(1.dp,Color.Black)
+                        .height(60.dp)
+                        .width(200.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xE48359)),
                 ) {
                     Text(
-                        text = "-",
-                        style = Typography.bodyLarge,
-                        color = Color.Black
+                        text = "Add To Cart",
                     )
                 }
-
             }
         }
     }
