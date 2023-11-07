@@ -48,7 +48,7 @@ import com.example.front.viewmodels.home.HomeViewModel
 import javax.inject.Inject
 
 @Composable
-fun HomePage(navController: NavHostController) {
+fun HomePage(navController: NavHostController, dataStoreManager: DataStoreManager) {
     val id = 1;
     var viewModel: HomeViewModel
     val repository = Repository()
@@ -71,7 +71,16 @@ fun HomePage(navController: NavHostController) {
         }
     }
 
+    var username by remember { mutableStateOf("") }
 
+
+    // Use LaunchedEffect to call the suspend function getUsernameFromToken
+    LaunchedEffect(Unit) {
+        username = TokenManager(dataStoreManager).getUsernameFromToken().toString()
+    }
+    Text(
+        text = username
+    )
 }
 
 data class CardData(
@@ -197,16 +206,6 @@ fun Search() {
                     .align(Alignment.CenterHorizontally)
                     .padding(top = 35.dp)
 
-            )
-            var username by remember { mutableStateOf("") }
-
-
-            // Use LaunchedEffect to call the suspend function getUsernameFromToken
-            LaunchedEffect(Unit) {
-                username = TokenManager().getUsernameFromToken().toString()
-            }
-            Text(
-                text = username
             )
         }
     }

@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.front.helper.DataStoreManager
 import com.example.front.model.LoginDTO
 import com.example.front.model.LoginResponse
 import com.example.front.repository.Repository
@@ -14,7 +15,7 @@ import org.json.JSONObject
 import retrofit2.Response
 
 
-class LoginViewModel(private val repository: Repository) : ViewModel() {
+class LoginViewModel(private val repository: Repository, private val dataStoreManager: DataStoreManager) : ViewModel() {
     val jwtToken: MutableLiveData<String?> = MutableLiveData()
     val errorMessage: MutableLiveData<String> = MutableLiveData()
 
@@ -61,5 +62,23 @@ class LoginViewModel(private val repository: Repository) : ViewModel() {
             }
         }
     }
-
+    suspend fun performLogin(
+        userInput: String,
+        passwordInput: String
+    ): Boolean {
+        try {
+            val data = LoginDTO(userInput, passwordInput)
+            getLoginInfo(data)
+            val token = jwtToken.value
+            val errorMess = errorMessage.value
+            if (token != null && errorMess == null) {
+                dataStoreManager.storeToken(token)
+                return true
+            }
+        } catch (e: Exception) {
+            // Handle the exception here (e.g., log or display an error message).
+            e.printStackTrace()
+        }
+        return false
+    }
 }

@@ -8,11 +8,11 @@ import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
 @Module
-@InstallIn(SingletonComponent::class) // You can choose the appropriate Hilt component
+@InstallIn(SingletonComponent::class)
 object DataStoreModule {
 
     @Provides
-    @Singleton // You can change the scope to match your needs
+    @Singleton
     fun provideDataStoreManager(context: Context): DataStoreManager {
         return DataStoreManager(context)
     }

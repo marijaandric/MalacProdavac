@@ -33,15 +33,14 @@ import androidx.compose.material.*
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import com.example.front.helper.DataStoreManager
-import com.example.front.helper.LoginHandler
-import com.example.front.helper.TokenManager
 import kotlinx.coroutines.launch
 
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun LoginScreen(
-    navController:NavHostController
+    navController:NavHostController,
+    dataStoreManager: DataStoreManager
 ) {
     var userInput by remember { mutableStateOf("marija.andric") }
     var passwordInput by remember { mutableStateOf("MejoSmrdi123!") }
@@ -49,13 +48,12 @@ fun LoginScreen(
 
     lateinit var viewModel: LoginViewModel
     val repository = Repository() // Create a Repository instance
-    viewModel = LoginViewModel(repository)
+    viewModel = LoginViewModel(repository,dataStoreManager)
 
     var scaffoldState: ScaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
 
     val context = LocalContext.current
-    val loginHandler = LoginHandler(context)
 
     Surface(
         color = Color.White,
@@ -98,7 +96,7 @@ fun LoginScreen(
                         onClick = {
                             coroutineScope.launch {
                                 try {
-                                    val success = loginHandler.performLogin(userInput, passwordInput)
+                                    val success = viewModel.performLogin(userInput, passwordInput)
                                     if (success) {
                                         navController.navigate(route = Screen.Home.route)
                                     } else {

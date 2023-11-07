@@ -50,6 +50,7 @@ import com.example.front.components.HeaderImage
 import com.example.front.components.LogoImage
 import com.example.front.components.MyTextField
 import com.example.front.components.TitleTextComponent
+import com.example.front.helper.DataStoreManager
 import com.example.front.model.RegistrationRequest
 import com.example.front.navigation.Screen
 import com.example.front.repository.Repository
@@ -68,10 +69,10 @@ fun isValidPassword(password: String): String {
 }
 
 @Composable
-fun RegisterScreen(navController: NavHostController) {
+fun RegisterScreen(navController: NavHostController, dataStoreManager: DataStoreManager) {
     lateinit var viewModel: RegisterViewModel
     val repository = Repository()
-    val viewModelFactory = MainViewModelFactory(repository)
+    val viewModelFactory = MainViewModelFactory(repository, dataStoreManager)
     viewModel = viewModelFactory.create(RegisterViewModel::class.java)
 
     var name by remember { mutableStateOf("") }
@@ -247,10 +248,4 @@ fun RegisterScreen(navController: NavHostController) {
 
         }
     }
-}
-
-@Preview
-@Composable
-fun prikaziRegister(){
-    RegisterScreen(navController = NavHostController(context = LocalContext.current))
 }

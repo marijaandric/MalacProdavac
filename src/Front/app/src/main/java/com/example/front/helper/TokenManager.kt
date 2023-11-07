@@ -6,10 +6,7 @@ import com.auth0.jwt.algorithms.Algorithm
 import javax.inject.Inject
 
 
-class TokenManager() {
-
-    @Inject
-    lateinit var dataStoreManager: DataStoreManager
+class TokenManager(private val dataStoreManager: DataStoreManager) {
 
     val JWT_SECRET = "10e13609875c047a26c74fcba54bde5b"
 

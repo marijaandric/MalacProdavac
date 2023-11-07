@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.front.helper.DataStoreManager
 import com.example.front.screens.home.HomePage
 import com.example.front.screens.Intro
 import com.example.front.screens.LoginScreen
@@ -21,7 +22,8 @@ import com.example.front.screens.categories.RegistrationCategories
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun SetupNavGraph(
-    navController: NavHostController
+    navController: NavHostController,
+    dataStoreManager: DataStoreManager
 ){
     NavHost(
         navController = navController,
@@ -36,12 +38,12 @@ fun SetupNavGraph(
         composable(
             route = Screen.Login.route
         ){
-            LoginScreen(navController = navController)
+            LoginScreen(navController = navController,dataStoreManager)
         }
         composable(
             route = Screen.Home.route
         ){
-            HomePage(navController = navController)
+            HomePage(navController = navController, dataStoreManager)
         }
         composable(
             route=Screen.Categories.route
@@ -57,7 +59,6 @@ fun SetupNavGraph(
 
         composable(route=Screen.Intro1.route)
         {
-            Log.e("USAO SAM", "USAOOOOO")
             Intro("Welcome to MalacProdavac","","intro1",0,navController = navController)
             val desc = "Showcase your products and engage with local customers! Increase your visibility and sales."
             val desc2 = "Showcase your products and engage with local customers! Increase your visibility and sales."
