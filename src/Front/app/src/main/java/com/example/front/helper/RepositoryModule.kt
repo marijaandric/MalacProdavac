@@ -1,20 +1,19 @@
 package com.example.front.helper
 
-import android.content.Context
+import com.example.front.repository.Repository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object DataStoreModule {
+object RepositoryModule {
 
     @Provides
     @Singleton
-    fun provideDataStoreManager(@ApplicationContext context: Context): DataStoreManager {
-        return DataStoreManager(context)
+    fun provideRepository(): Repository {
+        return Repository() // You need to instantiate or provide the Repository here.
     }
 }

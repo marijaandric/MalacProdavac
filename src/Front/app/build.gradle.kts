@@ -102,9 +102,10 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences-rxjava3:1.0.0")
     implementation("androidx.datastore:datastore:1.0.0")
 
-    //hilt
-    implementation("com.google.dagger:hilt-android:2.44")
+    implementation("com.google.dagger:hilt-android:2.44") // Use Dagger Hilt 2.x
     kapt("com.google.dagger:hilt-android-compiler:2.44")
+    implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
+    kapt("androidx.hilt:hilt-compiler:1.1.0") // Use Hilt Compiler 1.1.0
 
 
     // nesto za state

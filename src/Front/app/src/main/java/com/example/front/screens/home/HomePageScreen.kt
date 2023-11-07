@@ -32,29 +32,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.example.front.R
 import com.example.front.components.ProductCard
 import com.example.front.components.SearchTextField
 import com.example.front.components.SellerCard
 import com.example.front.helper.DataStoreManager
-import com.example.front.helper.TokenManager
 import com.example.front.repository.Repository
-import com.example.front.viewmodels.categories.CategoriesViewModel
 import com.example.front.viewmodels.home.HomeViewModel
-import javax.inject.Inject
 
 @Composable
-fun HomePage(navController: NavHostController, dataStoreManager: DataStoreManager) {
+fun HomePage(navController: NavHostController, homeViewModel: HomeViewModel) {
     val id = 1;
-    var viewModel: HomeViewModel
-    val repository = Repository()
-    viewModel = HomeViewModel(repository)
-    viewModel.getHomeProducts(id)
-    viewModel.getHomeShops(id)
+
+    homeViewModel.getHomeProducts(id)
+    homeViewModel.getHomeShops(id)
 
 
     LazyColumn(
@@ -64,23 +57,17 @@ fun HomePage(navController: NavHostController, dataStoreManager: DataStoreManage
             Search()
         }
         item {
-            Sellers(viewModel)
+            Sellers(homeViewModel)
         }
         item {
-            Products(viewModel)
+            Products(homeViewModel)
         }
     }
 
-    var username by remember { mutableStateOf("") }
 
 
-    // Use LaunchedEffect to call the suspend function getUsernameFromToken
-    LaunchedEffect(Unit) {
-        username = TokenManager(dataStoreManager).getUsernameFromToken().toString()
-    }
-    Text(
-        text = username
-    )
+    val username by homeViewModel.usernameState
+    //Text(text = "Cao $username")
 }
 
 data class CardData(

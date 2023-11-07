@@ -39,21 +39,14 @@ import kotlinx.coroutines.launch
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun LoginScreen(
-    navController:NavHostController,
-    dataStoreManager: DataStoreManager
+    navController: NavHostController,
+    viewModel: LoginViewModel
 ) {
     var userInput by remember { mutableStateOf("marija.andric") }
     var passwordInput by remember { mutableStateOf("MejoSmrdi123!") }
-    var errorMessage by remember { mutableStateOf("") }
-
-    lateinit var viewModel: LoginViewModel
-    val repository = Repository() // Create a Repository instance
-    viewModel = LoginViewModel(repository,dataStoreManager)
 
     var scaffoldState: ScaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
-
-    val context = LocalContext.current
 
     Surface(
         color = Color.White,
