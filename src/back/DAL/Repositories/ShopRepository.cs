@@ -160,5 +160,38 @@ namespace back.DAL.Repositories
                 WorkingHours = workingHours,
             };
         }
+
+        #region likes
+        public async Task<LikedShops> GetLike(int shopId, int userId)
+        {
+            return await _context.LikedShops.FirstOrDefaultAsync(x => x.ShopId == shopId && x.UserId == userId);
+        }
+
+        public async Task<bool> LikeShop(int shopId, int userId)
+        {
+            await _context.LikedShops.AddAsync(new LikedShops { ShopId = shopId, UserId = userId });
+            return await _context.SaveChangesAsync() > 0;
+        }
+
+        public async Task<bool> DislikeShop(int shopId, int userId)
+        {
+            _context.LikedShops.Remove(await GetLike(shopId, userId));
+            return await _context.SaveChangesAsync() > 0;
+        }
+        #endregion
+
+        public async Task<bool> LeaveReview(ReviewDto review)
+        {
+            _context.ShopReviews.AddAsync(new ShopReview
+            {
+                ReviewerId = review.UserId,
+                ShopId = review.Id,
+                Rating = review.Rating,
+                Comment = review.Comment,
+                PostedOn = DateTime.Now
+            });
+
+            return _context.SaveChanges() > 0;
+        }
     }
 }

@@ -65,5 +65,31 @@ namespace back.PL.Controllers
                 return BadRequest(new { Error = ex.Message });
             }
         }
+
+        [HttpPost("ToggleLike")]
+        public async Task<IActionResult> ToggleLike(int shopId, int userId)
+        {
+            try
+            {
+                return Ok(new { success = await _service.ToggleLike(shopId, userId) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
+
+        [HttpPost("Review")]
+        public async Task<IActionResult> LeaveReview(ReviewDto review)
+        {
+            try
+            {
+                return Ok(new { success = await _service.LeaveReview(review) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
     }
 }
