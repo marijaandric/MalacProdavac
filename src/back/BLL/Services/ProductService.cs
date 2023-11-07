@@ -73,5 +73,11 @@ namespace back.BLL.Services
             if (await _repository.LeaveReview(review)) return true;
             throw new ArgumentException("Product could not be reviewed!");
         }
+
+        public async Task<bool> LeaveQuestion(QnADto question)
+        {
+            if (await _repository.LeaveQuestion(question)) return true;
+            throw new ArgumentException("Question could not be saved!");
+        }
     }
 }

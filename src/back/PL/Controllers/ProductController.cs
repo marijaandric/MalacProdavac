@@ -120,5 +120,18 @@ namespace back.PL.Controllers
                 return BadRequest(new { Error = ex.Message });
             }
         }
+
+        [HttpPost("Question")]
+        public async Task<IActionResult> LeaveQuestion(QnADto question)
+        {
+            try
+            {
+                return Ok(new { success = await _service.LeaveQuestion(question) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
     }
 }

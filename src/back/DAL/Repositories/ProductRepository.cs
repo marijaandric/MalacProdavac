@@ -1,4 +1,5 @@
 ﻿using back.BLL.Dtos;
+using back.BLL.Dtos.HelpModels;
 using back.DAL.Contexts;
 using back.Models;
 using Microsoft.EntityFrameworkCore;
@@ -170,12 +171,19 @@ namespace back.DAL.Repositories
                                                 }).ToListAsync();
             List<ProductQuestion> questions = await _context.ProductQuestions.Where(x => x.ProductId == productId).ToListAsync();
             List<ProductAnswer> answers = await _context.ProductAnswers.Where(x => questions.Select(x => x.Id).Contains(x.QuestionId)).ToListAsync();
-            List<(ProductQuestion, ProductAnswer)> qna = questions.GroupJoin(answers, q => q.Id, a => a.QuestionId, (q, a) => (q, a))
+            List<QuestionWithAnswer> qna = questions.GroupJoin(answers, q => q.Id, a => a.QuestionId, (q, a) => (q, a))
                                                         .SelectMany(
                                                             q => q.a.DefaultIfEmpty(),
                                                             (q, a) => (q.q, a)
-                                                        ).ToList(); 
-            Dictionary<string, int> sizes = await _context.ProductSizes.Where(x => x.ProductId == productId).Join(_context.Sizes, ps => ps.SizeId, s => s.Id, (ps, s) => new { s.Name, ps.Stock }).ToDictionaryAsync(key => key.Name, value => value.Stock);
+                                                        ).Select(x => new QuestionWithAnswer
+                                                        {
+                                                            QuestionId = x.q.Id,
+                                                            AnswerId = x.a != null ? x.a.Id : -1,
+                                                            QuestionText = x.q.QuestionText,
+                                                            AnswerText = x.a != null ? x.a.AnswerText : null
+                                                        }
+                                                            ).ToList(); 
+            List<Stock> sizes = await _context.ProductSizes.Where(x => x.ProductId == productId).Join(_context.Sizes, ps => ps.SizeId, s => s.Id, (ps, s) => new Stock{ Size = s.Name, Quantity = ps.Stock }).ToListAsync();
             Dictionary<int,string> images = await _context.ProductImages.Where(x => x.ProductId == productId).ToDictionaryAsync(key => key.Id, value => value.Image);
             float average = 0;
             if (reviews.Count > 0) average = reviews.Select(x => x.Rating).Average();
@@ -264,6 +272,19 @@ namespace back.DAL.Repositories
                 ProductId = review.Id,
                 Rating = review.Rating,
                 Comment = review.Comment,
+                PostedOn = DateTime.Now
+            });
+
+            return _context.SaveChanges() > 0;
+        }
+
+        public async Task<bool> LeaveQuestion(QnADto question)
+        {
+            _context.ProductQuestions.AddAsync(new ProductQuestion
+            {
+                PosterId = question.UserId,
+                ProductId = question.Id,
+                QuestionText = question.Text,
                 PostedOn = DateTime.Now
             });
 
