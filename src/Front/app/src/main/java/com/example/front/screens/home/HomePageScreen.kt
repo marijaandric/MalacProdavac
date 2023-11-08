@@ -23,6 +23,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,9 +47,12 @@ import com.example.front.viewmodels.home.HomeViewModel
 fun HomePage(navController: NavHostController, homeViewModel: HomeViewModel) {
     val id = 1;
 
-    homeViewModel.getHomeProducts(id)
-    homeViewModel.getHomeShops(id)
 
+    LaunchedEffect(Unit) {
+        homeViewModel.getHomeProducts(id)
+        homeViewModel.getHomeShops(id)
+        homeViewModel.getUsername()
+    }
 
     LazyColumn(
         modifier = Modifier.background(MaterialTheme.colorScheme.background)
@@ -64,10 +68,9 @@ fun HomePage(navController: NavHostController, homeViewModel: HomeViewModel) {
         }
     }
 
+    val username by homeViewModel.usernameFlow.collectAsState("")
 
-
-    val username by homeViewModel.usernameState
-    //Text(text = "Cao $username")
+    Text(text = "Cao $username")
 }
 
 data class CardData(

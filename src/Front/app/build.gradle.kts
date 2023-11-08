@@ -114,8 +114,11 @@ dependencies {
     implementation("androidx.compose.runtime:runtime-livedata:1.5.2")
     implementation("androidx.compose.runtime:runtime-rxjava3:1.5.2")
 
-    //aut0
-    implementation("com.auth0:java-jwt:4.4.0")
+    //nimbus jwt
+    implementation("com.nimbusds:nimbus-jose-jwt:9.30.1")
+
+    //nesto idk
+    implementation("androidx.compose.runtime:runtime-livedata:1.0.0")
 }
 
 kapt {

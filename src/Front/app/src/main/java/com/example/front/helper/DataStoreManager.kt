@@ -6,8 +6,9 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import com.auth0.jwt.JWT
-import com.auth0.jwt.algorithms.Algorithm
+import com.nimbusds.jose.JWSObject
+import com.nimbusds.jwt.JWTClaimsSet
+import com.nimbusds.jwt.SignedJWT
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -43,22 +44,22 @@ class DataStoreManager @Inject constructor(@ApplicationContext context: Context)
         return decodeTokenAndGetUsername(token)
     }
 
-    private fun decodeTokenAndGetUsername(token: String?): String? {
+    fun decodeTokenAndGetUsername(token: String?): String? {
         if (token.isNullOrBlank()) {
             return "null"
         }
 
         try {
-            val algorithm = Algorithm.HMAC256(JWT_SECRET)
-            val verifier = JWT.require(algorithm).build()
-            val decodedJWT = verifier.verify(token)
+            val signedJWT = SignedJWT.parse(token)
+            val claimsSet = signedJWT.jwtClaimsSet
 
-            // Extract the "name" claim from the decoded JWT
-            return decodedJWT.getClaim("name").asString()
+            // Extract the "name" claim from the JWT claims
+            return claimsSet.getClaim("name") as? String
         } catch (e: Exception) {
             // Handle any exceptions that may occur during decoding
             e.printStackTrace()
             return null
         }
     }
+
 }

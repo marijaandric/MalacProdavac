@@ -14,6 +14,8 @@ import com.example.front.screens.categories.CategoriesState
 import com.example.front.screens.home.HomeProductsState
 import com.example.front.screens.home.HomeShopState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import retrofit2.Response
 import javax.inject.Inject
@@ -30,8 +32,9 @@ class HomeViewModel @Inject constructor(
     private val _stateShop = mutableStateOf(HomeShopState())
     var stateShop : State<HomeShopState> = _stateShop;
 
-    private var username = mutableStateOf("")
-    val usernameState: State<String> = username
+    private val _usernameFlow = MutableStateFlow("")
+    val usernameFlow: Flow<String> = _usernameFlow
+
 
     fun getHomeProducts(id: Int)
     {
@@ -81,7 +84,7 @@ class HomeViewModel @Inject constructor(
 
     suspend fun getUsername() {
         val retrievedUsername = dataStoreManager.getUsernameFromToken()
-        username.value = retrievedUsername ?: ""
+        _usernameFlow.value = retrievedUsername ?: ""
         println(retrievedUsername)
     }
 
