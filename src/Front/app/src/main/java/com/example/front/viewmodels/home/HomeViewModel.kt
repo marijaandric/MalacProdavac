@@ -3,21 +3,16 @@ package com.example.front.viewmodels.home
 import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.front.helper.DataStoreManager
-import com.example.front.model.CategoriesDTO
-import com.example.front.model.ChosenCategoriesDTO
+import com.example.front.helper.DataStore.DataStoreManager
 import com.example.front.repository.Repository
-import com.example.front.screens.categories.CategoriesState
 import com.example.front.screens.home.HomeProductsState
 import com.example.front.screens.home.HomeShopState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import retrofit2.Response
 import javax.inject.Inject
 
 @HiltViewModel

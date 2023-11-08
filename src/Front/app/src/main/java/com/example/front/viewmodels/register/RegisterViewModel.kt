@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.front.helper.DataStore.DataStoreManager
 import com.example.front.model.RegistrationRequest
 import com.example.front.repository.Repository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -12,7 +13,7 @@ import retrofit2.Response
 import javax.inject.Inject
 
 @HiltViewModel
-class RegisterViewModel @Inject constructor(private val repository: Repository) : ViewModel(){
+class RegisterViewModel @Inject constructor(private val repository: Repository, dataStoreManager: DataStoreManager) : ViewModel(){
     val myResponse: MutableLiveData<Response<Int>> = MutableLiveData()
     fun performRegistration(registrationRequest: RegistrationRequest) {
         viewModelScope.launch {

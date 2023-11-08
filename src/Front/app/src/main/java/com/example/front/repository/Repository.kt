@@ -1,5 +1,6 @@
 package com.example.front.repository
 
+import com.example.front.api.Api
 import com.example.front.api.RetrofitInstance
 import com.example.front.model.CategoriesDTO
 import com.example.front.model.ChosenCategoriesDTO
@@ -9,24 +10,30 @@ import com.example.front.model.RegistrationRequest
 import com.example.front.model.LoginResponse
 import com.example.front.model.ShopDTO
 import retrofit2.Response
+import javax.inject.Inject
 
-class Repository {
+class Repository @Inject constructor(private val api: Api) {
     suspend fun getLogin(login: LoginDTO): Response<LoginResponse> {
-        return RetrofitInstance.api.getLoginInfo(login)
+        return api.getLoginInfo(login)
     }
+
     suspend fun register(registrationRequest: RegistrationRequest): Response<Int> {
-        return RetrofitInstance.api.register(registrationRequest)
+        return api.register(registrationRequest)
     }
-    suspend fun getCategories(): Response<List<CategoriesDTO>>{
-        return RetrofitInstance.api.getCategories()
+
+    suspend fun getCategories(): Response<List<CategoriesDTO>> {
+        return api.getCategories()
     }
-    suspend fun postCategories(categories: ChosenCategoriesDTO): Response<Boolean>{
-        return RetrofitInstance.api.saveChosenCategories(categories)
+
+    suspend fun postCategories(categories: ChosenCategoriesDTO): Response<Boolean> {
+        return api.saveChosenCategories(categories)
     }
-    suspend fun getHomeProducts(id:Int):Response<List<HomeProduct>>{
-        return RetrofitInstance.api.getHomeProducts(id)
+
+    suspend fun getHomeProducts(id: Int): Response<List<HomeProduct>> {
+        return api.getHomeProducts(id)
     }
-    suspend fun getHomeShops(id:Int):Response<List<ShopDTO>>{
-        return RetrofitInstance.api.getHomeShops(id)
+
+    suspend fun getHomeShops(id: Int): Response<List<ShopDTO>> {
+        return api.getHomeShops(id)
     }
 }

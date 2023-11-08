@@ -39,8 +39,6 @@ import com.example.front.R
 import com.example.front.components.ProductCard
 import com.example.front.components.SearchTextField
 import com.example.front.components.SellerCard
-import com.example.front.helper.DataStoreManager
-import com.example.front.repository.Repository
 import com.example.front.viewmodels.home.HomeViewModel
 
 @Composable

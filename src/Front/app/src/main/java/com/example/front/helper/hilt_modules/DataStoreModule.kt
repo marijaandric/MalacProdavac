@@ -1,6 +1,7 @@
-package com.example.front.helper
+package com.example.front.helper.hilt_modules
 
 import android.content.Context
+import com.example.front.helper.DataStore.DataStoreManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

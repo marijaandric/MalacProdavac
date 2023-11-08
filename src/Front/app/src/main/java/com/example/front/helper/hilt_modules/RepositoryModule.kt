@@ -1,5 +1,6 @@
-package com.example.front.helper
+package com.example.front.helper.hilt_modules
 
+import com.example.front.api.Api
 import com.example.front.repository.Repository
 import dagger.Module
 import dagger.Provides
@@ -13,7 +14,7 @@ object RepositoryModule {
 
     @Provides
     @Singleton
-    fun provideRepository(): Repository {
-        return Repository() // You need to instantiate or provide the Repository here.
+    fun provideRepository(api: Api): Repository {
+        return Repository(api)
     }
 }

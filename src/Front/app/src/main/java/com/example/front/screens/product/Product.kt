@@ -1,4 +1,4 @@
-package com.example.front.screens
+package com.example.front.screens.product
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -15,8 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -31,11 +29,9 @@ import androidx.compose.ui.unit.dp
 import com.example.front.R
 import com.example.front.components.GalleryComponent
 import com.example.front.components.ProductImage
-import com.example.front.components.TitleTextComponent
 import com.example.front.components.ToggleImageButton
 import com.example.front.model.ImageData
 import com.example.front.ui.theme.Typography
-import kotlin.random.Random
 
 @Composable
 fun ProductPage(){

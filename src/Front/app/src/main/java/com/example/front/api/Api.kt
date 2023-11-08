@@ -13,7 +13,9 @@ import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.POST
 import retrofit2.http.Query
+import javax.inject.Singleton
 
+@Singleton
 interface Api {
     @Headers("Content-Type: application/json")
     @POST("back/Auth/Login")

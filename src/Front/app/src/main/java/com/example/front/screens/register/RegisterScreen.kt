@@ -1,4 +1,4 @@
-package com.example.front.screens
+package com.example.front.screens.register
 
 import android.util.Log
 import androidx.compose.foundation.background
@@ -38,10 +38,8 @@ import com.example.front.components.HeaderImage
 import com.example.front.components.LogoImage
 import com.example.front.components.MyTextField
 import com.example.front.components.TitleTextComponent
-import com.example.front.helper.DataStoreManager
 import com.example.front.model.RegistrationRequest
 import com.example.front.navigation.Screen
-import com.example.front.repository.Repository
 import com.example.front.viewmodels.register.RegisterViewModel
 
 fun isValidEmail(email: String): Boolean {

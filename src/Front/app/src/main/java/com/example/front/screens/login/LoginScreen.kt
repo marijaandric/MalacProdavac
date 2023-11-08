@@ -1,7 +1,6 @@
-package com.example.front.screens
+package com.example.front.screens.login
 
 import android.annotation.SuppressLint
-import android.media.session.MediaSession.Token
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -27,12 +26,9 @@ import com.example.front.components.LogoImage
 import com.example.front.components.MyTextField
 import com.example.front.components.TitleTextComponent
 import com.example.front.navigation.Screen
-import com.example.front.repository.Repository
 import com.example.front.viewmodels.login.LoginViewModel
 import androidx.compose.material.*
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.platform.LocalContext
-import com.example.front.helper.DataStoreManager
 import kotlinx.coroutines.launch
 
 

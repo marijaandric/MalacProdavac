@@ -1,7 +1,6 @@
 package com.example.front.navigation
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -12,15 +11,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.front.helper.DataStoreManager
 import com.example.front.screens.home.HomePage
-import com.example.front.screens.Intro
-import com.example.front.screens.LoginScreen
-import com.example.front.screens.SplashScreen
+import com.example.front.screens.splas_and_intro.Intro
+import com.example.front.screens.login.LoginScreen
+import com.example.front.screens.splas_and_intro.SplashScreen
 import com.example.front.screens.categories.RegistrationCategories
+import com.example.front.viewmodels.categories.CategoriesViewModel
 import com.example.front.viewmodels.home.HomeViewModel
 import com.example.front.viewmodels.login.LoginViewModel
-import com.example.front.viewmodels.register.RegisterViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
@@ -31,6 +29,7 @@ fun SetupNavGraph(
 
     val loginViewModel: LoginViewModel = hiltViewModel()
     val homeViewModel: HomeViewModel = hiltViewModel()
+    val categoriesViewModel : CategoriesViewModel = hiltViewModel()
     //val registerViewModel: RegisterViewModel = hiltViewModel()
     NavHost(
         navController = navController,
@@ -56,7 +55,7 @@ fun SetupNavGraph(
             route=Screen.Categories.route
         )
         {
-            RegistrationCategories(navController = navController)
+            RegistrationCategories(navController = navController, categoriesViewModel)
         }
 
 

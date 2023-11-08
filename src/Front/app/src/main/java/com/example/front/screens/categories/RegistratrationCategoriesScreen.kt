@@ -61,12 +61,9 @@ import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun RegistrationCategories(navController: NavHostController) {
+fun RegistrationCategories(navController: NavHostController, categoriesViewModel: CategoriesViewModel) {
 
-    var viewModel: CategoriesViewModel
-    val repository = Repository()
-    viewModel = CategoriesViewModel(repository)
-    viewModel.getCategoriesInfo()
+    categoriesViewModel.getCategoriesInfo()
 
     LazyColumn(
         modifier = Modifier
@@ -81,7 +78,7 @@ fun RegistrationCategories(navController: NavHostController) {
         }
         item{
             //FlowRow {
-                Cards(viewModel,navController)
+                Cards(categoriesViewModel,navController)
             //}
         }
     }

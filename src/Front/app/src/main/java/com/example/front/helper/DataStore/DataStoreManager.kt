@@ -1,4 +1,4 @@
-package com.example.front.helper
+package com.example.front.helper.DataStore
 
 import android.content.Context
 import androidx.datastore.core.DataStore
@@ -6,8 +6,6 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import com.nimbusds.jose.JWSObject
-import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
@@ -61,5 +59,4 @@ class DataStoreManager @Inject constructor(@ApplicationContext context: Context)
             return null
         }
     }
-
 }

@@ -1,6 +1,7 @@
 ﻿using back.BLL.Dtos;
 using back.BLL.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace back.PL.Controllers
 {
@@ -53,6 +54,7 @@ namespace back.PL.Controllers
             }
         }
 
+        [Authorize]
         [HttpGet("GetHomeProducts")]
         public async Task<IActionResult> GetHomeProducts(int id)
         {
