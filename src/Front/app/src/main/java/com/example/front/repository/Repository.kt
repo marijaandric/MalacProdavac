@@ -17,7 +17,7 @@ class Repository @Inject constructor(private val api: Api) {
         return api.getLoginInfo(login)
     }
 
-    suspend fun register(registrationRequest: RegistrationRequest): Response<Int> {
+    suspend fun register(registrationRequest: RegistrationRequest): Response<LoginResponse> {
         return api.register(registrationRequest)
     }
 

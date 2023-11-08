@@ -54,7 +54,8 @@ import kotlinx.coroutines.delay
                 )
             )
             delay(2500L)
-            navController.navigate("intro")
+            //// dodati da ako je ulogovan ne ide na intro nego na HomeScreen
+            navController.navigate("intro1")
         }
         Box(
             contentAlignment = Alignment.Center,

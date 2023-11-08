@@ -11,7 +11,8 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import com.example.front.screens.Intro
+import com.example.front.screens.splas_and_intro.Intro
+import com.example.front.screens.splas_and_intro.SplashScreen
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
@@ -19,9 +20,15 @@ fun NavGraphBuilder.introNavGraph(
     navController: NavHostController
 ) {
     navigation(
-        startDestination = Screen.Intro1.route,
+        startDestination = Screen.SplashScreen.route,
         route = "intro"
     ) {
+        composable(
+            route = Screen.SplashScreen.route
+        )
+        {
+            SplashScreen(navController = navController)
+        }
         composable(route=Screen.Intro1.route)
         {
             Log.e("USAO SAM", "USAOOOOO")

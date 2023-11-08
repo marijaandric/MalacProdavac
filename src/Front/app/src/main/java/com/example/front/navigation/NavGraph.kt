@@ -19,6 +19,7 @@ import com.example.front.screens.categories.RegistrationCategories
 import com.example.front.viewmodels.categories.CategoriesViewModel
 import com.example.front.viewmodels.home.HomeViewModel
 import com.example.front.viewmodels.login.LoginViewModel
+import com.example.front.viewmodels.register.RegisterViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -29,22 +30,11 @@ fun SetupNavGraph(
     val loginViewModel: LoginViewModel = hiltViewModel()
     val homeViewModel: HomeViewModel = hiltViewModel()
     val categoriesViewModel : CategoriesViewModel = hiltViewModel()
-    //val registerViewModel: RegisterViewModel = hiltViewModel()
+    val registerViewModel: RegisterViewModel = hiltViewModel()
     NavHost(
         navController = navController,
-        startDestination = Screen.SplashScreen.route
+        startDestination = "intro"
         ){
-        composable(
-            route = Screen.SplashScreen.route
-        )
-        {
-            SplashScreen(navController = navController)
-        }
-        composable(
-            route = Screen.Login.route
-        ){
-            LoginScreen(navController = navController,loginViewModel)
-        }
         composable(
             route = Screen.Home.route
         ){

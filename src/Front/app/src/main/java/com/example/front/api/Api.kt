@@ -27,7 +27,7 @@ interface Api {
     @POST("back/Auth/Register")
     suspend fun register(
         @Body registrationRequest: RegistrationRequest
-    ): Response<Int>
+    ): Response<LoginResponse>
 
     @GET("back/Home/GetCategories")
     suspend fun getCategories(

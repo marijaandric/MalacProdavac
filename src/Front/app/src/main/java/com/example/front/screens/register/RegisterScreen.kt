@@ -29,6 +29,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -57,6 +58,7 @@ import com.example.front.components.TitleTextComponent
 import com.example.front.model.RegistrationRequest
 import com.example.front.navigation.Screen
 import com.example.front.viewmodels.register.RegisterViewModel
+import kotlinx.coroutines.launch
 
 fun isValidEmail(email: String): Boolean {
     return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
@@ -87,6 +89,7 @@ fun RegisterScreen(navController: NavHostController, registerViewModel: Register
     var addressError by remember { mutableStateOf("") }
 
     val scrollState = rememberScrollState()
+    val coroutineScope = rememberCoroutineScope()
 
     Surface(
         color = Color.White,
@@ -214,10 +217,30 @@ fun RegisterScreen(navController: NavHostController, registerViewModel: Register
                             confirmPasswordError.isEmpty() &&
                             addressError.isEmpty()
                             ) {
-                            val data = RegistrationRequest(name, lastName, email, password, address, 1)
-                            registerViewModel.performRegistration(data)
-                            val response = registerViewModel.myResponse.value
-                            Log.e("RESPONSE", response.toString())
+                            coroutineScope.launch {
+                                try {
+                                    val data = RegistrationRequest(name, lastName, email, password, address, 1)
+                                    val success = registerViewModel.performRegistration(data)
+                                    if (success) {
+                                        navController.navigate(route = Screen.Categories.route) {
+                                            popUpTo("auth") {
+                                                inclusive = true
+                                            }
+                                        }
+                                    } else {
+                                        val errorMess = registerViewModel.errorMessage.value
+//                                        if (errorMess != null) {
+//                                            scaffoldState.snackbarHostState.showSnackbar(
+//                                                message = errorMess.toString(),
+//                                                actionLabel = "Try again",
+//                                                duration = SnackbarDuration.Indefinite
+//                                            )
+//                                        }
+                                    }
+                                } catch (e: Exception) {
+                                    e.printStackTrace()
+                                }
+                            }
                         }
                     },
                     modifier = Modifier

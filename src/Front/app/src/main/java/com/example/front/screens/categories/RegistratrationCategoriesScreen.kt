@@ -119,6 +119,7 @@ fun Cards(viewModel: CategoriesViewModel, navController: NavHostController) {
 
     if(statePost.isLoading == false)
     {
+        navController.popBackStack()
         navController.navigate(Screen.Home.route)
     }
 

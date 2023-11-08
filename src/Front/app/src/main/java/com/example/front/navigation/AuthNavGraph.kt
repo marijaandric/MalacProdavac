@@ -4,8 +4,8 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import com.example.front.screens.LoginScreen
-import com.example.front.screens.RegisterScreen
+import com.example.front.screens.login.LoginScreen
+import com.example.front.screens.register.RegisterScreen
 import com.example.front.viewmodels.login.LoginViewModel
 import com.example.front.viewmodels.register.RegisterViewModel
 
