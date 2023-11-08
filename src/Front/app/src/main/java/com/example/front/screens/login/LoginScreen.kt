@@ -1,10 +1,14 @@
 package com.example.front.screens.login
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.clickable
+import android.media.session.MediaSession.Token
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -28,6 +32,12 @@ import com.example.front.components.TitleTextComponent
 import com.example.front.navigation.Screen
 import com.example.front.viewmodels.login.LoginViewModel
 import androidx.compose.material.*
+import androidx.compose.material3.Text
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.sp
+import com.example.front.viewmodels.categories.CategoriesViewModel
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.launch
 
@@ -80,6 +90,7 @@ fun LoginScreen(
                         onValueChange = { passwordInput = it }, // Update the state on value change
                         isPassword = true
                     )
+                    Spacer(modifier = Modifier.height(100.dp))
                     BigBlueButton(
                         text = "Login",
                         onClick = {
@@ -105,7 +116,19 @@ fun LoginScreen(
                             }
                         },
                         width = 150f,
-                        modifier = Modifier.offset(y = 100.dp)
+                        modifier = Modifier
+                    )
+                    Text(
+                        text = "Don't have an account? Register now.",
+                        modifier = Modifier
+                            .clickable {
+                                navController.navigate(Screen.Register.route)
+                            }
+                            .fillMaxWidth(),
+                        textAlign = TextAlign.Center,
+                        color = Color(0xFF005F8B),
+                        fontWeight = FontWeight(600),
+                        fontSize = 16.sp
                     )
                 }
             }

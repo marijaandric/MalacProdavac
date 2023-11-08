@@ -12,6 +12,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.front.navigation.SetupNavGraph
+import com.example.front.screens.userprofile.UserProfileScreen
 import com.example.front.ui.theme.FrontTheme
 import com.example.front.viewmodels.login.LoginViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -28,7 +29,8 @@ import dagger.hilt.android.AndroidEntryPoint
                     .fillMaxSize()
                     .background(color = MaterialTheme.colorScheme.background)) {
                     navController = rememberNavController()
-                    SetupNavGraph(navController = navController)
+                    //SetupNavGraph(navController = navController)
+                    UserProfileScreen()
                 }
             }
         }
