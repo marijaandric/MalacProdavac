@@ -20,8 +20,8 @@ namespace back.PL.Controllers
         {
             try
             {
-                int userId = await _authService.Register(user);
-                if (userId != -1) return Ok(userId);
+                string token = await _authService.Register(user);
+                if (token != "") return Ok(new { Token = token });
                 else return BadRequest("Database error.");
             }
             catch (Exception ex)

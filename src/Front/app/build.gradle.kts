@@ -3,6 +3,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.serialization") version "1.8.0"
     kotlin("kapt")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -84,6 +85,7 @@ dependencies {
     // pager
     implementation("androidx.compose.foundation:foundation:1.4.0")
 
+
     //okhttp3
     implementation("com.squareup.okhttp3:okhttp:4.11.0")
 
@@ -96,5 +98,30 @@ dependencies {
 
     //datastore
     implementation("androidx.datastore:datastore-preferences:1.0.0")
+    implementation("androidx.datastore:datastore-preferences-rxjava2:1.0.0")
+    implementation("androidx.datastore:datastore-preferences-rxjava3:1.0.0")
+    implementation("androidx.datastore:datastore:1.0.0")
 
+    implementation("com.google.dagger:hilt-android:2.44") // Use Dagger Hilt 2.x
+    kapt("com.google.dagger:hilt-android-compiler:2.44")
+    implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
+    kapt("androidx.hilt:hilt-compiler:1.1.0") // Use Hilt Compiler 1.1.0
+
+
+    // nesto za state
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.2")
+    implementation("androidx.compose.runtime:runtime-rxjava2:1.5.2")
+    implementation("androidx.compose.runtime:runtime-livedata:1.5.2")
+    implementation("androidx.compose.runtime:runtime-rxjava3:1.5.2")
+
+    //nimbus jwt
+    implementation("com.nimbusds:nimbus-jose-jwt:9.30.1")
+
+    //nesto idk
+    implementation("androidx.compose.runtime:runtime-livedata:1.0.0")
 }
+
+kapt {
+    correctErrorTypes = true
+}
+

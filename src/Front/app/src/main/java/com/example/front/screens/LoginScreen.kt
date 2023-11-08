@@ -2,6 +2,7 @@ package com.example.front.screens
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.clickable
+import android.media.session.MediaSession.Token
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -34,36 +35,27 @@ import com.example.front.viewmodels.login.LoginViewModel
 import androidx.compose.material.*
 import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
-import com.example.front.helper.LoginHandler
-import com.example.front.helper.TokenManager
 import com.example.front.viewmodels.categories.CategoriesViewModel
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
+import com.example.front.helper.DataStoreManager
 import kotlinx.coroutines.launch
 
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun LoginScreen(
-    navController:NavHostController
+    navController: NavHostController,
+    viewModel: LoginViewModel
 ) {
-    var userInput by remember { mutableStateOf("") }
-    var passwordInput by remember { mutableStateOf("") }
-    var errorMessage by remember { mutableStateOf("") }
-
-    lateinit var viewModel: LoginViewModel
-    val repository = Repository() // Create a Repository instance
-    viewModel = LoginViewModel(repository)
+    var userInput by remember { mutableStateOf("marija.andric") }
+    var passwordInput by remember { mutableStateOf("MejoSmrdi123!") }
 
     var scaffoldState: ScaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
-
-    val context = LocalContext.current
-
-    val loginHandler = LoginHandler(LocalContext.current)
 
     Surface(
         color = Color.White,
@@ -98,25 +90,31 @@ fun LoginScreen(
                         labelValue = "Password",
                         painterResource = painterResource(id = R.drawable.padlock),
                         value = passwordInput, // Bind password input to the state
-                        onValueChange = { passwordInput = it } // Update the state on value change
+                        onValueChange = { passwordInput = it }, // Update the state on value change
+                        isPassword = true
                     )
                     Spacer(modifier = Modifier.height(100.dp))
                     BigBlueButton(
                         text = "Login",
                         onClick = {
                             coroutineScope.launch {
-                                val success = loginHandler.performLogin(userInput, passwordInput)
-                                if (success) {
-                                    navController.navigate(route = Screen.Home.route)
-                                } else {
-                                    val errorMess = viewModel.errorMessage.value
-                                    if (errorMess != null) {
-                                        scaffoldState.snackbarHostState.showSnackbar(
-                                            message = errorMess.toString(),
-                                            actionLabel = "Try again",
-                                            duration = SnackbarDuration.Indefinite
-                                        )
+                                try {
+                                    val success = viewModel.performLogin(userInput, passwordInput)
+                                    if (success) {
+                                        navController.navigate(route = Screen.Home.route)
+                                    } else {
+                                        val errorMess = viewModel.errorMessage.value
+                                        if (errorMess != null) {
+                                            scaffoldState.snackbarHostState.showSnackbar(
+                                                message = errorMess.toString(),
+                                                actionLabel = "Try again",
+                                                duration = SnackbarDuration.Indefinite
+                                            )
+                                        }
                                     }
+                                } catch (e: Exception) {
+                                    // Handle the exception here (e.g., log or display an error message).
+                                    e.printStackTrace()
                                 }
                             }
                         },

@@ -1,4 +1,5 @@
-﻿using back.BLL.Services;
+﻿using back.BLL.Dtos;
+using back.BLL.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace back.PL.Controllers
@@ -45,6 +46,45 @@ namespace back.PL.Controllers
             try
             {
                 return Ok(new { PageCount = _service.ShopPages() });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
+
+        [HttpGet("ShopDetails")]
+        public async Task<IActionResult> ShopDetails(int shopId, int userId)
+        {
+            try
+            {
+                return Ok(new { Shop = await _service.ShopDetails(shopId, userId) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
+
+        [HttpPost("ToggleLike")]
+        public async Task<IActionResult> ToggleLike(int shopId, int userId)
+        {
+            try
+            {
+                return Ok(new { success = await _service.ToggleLike(shopId, userId) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
+
+        [HttpPost("Review")]
+        public async Task<IActionResult> LeaveReview(ReviewDto review)
+        {
+            try
+            {
+                return Ok(new { success = await _service.LeaveReview(review) });
             }
             catch (Exception ex)
             {

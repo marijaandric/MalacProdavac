@@ -22,8 +22,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -44,15 +42,11 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.front.R
 import com.example.front.components.ErrorTextComponent
@@ -60,12 +54,11 @@ import com.example.front.components.HeaderImage
 import com.example.front.components.LogoImage
 import com.example.front.components.MyTextField
 import com.example.front.components.TitleTextComponent
+import com.example.front.helper.DataStoreManager
 import com.example.front.model.RegistrationRequest
 import com.example.front.navigation.Screen
 import com.example.front.repository.Repository
-import com.example.front.viewmodels.RegisterViewModel
-import com.example.front.viewmodels.login.LoginViewModel
-import com.example.front.viewmodels.login.MainViewModelFactory
+import com.example.front.viewmodels.register.RegisterViewModel
 
 fun isValidEmail(email: String): Boolean {
     return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
@@ -78,11 +71,7 @@ fun isValidPassword(password: String): String {
 }
 
 @Composable
-fun RegisterScreen(navController: NavHostController) {
-    lateinit var viewModel: RegisterViewModel
-    val repository = Repository()
-    val viewModelFactory = MainViewModelFactory(repository)
-    viewModel = viewModelFactory.create(RegisterViewModel::class.java)
+fun RegisterScreen(navController: NavHostController, registerViewModel: RegisterViewModel) {
 
     var name by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
@@ -228,8 +217,8 @@ fun RegisterScreen(navController: NavHostController) {
                             addressError.isEmpty()
                             ) {
                             val data = RegistrationRequest(name, lastName, email, password, address, 1)
-                            viewModel.performRegistration(data)
-                            val response = viewModel.myResponse.value
+                            registerViewModel.performRegistration(data)
+                            val response = registerViewModel.myResponse.value
                             Log.e("RESPONSE", response.toString())
                         }
                     },
@@ -267,15 +256,12 @@ fun RegisterScreen(navController: NavHostController) {
                     color = Color(0xFF005F8B),
                     fontWeight = FontWeight(600),
                     fontSize = 16.sp
+//                    modifier = Modifier.clickable {
+//                        navController.navigate(Screen.Categories.route)
+//                    }
                 )
             }
 
         }
     }
-}
-
-@Preview
-@Composable
-fun prikaziRegister(){
-    RegisterScreen(navController = NavHostController(context = LocalContext.current))
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Data.Sqlite;
 using back.Models;
+using back.DAL.Models;
 
 namespace back.DAL.Contexts;
 
@@ -32,6 +33,7 @@ public class Context : DbContext
     public DbSet<ProductAnswer> ProductAnswers { get; set; }
     public DbSet<ProductDisplay> ProductDisplays { get; set; }
     public DbSet<ProductImage> ProductImages { get; set; }
+    public DbSet<ProductSize> ProductSizes {  get; set; } 
     public DbSet<ProductQuestion> ProductQuestions { get; set; }
     public DbSet<ProductReview> ProductReviews { get; set; }
     public DbSet<Rating> Ratings { get; set; }
@@ -40,6 +42,7 @@ public class Context : DbContext
     public DbSet<ShopCategory> ShopCategories { get; set; }
     public DbSet<ShopReview> ShopReviews { get; set; }
     public DbSet<ShopSubcategory> ShopSubcategories { get; set; }
+    public DbSet<Size> Sizes { get; set; }
     public DbSet<Subcategory> Subcategories{ get; set; }
     public DbSet<User> Users { get; set; }
     public DbSet<WorkingHours> WorkingHours { get; set; }

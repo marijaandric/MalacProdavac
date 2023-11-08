@@ -1,4 +1,6 @@
-﻿using back.BLL.Services;
+﻿using back.BLL.Dtos;
+using back.BLL.Services;
+using back.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace back.PL.Controllers
@@ -18,7 +20,7 @@ namespace back.PL.Controllers
         {
             try
             {
-                return Ok(await _service.GetProducts(userId, categories, rating, open, range, location, sort, search, page));
+                return Ok(await _service.GetProducts(userId, categories, rating, open, range, location, sort, search, page, -1));
             }
             catch (Exception ex)
             {
@@ -51,6 +53,84 @@ namespace back.PL.Controllers
             catch (Exception ex)
             {
                 return BadRequest(new { ErrorMessage = ex.Message });
+            }
+        }
+
+        [HttpGet("ProductDetails")]
+        public async Task<IActionResult> ProductDetails(int productId, int userId)
+        {
+            try
+            {
+                return Ok(new { Details = await _service.ProductDetails(productId, userId) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { ErrorMessage = ex.Message });
+            }
+        }
+
+        [HttpPost("ToggleLike")]
+        public async Task<IActionResult> ToggleLike(int productId, int userId)
+        {
+            try
+            {
+                return Ok(new { success = await _service.ToggleLike(productId, userId) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
+
+        [HttpPost("AddToCart")]
+        public async Task<IActionResult> AddToCart(int productId, int userId, int quantity)
+        {
+            try
+            {
+                return Ok(new { success = await _service.AddToCart(productId, userId, quantity) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
+
+        [HttpPost("RemoveFromCart")]
+        public async Task<IActionResult> RemoveFromCart(int productId, int userId)
+        {
+            try
+            {
+                return Ok(new { success = await _service.RemoveFromCart(productId, userId) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
+
+        [HttpPost("Review")]
+        public async Task<IActionResult> LeaveReview(ReviewDto review)
+        {
+            try
+            {
+                return Ok(new { success = await _service.LeaveReview(review) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
+
+        [HttpPost("Question")]
+        public async Task<IActionResult> LeaveQuestion(QnADto question)
+        {
+            try
+            {
+                return Ok(new { success = await _service.LeaveQuestion(question) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
             }
         }
     }
