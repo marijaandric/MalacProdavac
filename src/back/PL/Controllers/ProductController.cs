@@ -62,7 +62,7 @@ namespace back.PL.Controllers
         {
             try
             {
-                return Ok(new { Details = await _service.ProductDetails(productId, userId) });
+                return Ok(await _service.ProductDetails(productId, userId));
             }
             catch (Exception ex)
             {
@@ -75,7 +75,7 @@ namespace back.PL.Controllers
         {
             try
             {
-                return Ok(new { Reviews = await _service.GetProductReviews(productId, page) });
+                return Ok(await _service.GetProductReviews(productId, page));
             }
             catch (Exception ex)
             {

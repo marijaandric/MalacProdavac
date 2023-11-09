@@ -18,7 +18,7 @@ namespace back.PL.Controllers
         {
             try
             {
-                return Ok(new { Profile = await _service.GetMyProfile(userId) });
+                return Ok(await _service.GetMyProfile(userId));
             }
             catch (Exception ex)
             {
@@ -31,7 +31,7 @@ namespace back.PL.Controllers
         {
             try
             {
-                return Ok(new { Profile = await _service.GetPublicProfile(userId) });
+                return Ok(await _service.GetPublicProfile(userId));
             }
             catch (Exception ex)
             {
@@ -44,7 +44,7 @@ namespace back.PL.Controllers
         {
             try
             {
-                return Ok(new { Reviews = await _service.GetProductReviewsOfAShop(userId, shopId, page) });
+                return Ok(await _service.GetProductReviewsOfAShop(userId, shopId, page));
             }
             catch (Exception ex)
             {
@@ -57,7 +57,7 @@ namespace back.PL.Controllers
         {
             try
             {
-                return Ok(new { Review = await _service.GetReviewOfAShop(userId, shopId) });
+                return Ok(await _service.GetReviewOfAShop(userId, shopId));
             }
             catch (Exception ex)
             {
@@ -71,7 +71,7 @@ namespace back.PL.Controllers
         {
             try
             {
-                return Ok(new { Products = await _service.GetReviewedProductsOfAShop(userId, shopId, page) });
+                return Ok(await _service.GetReviewedProductsOfAShop(userId, shopId, page));
             }
             catch (Exception ex)
             {
