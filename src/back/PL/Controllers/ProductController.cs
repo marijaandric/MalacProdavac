@@ -1,4 +1,5 @@
 ﻿using back.BLL.Dtos;
+using back.BLL.Dtos.HelpModels;
 using back.BLL.Services;
 using back.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -62,6 +63,19 @@ namespace back.PL.Controllers
             try
             {
                 return Ok(new { Details = await _service.ProductDetails(productId, userId) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { ErrorMessage = ex.Message });
+            }
+        }
+
+        [HttpGet("ProductReviews")]
+        public async Task<IActionResult> GetProductReviews(int productId, int page)
+        {
+            try
+            {
+                return Ok(new { Reviews = await _service.GetProductReviews(productId, page) });
             }
             catch (Exception ex)
             {
