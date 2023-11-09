@@ -22,6 +22,8 @@ import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.with
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -42,8 +44,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Button
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -124,7 +130,7 @@ fun Info() {
 //            }
 //        }
 //    }
-    var isImageClicked by remember { mutableStateOf(false) }
+    var isImageClicked by remember { mutableStateOf(true) }
 
     val scaleImage1 by animateDpAsState(
         targetValue = if (isImageClicked) 1.1.dp else 1.dp,
@@ -170,27 +176,88 @@ fun Info() {
                     .graphicsLayer(scaleX = scaleImage2.value, scaleY = scaleImage2.value)
             )
 
-            Row(
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
-                    .zIndex(2f),
-                        horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    "Info",
-                    style = MaterialTheme.typography.h5.copy(fontSize = if(isImageClicked) 30.sp else 25.sp),
-                    modifier = Modifier.clickable {
-                        isImageClicked = true
+                    .padding(16.dp,top=40.dp, end = 16.dp)
+                    .zIndex(2f)
+            )
+            {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .zIndex(2f),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        "Info",
+                        style = MaterialTheme.typography.h5.copy(fontSize = if(isImageClicked) 30.sp else 25.sp),
+                        modifier = Modifier.clickable {
+                            isImageClicked = true
+                        }
+                    )
+                    Text(
+                        "Stats",
+                        style = MaterialTheme.typography.h5.copy(fontSize = if(!isImageClicked) 30.sp else 25.sp),
+                        modifier = Modifier.clickable {
+                            isImageClicked = false
+                        }
+                    )
+                }
+
+                if(isImageClicked) {
+                    AnimatedVisibility(
+                        visible = isImageClicked,
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(top = 60.dp)
+                                .zIndex(2f)
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Person,
+                                    contentDescription = "Profile Icon",
+                                    tint = MaterialTheme.colors.onBackground,
+                                    modifier = Modifier.size(48.dp)
+                                )
+                                Text(
+                                    text = "Username",
+                                    modifier = Modifier.padding(start = 8.dp),
+                                    style = MaterialTheme.typography.h6.copy(fontWeight = FontWeight.ExtraBold)
+                                )
+                            }
+                            Text(
+                                text = "marija.andric",
+                                modifier = Modifier.padding(top = 8.dp),
+                                style = MaterialTheme.typography.h6.copy(color = MaterialTheme.colors.background)
+                            )
+
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.padding(top = 16.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Email,
+                                    contentDescription = "Email",
+                                    tint = MaterialTheme.colors.onBackground,
+                                    modifier = Modifier.size(48.dp)
+                                )
+                                Text(
+                                    text = "Email Address",
+                                    modifier = Modifier.padding(start = 8.dp),
+                                    style = MaterialTheme.typography.h6.copy(fontWeight = FontWeight.ExtraBold)
+                                )
+                            }
+                            Text(
+                                text = "marijaandric2001@gmail.com",
+                                modifier = Modifier.padding(top = 8.dp),
+                                style = MaterialTheme.typography.h6.copy(color = MaterialTheme.colors.background)
+                            )
+                        }
                     }
-                )
-                Text(
-                    "Stats",
-                    style = MaterialTheme.typography.h5.copy(fontSize = if(!isImageClicked) 30.sp else 25.sp),
-                    modifier = Modifier.clickable {
-                        isImageClicked = false
-                    }
-                )
+                }
             }
         }
     }
