@@ -3,12 +3,18 @@ package com.example.front.screens.userprofile
 import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateDp
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
@@ -21,8 +27,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -31,7 +39,9 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -46,10 +56,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.InspectableModifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.example.front.R
 
@@ -67,107 +80,120 @@ fun UserProfileScreen() {
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun Info() {
-//    Box() {
-//        var isImageClicked by remember { mutableStateOf(false) }
+//    var isImageClicked by remember { mutableStateOf(false) }
 //
-//        Box() {
+//    Box(
+//        modifier = Modifier.fillMaxSize()
+//    ) {
+//        Box {
 //            Image(
 //                painter = painterResource(id = R.drawable.infoelipse),
 //                contentDescription = "Elipse",
 //                contentScale = ContentScale.FillWidth,
 //                modifier = Modifier.fillMaxWidth()
-//                    .zIndex(if (isImageClicked) 1f else 0f)
-//                    .clickable {
-//                        isImageClicked = !isImageClicked
-//                    }
+//                    .zIndex(if (isImageClicked) 0.1f else 0f)
 //            )
 //            Image(
 //                painter = painterResource(id = R.drawable.infoelipsedva),
 //                contentDescription = "Elipse",
 //                contentScale = ContentScale.FillWidth,
 //                modifier = Modifier.fillMaxWidth()
-//                    .zIndex(if (isImageClicked) 0f else 1f)
+//                    .zIndex(if (isImageClicked) 0f else 0.1f)
 //            )
+//            Row(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .padding(16.dp)
+//                    .zIndex(2f),
+//                horizontalArrangement = Arrangement.SpaceBetween
+//            ) {
+//                Text(
+//                    "Info",
+//                    style = MaterialTheme.typography.h5,
+//                    modifier = Modifier.clickable {
+//                        isImageClicked = true
+//                    }
+//                )
+//                Text(
+//                    "Stats",
+//                    style = MaterialTheme.typography.h5,
+//                    modifier = Modifier.clickable {
+//                        isImageClicked = false
+//                    }
+//                )
+//            }
 //        }
 //    }
-    var isImageVisible by remember { mutableStateOf(false) }
+    var isImageClicked by remember { mutableStateOf(false) }
 
-    val transition = updateTransition(targetState = isImageVisible, label = "ImageVisibilityTransition")
+    val scaleImage1 by animateDpAsState(
+        targetValue = if (isImageClicked) 1.1.dp else 1.dp,
+        animationSpec = tween(durationMillis = 500), label = ""
+    )
 
-    val visibleAlpha by transition.animateFloat(
-        transitionSpec = {
-            if (targetState) {
-                tween(durationMillis = 1000, easing = FastOutSlowInEasing)
-            } else {
-                tween(durationMillis = 1000, easing = FastOutSlowInEasing)
-            }
-        },
-        label = "VisibleAlpha"
-    ) {
-        1f//if (isImageVisible) 1f else 1f
-    }
+    val scaleImage2 by animateDpAsState(
+        targetValue = if (isImageClicked) 1.dp else 1.1.dp,
+        animationSpec = tween(durationMillis = 500), label = ""
+    )
 
-    val hiddenAlpha by transition.animateFloat(
-        transitionSpec = {
-            if (targetState) {
-                tween(durationMillis = 1000, easing = LinearOutSlowInEasing)
-            } else {
-                tween(durationMillis = 1000, easing = LinearOutSlowInEasing)
-            }
-        },
-        label = "HiddenAlpha"
-    ) {
-        1f//if (isImageVisible) 1f else 1f
-    }
+    val zIndexImage1 by animateDpAsState(
+        targetValue = if (isImageClicked) 1.dp else 0.dp,
+        animationSpec = tween(durationMillis = 500), label = ""
+    )
+
+    val zIndexImage2 by animateDpAsState(
+        targetValue = if (isImageClicked) 0.dp else 1.dp,
+        animationSpec = tween(durationMillis = 500), label = ""
+    )
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
+        modifier = Modifier.fillMaxSize()
+            .padding(top=20.dp)
     ) {
         Box(
-            modifier = Modifier
-                .fillMaxSize()
+            modifier = Modifier.fillMaxSize()
         ) {
+            Image(
+                painter = painterResource(id = R.drawable.infoelipse),
+                contentDescription = "Elipse",
+                contentScale = ContentScale.FillWidth,
+                modifier = Modifier.fillMaxWidth()
+                    .zIndex(zIndexImage1.value)
+                    .graphicsLayer(scaleX = scaleImage1.value, scaleY = scaleImage1.value)
+            )
+            Image(
+                painter = painterResource(id = R.drawable.infoelipsedva),
+                contentDescription = "Elipse",
+                contentScale = ContentScale.FillWidth,
+                modifier = Modifier.fillMaxWidth()
+                    .zIndex(zIndexImage2.value)
+                    .graphicsLayer(scaleX = scaleImage2.value, scaleY = scaleImage2.value)
+            )
 
-            // Slika koja se animira
-            AnimatedVisibility(
-                visible = true,
-                enter = fadeIn(initialAlpha = 0.0f),
-                exit = fadeOut(targetAlpha = 0.0f),
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+                    .zIndex(2f),
+                        horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.infoelipsedva),
-                    contentDescription = "Image",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .alpha(visibleAlpha)
-                        .zIndex(if(isImageVisible) 1f else 0f)
+                Text(
+                    "Info",
+                    style = MaterialTheme.typography.h5.copy(fontSize = if(isImageClicked) 30.sp else 25.sp),
+                    modifier = Modifier.clickable {
+                        isImageClicked = true
+                    }
                 )
-            }
-
-            // Slika koja je inače ispred
-            AnimatedVisibility(
-                visible = true,
-                enter = fadeIn(initialAlpha = 1.0f),
-                exit = fadeOut(targetAlpha = 1.0f),
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.infoelipse),
-                    contentDescription = "FrontImage",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .alpha(hiddenAlpha)
-                        .zIndex(if(isImageVisible) 0f else 1f)
+                Text(
+                    "Stats",
+                    style = MaterialTheme.typography.h5.copy(fontSize = if(!isImageClicked) 30.sp else 25.sp),
+                    modifier = Modifier.clickable {
+                        isImageClicked = false
+                    }
                 )
-                Text("Info", modifier = Modifier.clickable {
-                    isImageVisible = !isImageVisible
-                }, style=MaterialTheme.typography.h4)
             }
         }
     }
-
 }
 
 @Composable
