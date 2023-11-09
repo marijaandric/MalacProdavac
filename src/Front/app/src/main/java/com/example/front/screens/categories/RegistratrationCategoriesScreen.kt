@@ -41,23 +41,27 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.front.components.MediumBlueButton
 import com.example.front.R
+import com.example.front.helper.DataStore.DataStoreManager
 import com.example.front.model.ChosenCategoriesDTO
 import com.example.front.navigation.Screen
 import com.example.front.repository.Repository
 import com.example.front.viewmodels.categories.CategoriesViewModel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -116,6 +120,7 @@ fun Cards(viewModel: CategoriesViewModel, navController: NavHostController) {
     var selectedCategories by remember { mutableStateOf(mutableListOf<Int>()) }
     val state = viewModel.state.value
     val statePost = viewModel.stateChosenCategories.value
+    val coroutineScope = rememberCoroutineScope()
 
     if(statePost.isLoading == false)
     {
@@ -195,17 +200,28 @@ fun Cards(viewModel: CategoriesViewModel, navController: NavHostController) {
         )
         {
             Spacer(modifier = Modifier.height(20.dp))
-            MediumBlueButton(text = "Continue", onClick = { ButtonClick(selectedCategories, viewModel) }, width = 0.90f, modifier = Modifier)
+            MediumBlueButton(text = "Continue",
+                onClick = {
+                    coroutineScope.launch {
+                        ButtonClick(selectedCategories, viewModel)
+                    }
+                },
+                width = 0.90f,
+                modifier = Modifier
+            )
         }
     }
 }
 
-fun ButtonClick(chosenCategories: List<Int>, viewModel: CategoriesViewModel)
+suspend fun ButtonClick(chosenCategories: List<Int>, viewModel: CategoriesViewModel)
 {
     // staviti neki alert
-    val id = 2;
-    val chosenCategoriesDTO = ChosenCategoriesDTO(userId = id, categoryIds = chosenCategories)
-    viewModel.postCategories(chosenCategoriesDTO)
+    val id = viewModel.getUserId()
+    println(id)
+    if (id != null){
+        val chosenCategoriesDTO = ChosenCategoriesDTO(userId = id, categoryIds = chosenCategories)
+        viewModel.postCategories(chosenCategoriesDTO)
+    }
 }
 
 

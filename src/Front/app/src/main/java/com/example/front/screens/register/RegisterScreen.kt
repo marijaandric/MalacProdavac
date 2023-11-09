@@ -78,7 +78,7 @@ fun RegisterScreen(navController: NavHostController, registerViewModel: Register
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordConfirm by remember { mutableStateOf("") }
-    var address by remember { mutableStateOf("") }
+//    var address by remember { mutableStateOf("") }
 
     // greske pri unosu
     var nameError by remember { mutableStateOf("") }
@@ -86,7 +86,7 @@ fun RegisterScreen(navController: NavHostController, registerViewModel: Register
     var emailError by remember { mutableStateOf("") }
     var passwordError by remember { mutableStateOf("") }
     var confirmPasswordError by remember { mutableStateOf("") }
-    var addressError by remember { mutableStateOf("") }
+//    var addressError by remember { mutableStateOf("") }
 
     val scrollState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
@@ -174,15 +174,15 @@ fun RegisterScreen(navController: NavHostController, registerViewModel: Register
                     ErrorTextComponent(confirmPasswordError)
                 }
 
-                MyTextField(
-                    labelValue = "Address",
-                    painterResource = painterResource(id = R.drawable.home),
-                    value = address,
-                    onValueChange = { address = it }
-                )
-                if(addressError.isNotEmpty()) {
-                    ErrorTextComponent(addressError)
-                }
+//                MyTextField(
+//                    labelValue = "Address",
+//                    painterResource = painterResource(id = R.drawable.home),
+//                    value = address,
+//                    onValueChange = { address = it }
+//                )
+//                if(addressError.isNotEmpty()) {
+//                    ErrorTextComponent(addressError)
+//                }
 
                 Button(
                     onClick = {
@@ -191,7 +191,7 @@ fun RegisterScreen(navController: NavHostController, registerViewModel: Register
                         emailError = ""
                         passwordError = ""
                         confirmPasswordError = ""
-                        addressError = ""
+//                        addressError = ""
 
                         if (name.isEmpty()) {
                             nameError = "First name is required"
@@ -206,20 +206,20 @@ fun RegisterScreen(navController: NavHostController, registerViewModel: Register
                         if(password != passwordConfirm) {
                             confirmPasswordError = "Passwords don't match"
                         }
-                        if (address.isEmpty()) {
-                            addressError = "Address is required"
-                        }
+//                        if (address.isEmpty()) {
+//                            addressError = "Address is required"
+//                        }
 
                         if (nameError.isEmpty() &&
                             lastNameError.isEmpty() &&
                             emailError.isEmpty() &&
                             passwordError.isEmpty() &&
-                            confirmPasswordError.isEmpty() &&
-                            addressError.isEmpty()
+                            confirmPasswordError.isEmpty()// &&
+//                            addressError.isEmpty()
                             ) {
                             coroutineScope.launch {
                                 try {
-                                    val data = RegistrationRequest(name, lastName, email, password, address, 1)
+                                    val data = RegistrationRequest(name, lastName, email, password, "ulica, grad, zemlja", 1)
                                     val success = registerViewModel.performRegistration(data)
                                     if (success) {
                                         navController.navigate(route = Screen.Categories.route) {
@@ -229,13 +229,9 @@ fun RegisterScreen(navController: NavHostController, registerViewModel: Register
                                         }
                                     } else {
                                         val errorMess = registerViewModel.errorMessage.value
-//                                        if (errorMess != null) {
-//                                            scaffoldState.snackbarHostState.showSnackbar(
-//                                                message = errorMess.toString(),
-//                                                actionLabel = "Try again",
-//                                                duration = SnackbarDuration.Indefinite
-//                                            )
-//                                        }
+                                        if (errorMess != null) {
+                                            println("RegisterScreen: " + errorMess)
+                                        }
                                     }
                                 } catch (e: Exception) {
                                     e.printStackTrace()

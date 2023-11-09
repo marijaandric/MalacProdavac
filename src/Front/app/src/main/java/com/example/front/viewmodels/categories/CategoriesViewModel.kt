@@ -11,6 +11,9 @@ import kotlinx.coroutines.launch
 import retrofit2.Response
 import dagger.hilt.android.lifecycle.HiltViewModel
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.platform.LocalContext
+import com.example.front.helper.DataStore.DataStoreManager
+import com.example.front.helper.DataStore.DataStoreManager_Factory
 import com.example.front.model.ChosenCategoriesDTO
 import com.example.front.screens.categories.CategoriesState
 import com.example.front.screens.categories.ChosenCategoriesState
@@ -20,6 +23,7 @@ import javax.inject.Inject
 @HiltViewModel
 class CategoriesViewModel @Inject constructor(
     private val repository: Repository,
+    private val dataStoreManager: DataStoreManager
 ) : ViewModel() {
     val myResponse: MutableLiveData<Response<List<CategoriesDTO>>> = MutableLiveData()
     private val _state = mutableStateOf(CategoriesState())
@@ -71,6 +75,11 @@ class CategoriesViewModel @Inject constructor(
                 _stateChosenCategories.value.error = e.message.toString()
             }
         }
+    }
+
+    suspend fun getUserId(): Int?
+    {
+        return dataStoreManager.getUserIdFromToken()
     }
 }
 
