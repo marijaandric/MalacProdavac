@@ -1,4 +1,5 @@
-﻿using back.DAL.Contexts;
+﻿using back.BLL.Dtos;
+using back.DAL.Contexts;
 using back.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,7 +21,10 @@ namespace back.DAL.Repositories
         public async Task<User> GetUser(string username)
         {
             return await _context.Users.Where(x => x.Username.Equals(username)).FirstOrDefaultAsync();
-            
+        }
+        public async Task<User> GetUser(int userId)
+        {
+            return await _context.Users.Where(x => x.Id == userId).FirstOrDefaultAsync();
         }
         public bool SameEmail(string email)
         {
@@ -46,6 +50,13 @@ namespace back.DAL.Repositories
         public Task<Role> GetRole(string roleName)
         {
             return _context.Roles.Where(x => x.Name.Equals(roleName)).FirstOrDefaultAsync();
+        }
+
+        public async Task<bool> EditUser(User newUser)
+        {
+            User user = await _context.Users.FirstOrDefaultAsync(x => x.Id == newUser.Id);
+            user = newUser;
+            return await Save();
         }
     }
 }
