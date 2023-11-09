@@ -16,4 +16,9 @@ class SplashAndIntroViewModel @Inject constructor(
     {
         return dataStoreManager.isFirstTime()
     }
+
+    suspend fun isLoggedIn(): Boolean
+    {
+        return dataStoreManager.isLoggedIn()
+    }
 }

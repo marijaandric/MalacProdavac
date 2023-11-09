@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.front.components.MediumBlueButton
 import com.example.front.R
+import com.example.front.navigation.Screen
 import com.example.front.viewmodels.SplashAndIntroViewModel
 import kotlinx.coroutines.delay
 
@@ -58,14 +59,21 @@ import kotlinx.coroutines.delay
                 )
             )
             delay(2500L)
-            //// ako je firstTime onda vodi na intro1, ako nije proveri sledece
+
             if (viewModel.isFirstTime()) {
                 navController.navigate("intro1")
             } else {
-                //// dodati da ako je ulogovan ne ide na intro nego na HomeScreen
-                navController.navigate("auth") {
-                    popUpTo(route = "intro") {
-                        inclusive = true
+                if (viewModel.isLoggedIn()) {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo("intro") {
+                            inclusive = true
+                        }
+                    }
+                } else {
+                    navController.navigate("auth") {
+                        popUpTo(route = "intro") {
+                            inclusive = true
+                        }
                     }
                 }
             }

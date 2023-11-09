@@ -102,4 +102,13 @@ class DataStoreManager @Inject constructor(@ApplicationContext context: Context)
         }
         return true
     }
+
+    suspend fun isLoggedIn(): Boolean
+    {
+        val result = dataStore.data.first()[TOKEN_KEY]
+        if (result != null && result != ""){
+            return true
+        }
+        return false
+    }
 }
