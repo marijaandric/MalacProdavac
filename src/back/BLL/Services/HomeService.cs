@@ -33,9 +33,9 @@ namespace back.BLL.Services
             return categories;
         }
 
-        public async Task<List<Product>> GetHomeProducts(int id)
+        public async Task<List<ProductCard>> GetHomeProducts(int id)
         {
-            List<Product> products = await _repository.GetHomeProducts(id);
+            List<ProductCard> products = await _repository.GetHomeProducts(id);
             if (products.Count == 0) throw new ArgumentException("No products found!");
             return products;
         }

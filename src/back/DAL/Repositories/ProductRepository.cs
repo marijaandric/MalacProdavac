@@ -78,15 +78,9 @@ namespace back.DAL.Repositories
                                         Id = p.Id,
                                         ShopId = p.ShopId,
                                         Name = p.Name,
-                                        Description = p.Description,
                                         Price = p.Price,
-                                        MetricId = p.MetricId,
-                                        CategoryId = p.CategoryId,
-                                        SubcategoryId = p.SubcategoryId,
-                                        SalePercentage = p.SalePercentage,
-                                        SaleMinQuantity = p.SaleMinQuantity,
-                                        SaleMessage = p.SaleMessage,
-                                        Rating = pr.DefaultIfEmpty().Select(x => x.avg).FirstOrDefault()
+                                        Rating = pr.DefaultIfEmpty().Select(x => x.avg).FirstOrDefault(),
+                                        Image = _context.ProductImages.FirstOrDefault(x => x.ProductId == p.Id).Image
                                     })
                                     .Where(x => x.Rating >= rating)
                                     .ToListAsync();
@@ -103,15 +97,9 @@ namespace back.DAL.Repositories
                                         Id = p.Id,
                                         ShopId = p.ShopId,
                                         Name = p.Name,
-                                        Description = p.Description,
                                         Price = p.Price,
-                                        MetricId = p.MetricId,
-                                        CategoryId = p.CategoryId,
-                                        SubcategoryId = p.SubcategoryId,
-                                        SalePercentage = p.SalePercentage,
-                                        SaleMinQuantity = p.SaleMinQuantity,
-                                        SaleMessage = p.SaleMessage,
-                                        Rating = pr.DefaultIfEmpty().Select(x => x.avg).FirstOrDefault()
+                                        Rating = pr.DefaultIfEmpty().Select(x => x.avg).FirstOrDefault(),
+                                        Image = _context.ProductImages.FirstOrDefault(x => x.ProductId == p.Id).Image
                                     })
                                     .Where(x => x.Rating >= rating)
                                     .ToListAsync();
