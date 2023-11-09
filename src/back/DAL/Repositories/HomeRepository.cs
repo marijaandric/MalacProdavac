@@ -1,4 +1,5 @@
-﻿using back.DAL.Contexts;
+﻿using back.BLL.Dtos;
+using back.DAL.Contexts;
 using back.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -40,7 +41,7 @@ namespace back.DAL.Repositories
             return await _context.ChosenCategories.Where(x => x.UserId == id).Join(_context.Categories, ccat => ccat.CategoryId, cat => cat.Id, (ccat, cat) => cat).ToListAsync();
         }
 
-        public async Task<List<Product>> GetHomeProducts(int id)
+        public async Task<List<ProductCard>> GetHomeProducts(int id)
         {
             List<Category> categories = await GetChosenCategories(id);
             int take;
@@ -48,7 +49,19 @@ namespace back.DAL.Repositories
             if (categories.Count > 6) take = 1;
             else take = 2;
 
-            return categories.SelectMany(category => _context.Products.Where(x => x.Category == category).Take(take)).ToList();
+            return categories.SelectMany(category => _context.Products.Where(x => x.Category == category).GroupJoin(_context.ProductReviews.GroupBy(x => x.ProductId).Select(group => new
+            {
+                ProductId = group.Key,
+                avg = group.Average(x => x.Rating)
+            }), p => p.Id, pr => pr.ProductId, (p, pr) => new ProductCard
+            {
+                Id = p.Id,
+                ShopId = p.ShopId,
+                Name = p.Name,
+                Price = p.Price,
+                Image = _context.ProductImages.FirstOrDefault(i => i.ProductId == p.Id).Image,
+                Rating = pr.DefaultIfEmpty().Select(x => x.avg).FirstOrDefault(),
+            }).Take(take)).ToList();
         }
 
         public async Task<List<Shop>> GetHomeShops(int id)
