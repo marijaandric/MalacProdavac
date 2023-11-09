@@ -1,5 +1,6 @@
 package com.example.front.viewmodels.login
 
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -20,7 +21,6 @@ class LoginViewModel @Inject constructor(
 ) : ViewModel() {
     val jwtToken: MutableLiveData<String?> = MutableLiveData()
     val errorMessage: MutableLiveData<String> = MutableLiveData()
-
     fun getLoginInfo(login: LoginDTO) {
         viewModelScope.launch {
             try {
@@ -82,5 +82,10 @@ class LoginViewModel @Inject constructor(
             e.printStackTrace()
         }
         return false
+    }
+
+    suspend fun setFirstTimeToFalse()
+    {
+        dataStoreManager.setFirstTime()
     }
 }

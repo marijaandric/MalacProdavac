@@ -16,6 +16,7 @@ import com.example.front.screens.splas_and_intro.Intro
 import com.example.front.screens.login.LoginScreen
 import com.example.front.screens.splas_and_intro.SplashScreen
 import com.example.front.screens.categories.RegistrationCategories
+import com.example.front.viewmodels.SplashAndIntroViewModel
 import com.example.front.viewmodels.categories.CategoriesViewModel
 import com.example.front.viewmodels.home.HomeViewModel
 import com.example.front.viewmodels.login.LoginViewModel
@@ -31,6 +32,7 @@ fun SetupNavGraph(
     val homeViewModel: HomeViewModel = hiltViewModel()
     val categoriesViewModel : CategoriesViewModel = hiltViewModel()
     val registerViewModel: RegisterViewModel = hiltViewModel()
+    val splashViewModel: SplashAndIntroViewModel = hiltViewModel()
     NavHost(
         navController = navController,
         startDestination = "intro"
@@ -40,13 +42,8 @@ fun SetupNavGraph(
         ){
             HomePage(navController = navController, homeViewModel)
         }
-        composable(
-            route=Screen.Categories.route
-        )
-        {
-            RegistrationCategories(navController = navController, categoriesViewModel)
-        }
-        introNavGraph(navController = navController)
-        authNavGraph(navController = navController, loginViewModel = loginViewModel, registerViewModel = registerViewModel)
+
+        introNavGraph(navController = navController, splashViewModel)
+        authNavGraph(navController = navController, loginViewModel = loginViewModel, registerViewModel = registerViewModel, categoriesViewModel)
     }
 }

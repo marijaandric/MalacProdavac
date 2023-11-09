@@ -54,6 +54,10 @@ fun LoginScreen(
     var scaffoldState: ScaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
 
+    LaunchedEffect(key1 = true) {
+        viewModel.setFirstTimeToFalse()
+    }
+
     Surface(
         color = Color.White,
         modifier = Modifier.fillMaxSize()
@@ -98,7 +102,9 @@ fun LoginScreen(
                                 try {
                                     val success = viewModel.performLogin(userInput, passwordInput)
                                     if (success) {
-                                        navController.navigate(route = Screen.Home.route)
+                                        navController.navigate(route = Screen.Home.route) {
+                                            popUpTo("auth") {inclusive = true}
+                                        }
                                     } else {
                                         val errorMess = viewModel.errorMessage.value
                                         if (errorMess != null) {

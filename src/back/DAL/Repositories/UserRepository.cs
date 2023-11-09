@@ -115,5 +115,27 @@ namespace back.DAL.Repositories
             }).FirstOrDefaultAsync();
         }
 
+        public async Task<List<ProductCard>> GetReviewedProductsOfAShop(int userId, int shopId, int page)
+        {
+            User user = await _context.Users.FirstOrDefaultAsync(x => x.Id == userId);
+            return await _context.ProductReviews.Where(x => x.ReviewerId == userId)
+                        .GroupBy(x => x.ProductId)
+                        .Select(group => new
+                        {
+                            ProductId = group.Key,
+                            AvgRating = group.Average(x => x.Rating)
+                        })
+                        .Join(_context.Products, pr => pr.ProductId, p => p.Id, (pr, p) => new ProductCard
+                        {
+                            Id = p.Id,
+                            ShopId = p.ShopId,
+                            Name = p.Name,
+                            Price = p.Price,
+                            Rating = pr.AvgRating,
+                            Image = _context.ProductImages.FirstOrDefault(x => x.ProductId == p.Id).Image
+                        })
+                        .Skip((page - 1) * numberOfItems).Take(numberOfItems).ToListAsync();
+        }
+
     }
 }

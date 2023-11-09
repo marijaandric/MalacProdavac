@@ -59,4 +59,56 @@ class DataStoreManager @Inject constructor(@ApplicationContext context: Context)
             return null
         }
     }
+
+    suspend fun getUserIdFromToken(): Int? {
+        val token = this.tokenFlow.first()
+
+        return decodeTokenAndGetUserId(token)
+    }
+
+    private fun decodeTokenAndGetUserId(token: String?): Int? {
+        if (token.isNullOrBlank()) {
+            return null
+        }
+
+        try {
+            val signedJWT = SignedJWT.parse(token)
+            val claimsSet = signedJWT.jwtClaimsSet
+
+            val subClaim = claimsSet.getClaim("sub") as? String
+
+            if (subClaim?.toIntOrNull() != null) {
+                return subClaim.toInt()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return null
+        }
+        return null
+    }
+
+    suspend fun setFirstTime()
+    {
+        dataStore.edit { preferences ->
+            preferences[stringPreferencesKey("firstTimeInApp")] = "false"
+        }
+    }
+
+    suspend fun isFirstTime(): Boolean
+    {
+        val result = dataStore.data.first()[stringPreferencesKey("firstTimeInApp")]
+        if (result != null){
+            return false
+        }
+        return true
+    }
+
+    suspend fun isLoggedIn(): Boolean
+    {
+        val result = dataStore.data.first()[TOKEN_KEY]
+        if (result != null && result != ""){
+            return true
+        }
+        return false
+    }
 }

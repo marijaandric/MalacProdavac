@@ -44,5 +44,13 @@ namespace back.BLL.Services
 
             return review;
         }
+
+        public async Task<List<ProductCard>> GetReviewedProductsOfAShop(int userId, int shopId, int page)
+        {
+            List<ProductCard> products = await _repository.GetReviewedProductsOfAShop(userId, shopId, page);
+            if (products.Count == 0) throw new ArgumentException("No products found!");
+
+            return products;
+        }
     }
 }

@@ -78,15 +78,9 @@ namespace back.DAL.Repositories
                                         Id = p.Id,
                                         ShopId = p.ShopId,
                                         Name = p.Name,
-                                        Description = p.Description,
                                         Price = p.Price,
-                                        MetricId = p.MetricId,
-                                        CategoryId = p.CategoryId,
-                                        SubcategoryId = p.SubcategoryId,
-                                        SalePercentage = p.SalePercentage,
-                                        SaleMinQuantity = p.SaleMinQuantity,
-                                        SaleMessage = p.SaleMessage,
-                                        Rating = pr.DefaultIfEmpty().Select(x => x.avg).FirstOrDefault()
+                                        Rating = pr.DefaultIfEmpty().Select(x => x.avg).FirstOrDefault(),
+                                        Image = _context.ProductImages.FirstOrDefault(x => x.ProductId == p.Id).Image
                                     })
                                     .Where(x => x.Rating >= rating)
                                     .ToListAsync();
@@ -103,15 +97,9 @@ namespace back.DAL.Repositories
                                         Id = p.Id,
                                         ShopId = p.ShopId,
                                         Name = p.Name,
-                                        Description = p.Description,
                                         Price = p.Price,
-                                        MetricId = p.MetricId,
-                                        CategoryId = p.CategoryId,
-                                        SubcategoryId = p.SubcategoryId,
-                                        SalePercentage = p.SalePercentage,
-                                        SaleMinQuantity = p.SaleMinQuantity,
-                                        SaleMessage = p.SaleMessage,
-                                        Rating = pr.DefaultIfEmpty().Select(x => x.avg).FirstOrDefault()
+                                        Rating = pr.DefaultIfEmpty().Select(x => x.avg).FirstOrDefault(),
+                                        Image = _context.ProductImages.FirstOrDefault(x => x.ProductId == p.Id).Image
                                     })
                                     .Where(x => x.Rating >= rating)
                                     .ToListAsync();
@@ -208,12 +196,28 @@ namespace back.DAL.Repositories
                 IsOwner = product.ShopId == userId,
                 Rating = average,
                 WorkingHours = workingHours,
-                Reviews = reviews,
                 QuestionsAndAnswers = qna,
                 Sizes = sizes,
                 Images = images
             };
 
+        }
+
+        public async Task<List<ProductReviewExtended>> GetProductReviews(int productId, int page)
+        {
+            return await _context.ProductReviews.Where(x => x.ProductId == productId).Join(_context.Users, pr => pr.ReviewerId, u => u.Id, (pr, u) => new {pr, u}).Select(x => new ProductReviewExtended
+            {
+                ProductId = productId,
+                ReviewerId = x.pr.ReviewerId,
+                Comment = x.pr.Comment,
+                Rating = x.pr.Rating,
+                PostedOn = x.pr.PostedOn,
+                Image = x.u.Image,
+                Username = x.u.Username,
+                Product = null,
+                Reviewer = null
+                
+            }).Skip((page-1) * numberOfItems).Take(numberOfItems).ToListAsync();
         }
 
         #region likes

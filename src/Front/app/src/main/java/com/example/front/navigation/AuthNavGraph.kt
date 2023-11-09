@@ -4,15 +4,18 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
+import com.example.front.screens.categories.RegistrationCategories
 import com.example.front.screens.login.LoginScreen
 import com.example.front.screens.register.RegisterScreen
+import com.example.front.viewmodels.categories.CategoriesViewModel
 import com.example.front.viewmodels.login.LoginViewModel
 import com.example.front.viewmodels.register.RegisterViewModel
 
 fun NavGraphBuilder.authNavGraph(
     navController: NavHostController,
     loginViewModel: LoginViewModel,
-    registerViewModel: RegisterViewModel
+    registerViewModel: RegisterViewModel,
+    categoriesViewModel: CategoriesViewModel
 ) {
     navigation(
         startDestination = Screen.Login.route,
@@ -23,6 +26,12 @@ fun NavGraphBuilder.authNavGraph(
         }
         composable(route = Screen.Register.route) {
             RegisterScreen(navController = navController, registerViewModel = registerViewModel)
+        }
+        composable(
+            route=Screen.Categories.route
+        )
+        {
+            RegistrationCategories(navController = navController, categoriesViewModel)
         }
     }
 }
