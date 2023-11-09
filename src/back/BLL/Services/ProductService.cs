@@ -1,4 +1,5 @@
 ﻿using back.BLL.Dtos;
+using back.BLL.Dtos.HelpModels;
 using back.DAL.Repositories;
 using back.Models;
 
@@ -36,6 +37,13 @@ namespace back.BLL.Services
             return productInfo;
         }
 
+        public async Task<List<ProductReviewExtended>> GetProductReviews(int productId, int page)
+        {
+            List<ProductReviewExtended> reviews = await _repository.GetProductReviews(productId, page);
+            if (reviews.Count == 0) throw new ArgumentException("No reviews found!");
+
+            return reviews;
+        }
         public async Task<bool> ToggleLike(int productId, int userId)
         {
             if (await _repository.GetLike(productId, userId) == null)
