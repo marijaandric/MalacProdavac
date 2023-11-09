@@ -54,6 +54,10 @@ fun LoginScreen(
     var scaffoldState: ScaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
 
+    LaunchedEffect(key1 = true) {
+        viewModel.setFirstTimeToFalse()
+    }
+
     Surface(
         color = Color.White,
         modifier = Modifier.fillMaxSize()

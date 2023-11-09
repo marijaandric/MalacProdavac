@@ -86,4 +86,20 @@ class DataStoreManager @Inject constructor(@ApplicationContext context: Context)
         }
         return null
     }
+
+    suspend fun setFirstTime()
+    {
+        dataStore.edit { preferences ->
+            preferences[stringPreferencesKey("firstTimeInApp")] = "false"
+        }
+    }
+
+    suspend fun isFirstTime(): Boolean
+    {
+        val result = dataStore.data.first()[stringPreferencesKey("firstTimeInApp")]
+        if (result != null){
+            return false
+        }
+        return true
+    }
 }

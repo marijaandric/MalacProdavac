@@ -34,11 +34,15 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.front.components.MediumBlueButton
 import com.example.front.R
+import com.example.front.viewmodels.SplashAndIntroViewModel
 import kotlinx.coroutines.delay
 
     // -- Splash Screen --
     @Composable
-    fun SplashScreen(navController:NavController) {
+    fun SplashScreen(
+        navController:NavController,
+        viewModel: SplashAndIntroViewModel
+    ) {
         val scale = remember {
             Animatable(2.5f)
         }
@@ -54,8 +58,23 @@ import kotlinx.coroutines.delay
                 )
             )
             delay(2500L)
-            //// dodati da ako je ulogovan ne ide na intro nego na HomeScreen
-            navController.navigate("intro1")
+            //// ako je firstTime onda vodi na intro1, ako nije proveri sledece
+            if (viewModel.isFirstTime()) {
+                navController.navigate("intro1")
+            } else {
+                //// dodati da ako je ulogovan ne ide na intro nego na HomeScreen
+                navController.navigate("auth") {
+                    popUpTo(route = "intro") {
+                        inclusive = true
+                    }
+                }
+            }
+
+
+
+
+
+
         }
         Box(
             contentAlignment = Alignment.Center,
