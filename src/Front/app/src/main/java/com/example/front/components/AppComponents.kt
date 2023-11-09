@@ -91,7 +91,8 @@ fun MyTextField(
     painterResource: Painter,
     value: String,
     onValueChange: (String) -> Unit,
-    isPassword: Boolean = false
+    isPassword: Boolean = false,
+    isLast: Boolean = false
 ) {
     OutlinedTextField(
         modifier = Modifier
@@ -113,14 +114,10 @@ fun MyTextField(
             )
         },
         visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
-        keyboardOptions = if (isPassword) {
-            KeyboardOptions.Default.copy(
-                imeAction = ImeAction.Done,
-                keyboardType = KeyboardType.Password
-            )
-        } else {
-            KeyboardOptions.Default
-        },
+        keyboardOptions = KeyboardOptions.Default.copy(
+            keyboardType =  if (isPassword) KeyboardType.Password else KeyboardType.Text,
+            imeAction = if (isLast) ImeAction.Done else ImeAction.Next
+        ),
         shape = RoundedCornerShape(20.dp)
     )
 }
