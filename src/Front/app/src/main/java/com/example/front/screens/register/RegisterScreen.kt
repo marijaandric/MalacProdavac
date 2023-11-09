@@ -1,12 +1,15 @@
 package com.example.front.screens.register
 
 import android.util.Log
+import android.widget.RadioGroup
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,8 +23,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -92,6 +97,9 @@ fun RegisterScreen(navController: NavHostController, registerViewModel: Register
 
     val scrollState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
+
+    var checkbox1State by remember { mutableStateOf(false) }
+    var checkbox2State by remember { mutableStateOf(false) }
 
     Surface(
         color = Color.White,
@@ -197,6 +205,56 @@ fun RegisterScreen(navController: NavHostController, registerViewModel: Register
                     ErrorTextComponent(cityError)
                 }
 
+                Text(
+                    text = "Additional Role:",
+                    modifier = Modifier
+                        .padding(top = 10.dp, bottom = 8.dp)
+                )
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(0.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Checkbox(
+                        checked = checkbox1State,
+                        onCheckedChange = { checked ->
+                            checkbox1State = checked
+                            if (checked) {
+                                checkbox2State = false
+                            }
+                        },
+                        colors = CheckboxDefaults.colors(checkedColor = Color(0xFF005F8B)),
+                        modifier = Modifier
+                            .padding(0.dp)
+                            .height(24.dp)
+                    )
+                    Text(text = "Business Owner", modifier = Modifier.padding(0.dp))
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(0.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Checkbox(
+                        checked = checkbox2State,
+                        onCheckedChange = { checked ->
+                            checkbox2State = checked
+                            if (checked) {
+                                checkbox1State = false
+                            }
+                        },
+                        colors = CheckboxDefaults.colors(checkedColor = Color(0xFF005F8B)),
+                        modifier = Modifier
+                            .padding(0.dp)
+                            .height(24.dp)
+                    )
+                    Text(text = "Delivery person", modifier = Modifier.padding(0.dp))
+                }
+
                 Button(
                     onClick = {
                         nameError = ""
@@ -237,7 +295,15 @@ fun RegisterScreen(navController: NavHostController, registerViewModel: Register
                         ) {
                             coroutineScope.launch {
                                 try {
-                                    val data = RegistrationRequest(name, lastName, email, password, address + ", " + city + ", Srbija", 1)
+                                    var roleId = 1
+                                    if (checkbox1State) {
+                                        roleId = 2
+                                    } else {
+                                        if (checkbox2State) {
+                                            roleId = 3
+                                        }
+                                    }
+                                    val data = RegistrationRequest(name, lastName, email, password, address + ", " + city + ", Srbija", roleId)
                                     val success = registerViewModel.performRegistration(data)
                                     if (success) {
                                         navController.navigate(route = Screen.Categories.route) {
