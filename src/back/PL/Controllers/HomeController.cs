@@ -41,6 +41,18 @@ namespace back.PL.Controllers
             }
         }
 
+        [HttpPut("UpdateChosenCategories")]
+        public async Task<IActionResult> UpdateChosenCategories(ChosenCategoriesDto categoriesDto)
+        {
+            try
+            {
+                return Ok(await _service.UpdateChosenCategories(categoriesDto));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
         [HttpGet("GetChosenCategories")]
         public async Task<IActionResult> GetChosenCategories(int id)
         {

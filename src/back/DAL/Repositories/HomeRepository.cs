@@ -36,6 +36,19 @@ namespace back.DAL.Repositories
             return await Save();
         }
 
+        public async Task<bool> DeleteChosenCategories(int userId, List<int> categoryIds)
+        {
+            foreach (int categoryId in categoryIds)
+            {
+                ChosenCategory cat = new ChosenCategory();
+                cat.CategoryId = categoryId;
+                cat.UserId = userId;
+                _context.ChosenCategories.Remove(cat);
+            }
+
+            return await Save();
+        }
+
         public async Task<List<Category>> GetChosenCategories(int id)
         {
             return await _context.ChosenCategories.Where(x => x.UserId == id).Join(_context.Categories, ccat => ccat.CategoryId, cat => cat.Id, (ccat, cat) => cat).ToListAsync();
