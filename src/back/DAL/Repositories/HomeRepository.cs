@@ -57,12 +57,13 @@ namespace back.DAL.Repositories
         public async Task<List<ProductCard>> GetHomeProducts(int id)
         {
             List<Category> categories = await GetChosenCategories(id);
+            List<ProductCard> products = new List<ProductCard>();
             int take;
 
             if (categories.Count > 6) take = 1;
             else take = 2;
 
-            return categories.SelectMany(category => _context.Products.Where(x => x.Category == category).GroupJoin(_context.ProductReviews.GroupBy(x => x.ProductId).Select(group => new
+            products = categories.SelectMany(category => _context.Products.Where(x => x.Category == category).GroupJoin(_context.ProductReviews.GroupBy(x => x.ProductId).Select(group => new
             {
                 ProductId = group.Key,
                 avg = group.Average(x => x.Rating)
@@ -75,6 +76,27 @@ namespace back.DAL.Repositories
                 Image = _context.ProductImages.FirstOrDefault(i => i.ProductId == p.Id).Image,
                 Rating = pr.DefaultIfEmpty().Select(x => x.avg).FirstOrDefault(),
             }).Take(take)).ToList();
+
+            if (products.Count == 0)
+            {
+                products = await _context.Products.GroupJoin(_context.ProductReviews.GroupBy(x => x.ProductId)
+                            .Select(group => new
+                            {
+                                ProductId = group.Key,
+                                avg = group.Average(x => x.Rating)
+                            }), p => p.Id, pr => pr.ProductId, (p, pr) => new ProductCard
+                            {
+                                Id = p.Id,
+                                ShopId = p.ShopId,
+                                Name = p.Name,
+                                Price = p.Price,
+                                Image = _context.ProductImages.FirstOrDefault(i => i.ProductId == p.Id).Image,
+                                Rating = pr.DefaultIfEmpty().Select(x => x.avg).FirstOrDefault()
+                            })
+                            .Take(3).ToListAsync();
+            }
+
+            return products;
         }
 
         public async Task<List<Shop>> GetHomeShops(int id)
