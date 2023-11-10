@@ -1,6 +1,7 @@
 package com.example.front.screens.userprofile
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
@@ -45,12 +46,18 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Button
 import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -71,12 +78,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.example.front.R
+import kotlinx.coroutines.delay
 
 
 @Preview
 @Composable
 fun UserProfileScreen() {
-    Column {
+    Column(
+        modifier = Modifier.background(MaterialTheme.colorScheme.background)
+    ) {
         TopCenterImages()
         Info()
     }
@@ -86,51 +96,8 @@ fun UserProfileScreen() {
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun Info() {
-//    var isImageClicked by remember { mutableStateOf(false) }
-//
-//    Box(
-//        modifier = Modifier.fillMaxSize()
-//    ) {
-//        Box {
-//            Image(
-//                painter = painterResource(id = R.drawable.infoelipse),
-//                contentDescription = "Elipse",
-//                contentScale = ContentScale.FillWidth,
-//                modifier = Modifier.fillMaxWidth()
-//                    .zIndex(if (isImageClicked) 0.1f else 0f)
-//            )
-//            Image(
-//                painter = painterResource(id = R.drawable.infoelipsedva),
-//                contentDescription = "Elipse",
-//                contentScale = ContentScale.FillWidth,
-//                modifier = Modifier.fillMaxWidth()
-//                    .zIndex(if (isImageClicked) 0f else 0.1f)
-//            )
-//            Row(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .padding(16.dp)
-//                    .zIndex(2f),
-//                horizontalArrangement = Arrangement.SpaceBetween
-//            ) {
-//                Text(
-//                    "Info",
-//                    style = MaterialTheme.typography.h5,
-//                    modifier = Modifier.clickable {
-//                        isImageClicked = true
-//                    }
-//                )
-//                Text(
-//                    "Stats",
-//                    style = MaterialTheme.typography.h5,
-//                    modifier = Modifier.clickable {
-//                        isImageClicked = false
-//                    }
-//                )
-//            }
-//        }
-//    }
     var isImageClicked by remember { mutableStateOf(true) }
+    var firstTime by remember { mutableStateOf(true) }
 
     val scaleImage1 by animateDpAsState(
         targetValue = if (isImageClicked) 1.1.dp else 1.dp,
@@ -153,8 +120,9 @@ fun Info() {
     )
 
     Box(
-        modifier = Modifier.fillMaxSize()
-            .padding(top=20.dp)
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 20.dp)
     ) {
         Box(
             modifier = Modifier.fillMaxSize()
@@ -163,7 +131,8 @@ fun Info() {
                 painter = painterResource(id = R.drawable.infoelipse),
                 contentDescription = "Elipse",
                 contentScale = ContentScale.FillWidth,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .zIndex(zIndexImage1.value)
                     .graphicsLayer(scaleX = scaleImage1.value, scaleY = scaleImage1.value)
             )
@@ -171,7 +140,8 @@ fun Info() {
                 painter = painterResource(id = R.drawable.infoelipsedva),
                 contentDescription = "Elipse",
                 contentScale = ContentScale.FillWidth,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .zIndex(zIndexImage2.value)
                     .graphicsLayer(scaleX = scaleImage2.value, scaleY = scaleImage2.value)
             )
@@ -179,7 +149,7 @@ fun Info() {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp,top=40.dp, end = 16.dp)
+                    .padding(16.dp, top = 40.dp, end = 16.dp)
                     .zIndex(2f)
             )
             {
@@ -191,26 +161,35 @@ fun Info() {
                 ) {
                     Text(
                         "Info",
-                        style = MaterialTheme.typography.h5.copy(fontSize = if(isImageClicked) 30.sp else 25.sp),
+                        style = MaterialTheme.typography.titleLarge.copy(fontSize = if(isImageClicked) 30.sp else 25.sp, fontWeight = FontWeight.Medium,color=MaterialTheme.colorScheme.onBackground),
                         modifier = Modifier.clickable {
                             isImageClicked = true
                         }
                     )
                     Text(
                         "Stats",
-                        style = MaterialTheme.typography.h5.copy(fontSize = if(!isImageClicked) 30.sp else 25.sp),
+                        style = MaterialTheme.typography.titleLarge.copy(fontSize = if(!isImageClicked) 30.sp else 25.sp, fontWeight = FontWeight.Medium,color=MaterialTheme.colorScheme.onBackground),
                         modifier = Modifier.clickable {
                             isImageClicked = false
                         }
                     )
                 }
 
+
+                // -- INFO O KORISIKU --
                 if(isImageClicked) {
-                    AnimatedVisibility(
-                        visible = isImageClicked,
-                    ) {
+                    var showText by remember { mutableStateOf(false) }
+
+                    LaunchedEffect(isImageClicked) {
+                        delay(200)
+                        showText = true
+                        firstTime = false
+                    }
+                    if(showText || firstTime) {
+
                         Column(
-                            modifier = Modifier.padding(top = 60.dp)
+                            modifier = Modifier
+                                .padding(top = 60.dp)
                                 .zIndex(2f)
                         ) {
                             Row(
@@ -219,19 +198,19 @@ fun Info() {
                                 Icon(
                                     imageVector = Icons.Default.Person,
                                     contentDescription = "Profile Icon",
-                                    tint = MaterialTheme.colors.onBackground,
-                                    modifier = Modifier.size(48.dp)
+                                    tint = MaterialTheme.colorScheme.onBackground,
+                                    modifier = Modifier.size(30.dp)
                                 )
                                 Text(
                                     text = "Username",
                                     modifier = Modifier.padding(start = 8.dp),
-                                    style = MaterialTheme.typography.h6.copy(fontWeight = FontWeight.ExtraBold)
+                                    style = MaterialTheme.typography.titleSmall.copy(color=MaterialTheme.colorScheme.onBackground)
                                 )
                             }
                             Text(
                                 text = "marija.andric",
                                 modifier = Modifier.padding(top = 8.dp),
-                                style = MaterialTheme.typography.h6.copy(color = MaterialTheme.colors.background)
+                                style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.background)
                             )
 
                             Row(
@@ -241,20 +220,177 @@ fun Info() {
                                 Icon(
                                     imageVector = Icons.Default.Email,
                                     contentDescription = "Email",
-                                    tint = MaterialTheme.colors.onBackground,
-                                    modifier = Modifier.size(48.dp)
+                                    tint = MaterialTheme.colorScheme.onBackground,
+                                    modifier = Modifier.size(30.dp)
                                 )
                                 Text(
                                     text = "Email Address",
                                     modifier = Modifier.padding(start = 8.dp),
-                                    style = MaterialTheme.typography.h6.copy(fontWeight = FontWeight.ExtraBold)
+                                    style = MaterialTheme.typography.titleSmall.copy(color=MaterialTheme.colorScheme.onBackground)
                                 )
                             }
                             Text(
                                 text = "marijaandric2001@gmail.com",
                                 modifier = Modifier.padding(top = 8.dp),
-                                style = MaterialTheme.typography.h6.copy(color = MaterialTheme.colors.background)
+                                style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.background)
                             )
+                        }
+                    }
+                }
+                else{
+                    // -- STATS O KORISNIKU --
+                    var showElseText by remember { mutableStateOf(false) }
+
+                    LaunchedEffect(isImageClicked) {
+                        delay(200)
+                        showElseText = true
+                    }
+                    if(showElseText) {
+
+                        Column(
+                            modifier = Modifier
+                                .padding(top = 60.dp)
+                                .zIndex(2f)
+                                .fillMaxWidth()
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Star,
+                                        contentDescription = "Star Icon",
+                                        tint = MaterialTheme.colorScheme.onBackground,
+                                        modifier = Modifier.size(30.dp)
+                                    )
+                                    Text(
+                                        text = "Overall Rating",
+                                        modifier = Modifier.padding(start = 8.dp),
+                                        style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onBackground)
+                                    )
+                                }
+                                Text(
+                                    text = "4.0",
+                                    modifier = Modifier.padding(start = 8.dp),
+                                    style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold)
+                                )
+                            }
+
+
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+
+                            ) {
+                                Text(
+                                    text = "Communication",
+                                    modifier = Modifier.padding(start = 8.dp),
+                                    style = MaterialTheme.typography.titleSmall.copy(fontSize = 15.sp,color = MaterialTheme.colorScheme.onBackground)
+                                )
+                                Text(
+                                    text = "4.0",
+                                    modifier = Modifier.padding(start = 8.dp),
+                                    style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                                )
+                            }
+
+
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+
+                            ) {
+                                Text(
+                                    text = "Reliability",
+                                    modifier = Modifier.padding(start = 8.dp),
+                                    style = MaterialTheme.typography.titleSmall.copy(fontSize = 15.sp,color = MaterialTheme.colorScheme.onBackground)
+                                )
+                                Text(
+                                    text = "3.0",
+                                    modifier = Modifier.padding(start = 8.dp),
+                                    style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                                )
+                            }
+
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(bottom = 16.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+
+                            ) {
+                                Text(
+                                    text = "Overall Experience",
+                                    modifier = Modifier.padding(start = 8.dp),
+                                    style = MaterialTheme.typography.titleSmall.copy(fontSize = 15.sp,color = MaterialTheme.colorScheme.onBackground)
+                                )
+                                Text(
+                                    text = "5.0",
+                                    modifier = Modifier.padding(start = 8.dp),
+                                    style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                                )
+                            }
+
+                            Column(
+                                modifier = Modifier.padding(bottom = 16.dp)
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Info,
+                                        contentDescription = "Date Icon",
+                                        tint = MaterialTheme.colorScheme.onBackground,
+                                        modifier = Modifier.size(30.dp)
+                                    )
+                                    Text(
+                                        text = "Money spent",
+                                        modifier = Modifier.padding(start = 8.dp),
+                                        style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onBackground)
+                                    )
+                                }
+                                Text(
+                                    text = "5240,00 din",
+                                    modifier = Modifier.padding(start = 8.dp),
+                                    style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                                )
+                            }
+
+                            Column(
+                                modifier = Modifier.padding(bottom = 16.dp)
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Info,
+                                        contentDescription = "Date Icon",
+                                        tint = MaterialTheme.colorScheme.onBackground,
+                                        modifier = Modifier.size(30.dp)
+                                    )
+                                    Text(
+                                        text = "Money earned",
+                                        modifier = Modifier.padding(start = 8.dp),
+                                        style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onBackground)
+                                    )
+                                }
+                                Text(
+                                    text = "17220,00 din",
+                                    modifier = Modifier.padding(start = 8.dp),
+                                    style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                                )
+                            }
                         }
                     }
                 }
@@ -277,6 +413,33 @@ fun TopCenterImages() {
                 contentScale = ContentScale.FillWidth,
                 modifier = Modifier.fillMaxWidth()
             )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 35.dp, start = 16.dp, end = 16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            )
+            {
+                androidx.compose.material3.Icon(
+                    imageVector = Icons.Default.Menu,
+                    contentDescription = "Search icon",
+                    modifier = Modifier
+                        .padding(end = 10.dp)
+                        .size(50.dp)
+                        .align(Alignment.CenterVertically),
+                    tint = androidx.compose.material3.MaterialTheme.colorScheme.background
+                )
+
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = "Edit icon",
+                    modifier = Modifier
+                        .padding(end = 10.dp)
+                        .size(40.dp)
+                        .align(Alignment.CenterVertically),
+                    tint = MaterialTheme.colorScheme.background
+                )
+            }
 
             Box(
                 modifier = Modifier.padding(top=140.dp),
@@ -302,8 +465,8 @@ fun TopCenterImages() {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(text = "Pryanka Chopra", style = MaterialTheme.typography.h5, fontWeight = FontWeight.Bold)
-                Text(text = "Customer", style = MaterialTheme.typography.h6)
+                Text(text = "Pryanka Chopra", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                Text(text = "Customer", style = MaterialTheme.typography.titleSmall,color = MaterialTheme.colorScheme.primary)
             }
         }
     }

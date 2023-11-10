@@ -1,5 +1,6 @@
 package com.example.front.ui.theme
 
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
@@ -46,6 +47,12 @@ val Typography = Typography(
                 fontFamily = FontFamily(Font(R.font.lexend)),
                 fontWeight = FontWeight.Bold,
                 fontSize = 8.sp,
+                letterSpacing = 0.5.sp
+        ),
+        titleSmall = TextStyle(
+                fontFamily = FontFamily(Font(R.font.lexend)),
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 17.sp,
                 letterSpacing = 0.5.sp
         )
 
