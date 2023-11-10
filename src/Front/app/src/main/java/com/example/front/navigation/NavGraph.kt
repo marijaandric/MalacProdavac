@@ -16,10 +16,12 @@ import com.example.front.screens.splas_and_intro.Intro
 import com.example.front.screens.login.LoginScreen
 import com.example.front.screens.splas_and_intro.SplashScreen
 import com.example.front.screens.categories.RegistrationCategories
+import com.example.front.screens.product.ProductPage
 import com.example.front.viewmodels.SplashAndIntroViewModel
 import com.example.front.viewmodels.categories.CategoriesViewModel
 import com.example.front.viewmodels.home.HomeViewModel
 import com.example.front.viewmodels.login.LoginViewModel
+import com.example.front.viewmodels.product.ProductViewModel
 import com.example.front.viewmodels.register.RegisterViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -32,6 +34,7 @@ fun SetupNavGraph(
     val homeViewModel: HomeViewModel = hiltViewModel()
     val categoriesViewModel : CategoriesViewModel = hiltViewModel()
     val registerViewModel: RegisterViewModel = hiltViewModel()
+    val productViewModel: ProductViewModel = hiltViewModel()
     val splashViewModel: SplashAndIntroViewModel = hiltViewModel()
     NavHost(
         navController = navController,
@@ -41,6 +44,17 @@ fun SetupNavGraph(
             route = Screen.Home.route
         ){
             HomePage(navController = navController, homeViewModel)
+        }
+        composable(
+            route=Screen.Categories.route
+        )
+        {
+            RegistrationCategories(navController = navController, categoriesViewModel)
+        }
+        composable(
+            route = Screen.Product.route
+        ){
+            ProductPage(navController, productViewModel)
         }
 
         introNavGraph(navController = navController, splashViewModel)

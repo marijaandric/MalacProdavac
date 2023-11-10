@@ -5,10 +5,12 @@ import com.example.front.api.RetrofitInstance
 import com.example.front.model.CategoriesDTO
 import com.example.front.model.ChosenCategoriesDTO
 import com.example.front.model.HomeProduct
+import com.example.front.model.ImageData
 import com.example.front.model.LoginDTO
 import com.example.front.model.RegistrationRequest
 import com.example.front.model.LoginResponse
 import com.example.front.model.ShopDTO
+import com.example.front.model.product.ProductInfo
 import retrofit2.Response
 import javax.inject.Inject
 
@@ -35,5 +37,9 @@ class Repository @Inject constructor(private val api: Api) {
 
     suspend fun getHomeShops(id: Int): Response<List<ShopDTO>> {
         return api.getHomeShops(id)
+    }
+
+    suspend fun getProductInfo(productId: Int, userId:Int): Response<ProductInfo> {
+        return api.getProductDetails(productId,userId)
     }
 }

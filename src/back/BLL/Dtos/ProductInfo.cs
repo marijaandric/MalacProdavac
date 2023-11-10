@@ -18,7 +18,6 @@ namespace back.BLL.Dtos
         public List<WorkingHours> WorkingHours { get; set; }
         public List<QuestionWithAnswer> QuestionsAndAnswers { get; set; }
         public List<Stock> Sizes { get; set; }
-        public Dictionary<int, string> Images { get; set; }
-
+        public List<ImageData> Images { get; set; }
     }
 }

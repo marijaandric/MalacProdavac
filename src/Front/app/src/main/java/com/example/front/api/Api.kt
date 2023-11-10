@@ -7,6 +7,7 @@ import com.example.front.model.LoginDTO
 import com.example.front.model.RegistrationRequest
 import com.example.front.model.LoginResponse
 import com.example.front.model.ShopDTO
+import com.example.front.model.product.ProductInfo
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -48,4 +49,11 @@ interface Api {
     suspend fun getHomeShops(
         @Query("id") id: Int
     ): Response<List<ShopDTO>>
+
+    @Headers("Content-Type: application/json")
+    @GET("/back/Product/ProductDetails")
+    suspend fun getProductDetails(
+        @Query("productId") productID: Int,
+        @Query("userId") userID: Int
+    ): Response<ProductInfo>
 }
