@@ -172,7 +172,7 @@ namespace back.DAL.Repositories
                                                         }
                                                             ).ToList(); 
             List<Stock> sizes = await _context.ProductSizes.Where(x => x.ProductId == productId).Join(_context.Sizes, ps => ps.SizeId, s => s.Id, (ps, s) => new Stock{ Size = s.Name, Quantity = ps.Stock }).ToListAsync();
-            Dictionary<int,string> images = await _context.ProductImages.Where(x => x.ProductId == productId).ToDictionaryAsync(key => key.Id, value => value.Image);
+            List<ImageData> images = await _context.ProductImages.Where(x => x.ProductId == productId).Select(x => new ImageData{Id = x.Id, Image = x.Image}).ToListAsync();
             float average = 0;
             if (reviews.Count > 0) average = reviews.Select(x => x.Rating).Average();
 

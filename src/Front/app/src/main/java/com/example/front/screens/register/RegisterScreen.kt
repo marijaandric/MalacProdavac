@@ -1,12 +1,15 @@
 package com.example.front.screens.register
 
 import android.util.Log
+import android.widget.RadioGroup
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,8 +23,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -78,7 +83,8 @@ fun RegisterScreen(navController: NavHostController, registerViewModel: Register
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordConfirm by remember { mutableStateOf("") }
-//    var address by remember { mutableStateOf("") }
+    var address by remember { mutableStateOf("") }
+    var city by remember { mutableStateOf("") }
 
     // greske pri unosu
     var nameError by remember { mutableStateOf("") }
@@ -86,10 +92,14 @@ fun RegisterScreen(navController: NavHostController, registerViewModel: Register
     var emailError by remember { mutableStateOf("") }
     var passwordError by remember { mutableStateOf("") }
     var confirmPasswordError by remember { mutableStateOf("") }
-//    var addressError by remember { mutableStateOf("") }
+    var addressError by remember { mutableStateOf("") }
+    var cityError by remember { mutableStateOf("") }
 
     val scrollState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
+
+    var checkbox1State by remember { mutableStateOf(false) }
+    var checkbox2State by remember { mutableStateOf(false) }
 
     Surface(
         color = Color.White,
@@ -174,15 +184,76 @@ fun RegisterScreen(navController: NavHostController, registerViewModel: Register
                     ErrorTextComponent(confirmPasswordError)
                 }
 
-//                MyTextField(
-//                    labelValue = "Address",
-//                    painterResource = painterResource(id = R.drawable.home),
-//                    value = address,
-//                    onValueChange = { address = it }
-//                )
-//                if(addressError.isNotEmpty()) {
-//                    ErrorTextComponent(addressError)
-//                }
+                MyTextField(
+                    labelValue = "Address",
+                    painterResource = painterResource(id = R.drawable.home),
+                    value = address,
+                    onValueChange = { address = it }
+                )
+                if(addressError.isNotEmpty()) {
+                    ErrorTextComponent(addressError)
+                }
+
+                MyTextField(
+                    labelValue = "City",
+                    painterResource = painterResource(id = R.drawable.home),
+                    value = city,
+                    onValueChange = { city = it },
+                    isLast = true
+                )
+                if(cityError.isNotEmpty()) {
+                    ErrorTextComponent(cityError)
+                }
+
+                Text(
+                    text = "Additional Role:",
+                    modifier = Modifier
+                        .padding(top = 10.dp, bottom = 8.dp)
+                )
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(0.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Checkbox(
+                        checked = checkbox1State,
+                        onCheckedChange = { checked ->
+                            checkbox1State = checked
+                            if (checked) {
+                                checkbox2State = false
+                            }
+                        },
+                        colors = CheckboxDefaults.colors(checkedColor = Color(0xFF005F8B)),
+                        modifier = Modifier
+                            .padding(0.dp)
+                            .height(24.dp)
+                    )
+                    Text(text = "Business Owner", modifier = Modifier.padding(0.dp))
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(0.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Checkbox(
+                        checked = checkbox2State,
+                        onCheckedChange = { checked ->
+                            checkbox2State = checked
+                            if (checked) {
+                                checkbox1State = false
+                            }
+                        },
+                        colors = CheckboxDefaults.colors(checkedColor = Color(0xFF005F8B)),
+                        modifier = Modifier
+                            .padding(0.dp)
+                            .height(24.dp)
+                    )
+                    Text(text = "Delivery person", modifier = Modifier.padding(0.dp))
+                }
 
                 Button(
                     onClick = {
@@ -191,7 +262,8 @@ fun RegisterScreen(navController: NavHostController, registerViewModel: Register
                         emailError = ""
                         passwordError = ""
                         confirmPasswordError = ""
-//                        addressError = ""
+                        addressError = ""
+                        cityError = ""
 
                         if (name.isEmpty()) {
                             nameError = "First name is required"
@@ -206,20 +278,32 @@ fun RegisterScreen(navController: NavHostController, registerViewModel: Register
                         if(password != passwordConfirm) {
                             confirmPasswordError = "Passwords don't match"
                         }
-//                        if (address.isEmpty()) {
-//                            addressError = "Address is required"
-//                        }
+                        if (address.isEmpty()) {
+                            addressError = "Address is required"
+                        }
+                        if (city.isEmpty()) {
+                            cityError = "City is required"
+                        }
 
                         if (nameError.isEmpty() &&
                             lastNameError.isEmpty() &&
                             emailError.isEmpty() &&
                             passwordError.isEmpty() &&
-                            confirmPasswordError.isEmpty()// &&
-//                            addressError.isEmpty()
-                            ) {
+                            confirmPasswordError.isEmpty() &&
+                            addressError.isEmpty() &&
+                            cityError.isEmpty()
+                        ) {
                             coroutineScope.launch {
                                 try {
-                                    val data = RegistrationRequest(name, lastName, email, password, "ulica, grad, zemlja", 1)
+                                    var roleId = 1
+                                    if (checkbox1State) {
+                                        roleId = 2
+                                    } else {
+                                        if (checkbox2State) {
+                                            roleId = 3
+                                        }
+                                    }
+                                    val data = RegistrationRequest(name, lastName, email, password, address + ", " + city + ", Srbija", roleId)
                                     val success = registerViewModel.performRegistration(data)
                                     if (success) {
                                         navController.navigate(route = Screen.Categories.route) {
@@ -273,9 +357,6 @@ fun RegisterScreen(navController: NavHostController, registerViewModel: Register
                     color = Color(0xFF005F8B),
                     fontWeight = FontWeight(600),
                     fontSize = 16.sp
-//                    modifier = Modifier.clickable {
-//                        navController.navigate(Screen.Categories.route)
-//                    }
                 )
             }
 

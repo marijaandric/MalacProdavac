@@ -1,14 +1,10 @@
 package com.example.front.components
 
 import android.graphics.BitmapFactory
+import android.util.Log
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,7 +16,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
@@ -32,25 +27,18 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color.Companion.Gray
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -58,20 +46,16 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.front.R
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.front.model.ImageData
 import com.example.front.ui.theme.LightBlue
 import com.example.front.ui.theme.MainBlue
 import com.example.front.ui.theme.Typography
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
-import kotlin.random.Random
 
 @Composable
 fun TitleTextComponent(value:String){
@@ -91,7 +75,8 @@ fun MyTextField(
     painterResource: Painter,
     value: String,
     onValueChange: (String) -> Unit,
-    isPassword: Boolean = false
+    isPassword: Boolean = false,
+    isLast: Boolean = false
 ) {
     OutlinedTextField(
         modifier = Modifier
@@ -113,14 +98,10 @@ fun MyTextField(
             )
         },
         visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
-        keyboardOptions = if (isPassword) {
-            KeyboardOptions.Default.copy(
-                imeAction = ImeAction.Done,
-                keyboardType = KeyboardType.Password
-            )
-        } else {
-            KeyboardOptions.Default
-        },
+        keyboardOptions = KeyboardOptions.Default.copy(
+            keyboardType =  if (isPassword) KeyboardType.Password else KeyboardType.Text,
+            imeAction = if (isLast) ImeAction.Done else ImeAction.Next
+        ),
         shape = RoundedCornerShape(20.dp)
     )
 }
@@ -351,11 +332,13 @@ fun ProductCard(title: String, price: String, imageResource: Int) {
 @Composable
 fun GalleryComponent(images: List<ImageData>, modifier: Modifier) {
     LazyRow(
-        modifier = Modifier.fillMaxWidth().then(modifier), // Use Modifier to set the width of the LazyRow
+        modifier = Modifier
+            .fillMaxWidth()
+            .then(modifier), // Use Modifier to set the width of the LazyRow
         horizontalArrangement = Arrangement.spacedBy(8.dp) // Adjust the spacing as needed
     ) {
         items(images) { image ->
-            ImageItem(image)
+            ImageItem(image = image)
         }
     }
 }
@@ -363,12 +346,12 @@ fun GalleryComponent(images: List<ImageData>, modifier: Modifier) {
 @OptIn(ExperimentalEncodingApi::class)
 @Composable
 fun ImageItem(image:ImageData){
-    val byteArray = Base64.decode(image.base64Image)
+    val byteArray = Base64.decode(image.image)
     val bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
     Image(bitmap = bitmap.asImageBitmap(),
         contentDescription = null,
         modifier = Modifier
-            .size(50.dp)
+            .size(100.dp)
             .clip(RoundedCornerShape(5.dp))
     )
 }

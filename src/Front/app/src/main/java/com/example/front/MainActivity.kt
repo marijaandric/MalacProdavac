@@ -29,8 +29,8 @@ import dagger.hilt.android.AndroidEntryPoint
                     .fillMaxSize()
                     .background(color = MaterialTheme.colorScheme.background)) {
                     navController = rememberNavController()
-                    //SetupNavGraph(navController = navController)
-                    UserProfileScreen()
+                    SetupNavGraph(navController = navController)
+                    //UserProfileScreen()
                 }
             }
         }

@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -39,6 +40,7 @@ import com.example.front.R
 import com.example.front.components.ProductCard
 import com.example.front.components.SearchTextField
 import com.example.front.components.SellerCard
+import com.example.front.navigation.Screen
 import com.example.front.viewmodels.home.HomeViewModel
 
 @Composable
@@ -65,10 +67,9 @@ fun HomePage(navController: NavHostController, homeViewModel: HomeViewModel) {
             Products(homeViewModel)
         }
     }
-
-    val username by homeViewModel.usernameFlow.collectAsState("")
-
-    Text(text = "Cao $username")
+    Button(onClick = { navController.navigate(Screen.Product.route) }) {
+        Text(text = "Predji")
+    }
 }
 
 data class CardData(

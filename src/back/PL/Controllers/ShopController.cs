@@ -58,7 +58,7 @@ namespace back.PL.Controllers
         {
             try
             {
-                return Ok(new { Shop = await _service.ShopDetails(shopId, userId) });
+                return Ok(await _service.ShopDetails(shopId, userId));
             }
             catch (Exception ex)
             {

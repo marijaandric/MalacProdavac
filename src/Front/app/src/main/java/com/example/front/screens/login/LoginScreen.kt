@@ -92,7 +92,8 @@ fun LoginScreen(
                         painterResource = painterResource(id = R.drawable.padlock),
                         value = passwordInput, // Bind password input to the state
                         onValueChange = { passwordInput = it }, // Update the state on value change
-                        isPassword = true
+                        isPassword = true,
+                        isLast = true
                     )
                     Spacer(modifier = Modifier.height(100.dp))
                     BigBlueButton(
