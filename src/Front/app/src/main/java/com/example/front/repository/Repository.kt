@@ -11,6 +11,7 @@ import com.example.front.model.RegistrationRequest
 import com.example.front.model.LoginResponse
 import com.example.front.model.ShopDTO
 import com.example.front.model.product.ProductInfo
+import com.example.front.model.user.MyProfileDTO
 import retrofit2.Response
 import javax.inject.Inject
 
@@ -41,5 +42,9 @@ class Repository @Inject constructor(private val api: Api) {
 
     suspend fun getProductInfo(productId: Int, userId:Int): Response<ProductInfo> {
         return api.getProductDetails(productId,userId)
+    }
+
+    suspend fun getMyProfileInfo(userId:Int): Response<MyProfileDTO>{
+        return api.getMyProfileInfo(userId)
     }
 }

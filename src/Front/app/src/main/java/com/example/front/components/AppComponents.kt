@@ -3,6 +3,7 @@ package com.example.front.components
 import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -353,5 +355,21 @@ fun ImageItem(image:ImageData){
         modifier = Modifier
             .size(100.dp)
             .clip(RoundedCornerShape(5.dp))
+    )
+}
+
+@OptIn(ExperimentalEncodingApi::class)
+@Composable
+fun ImageItemForProfilePic(image:String){
+    val byteArray = Base64.decode(image)
+    val bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
+    Image(bitmap = bitmap.asImageBitmap(),
+        contentDescription = null,
+        contentScale = ContentScale.Crop,
+        modifier = Modifier
+            .size(140.dp)
+            .clip(CircleShape)
+            .border(4.dp, Color.White, CircleShape)
+
     )
 }

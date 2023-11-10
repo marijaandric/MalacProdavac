@@ -77,25 +77,36 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.navigation.NavHostController
 import com.example.front.R
+import com.example.front.components.ImageItem
+import com.example.front.components.ImageItemForProfilePic
+import com.example.front.viewmodels.home.HomeViewModel
+import com.example.front.viewmodels.myprofile.MyProfileViewModel
 import kotlinx.coroutines.delay
 
 
-@Preview
 @Composable
-fun UserProfileScreen() {
+fun UserProfileScreen(navController: NavHostController, myProfileViewModel: MyProfileViewModel) {
+    val id = 1;
+
+
+    LaunchedEffect(Unit) {
+        myProfileViewModel.getMyProfileInfo(id)
+    }
+
     Column(
         modifier = Modifier.background(MaterialTheme.colorScheme.background)
     ) {
-        TopCenterImages()
-        Info()
+        TopCenterImages(myProfileViewModel)
+        Info(myProfileViewModel)
     }
 }
 
 @SuppressLint("UnusedTransitionTargetStateParameter")
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun Info() {
+fun Info(myProfileViewModel: MyProfileViewModel) {
     var isImageClicked by remember { mutableStateOf(true) }
     var firstTime by remember { mutableStateOf(true) }
 
@@ -177,7 +188,7 @@ fun Info() {
 
 
                 // -- INFO O KORISIKU --
-                if(isImageClicked) {
+                if(isImageClicked && myProfileViewModel.state.value.isLoading==false) {
                     var showText by remember { mutableStateOf(false) }
 
                     LaunchedEffect(isImageClicked) {
@@ -207,11 +218,13 @@ fun Info() {
                                     style = MaterialTheme.typography.titleSmall.copy(color=MaterialTheme.colorScheme.onBackground)
                                 )
                             }
-                            Text(
-                                text = "marija.andric",
-                                modifier = Modifier.padding(top = 8.dp),
-                                style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.background)
-                            )
+                            myProfileViewModel.state.value.info?.let {
+                                Text(
+                                    text = it.username,
+                                    modifier = Modifier.padding(top = 8.dp),
+                                    style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.background)
+                                )
+                            }
 
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
@@ -230,14 +243,14 @@ fun Info() {
                                 )
                             }
                             Text(
-                                text = "marijaandric2001@gmail.com",
+                                text = myProfileViewModel.state.value.info!!.email,
                                 modifier = Modifier.padding(top = 8.dp),
                                 style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.background)
                             )
                         }
                     }
                 }
-                else{
+                else if(myProfileViewModel.state.value.isLoading==false){
                     // -- STATS O KORISNIKU --
                     var showElseText by remember { mutableStateOf(false) }
 
@@ -276,7 +289,7 @@ fun Info() {
                                     )
                                 }
                                 Text(
-                                    text = "4.0",
+                                    text = myProfileViewModel.state.value.info!!.rating.average.toString(),
                                     modifier = Modifier.padding(start = 8.dp),
                                     style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold)
                                 )
@@ -296,7 +309,7 @@ fun Info() {
                                     style = MaterialTheme.typography.titleSmall.copy(fontSize = 15.sp,color = MaterialTheme.colorScheme.onBackground)
                                 )
                                 Text(
-                                    text = "4.0",
+                                    text = myProfileViewModel.state.value.info!!.rating.communication.toString(),
                                     modifier = Modifier.padding(start = 8.dp),
                                     style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold, fontSize = 15.sp)
                                 )
@@ -316,7 +329,7 @@ fun Info() {
                                     style = MaterialTheme.typography.titleSmall.copy(fontSize = 15.sp,color = MaterialTheme.colorScheme.onBackground)
                                 )
                                 Text(
-                                    text = "3.0",
+                                    text = myProfileViewModel.state.value.info!!.rating.reliability.toString(),
                                     modifier = Modifier.padding(start = 8.dp),
                                     style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold, fontSize = 15.sp)
                                 )
@@ -336,7 +349,7 @@ fun Info() {
                                     style = MaterialTheme.typography.titleSmall.copy(fontSize = 15.sp,color = MaterialTheme.colorScheme.onBackground)
                                 )
                                 Text(
-                                    text = "5.0",
+                                    text = myProfileViewModel.state.value.info!!.rating.overallExperience.toString(),
                                     modifier = Modifier.padding(start = 8.dp),
                                     style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold, fontSize = 15.sp)
                                 )
@@ -350,7 +363,7 @@ fun Info() {
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.Info,
-                                        contentDescription = "Date Icon",
+                                        contentDescription = "Info Icon",
                                         tint = MaterialTheme.colorScheme.onBackground,
                                         modifier = Modifier.size(30.dp)
                                     )
@@ -361,7 +374,7 @@ fun Info() {
                                     )
                                 }
                                 Text(
-                                    text = "5240,00 din",
+                                    text = myProfileViewModel.state.value.info!!.moneySpent.toString()+ " din",
                                     modifier = Modifier.padding(start = 8.dp),
                                     style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold, fontSize = 15.sp)
                                 )
@@ -386,7 +399,7 @@ fun Info() {
                                     )
                                 }
                                 Text(
-                                    text = "17220,00 din",
+                                    text = myProfileViewModel.state.value.info!!.moneyEarned.toString() + " din",
                                     modifier = Modifier.padding(start = 8.dp),
                                     style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold, fontSize = 15.sp)
                                 )
@@ -400,7 +413,7 @@ fun Info() {
 }
 
 @Composable
-fun TopCenterImages() {
+fun TopCenterImages(myProfileViewModel: MyProfileViewModel) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -446,15 +459,25 @@ fun TopCenterImages() {
                 contentAlignment = Alignment.Center
             )
             {
-                Image(
-                    painter = painterResource(id = R.drawable.jabuke),
-                    contentDescription = "ProfilePic",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier//.fillMaxWidth(0.3f)
-                        .size(140.dp)
-                        .clip(CircleShape)
-                        .border(4.dp, Color.White, CircleShape)
-                )
+                if(myProfileViewModel.state.value.isLoading)
+                {
+                    // promeniti da bude neki placeholder
+                    Image(
+                        painter = painterResource(id = R.drawable.imageplaceholder),
+                        contentDescription = "Placeholder",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier//.fillMaxWidth(0.3f)
+                            .size(140.dp)
+                            .clip(CircleShape)
+                            .border(4.dp, Color.White, CircleShape)
+                    )
+                }
+                else{
+                    if(myProfileViewModel.state.value.info!!.image.isNotEmpty())
+                    {
+                        ImageItemForProfilePic(image = myProfileViewModel.state.value.info!!.image)
+                    }
+                }
             }
         }
         Box(
@@ -465,8 +488,11 @@ fun TopCenterImages() {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(text = "Pryanka Chopra", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                Text(text = "Customer", style = MaterialTheme.typography.titleSmall,color = MaterialTheme.colorScheme.primary)
+                if(myProfileViewModel.state.value.isLoading == false)
+                {
+                    Text(text = myProfileViewModel.state.value.info!!.name, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text(text = myProfileViewModel.state.value.info!!.role, style = MaterialTheme.typography.titleSmall,color = MaterialTheme.colorScheme.primary)
+                }
             }
         }
     }

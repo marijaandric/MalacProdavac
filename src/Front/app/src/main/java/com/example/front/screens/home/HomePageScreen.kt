@@ -86,7 +86,7 @@ fun Products(viewModel: HomeViewModel) {
         CardData(
             title = productsState.name,
             description = productsState.price.toString()+" din",
-            imageResource = R.drawable.jabuke
+            imageResource = R.drawable.imageplaceholder
         )
     }?.toList() ?: emptyList()
 
@@ -124,7 +124,7 @@ fun Sellers(viewModel: HomeViewModel) {
         CardData(
             title = shopState.name,
             description = shopState.address,
-            imageResource = R.drawable.jabuke
+            imageResource = R.drawable.imageplaceholder
         )
     }?.toList() ?: emptyList()
 

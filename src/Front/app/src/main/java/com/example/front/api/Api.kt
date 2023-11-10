@@ -8,6 +8,7 @@ import com.example.front.model.RegistrationRequest
 import com.example.front.model.LoginResponse
 import com.example.front.model.ShopDTO
 import com.example.front.model.product.ProductInfo
+import com.example.front.model.user.MyProfileDTO
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -56,4 +57,9 @@ interface Api {
         @Query("productId") productID: Int,
         @Query("userId") userID: Int
     ): Response<ProductInfo>
+
+    @GET("back/User/MyProfile")
+    suspend fun getMyProfileInfo(
+        @Query("userId") productID: Int,
+    ): Response<MyProfileDTO>
 }
