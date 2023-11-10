@@ -220,17 +220,24 @@ namespace back.BLL.Services
             if (values.RoleId != null) newUser.RoleId = (int)values.RoleId;
             if (values.Image.Length > 0) newUser.Image = values.Image;
             if (values.Name.Length > 0) newUser.Name = values.Name;
-            if (values.OldPassword.Length > 0 && values.Password.Length > 0)
-            {
-                using (HMACSHA512 hmac = new HMACSHA512(newUser.PasswordSalt))
-                {
-                    if (hmac.ComputeHash(Encoding.UTF8.GetBytes(values.OldPassword)).SequenceEqual(newUser.Password)) newUser.Password = hmac.ComputeHash(Encoding.UTF8.GetBytes(values.Password));
-                    else throw new ArgumentException("Passwords do not match!");
-                };
-            }
 
             if (await _authRepository.EditUser(newUser)) return await CreateToken(newUser);
             else throw new ArgumentException("Changes could not be saved!");
+        }
+
+        public async Task<bool> ChangePassword(ChangePasswordDto values)
+        {
+            User user = await _authRepository.GetUser(values.Id);
+
+            if (values.Password.Length == 0 || values.OldPassword.Length == 0) throw new ArgumentException("Check fields and try again!");
+
+            using (HMACSHA512 hmac = new HMACSHA512(user.PasswordSalt))
+            {
+                if (hmac.ComputeHash(Encoding.UTF8.GetBytes(values.OldPassword)).SequenceEqual(user.Password)) user.Password = hmac.ComputeHash(Encoding.UTF8.GetBytes(values.Password));
+                else throw new ArgumentException("Passwords do not match!");
+            };
+
+            return await _authRepository.EditUser(user);
         }
     }
 }
