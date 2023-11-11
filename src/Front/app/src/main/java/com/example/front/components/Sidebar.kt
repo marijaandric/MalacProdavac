@@ -10,14 +10,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Face
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
@@ -32,8 +28,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.example.front.R
 import kotlinx.coroutines.launch
 
 @Composable
@@ -42,10 +40,16 @@ fun Sidebar() {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val items = listOf(
-        DrawerItem(icon = Icons.Default.Favorite, label = "Likes", secondaryLabel = "64"),
-        DrawerItem(icon = Icons.Default.Face, label = "Asd", secondaryLabel = "12"),
-        DrawerItem(icon = Icons.Default.Email, label = "Enas", secondaryLabel = "64"),
-        DrawerItem(icon = Icons.Default.Settings, label = "Sett", secondaryLabel = ""),
+        DrawerItem(icon = painterResource(id = R.drawable.navbar_home), label = "Home", secondaryLabel = ""),
+        DrawerItem(icon = painterResource(id = R.drawable.navbar_cart2), label = "My Cart", secondaryLabel = ""),
+        DrawerItem(icon = painterResource(id = R.drawable.navbar_cart1), label = "My Orders", secondaryLabel = ""),
+        DrawerItem(icon = painterResource(id = R.drawable.navbar_package), label = "Products", secondaryLabel = ""),
+        DrawerItem(icon = painterResource(id = R.drawable.navbar_shop1), label = "Shops", secondaryLabel = ""),
+        DrawerItem(icon = painterResource(id = R.drawable.navbar_bell), label = "Notifications", secondaryLabel = ""),
+        DrawerItem(icon = painterResource(id = R.drawable.navbar_shop2), label = "My Shop", secondaryLabel = ""),
+        DrawerItem(icon = painterResource(id = R.drawable.navbar_message), label = "Messages", secondaryLabel = ""),
+        DrawerItem(icon = painterResource(id = R.drawable.navbar_profile), label = "Delivery Profile", secondaryLabel = ""),
+        DrawerItem(icon = painterResource(id = R.drawable.navbar_car), label = "Deliveries", secondaryLabel = ""),
     )
     var selectedItem by remember { mutableStateOf(items[0]) }
 
@@ -68,7 +72,8 @@ fun Sidebar() {
                         onClick = {
                             scope.launch { drawerState.close() }
                             selectedItem = item
-                        }
+                        },
+                        icon = { Icon(painter = item.icon, contentDescription = null) }
                     )
                 }
             }
@@ -82,7 +87,7 @@ fun Sidebar() {
 }
 
 data class DrawerItem(
-    val icon: ImageVector,
+    val icon: Painter,
     val label: String,
     val secondaryLabel: String
 )

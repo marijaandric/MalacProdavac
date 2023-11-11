@@ -40,6 +40,7 @@ import com.example.front.R
 import com.example.front.components.ProductCard
 import com.example.front.components.SearchTextField
 import com.example.front.components.SellerCard
+import com.example.front.components.Sidebar
 import com.example.front.navigation.Screen
 import com.example.front.viewmodels.home.HomeViewModel
 
@@ -70,6 +71,7 @@ fun HomePage(navController: NavHostController, homeViewModel: HomeViewModel) {
     Button(onClick = { navController.navigate(Screen.Product.route) }) {
         Text(text = "Predji")
     }
+    Sidebar()
 }
 
 data class CardData(
