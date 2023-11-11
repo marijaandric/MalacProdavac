@@ -52,9 +52,9 @@ namespace back.BLL.Services
             return products;
         }
 
-        public async Task<List<Shop>> GetHomeShops(int id)
+        public async Task<List<ShopCard>> GetHomeShops(int id)
         {
-            List<Shop> shops = await _repository.GetHomeShops(id);
+            List<ShopCard> shops = await _repository.GetHomeShops(id);
             if (shops.Count == 0) throw new ArgumentException("No shops found!");
             return shops;
         }

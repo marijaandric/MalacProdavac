@@ -72,12 +72,11 @@ namespace back.DAL.Repositories
                     }), s => s.Id, sr => sr.ShopId, (s, sr) => new ShopCard
                     {
                         Id = s.Id,
-                        OwnerId = s.OwnerId,
                         Name = s.Name,
                         Address = s.Address,
-                        Latitude = s.Latitude,
-                        Longitude = s.Longitude,
                         Image = s.Image,
+                        WorkingHours = _context.WorkingHours.Where(x => x.ShopId == s.Id).ToList(),
+                        Liked = _context.LikedShops.Any(x => x.ShopId == s.Id && x.UserId == userId),
                         Rating = sr.DefaultIfEmpty().Select(x => x.AvgRating).FirstOrDefault()
                     })
                 .Where(x => x.Rating >= rating)
