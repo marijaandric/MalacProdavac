@@ -1,4 +1,4 @@
-package com.example.front.model.product
+package com.example.front.model.DTO
 
 import com.nimbusds.jose.shaded.gson.annotations.SerializedName
 
@@ -7,5 +7,5 @@ data class WorkingHoursDTO(
     @SerializedName("day") val day: Int,
     @SerializedName("openingHours") val openingHours: String,
     @SerializedName("closingHours") val closingHours: String,
-    @SerializedName("shop") val shop: String? // Change the type to the actual type of 'shop' if it's not a String
+    @SerializedName("shop") val shop: String?
 )

@@ -1,16 +1,10 @@
 package com.example.front.api
-import com.example.front.helper.DataStore.DataStoreManager
 import com.example.front.helper.interceptor.AuthorizationHeaderHttpClient
-import com.example.front.util.Contsnats
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
-import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Inject
-import javax.inject.Singleton
 
-val url = com.example.front.util.Contsnats.BASE_URL
+val url = com.example.front.util.Constants.BASE_URL
 
 class RetrofitInstance @Inject constructor(private val httpClient: AuthorizationHeaderHttpClient) {
 
@@ -18,7 +12,7 @@ class RetrofitInstance @Inject constructor(private val httpClient: Authorization
         Retrofit.Builder()
             .baseUrl(url)
             .addConverterFactory(GsonConverterFactory.create())
-            .client(httpClient.okHttpClient) // Use the injected OkHttpClient with the authorization header interceptor
+            .client(httpClient.okHttpClient)
             .build()
     }
 

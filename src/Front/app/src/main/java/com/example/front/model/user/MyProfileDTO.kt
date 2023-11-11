@@ -1,8 +1,7 @@
 package com.example.front.model.user
 
-import com.example.front.model.RatingDTO
+import com.example.front.model.DTO.RatingDTO
 import com.google.gson.annotations.SerializedName
-import java.util.Date
 
 data class MyProfileDTO (
     @SerializedName("id") val id: Int,

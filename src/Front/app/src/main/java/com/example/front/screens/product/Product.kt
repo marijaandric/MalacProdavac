@@ -1,5 +1,6 @@
 package com.example.front.screens.product
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -39,200 +40,192 @@ import com.example.front.R
 import com.example.front.components.GalleryComponent
 import com.example.front.components.ProductImage
 import com.example.front.components.ToggleImageButton
-import com.example.front.model.product.WorkingHoursDTO
+import com.example.front.model.DTO.WorkingHoursDTO
 import com.example.front.navigation.Screen
 import com.example.front.ui.theme.Typography
 import com.example.front.viewmodels.product.ProductViewModel
 
+@SuppressLint("SuspiciousIndentation")
 @Composable
-fun ProductPage(navHostController: NavHostController,productViewModel: ProductViewModel){
+fun ProductPage(navHostController: NavHostController, productViewModel: ProductViewModel) {
 
-
-    LaunchedEffect(Unit)
-    {
-        productViewModel.getProductInfo(1,1)
+    LaunchedEffect(Unit) {
+        productViewModel.getProductInfo(1, 1)
     }
-    val productInfo by productViewModel.productInfo.collectAsState(null)
+
+    val productInfo = productViewModel.state.value.product
 
     Column(
-        modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
-    content = {
-//        if(productViewModel.state.value.isLoading)
-//        {
-//            CircularProgressIndicator()
-//        }
-        Box() {
-            ProductImage(
-                painterResource(
-                    id = R.drawable.jabukeproduct
-                )
-            )
-            ToggleImageButton(
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-            )
-            Image(
-                painter = painterResource(id = R.drawable.backarrow),
-                contentDescription = "",
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        if (productViewModel.state.value.isLoading) {
+            CircularProgressIndicator(
                 modifier = Modifier
                     .size(50.dp)
-                    .padding(5.dp)
-                    .align(Alignment.TopStart)
-                    .clickable { navHostController.navigate(Screen.Home.route) }
+                    .padding(8.dp),
+                color = Color.Magenta
             )
-            Column(
+        } else {
+            Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .offset(y = 300.dp)
                     .background(Color.White)
-                    .align(Alignment.Center)
                     .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
                     .border(1.dp, Color.Black)
+                    .verticalScroll(rememberScrollState())
             ) {
-                productInfo?.images?.let {
-                    GalleryComponent(
-                        images = it,
-                        modifier = Modifier.padding(20.dp)
-                    )
-                }
-                productInfo?.name?.let {
-                    Text(
-                        text = it,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(5.dp),
-                        style = Typography.titleMedium,
-                    )
-                }
-                Box(
-                    modifier = Modifier.fillMaxWidth()
+                ProductImage(painterResource(id = R.drawable.jabukeproduct))
+
+                ToggleImageButton(modifier = Modifier.align(Alignment.TopEnd))
+
+                Image(
+                    painter = painterResource(id = R.drawable.backarrow),
+                    contentDescription = "",
+                    modifier = Modifier
+                        .size(50.dp)
+                        .padding(5.dp)
+                        .align(Alignment.TopStart)
+                        .clickable { navHostController.navigate(Screen.Home.route) }
+                )
+
+                Column(
+                    modifier = Modifier
+                        .padding(20.dp)
+                        .fillMaxWidth()
                 ) {
+                    productInfo?.images?.let {
+                        GalleryComponent(images = it,modifier = Modifier.padding(20.dp))
+                    }
+
+                    productInfo?.name?.let {
+                        Text(
+                            text = it,
+                            modifier = Modifier
+                                .padding(5.dp)
+                                .fillMaxWidth(),
+                            style = Typography.titleMedium,
+                        )
+                    }
+
                     productInfo?.shopName?.let {
                         Text(
                             text = it,
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(5.dp),
+                                .padding(5.dp)
+                                .fillMaxWidth(),
                             style = Typography.titleSmall,
                             textAlign = TextAlign.Center
                         )
                     }
+
                     Image(
                         painter = painterResource(R.drawable.strelica),
                         contentDescription = "",
                         modifier = Modifier
                             .size(29.dp)
-                            .align(Alignment.Center)
                             .offset(x = 90.dp)
                     )
-                }
-                Box() {
+
                     Text(
-                        text = productInfo?.price.toString(),
+                        text = "${productInfo?.price} rsd",
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(20.dp),
+                            .padding(20.dp)
+                            .fillMaxWidth(),
                         style = Typography.titleLarge,
                         textAlign = TextAlign.Center
                     )
-                }
-                Box() {
+
                     productInfo?.saleMessage?.let {
                         Text(
                             text = it,
-                            modifier = Modifier
-                                .fillMaxWidth(),
+                            modifier = Modifier.fillMaxWidth(),
                             style = Typography.titleMedium,
                             textAlign = TextAlign.Center
                         )
                     }
-                }
-                Box() {
+
                     productInfo?.description?.let {
                         Text(
                             text = it,
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(10.dp),
+                                .padding(10.dp)
+                                .fillMaxWidth(),
                             style = Typography.bodySmall,
                             textAlign = TextAlign.Center
                         )
                     }
-                }
-                Divider(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(1.dp) // Adjust the height as needed
-                        .padding(horizontal = 16.dp), // Adjust the padding as needed
-                    color = Color.Gray // You can set the color of the divider
-                )
-                productInfo?.workingHours?.let { ExpandableRow(it) }
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(10.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = "Quantity",
-                        style = Typography.titleSmall,
+
+                    Divider(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(1.dp)
+                            .padding(horizontal = 16.dp),
+                        color = Color.Gray
                     )
-                    Row() {
-                        Button(
-                            onClick = {},
-                            modifier = Modifier
-                                .height(40.dp)
-                                .border(1.dp, Color.Black),
-                            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-                        ) {
-                            Text(
-                                text = "-",
-                                style = Typography.bodyLarge
-                            )
-                        }
+
+                    productInfo?.workingHours?.let { ExpandableRow(it) }
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(10.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
                         Text(
-                            text = "1",
-                            modifier = Modifier
-                                .padding(20.dp),
-                            textAlign = TextAlign.Justify
+                            text = "Quantity",
+                            style = Typography.titleSmall,
                         )
-                        Button(
-                            onClick = {},
-                            modifier = Modifier
-                                .height(40.dp)
-                                .border(1.dp, Color.Black),
-                            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
+                            Button(
+                                onClick = {},
+                                modifier = Modifier
+                                    .height(40.dp)
+                                    .border(1.dp, Color.Black),
+                                colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+                            ) {
+                                Text(text = "-")
+                            }
+
                             Text(
-                                text = "+",
-                                style = Typography.bodyLarge,
+                                text = "1",
+                                modifier = Modifier.padding(20.dp),
+                                textAlign = TextAlign.Justify
                             )
+
+                            Button(
+                                onClick = {},
+                                modifier = Modifier
+                                    .height(40.dp)
+                                    .border(1.dp, Color.Black),
+                                colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+                            ) {
+                                Text(text = "+")
+                            }
                         }
                     }
-                }
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(20.dp),
-                    horizontalArrangement = Arrangement.Center
-                ) {
+
                     Button(
                         onClick = {},
                         modifier = Modifier
                             .height(60.dp)
-                            .width(200.dp),
+                            .width(200.dp)
+                            .padding(20.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xE48359)),
                     ) {
-                        Text(
-                            text = "Add To Cart",
-                        )
+                        Text(text = "Add To Cart")
                     }
                 }
             }
         }
     }
-    )
 }
+
+
 @Composable
 fun ExpandableRow(workingHoursList: List<WorkingHoursDTO>) {
     var isExpanded by remember { mutableStateOf(false) }
@@ -245,17 +238,11 @@ fun ExpandableRow(workingHoursList: List<WorkingHoursDTO>) {
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "Pick up time",
-                style = Typography.titleSmall,
-            )
-
-            Text(
-                text = "Mon - Fri   ${getDayName(workingHoursList.firstOrNull()?.day ?: 0)}   " +
-                        "${workingHoursList.firstOrNull()?.openingHours} - ${workingHoursList.firstOrNull()?.closingHours}",
-                style = Typography.titleSmall,
+                text = "Click to see pick up times",
+                style = Typography.titleSmall
             )
         }
 
@@ -268,18 +255,13 @@ fun ExpandableRow(workingHoursList: List<WorkingHoursDTO>) {
             ) {
                 workingHoursList.forEach { workingHours ->
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        modifier = Modifier.fillMaxWidth().padding(5.dp),
+                        horizontalArrangement = Arrangement.Center
                     ) {
-                        Text(
-                            text = "Pick up time",
-                            style = Typography.titleSmall,
-                        )
-
                         Text(
                             text = "${getDayName(workingHours.day)}   " +
                                     "${workingHours.openingHours} - ${workingHours.closingHours}",
-                            style = Typography.titleSmall,
+                            style = Typography.displaySmall,
                         )
                     }
                 }
@@ -288,17 +270,13 @@ fun ExpandableRow(workingHoursList: List<WorkingHoursDTO>) {
     }
 }
 
-// Function to get the day name based on day number
 fun getDayName(day: Int): String {
-    // Implement logic to get the day name based on your requirements
-    // For simplicity, using a basic mapping here
     return when (day) {
         1 -> "Monday"
         2 -> "Tuesday"
         3 -> "Wednesday"
         4 -> "Thursday"
         5 -> "Friday"
-        // Add more cases as needed
         else -> "Unknown Day"
     }
 }

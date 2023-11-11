@@ -29,13 +29,10 @@ class LoginViewModel @Inject constructor(
                     val responseBody = response.body()!!.token
                     if (responseBody != null)
                         jwtToken.value = responseBody
-
                     else {
                         errorMessage.value = "Response body is null"
                     }
-                }
-
-                else {
+                } else {
                     if (response.code() == 400) {
                         val errorResponse = response.errorBody()?.string()
                         if (errorResponse != null) {
@@ -54,7 +51,6 @@ class LoginViewModel @Inject constructor(
                             errorMessage.value = "Bad Request: An unknown error occurred 3"
                         }
                     } else {
-                        // Handle other errors
                         errorMessage.value = "Error: ${response.message()}"
                     }
                 }
@@ -63,6 +59,7 @@ class LoginViewModel @Inject constructor(
             }
         }
     }
+
     suspend fun performLogin(
         userInput: String,
         passwordInput: String
@@ -77,14 +74,12 @@ class LoginViewModel @Inject constructor(
                 return true
             }
         } catch (e: Exception) {
-            // Handle the exception here (e.g., log or display an error message).
             e.printStackTrace()
         }
         return false
     }
 
-    suspend fun setFirstTimeToFalse()
-    {
+    suspend fun setFirstTimeToFalse() {
         dataStoreManager.setFirstTime()
     }
 }

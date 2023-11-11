@@ -183,7 +183,7 @@ fun LogoImage(painterResource: Painter, modifier: Modifier = Modifier) {
         modifier = Modifier
             .fillMaxWidth()
             .size(200.dp)
-            .then(modifier) // Combine the existing modifier with the one passed as an argument
+            .then(modifier)
     )
 }
 
@@ -365,8 +365,8 @@ fun GalleryComponent(images: List<ImageDataDTO>, modifier: Modifier) {
     LazyRow(
         modifier = Modifier
             .fillMaxWidth()
-            .then(modifier), // Use Modifier to set the width of the LazyRow
-        horizontalArrangement = Arrangement.spacedBy(8.dp) // Adjust the spacing as needed
+            .then(modifier),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(images) { image ->
             ImageItem(image = image)

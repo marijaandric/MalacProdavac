@@ -1,6 +1,7 @@
 package com.example.front.model.product
 
 import com.example.front.model.DTO.ImageDataDTO
+import com.example.front.model.DTO.WorkingHoursDTO
 import com.google.gson.annotations.SerializedName
 
 data class ProductInfo(
