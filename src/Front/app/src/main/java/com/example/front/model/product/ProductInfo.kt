@@ -1,6 +1,6 @@
 package com.example.front.model.product
 
-import com.example.front.model.ImageData
+import com.example.front.model.DTO.ImageDataDTO
 import com.google.gson.annotations.SerializedName
 
 data class ProductInfo(
@@ -16,7 +16,7 @@ data class ProductInfo(
     @SerializedName("workingHours") val workingHours: List<WorkingHoursDTO>?,
     @SerializedName("questionsAndAnswers") val questionsAndAnswers: List<QuestionWithAnswer>?,
     @SerializedName("sizes") val sizes: List<Stock>?,
-    @SerializedName("images") val images: List<ImageData>?,
+    @SerializedName("images") val images: List<ImageDataDTO>?,
     @SerializedName("id") val productId: Int?,
     @SerializedName("shopId") val shopId: Int?,
     @SerializedName("name") val name: String?,

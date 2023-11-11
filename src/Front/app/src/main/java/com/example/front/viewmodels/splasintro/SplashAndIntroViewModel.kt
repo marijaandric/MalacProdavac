@@ -1,4 +1,4 @@
-package com.example.front.viewmodels
+package com.example.front.viewmodels.splasintro
 
 import androidx.lifecycle.ViewModel
 import com.example.front.helper.DataStore.DataStoreManager

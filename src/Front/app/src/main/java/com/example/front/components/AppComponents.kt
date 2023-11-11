@@ -1,7 +1,6 @@
 package com.example.front.components
 
 import android.graphics.BitmapFactory
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -56,7 +55,7 @@ import androidx.compose.ui.unit.sp
 import com.example.front.R
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.front.model.ImageData
+import com.example.front.model.DTO.ImageDataDTO
 import com.example.front.ui.theme.LightBlue
 import com.example.front.ui.theme.MainBlue
 import com.example.front.ui.theme.Typography
@@ -362,7 +361,7 @@ fun ProductCard(title: String, price: String, imageResource: Int) {
 
 
 @Composable
-fun GalleryComponent(images: List<ImageData>, modifier: Modifier) {
+fun GalleryComponent(images: List<ImageDataDTO>, modifier: Modifier) {
     LazyRow(
         modifier = Modifier
             .fillMaxWidth()
@@ -377,7 +376,7 @@ fun GalleryComponent(images: List<ImageData>, modifier: Modifier) {
 
 @OptIn(ExperimentalEncodingApi::class)
 @Composable
-fun ImageItem(image:ImageData){
+fun ImageItem(image: ImageDataDTO){
     val byteArray = Base64.decode(image.image)
     val bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
     Image(bitmap = bitmap.asImageBitmap(),

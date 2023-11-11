@@ -1,6 +1,5 @@
 package com.example.front.screens.product
 
-import android.widget.ScrollView
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -34,14 +33,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.front.R
 import com.example.front.components.GalleryComponent
 import com.example.front.components.ProductImage
 import com.example.front.components.ToggleImageButton
-import com.example.front.model.ImageData
 import com.example.front.model.product.WorkingHoursDTO
 import com.example.front.navigation.Screen
 import com.example.front.ui.theme.Typography
@@ -60,6 +57,10 @@ fun ProductPage(navHostController: NavHostController,productViewModel: ProductVi
     Column(
         modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
     content = {
+//        if(productViewModel.state.value.isLoading)
+//        {
+//            CircularProgressIndicator()
+//        }
         Box() {
             ProductImage(
                 painterResource(
@@ -252,7 +253,8 @@ fun ExpandableRow(workingHoursList: List<WorkingHoursDTO>) {
             )
 
             Text(
-                text = "Mon - Fri   ${workingHoursList.firstOrNull()?.openingHours} - ${workingHoursList.firstOrNull()?.closingHours}",
+                text = "Mon - Fri   ${getDayName(workingHoursList.firstOrNull()?.day ?: 0)}   " +
+                        "${workingHoursList.firstOrNull()?.openingHours} - ${workingHoursList.firstOrNull()?.closingHours}",
                 style = Typography.titleSmall,
             )
         }
@@ -275,7 +277,8 @@ fun ExpandableRow(workingHoursList: List<WorkingHoursDTO>) {
                         )
 
                         Text(
-                            text = "Mon - Fri   ${workingHoursList.firstOrNull()?.openingHours} - ${workingHoursList.firstOrNull()?.closingHours}",
+                            text = "${getDayName(workingHours.day)}   " +
+                                    "${workingHours.openingHours} - ${workingHours.closingHours}",
                             style = Typography.titleSmall,
                         )
                     }

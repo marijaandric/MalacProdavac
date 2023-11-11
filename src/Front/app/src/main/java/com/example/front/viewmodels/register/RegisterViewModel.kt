@@ -1,17 +1,15 @@
 package com.example.front.viewmodels.register
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.front.helper.DataStore.DataStoreManager
-import com.example.front.model.RegistrationRequest
+import com.example.front.model.request.RegistrationRequest
 import com.example.front.repository.Repository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import org.json.JSONException
 import org.json.JSONObject
-import retrofit2.Response
 import javax.inject.Inject
 
 @HiltViewModel

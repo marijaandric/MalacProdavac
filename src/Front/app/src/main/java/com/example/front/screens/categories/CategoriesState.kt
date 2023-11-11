@@ -1,6 +1,6 @@
 package com.example.front.screens.categories
 
-import com.example.front.model.CategoriesDTO
+import com.example.front.model.DTO.CategoriesDTO
 
 data class CategoriesState (
     var isLoading : Boolean = true,

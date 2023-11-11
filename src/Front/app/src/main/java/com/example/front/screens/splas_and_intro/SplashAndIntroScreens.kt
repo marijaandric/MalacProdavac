@@ -35,7 +35,7 @@ import androidx.navigation.NavController
 import com.example.front.components.MediumBlueButton
 import com.example.front.R
 import com.example.front.navigation.Screen
-import com.example.front.viewmodels.SplashAndIntroViewModel
+import com.example.front.viewmodels.splasintro.SplashAndIntroViewModel
 import kotlinx.coroutines.delay
 
     // -- Splash Screen --
