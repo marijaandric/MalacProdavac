@@ -64,7 +64,7 @@ namespace back.DAL.Repositories
             if (categories.Count == 0) categories = await _context.Categories.Select(x => x.Id).ToListAsync();
 
             List<ShopCard>  shops = await _context.Shop
-                    .Where(x => x.Name.ToLower().Contains(search.Trim().ToLower()))
+                    .Where(x => x.Name.ToLower().Contains(search.Trim().ToLower()) && x.OwnerId != userId)
                     .GroupJoin(_context.ShopReviews.GroupBy(x => x.ShopId).Select(group => new
                     {
                         ShopId = group.Key,
