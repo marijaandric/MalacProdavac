@@ -37,30 +37,26 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
+import androidx.compose.material.Checkbox
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.Card
+import androidx.compose.material.CheckboxDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -70,32 +66,23 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.InspectableModifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import androidx.compose.ui.window.Popup
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
 import com.example.front.R
-import com.example.front.components.ImageItem
+import com.example.front.components.CardButton
 import com.example.front.components.ImageItemForProfilePic
-import com.example.front.viewmodels.home.HomeViewModel
+import com.example.front.components.MyTextField
 import com.example.front.viewmodels.myprofile.MyProfileViewModel
 import kotlinx.coroutines.delay
 
@@ -481,7 +468,10 @@ fun TopCenterImages(myProfileViewModel: MyProfileViewModel) {
                         .size(40.dp)
                         .align(Alignment.CenterVertically)
                         .clickable {
-                            showDialog.value = true
+                            if(myProfileViewModel.state.value.isLoading == false)
+                            {
+                                showDialog.value = true
+                            }
                         },
                     tint = MaterialTheme.colorScheme.background
                 )
@@ -531,13 +521,23 @@ fun TopCenterImages(myProfileViewModel: MyProfileViewModel) {
     }
 
     if (showDialog.value) {
-        EditDialog(onDismiss = { showDialog.value = false })
+        EditDialog(onDismiss = { showDialog.value = false },myProfileViewModel)
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditDialog(onDismiss: () -> Unit) {
+fun EditDialog(onDismiss: () -> Unit,myProfileViewModel: MyProfileViewModel) {
+    val state = myProfileViewModel.state.value.info
+
     val overlayColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)
+
+    var username by remember { mutableStateOf(state!!.username) }
+    var address by remember { mutableStateOf(state!!.address) }
+    var name by remember { mutableStateOf(state!!.name) }
+
+    var checkbox1State by remember { mutableStateOf(state?.roleId == 2) }
+    var checkbox2State by remember { mutableStateOf(state?.roleId == 3) }
 
     Dialog(
         properties = DialogProperties(usePlatformDefaultWidth = false),
@@ -565,7 +565,103 @@ fun EditDialog(onDismiss: () -> Unit) {
                     .padding(16.dp)
                     .align(Alignment.Center)
             ) {
-                Text("Edit profile", style = MaterialTheme.typography.titleMedium, modifier = Modifier.align(Alignment.Center))
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                        .align(Alignment.Center)
+                ) {
+                    Text("Edit profile", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(bottom = 25.dp).align(Alignment.CenterHorizontally))
+
+                    MyTextField(
+                        labelValue = "Username",
+                        painterResource = painterResource(id = R.drawable.user),
+                        value = username,
+                        onValueChange = { username = it }
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    MyTextField(
+                        labelValue = "Name",
+                        painterResource = painterResource(id = R.drawable.user),
+                        value = name,
+                        onValueChange = { name = it }
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    MyTextField(
+                        labelValue = "Address",
+                        painterResource = painterResource(id = R.drawable.user),
+                        value = address,
+                        onValueChange = { address = it }
+                    )
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(0.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        androidx.compose.material3.Checkbox(
+                            checked = checkbox1State,
+                            onCheckedChange = { checked ->
+                                checkbox1State = checked
+                                if (checked) {
+                                    checkbox2State = false
+                                }
+                            },
+                            colors = androidx.compose.material3.CheckboxDefaults.colors(
+                                checkedColor = Color(
+                                    0xFF005F8B
+                                )
+                            ),
+                            modifier = Modifier
+                                .padding(0.dp)
+                                .height(24.dp)
+                        )
+                        androidx.compose.material3.Text(
+                            text = "Business Owner",
+                            modifier = Modifier.padding(0.dp)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(0.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Checkbox(
+                            checked = checkbox2State,
+                            onCheckedChange = { checked ->
+                                checkbox2State = checked
+                                if (checked) {
+                                    checkbox1State = false
+                                }
+                            },
+                            colors = CheckboxDefaults.colors(checkedColor = Color(0xFF005F8B)),
+                            modifier = Modifier
+                                .padding(0.dp)
+                                .height(24.dp)
+                        )
+                        androidx.compose.material3.Text(
+                            text = "Delivery person",
+                            modifier = Modifier.padding(0.dp)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(40.dp))
+
+                    CardButton(text = "Save", onClick = { onDismiss() }, width = 0.5f, modifier = Modifier.align(Alignment.CenterHorizontally), color = MaterialTheme.colorScheme.secondary)
+
+                }
+
             }
         }
     }

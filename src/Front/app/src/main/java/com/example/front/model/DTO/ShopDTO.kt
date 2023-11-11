@@ -1,5 +1,6 @@
 package com.example.front.model.DTO
 
+import com.example.front.model.user.UserDTO
 import com.google.gson.annotations.SerializedName
 
 data class ShopDTO (
