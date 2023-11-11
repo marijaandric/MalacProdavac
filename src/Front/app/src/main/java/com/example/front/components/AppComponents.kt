@@ -6,8 +6,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -35,6 +37,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -52,6 +55,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.front.R
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import com.example.front.model.ImageData
 import com.example.front.ui.theme.LightBlue
 import com.example.front.ui.theme.MainBlue
@@ -251,7 +255,6 @@ fun BigBlueButton(text:String,onClick: () -> Unit,width:Float,modifier: Modifier
     }
 }
 
-
 @Composable
 fun SellerCard(title: String, author: String, imageResource: Int) {
     Card(
@@ -262,16 +265,43 @@ fun SellerCard(title: String, author: String, imageResource: Int) {
         Column(
             modifier = Modifier.fillMaxWidth()
         ) {
-            Image(
-                painter = painterResource(id = imageResource),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
+//            Image(
+//                painter = painterResource(id = imageResource),
+//                contentDescription = null,
+//                contentScale = ContentScale.Crop,
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .height(150.dp)
+//                    .padding(13.dp)
+//                    .clip(RoundedCornerShape(10.dp))
+//            )
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(150.dp)
-                    .padding(13.dp)
-                    .clip(RoundedCornerShape(10.dp))
-            )
+            ) {
+                Image(
+                    painter = painterResource(id = imageResource),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(150.dp)
+                        .padding(13.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                )
+
+                Image(
+                    painter = painterResource(id = R.drawable.srce),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(50.dp)
+                        .align(Alignment.TopEnd)
+                        .padding(8.dp)
+                )
+            }
+
 
             Column(
                 modifier = Modifier
