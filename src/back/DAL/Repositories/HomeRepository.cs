@@ -56,6 +56,9 @@ namespace back.DAL.Repositories
 
         public async Task<List<ProductCard>> GetHomeProducts(int id)
         {
+            int shopId = -1;
+            if (_context.Shop.Any(x => x.OwnerId == id)) shopId =(await _context.Shop.FirstOrDefaultAsync(x => x.OwnerId == id)).Id;
+
             List<Category> categories = await GetChosenCategories(id);
             List<ProductCard> products = new List<ProductCard>();
             int take;
@@ -75,11 +78,11 @@ namespace back.DAL.Repositories
                 Price = p.Price,
                 Image = _context.ProductImages.FirstOrDefault(i => i.ProductId == p.Id).Image,
                 Rating = pr.DefaultIfEmpty().Select(x => x.avg).FirstOrDefault(),
-            }).Take(take)).ToList();
+            }).Where(x => x.ShopId != shopId).Take(take)).ToList();
 
             if (products.Count == 0)
             {
-                products = await _context.Products.GroupJoin(_context.ProductReviews.GroupBy(x => x.ProductId)
+                products = await _context.Products.Where(x => x.ShopId != shopId).GroupJoin(_context.ProductReviews.GroupBy(x => x.ProductId)
                             .Select(group => new
                             {
                                 ProductId = group.Key,
