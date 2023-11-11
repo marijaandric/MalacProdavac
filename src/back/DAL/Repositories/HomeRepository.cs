@@ -99,17 +99,44 @@ namespace back.DAL.Repositories
             return products;
         }
 
-        public async Task<List<Shop>> GetHomeShops(int id)
+        public async Task<List<ShopCard>> GetHomeShops(int id)
         {
             List<int> categories = (await GetChosenCategories(id)).Select(x => x.Id).ToList();
+            List<ShopCard> shops = new List<ShopCard>();
             int take;
 
             if (categories.Count > 6) take = 1;
             else take = 2;
 
             List<int> shopIds = categories.SelectMany(category => _context.ShopCategories.Where(x => x.CategoryId == category).Take(take)).Select(x => x.ShopId).Distinct().ToList();
-            return _context.Shop.Where(x => shopIds.Contains(x.Id)).ToList();
+            shops = _context.Shop.Where(x => shopIds.Contains(x.Id) && x.OwnerId != id).Select(s => new ShopCard
+            {
+                Id = s.Id,
+                Name = s.Name,
+                Address = s.Address,
+                Image = s.Image,
+                WorkingHours = _context.WorkingHours.Where(x => x.ShopId == s.Id).ToList(),
+                Liked = _context.LikedShops.Any(x => x.ShopId == s.Id && x.UserId == id),
+                Rating = _context.ShopReviews.Where(x => x.ShopId == s.Id).Count() > 0 ? _context.ShopReviews.Where(x => x.ShopId == s.Id).Average(x => x.Rating) : 0
+            }
+                ).ToList();
 
+            if (shops.Count == 0)
+            {
+                shops = _context.Shop.Where(x => x.OwnerId != id).Select(s => new ShopCard
+                {
+                    Id = s.Id,
+                    Name = s.Name,
+                    Address = s.Address,
+                    Image = s.Image,
+                    WorkingHours = _context.WorkingHours.Where(x => x.ShopId == s.Id).ToList(),
+                    Liked = _context.LikedShops.Any(x => x.ShopId == s.Id && x.UserId == id),
+                    Rating = _context.ShopReviews.Where(x => x.ShopId == s.Id).Count() > 0 ? _context.ShopReviews.Where(x => x.ShopId == s.Id).Average(x => x.Rating) : 0
+                }
+                ).Take(3).ToList();
+            }
+
+            return shops;
         }
     }
 }
