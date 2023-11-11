@@ -1,6 +1,7 @@
 package com.example.front.screens.userprofile
 
 import android.annotation.SuppressLint
+import android.graphics.Color.alpha
 import android.util.Log
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
@@ -30,11 +31,13 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -44,6 +47,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
@@ -55,6 +59,8 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -66,16 +72,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.InspectableModifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import androidx.compose.ui.window.Popup
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
 import com.example.front.R
@@ -94,13 +108,28 @@ fun UserProfileScreen(navController: NavHostController, myProfileViewModel: MyPr
     LaunchedEffect(Unit) {
         myProfileViewModel.getMyProfileInfo(id)
     }
-
-    Column(
-        modifier = Modifier.background(MaterialTheme.colorScheme.background)
-    ) {
-        TopCenterImages(myProfileViewModel)
-        Info(myProfileViewModel)
+    if(myProfileViewModel.state.value.isLoading)
+    {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        )
+        {
+            CircularProgressIndicator()
+        }
     }
+    else{
+        Column(
+            modifier = Modifier.background(MaterialTheme.colorScheme.background)
+        ) {
+            TopCenterImages(myProfileViewModel)
+            Info(myProfileViewModel)
+        }
+    }
+
 }
 
 @SuppressLint("UnusedTransitionTargetStateParameter")
@@ -414,6 +443,7 @@ fun Info(myProfileViewModel: MyProfileViewModel) {
 
 @Composable
 fun TopCenterImages(myProfileViewModel: MyProfileViewModel) {
+    val showDialog = remember { mutableStateOf(false) }
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -440,7 +470,7 @@ fun TopCenterImages(myProfileViewModel: MyProfileViewModel) {
                         .padding(end = 10.dp)
                         .size(50.dp)
                         .align(Alignment.CenterVertically),
-                    tint = androidx.compose.material3.MaterialTheme.colorScheme.background
+                    tint = MaterialTheme.colorScheme.background
                 )
 
                 Icon(
@@ -449,7 +479,10 @@ fun TopCenterImages(myProfileViewModel: MyProfileViewModel) {
                     modifier = Modifier
                         .padding(end = 10.dp)
                         .size(40.dp)
-                        .align(Alignment.CenterVertically),
+                        .align(Alignment.CenterVertically)
+                        .clickable {
+                            showDialog.value = true
+                        },
                     tint = MaterialTheme.colorScheme.background
                 )
             }
@@ -496,4 +529,45 @@ fun TopCenterImages(myProfileViewModel: MyProfileViewModel) {
             }
         }
     }
+
+    if (showDialog.value) {
+        EditDialog(onDismiss = { showDialog.value = false })
+    }
+}
+
+@Composable
+fun EditDialog(onDismiss: () -> Unit) {
+    val overlayColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)
+
+    Dialog(
+        properties = DialogProperties(usePlatformDefaultWidth = false),
+        onDismissRequest = { onDismiss() }) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(overlayColor)
+                .pointerInput(Unit) {
+                    detectTapGestures { offset ->
+                        onDismiss()
+                    }
+                }
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.8f)
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(MaterialTheme.colorScheme.background)
+                    .pointerInput(Unit) {
+                        detectTapGestures { offset ->
+
+                        }
+                    }
+                    .padding(16.dp)
+                    .align(Alignment.Center)
+            ) {
+                Text("Edit profile", style = MaterialTheme.typography.titleMedium, modifier = Modifier.align(Alignment.Center))
+            }
+        }
+    }
+
 }
