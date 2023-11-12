@@ -58,7 +58,7 @@ namespace back.DAL.Repositories
 
         #endregion
 
-        public async Task<List<ProductCard>> GetProducts(int userId, List<int> categories, int rating, bool open, int range, string location, int sort, string search, int page, int specificShopId)
+        public async Task<List<ProductCard>> GetProducts(int userId, List<int> categories, int rating, bool open, int range, string location, int sort, string search, int page, int specificShopId, bool favorite)
         {
             List<ProductCard> products;
             User currentUser = _context.Users.FirstOrDefault(x => x.Id == userId);
@@ -107,7 +107,10 @@ namespace back.DAL.Repositories
                                     .ToListAsync();
             }
                 
-            
+            if (favorite)
+            {
+                products = products.Join(_context.LikedProducts.Where(x => x.UserId == userId), p => p.Id, lp => lp.ProductId, (p, lp) => p).ToList();
+            }
 
             if (open)
             {
