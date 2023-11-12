@@ -6,6 +6,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.front.components.Sidebar
 import com.example.front.screens.home.HomePage
 import com.example.front.screens.categories.RegistrationCategories
 import com.example.front.screens.product.ProductPage
