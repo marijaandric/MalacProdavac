@@ -71,7 +71,7 @@ fun HomePage(navController: NavHostController, homeViewModel: HomeViewModel) {
     Button(onClick = { navController.navigate(Screen.Product.route) }) {
         Text(text = "Predji")
     }
-    Sidebar()
+    Sidebar(navController)
 }
 
 data class CardData(
