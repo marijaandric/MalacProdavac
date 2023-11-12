@@ -70,10 +70,7 @@ class MyProfileViewModel @Inject constructor(
                     )
                 }
                 else{
-                    _stateEdit.value!!.error = "GRESKA"
-//                    _stateEdit.value = _stateEdit.value.copy(
-//                        isLoading = false
-//                    )
+                    _stateEdit.value = _stateEdit.value!!.copy(error = "Error, please check all fields!")
                     Log.d("Error", _stateEdit.value!!.error)
                 }
             } catch (e: Exception) {

@@ -501,7 +501,9 @@ fun TopCenterImages(myProfileViewModel: MyProfileViewModel) {
                 else{
                     if(myProfileViewModel.state.value.info!!.image.isNotEmpty())
                     {
-                        ImageItemForProfilePic(image = myProfileViewModel.state.value.info!!.image)
+                        ImageItemForProfilePic(image = myProfileViewModel.state.value.info!!.image, onEditClick = {
+
+                        })
                     }
                 }
             }
@@ -524,6 +526,7 @@ fun TopCenterImages(myProfileViewModel: MyProfileViewModel) {
     }
 
     if (showDialog.value) {
+        myProfileViewModel.stateEdit.value!!.error = "";
         EditDialog(onDismiss = { showDialog.value = false },myProfileViewModel)
     }
 }
@@ -663,20 +666,34 @@ fun EditDialog(onDismiss: () -> Unit,myProfileViewModel: MyProfileViewModel) {
                         )
                     }
 
-                    
-                    if(editState!!.error.isNotEmpty())
-                    {
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text("GRESKA")
-                    }
-
                     Spacer(modifier = Modifier.height(40.dp))
 
                     CardButton(text = "Save", onClick = {
-                        val userNewInfo = UserEditDTO(state!!.id,"mejoo2",state!!.address,state!!.roleId,state!!.image,state!!.name)
+                        var x = 1;
+                        if (checkbox1State) {
+                            x = 2;
+                        }
+                        if (checkbox2State) {
+                            x = 3;
+                        }
+                        val userNewInfo = UserEditDTO(state!!.id,username,address,x,state!!.image,name)
                         myProfileViewModel.editProfile(userNewInfo)
-//                        onDismiss()
                         }, width = 0.5f, modifier = Modifier.align(Alignment.CenterHorizontally), color = MaterialTheme.colorScheme.secondary)
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    if(editState!!.error.isNotEmpty())
+                    {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(editState!!.error,modifier = Modifier.align(Alignment.CenterHorizontally), style=MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.secondary))
+                    }
+
+                    if(editState!!.isLoading == false)
+                    {
+                        myProfileViewModel.getMyProfileInfo(state!!.id)
+                        onDismiss()
+                    }
+
 
                 }
 

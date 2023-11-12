@@ -2,6 +2,7 @@ package com.example.front.components
 
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -21,12 +22,14 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -379,16 +382,35 @@ fun ImageItem(image: ImageDataDTO){
 
 @OptIn(ExperimentalEncodingApi::class)
 @Composable
-fun ImageItemForProfilePic(image:String){
+fun ImageItemForProfilePic(image:String,onEditClick: () -> Unit){
     val byteArray = Base64.decode(image)
     val bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
-    Image(bitmap = bitmap.asImageBitmap(),
-        contentDescription = null,
-        contentScale = ContentScale.Crop,
-        modifier = Modifier
-            .size(140.dp)
-            .clip(CircleShape)
-            .border(4.dp, Color.White, CircleShape)
+    Box{
+        Image(
+            bitmap = bitmap.asImageBitmap(),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .size(140.dp)
+                .clip(CircleShape)
+                .border(4.dp, Color.White, CircleShape)
+        )
 
-    )
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .background(MaterialTheme.colorScheme.onBackground, shape = CircleShape)
+                .padding(8.dp)
+                .clickable {
+                    onEditClick.invoke()
+                }
+        ) {
+            Icon(
+                imageVector = Icons.Default.Edit,
+                contentDescription = "Edit",
+                tint = Color.White,
+                modifier = Modifier.size(24.dp)
+            )
+        }
+    }
 }
