@@ -10,6 +10,7 @@ import com.example.front.model.response.LoginResponse
 import com.example.front.model.DTO.ShopDTO
 import com.example.front.model.product.ProductInfo
 import com.example.front.model.user.MyProfileDTO
+import com.example.front.model.user.UserEditDTO
 import retrofit2.Response
 import javax.inject.Inject
 
@@ -44,5 +45,9 @@ class Repository @Inject constructor(private val api: Api) {
 
     suspend fun getMyProfileInfo(userId:Int): Response<MyProfileDTO>{
         return api.getMyProfileInfo(userId)
+    }
+
+    suspend fun editProfile(editDTO: UserEditDTO): Response<LoginResponse>{
+        return api.editUserProfile(editDTO)
     }
 }

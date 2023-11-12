@@ -61,8 +61,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -81,8 +83,10 @@ import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
 import com.example.front.R
 import com.example.front.components.CardButton
+import com.example.front.components.ErrorTextComponent
 import com.example.front.components.ImageItemForProfilePic
 import com.example.front.components.MyTextField
+import com.example.front.model.user.UserEditDTO
 import com.example.front.viewmodels.myprofile.MyProfileViewModel
 import kotlinx.coroutines.delay
 
@@ -468,8 +472,7 @@ fun TopCenterImages(myProfileViewModel: MyProfileViewModel) {
                         .size(40.dp)
                         .align(Alignment.CenterVertically)
                         .clickable {
-                            if(myProfileViewModel.state.value.isLoading == false)
-                            {
+                            if (myProfileViewModel.state.value.isLoading == false) {
                                 showDialog.value = true
                             }
                         },
@@ -529,6 +532,7 @@ fun TopCenterImages(myProfileViewModel: MyProfileViewModel) {
 @Composable
 fun EditDialog(onDismiss: () -> Unit,myProfileViewModel: MyProfileViewModel) {
     val state = myProfileViewModel.state.value.info
+    val editState by myProfileViewModel.stateEdit.observeAsState()
 
     val overlayColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)
 
@@ -538,6 +542,7 @@ fun EditDialog(onDismiss: () -> Unit,myProfileViewModel: MyProfileViewModel) {
 
     var checkbox1State by remember { mutableStateOf(state?.roleId == 2) }
     var checkbox2State by remember { mutableStateOf(state?.roleId == 3) }
+
 
     Dialog(
         properties = DialogProperties(usePlatformDefaultWidth = false),
@@ -571,7 +576,9 @@ fun EditDialog(onDismiss: () -> Unit,myProfileViewModel: MyProfileViewModel) {
                         .padding(16.dp)
                         .align(Alignment.Center)
                 ) {
-                    Text("Edit profile", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(bottom = 25.dp).align(Alignment.CenterHorizontally))
+                    Text("Edit profile", style = MaterialTheme.typography.titleMedium, modifier = Modifier
+                        .padding(bottom = 25.dp)
+                        .align(Alignment.CenterHorizontally))
 
                     MyTextField(
                         labelValue = "Username",
@@ -656,9 +663,20 @@ fun EditDialog(onDismiss: () -> Unit,myProfileViewModel: MyProfileViewModel) {
                         )
                     }
 
+                    
+                    if(editState!!.error.isNotEmpty())
+                    {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text("GRESKA")
+                    }
+
                     Spacer(modifier = Modifier.height(40.dp))
 
-                    CardButton(text = "Save", onClick = { onDismiss() }, width = 0.5f, modifier = Modifier.align(Alignment.CenterHorizontally), color = MaterialTheme.colorScheme.secondary)
+                    CardButton(text = "Save", onClick = {
+                        val userNewInfo = UserEditDTO(state!!.id,"mejoo2",state!!.address,state!!.roleId,state!!.image,state!!.name)
+                        myProfileViewModel.editProfile(userNewInfo)
+//                        onDismiss()
+                        }, width = 0.5f, modifier = Modifier.align(Alignment.CenterHorizontally), color = MaterialTheme.colorScheme.secondary)
 
                 }
 
