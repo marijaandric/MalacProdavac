@@ -1,10 +1,9 @@
 package com.example.front.screens.home
 
-import com.example.front.model.CategoriesDTO
-import com.example.front.model.HomeProduct
+import com.example.front.model.DTO.HomeProductDTO
 
 data class HomeProductsState (
     var isLoading : Boolean = true,
-    var products : List<HomeProduct>? = emptyList(),
+    var products : List<HomeProductDTO>? = emptyList(),
     var error : String = ""
 )

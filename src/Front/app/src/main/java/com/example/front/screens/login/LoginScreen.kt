@@ -84,14 +84,14 @@ fun LoginScreen(
                     MyTextField(
                         labelValue = "Username",
                         painterResource = painterResource(id = R.drawable.user),
-                        value = userInput, // Bind user input to the state
-                        onValueChange = { userInput = it } // Update the state on value change
+                        value = userInput,
+                        onValueChange = { userInput = it }
                     )
                     MyTextField(
                         labelValue = "Password",
                         painterResource = painterResource(id = R.drawable.padlock),
-                        value = passwordInput, // Bind password input to the state
-                        onValueChange = { passwordInput = it }, // Update the state on value change
+                        value = passwordInput,
+                        onValueChange = { passwordInput = it },
                         isPassword = true,
                         isLast = true
                     )
@@ -104,7 +104,7 @@ fun LoginScreen(
                                     val success = viewModel.performLogin(userInput, passwordInput)
                                     if (success) {
                                         navController.navigate(route = Screen.Home.route) {
-                                            popUpTo("auth") {inclusive = true}
+                                            popUpTo("auth") { inclusive = true }
                                         }
                                     } else {
                                         val errorMess = viewModel.errorMessage.value
@@ -117,7 +117,6 @@ fun LoginScreen(
                                         }
                                     }
                                 } catch (e: Exception) {
-                                    // Handle the exception here (e.g., log or display an error message).
                                     e.printStackTrace()
                                 }
                             }

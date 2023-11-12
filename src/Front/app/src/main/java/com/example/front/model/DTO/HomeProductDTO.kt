@@ -1,8 +1,8 @@
-package com.example.front.model
+package com.example.front.model.DTO
 
 import com.google.gson.annotations.SerializedName
 
-data class HomeProduct (
+data class HomeProductDTO (
     @SerializedName("id") val id: Int,
     @SerializedName("shopId") val shopId: Int,
     @SerializedName("name") val name: String,
@@ -18,9 +18,4 @@ data class HomeProduct (
     @SerializedName("metric") val metric: MetricDTO,
     @SerializedName("category") val category: CategoriesDTO,
     @SerializedName("subcategory") val subcategory: Int,
-)
-
-data class MetricDTO (
-    @SerializedName("id") val id: Int,
-    @SerializedName("name") val name: String,
 )

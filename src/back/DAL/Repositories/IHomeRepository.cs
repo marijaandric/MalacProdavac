@@ -7,8 +7,9 @@ namespace back.DAL.Repositories
     {
         public Task<List<Category>> GetCategories();
         public Task<bool> SaveChosenCategories(int userId, List<int> categoryIds);
+        public Task<bool> DeleteChosenCategories(int userId, List<int> categoryIds);
         public Task<List<Category>> GetChosenCategories(int id);
         public Task<List<ProductCard>> GetHomeProducts(int id);
-        public Task<List<Shop>> GetHomeShops(int id);
+        public Task<List<ShopCard>> GetHomeShops(int id);
     }
 }

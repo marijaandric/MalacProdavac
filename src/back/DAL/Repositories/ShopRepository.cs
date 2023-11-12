@@ -64,7 +64,7 @@ namespace back.DAL.Repositories
             if (categories.Count == 0) categories = await _context.Categories.Select(x => x.Id).ToListAsync();
 
             List<ShopCard>  shops = await _context.Shop
-                    .Where(x => x.Name.ToLower().Contains(search.Trim().ToLower()))
+                    .Where(x => x.Name.ToLower().Contains(search.Trim().ToLower()) && x.OwnerId != userId)
                     .GroupJoin(_context.ShopReviews.GroupBy(x => x.ShopId).Select(group => new
                     {
                         ShopId = group.Key,
@@ -72,12 +72,11 @@ namespace back.DAL.Repositories
                     }), s => s.Id, sr => sr.ShopId, (s, sr) => new ShopCard
                     {
                         Id = s.Id,
-                        OwnerId = s.OwnerId,
                         Name = s.Name,
                         Address = s.Address,
-                        Latitude = s.Latitude,
-                        Longitude = s.Longitude,
                         Image = s.Image,
+                        WorkingHours = _context.WorkingHours.Where(x => x.ShopId == s.Id).ToList(),
+                        Liked = _context.LikedShops.Any(x => x.ShopId == s.Id && x.UserId == userId),
                         Rating = sr.DefaultIfEmpty().Select(x => x.AvgRating).FirstOrDefault()
                     })
                 .Where(x => x.Rating >= rating)

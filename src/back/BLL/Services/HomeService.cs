@@ -26,6 +26,18 @@ namespace back.BLL.Services
             return true;
         }
 
+        public async Task<bool> UpdateChosenCategories(ChosenCategoriesDto categoriesDto)
+        {
+            List<int> existing = (await GetChosenCategories(categoriesDto.UserId)).Select(x => x.Id).ToList();
+            List<int> newCategories = categoriesDto.CategoryIds.Where(x => !existing.Contains(x)).ToList();
+            List<int> toDelete = existing.Where(x => !categoriesDto.CategoryIds.Contains(x)).ToList();
+
+            if (categoriesDto.CategoryIds.Count < 2) throw new ArgumentException("You need to choose at least 2 categories.");
+            if (toDelete.Count > 0 && !await _repository.DeleteChosenCategories(categoriesDto.UserId, toDelete)) throw new ArgumentException("Database error on deleting deselected items!");
+            if (newCategories.Count > 0 && !await _repository.SaveChosenCategories(categoriesDto.UserId, newCategories)) throw new ArgumentException("Database error on inserting new values!");
+            return true;
+        }
+
         public async Task<List<Category>> GetChosenCategories(int id)
         {
             List<Category> categories = await _repository.GetChosenCategories(id);
@@ -40,9 +52,9 @@ namespace back.BLL.Services
             return products;
         }
 
-        public async Task<List<Shop>> GetHomeShops(int id)
+        public async Task<List<ShopCard>> GetHomeShops(int id)
         {
-            List<Shop> shops = await _repository.GetHomeShops(id);
+            List<ShopCard> shops = await _repository.GetHomeShops(id);
             if (shops.Count == 0) throw new ArgumentException("No shops found!");
             return shops;
         }

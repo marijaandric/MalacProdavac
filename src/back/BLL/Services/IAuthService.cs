@@ -8,5 +8,6 @@ namespace back.BLL.Services
         public Task<string> Login(LoginDto loginDto);
         public Task<string> Register(UserDto userDto);
         public Task<string> EditUser(EditUserDto values);
+        public Task<bool> ChangePassword(ChangePasswordDto values);
     }
 }

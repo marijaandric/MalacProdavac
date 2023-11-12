@@ -1,16 +1,16 @@
 package com.example.front.repository
 
 import com.example.front.api.Api
-import com.example.front.api.RetrofitInstance
-import com.example.front.model.CategoriesDTO
-import com.example.front.model.ChosenCategoriesDTO
-import com.example.front.model.HomeProduct
-import com.example.front.model.ImageData
-import com.example.front.model.LoginDTO
-import com.example.front.model.RegistrationRequest
-import com.example.front.model.LoginResponse
-import com.example.front.model.ShopDTO
+import com.example.front.model.DTO.CategoriesDTO
+import com.example.front.model.DTO.ChosenCategoriesDTO
+import com.example.front.model.DTO.HomeProductDTO
+import com.example.front.model.DTO.LoginDTO
+import com.example.front.model.request.RegistrationRequest
+import com.example.front.model.response.LoginResponse
+import com.example.front.model.DTO.ShopDTO
 import com.example.front.model.product.ProductInfo
+import com.example.front.model.user.MyProfileDTO
+import com.example.front.model.user.UserEditDTO
 import retrofit2.Response
 import javax.inject.Inject
 
@@ -31,7 +31,7 @@ class Repository @Inject constructor(private val api: Api) {
         return api.saveChosenCategories(categories)
     }
 
-    suspend fun getHomeProducts(id: Int): Response<List<HomeProduct>> {
+    suspend fun getHomeProducts(id: Int): Response<List<HomeProductDTO>> {
         return api.getHomeProducts(id)
     }
 
@@ -41,5 +41,13 @@ class Repository @Inject constructor(private val api: Api) {
 
     suspend fun getProductInfo(productId: Int, userId:Int): Response<ProductInfo> {
         return api.getProductDetails(productId,userId)
+    }
+
+    suspend fun getMyProfileInfo(userId:Int): Response<MyProfileDTO>{
+        return api.getMyProfileInfo(userId)
+    }
+
+    suspend fun editProfile(editDTO: UserEditDTO): Response<LoginResponse>{
+        return api.editUserProfile(editDTO)
     }
 }

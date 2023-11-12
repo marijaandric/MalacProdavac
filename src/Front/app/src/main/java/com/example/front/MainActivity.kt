@@ -30,7 +30,6 @@ import dagger.hilt.android.AndroidEntryPoint
                     .background(color = MaterialTheme.colorScheme.background)) {
                     navController = rememberNavController()
                     SetupNavGraph(navController = navController)
-                    //UserProfileScreen()
                 }
             }
         }

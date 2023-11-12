@@ -1,11 +1,10 @@
 package com.example.front.viewmodels.login
 
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.front.helper.DataStore.DataStoreManager
-import com.example.front.model.LoginDTO
+import com.example.front.model.DTO.LoginDTO
 import com.example.front.repository.Repository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -30,13 +29,10 @@ class LoginViewModel @Inject constructor(
                     val responseBody = response.body()!!.token
                     if (responseBody != null)
                         jwtToken.value = responseBody
-
                     else {
                         errorMessage.value = "Response body is null"
                     }
-                }
-
-                else {
+                } else {
                     if (response.code() == 400) {
                         val errorResponse = response.errorBody()?.string()
                         if (errorResponse != null) {
@@ -55,7 +51,6 @@ class LoginViewModel @Inject constructor(
                             errorMessage.value = "Bad Request: An unknown error occurred 3"
                         }
                     } else {
-                        // Handle other errors
                         errorMessage.value = "Error: ${response.message()}"
                     }
                 }
@@ -64,6 +59,7 @@ class LoginViewModel @Inject constructor(
             }
         }
     }
+
     suspend fun performLogin(
         userInput: String,
         passwordInput: String
@@ -78,14 +74,12 @@ class LoginViewModel @Inject constructor(
                 return true
             }
         } catch (e: Exception) {
-            // Handle the exception here (e.g., log or display an error message).
             e.printStackTrace()
         }
         return false
     }
 
-    suspend fun setFirstTimeToFalse()
-    {
+    suspend fun setFirstTimeToFalse() {
         dataStoreManager.setFirstTime()
     }
 }

@@ -1,4 +1,4 @@
-package com.example.front.model
+package com.example.front.model.user
 
 import com.google.gson.annotations.SerializedName
 

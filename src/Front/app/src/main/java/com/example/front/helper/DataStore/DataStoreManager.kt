@@ -17,26 +17,21 @@ class DataStoreManager @Inject constructor(@ApplicationContext context: Context)
     private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "token_datastore")
     private val dataStore: DataStore<Preferences> = context.dataStore
 
-    // Define a key for the token
     private val TOKEN_KEY = stringPreferencesKey("token")
 
-    // Function to store the token
     suspend fun storeToken(token: String) {
         dataStore.edit { preferences ->
             preferences[TOKEN_KEY] = token
         }
     }
 
-    // Function to retrieve the token
     val tokenFlow: Flow<String?> = dataStore.data.map { preferences ->
         preferences[TOKEN_KEY]
     }
 
     val JWT_SECRET = "10e13609875c047a26c74fcba54bde5b"
 
-    // Function to retrieve and decode the token
     suspend fun getUsernameFromToken(): String? {
-        // Retrieve the token from the DataStoreManager
         val token = this.tokenFlow.first()
 
         return decodeTokenAndGetUsername(token)
@@ -51,10 +46,8 @@ class DataStoreManager @Inject constructor(@ApplicationContext context: Context)
             val signedJWT = SignedJWT.parse(token)
             val claimsSet = signedJWT.jwtClaimsSet
 
-            // Extract the "name" claim from the JWT claims
             return claimsSet.getClaim("name") as? String
         } catch (e: Exception) {
-            // Handle any exceptions that may occur during decoding
             e.printStackTrace()
             return null
         }

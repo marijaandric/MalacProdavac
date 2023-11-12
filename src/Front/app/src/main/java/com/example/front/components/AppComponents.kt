@@ -1,12 +1,15 @@
 package com.example.front.components
 
 import android.graphics.BitmapFactory
-import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -15,15 +18,18 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -33,6 +39,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -50,7 +57,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.front.R
 import androidx.compose.ui.res.painterResource
-import com.example.front.model.ImageData
+import androidx.compose.ui.tooling.preview.Preview
+import com.example.front.model.DTO.ImageDataDTO
+import com.example.front.ui.theme.DarkBlue
 import com.example.front.ui.theme.LightBlue
 import com.example.front.ui.theme.MainBlue
 import com.example.front.ui.theme.Typography
@@ -178,12 +187,11 @@ fun LogoImage(painterResource: Painter, modifier: Modifier = Modifier) {
         modifier = Modifier
             .fillMaxWidth()
             .size(200.dp)
-            .then(modifier) // Combine the existing modifier with the one passed as an argument
+            .then(modifier)
     )
 }
 
 
-// -- BUTTONS --
 @Composable
 fun ErrorTextComponent(text: String) {
     Text(
@@ -249,7 +257,6 @@ fun BigBlueButton(text:String,onClick: () -> Unit,width:Float,modifier: Modifier
     }
 }
 
-
 @Composable
 fun SellerCard(title: String, author: String, imageResource: Int) {
     Card(
@@ -260,16 +267,33 @@ fun SellerCard(title: String, author: String, imageResource: Int) {
         Column(
             modifier = Modifier.fillMaxWidth()
         ) {
-            Image(
-                painter = painterResource(id = imageResource),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(150.dp)
-                    .padding(13.dp)
-                    .clip(RoundedCornerShape(10.dp))
-            )
+            ) {
+                Image(
+                    painter = painterResource(id = imageResource),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(150.dp)
+                        .padding(13.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                )
+
+                Image(
+                    painter = painterResource(id = R.drawable.srce),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(50.dp)
+                        .align(Alignment.TopEnd)
+                        .padding(8.dp)
+                )
+            }
+
 
             Column(
                 modifier = Modifier
@@ -330,12 +354,12 @@ fun ProductCard(title: String, price: String, imageResource: Int) {
 
 
 @Composable
-fun GalleryComponent(images: List<ImageData>, modifier: Modifier) {
+fun GalleryComponent(images: List<ImageDataDTO>, modifier: Modifier) {
     LazyRow(
         modifier = Modifier
             .fillMaxWidth()
-            .then(modifier), // Use Modifier to set the width of the LazyRow
-        horizontalArrangement = Arrangement.spacedBy(8.dp) // Adjust the spacing as needed
+            .then(modifier),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(images) { image ->
             ImageItem(image = image)
@@ -345,13 +369,48 @@ fun GalleryComponent(images: List<ImageData>, modifier: Modifier) {
 
 @OptIn(ExperimentalEncodingApi::class)
 @Composable
-fun ImageItem(image:ImageData){
+fun ImageItem(image: ImageDataDTO){
     val byteArray = Base64.decode(image.image)
     val bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
     Image(bitmap = bitmap.asImageBitmap(),
         contentDescription = null,
         modifier = Modifier
             .size(100.dp)
-            .clip(RoundedCornerShape(5.dp))
+            .clip(RoundedCornerShape(10.dp))
     )
+}
+
+@OptIn(ExperimentalEncodingApi::class)
+@Composable
+fun ImageItemForProfilePic(image:String,onEditClick: () -> Unit){
+    val byteArray = Base64.decode(image)
+    val bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
+    Box{
+        Image(
+            bitmap = bitmap.asImageBitmap(),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .size(140.dp)
+                .clip(CircleShape)
+                .border(4.dp, Color.White, CircleShape)
+        )
+
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .background(MaterialTheme.colorScheme.onBackground, shape = CircleShape)
+                .padding(8.dp)
+                .clickable {
+                    onEditClick.invoke()
+                }
+        ) {
+            Icon(
+                imageVector = Icons.Default.Edit,
+                contentDescription = "Edit",
+                tint = Color.White,
+                modifier = Modifier.size(24.dp)
+            )
+        }
+    }
 }

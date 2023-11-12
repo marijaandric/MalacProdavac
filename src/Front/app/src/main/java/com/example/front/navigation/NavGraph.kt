@@ -1,26 +1,20 @@
 package com.example.front.navigation
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.front.screens.home.HomePage
-import com.example.front.screens.splas_and_intro.Intro
-import com.example.front.screens.login.LoginScreen
-import com.example.front.screens.splas_and_intro.SplashScreen
 import com.example.front.screens.categories.RegistrationCategories
 import com.example.front.screens.product.ProductPage
-import com.example.front.viewmodels.SplashAndIntroViewModel
+import com.example.front.screens.userprofile.UserProfileScreen
+import com.example.front.viewmodels.splasintro.SplashAndIntroViewModel
 import com.example.front.viewmodels.categories.CategoriesViewModel
 import com.example.front.viewmodels.home.HomeViewModel
 import com.example.front.viewmodels.login.LoginViewModel
+import com.example.front.viewmodels.myprofile.MyProfileViewModel
 import com.example.front.viewmodels.product.ProductViewModel
 import com.example.front.viewmodels.register.RegisterViewModel
 
@@ -36,9 +30,10 @@ fun SetupNavGraph(
     val registerViewModel: RegisterViewModel = hiltViewModel()
     val productViewModel: ProductViewModel = hiltViewModel()
     val splashViewModel: SplashAndIntroViewModel = hiltViewModel()
+    val myProfileViewModel : MyProfileViewModel = hiltViewModel()
     NavHost(
         navController = navController,
-        startDestination = "intro"
+        startDestination = "my_profile"
         ){
         composable(
             route = Screen.Home.route
@@ -55,6 +50,12 @@ fun SetupNavGraph(
             route = Screen.Product.route
         ){
             ProductPage(navController, productViewModel)
+        }
+        composable(
+            route = Screen.MyProfile.route
+        )
+        {
+            UserProfileScreen(navController = navController, myProfileViewModel)
         }
 
         introNavGraph(navController = navController, splashViewModel)
