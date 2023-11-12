@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName
 data class MyProfileDTO (
     @SerializedName("id") val id: Int,
     @SerializedName("name") val name: String,
-    @SerializedName("image") val image: String,
+    @SerializedName("image") var image: String,
     @SerializedName("role") val role: String,
     @SerializedName("roleId") val roleId: Int,
     @SerializedName("username") val username: String,

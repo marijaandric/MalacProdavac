@@ -1,32 +1,19 @@
 package com.example.front.screens.userprofile
 
+import android.R.attr.bitmap
 import android.annotation.SuppressLint
-import android.graphics.Color.alpha
-import android.util.Log
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.Crossfade
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
+import android.net.Uri
+import android.os.Build
+import android.provider.MediaStore
+import android.util.Base64
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.LinearOutSlowInEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.core.updateTransition
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
-import androidx.compose.animation.with
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -45,6 +32,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Checkbox
+import androidx.compose.material.CheckboxDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -54,7 +42,6 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.CheckboxDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -64,15 +51,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -83,12 +72,12 @@ import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
 import com.example.front.R
 import com.example.front.components.CardButton
-import com.example.front.components.ErrorTextComponent
 import com.example.front.components.ImageItemForProfilePic
 import com.example.front.components.MyTextField
 import com.example.front.model.user.UserEditDTO
 import com.example.front.viewmodels.myprofile.MyProfileViewModel
 import kotlinx.coroutines.delay
+import java.io.ByteArrayOutputStream
 
 
 @Composable
@@ -435,6 +424,23 @@ fun Info(myProfileViewModel: MyProfileViewModel) {
 @Composable
 fun TopCenterImages(myProfileViewModel: MyProfileViewModel) {
     val showDialog = remember { mutableStateOf(false) }
+
+    //photo picker
+    var uri by remember {
+        mutableStateOf<Uri?>(null)
+    }
+    val context = LocalContext.current
+
+    val bitmap = remember {
+        mutableStateOf<Bitmap?>(null)
+    }
+
+    val photoPicker = rememberLauncherForActivityResult(contract = ActivityResultContracts.PickVisualMedia(), onResult = {
+        uri = it
+    })
+
+    var imagee by remember { mutableStateOf<String?>(null) }
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -502,10 +508,26 @@ fun TopCenterImages(myProfileViewModel: MyProfileViewModel) {
                     if(myProfileViewModel.state.value.info!!.image.isNotEmpty())
                     {
                         ImageItemForProfilePic(image = myProfileViewModel.state.value.info!!.image, onEditClick = {
+                            photoPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                            uri?.let {
+                                if (Build.VERSION.SDK_INT < 28)
+                                {
+                                    bitmap.value = MediaStore.Images.Media.getBitmap(context.contentResolver, it)
+                                }else{
+                                    val source = ImageDecoder.createSource(context.contentResolver, it)
+                                    bitmap.value = ImageDecoder.decodeBitmap(source)
+                                }
 
+                                bitmap.value?.let{btm ->
+                                    //imagee = convertImageBitmapToBase64(btm.asImageBitmap())
+                                }
+
+                            }
                         })
+
                     }
                 }
+
             }
         }
         Box(
@@ -530,6 +552,15 @@ fun TopCenterImages(myProfileViewModel: MyProfileViewModel) {
         EditDialog(onDismiss = { showDialog.value = false },myProfileViewModel)
     }
 }
+
+private fun convertImageBitmapToBase64(imageBitmap: ImageBitmap): String {
+    val androidBitmap: Bitmap = imageBitmap.asAndroidBitmap()
+    val byteArrayOutputStream = ByteArrayOutputStream()
+    androidBitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream)
+    val byteArray = byteArrayOutputStream.toByteArray()
+    return Base64.encodeToString(byteArray, Base64.DEFAULT)
+}
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -700,5 +731,4 @@ fun EditDialog(onDismiss: () -> Unit,myProfileViewModel: MyProfileViewModel) {
             }
         }
     }
-
 }

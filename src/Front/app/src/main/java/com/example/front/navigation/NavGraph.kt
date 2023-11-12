@@ -33,7 +33,7 @@ fun SetupNavGraph(
     val myProfileViewModel : MyProfileViewModel = hiltViewModel()
     NavHost(
         navController = navController,
-        startDestination = "my_profile"
+        startDestination = "intro"
         ){
         composable(
             route = Screen.Home.route

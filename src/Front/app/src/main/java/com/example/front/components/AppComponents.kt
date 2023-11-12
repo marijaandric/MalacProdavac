@@ -1,6 +1,10 @@
 package com.example.front.components
 
 import android.graphics.BitmapFactory
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -385,6 +389,7 @@ fun ImageItem(image: ImageDataDTO){
 fun ImageItemForProfilePic(image:String,onEditClick: () -> Unit){
     val byteArray = Base64.decode(image)
     val bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
+
     Box{
         Image(
             bitmap = bitmap.asImageBitmap(),

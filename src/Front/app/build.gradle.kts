@@ -120,6 +120,10 @@ dependencies {
 
     //nesto idk
     implementation("androidx.compose.runtime:runtime-livedata:1.0.0")
+
+    // photo picker
+    implementation("io.coil-kt:coil-compose:2.3.0")
+
 }
 
 kapt {
