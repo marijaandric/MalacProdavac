@@ -56,6 +56,7 @@ import com.example.front.R
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.front.model.DTO.ImageDataDTO
+import com.example.front.ui.theme.DarkBlue
 import com.example.front.ui.theme.LightBlue
 import com.example.front.ui.theme.MainBlue
 import com.example.front.ui.theme.Typography
@@ -383,7 +384,7 @@ fun ImageItem(image: ImageDataDTO){
         contentDescription = null,
         modifier = Modifier
             .size(100.dp)
-            .clip(RoundedCornerShape(5.dp))
+            .clip(RoundedCornerShape(10.dp))
     )
 }
 

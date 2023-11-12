@@ -42,6 +42,9 @@ import com.example.front.components.ProductImage
 import com.example.front.components.ToggleImageButton
 import com.example.front.model.DTO.WorkingHoursDTO
 import com.example.front.navigation.Screen
+import com.example.front.ui.theme.Black
+import com.example.front.ui.theme.DarkBlue
+import com.example.front.ui.theme.Orange
 import com.example.front.ui.theme.Typography
 import com.example.front.viewmodels.product.ProductViewModel
 
@@ -57,8 +60,6 @@ fun ProductPage(navHostController: NavHostController, productViewModel: ProductV
 
     Column(
         modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         if (productViewModel.state.value.isLoading) {
             CircularProgressIndicator(
@@ -70,11 +71,8 @@ fun ProductPage(navHostController: NavHostController, productViewModel: ProductV
         } else {
             Box(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.White)
-                    .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
-                    .border(1.dp, Color.Black)
-                    .verticalScroll(rememberScrollState())
+                    .fillMaxWidth()
+                    .weight(1.5f)
             ) {
                 ProductImage(painterResource(id = R.drawable.jabukeproduct))
 
@@ -89,139 +87,147 @@ fun ProductPage(navHostController: NavHostController, productViewModel: ProductV
                         .align(Alignment.TopStart)
                         .clickable { navHostController.navigate(Screen.Home.route) }
                 )
+            }
 
-                Column(
-                    modifier = Modifier
-                        .padding(20.dp)
-                        .fillMaxWidth()
-                ) {
-                    productInfo?.images?.let {
-                        GalleryComponent(images = it,modifier = Modifier.padding(20.dp))
-                    }
+            Column(
+                modifier = Modifier
+                    .padding(20.dp)
+                    .fillMaxWidth()
+                    .weight(2f)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                productInfo?.images?.let {
+                    GalleryComponent(images = it, modifier = Modifier.padding(20.dp))
+                }
 
-                    productInfo?.name?.let {
-                        Text(
-                            text = it,
-                            modifier = Modifier
-                                .padding(5.dp)
-                                .fillMaxWidth(),
-                            style = Typography.titleMedium,
-                        )
-                    }
-
-                    productInfo?.shopName?.let {
-                        Text(
-                            text = it,
-                            modifier = Modifier
-                                .padding(5.dp)
-                                .fillMaxWidth(),
-                            style = Typography.titleSmall,
-                            textAlign = TextAlign.Center
-                        )
-                    }
-
-                    Image(
-                        painter = painterResource(R.drawable.strelica),
-                        contentDescription = "",
-                        modifier = Modifier
-                            .size(29.dp)
-                            .offset(x = 90.dp)
-                    )
-
+                productInfo?.name?.let {
                     Text(
-                        text = "${productInfo?.price} rsd",
+                        text = it,
                         modifier = Modifier
-                            .padding(20.dp)
+                            .padding(5.dp)
                             .fillMaxWidth(),
-                        style = Typography.titleLarge,
+                        style = Typography.titleMedium,
+                        color = DarkBlue
+                    )
+                }
+
+                productInfo?.shopName?.let {
+                    Text(
+                        text = it,
+                        modifier = Modifier
+                            .padding(5.dp)
+                            .fillMaxWidth(),
+                        style = Typography.titleSmall,
                         textAlign = TextAlign.Center
                     )
+                }
 
-                    productInfo?.saleMessage?.let {
-                        Text(
-                            text = it,
-                            modifier = Modifier.fillMaxWidth(),
-                            style = Typography.titleMedium,
-                            textAlign = TextAlign.Center
-                        )
-                    }
+                Image(
+                    painter = painterResource(R.drawable.strelica),
+                    contentDescription = "",
+                    modifier = Modifier
+                        .size(29.dp)
+                        .offset(x = 90.dp)
+                )
 
-                    productInfo?.description?.let {
-                        Text(
-                            text = it,
-                            modifier = Modifier
-                                .padding(10.dp)
-                                .fillMaxWidth(),
-                            style = Typography.bodySmall,
-                            textAlign = TextAlign.Center
-                        )
-                    }
+                Text(
+                    text = "${productInfo?.price} rsd",
+                    modifier = Modifier
+                        .padding(20.dp)
+                        .fillMaxWidth(),
+                    style = Typography.titleLarge,
+                    color = DarkBlue,
+                    textAlign = TextAlign.Center
+                )
 
-                    Divider(
+                productInfo?.saleMessage?.let {
+                    Text(
+                        text = it,
+                        modifier = Modifier.fillMaxWidth(),
+                        style = Typography.titleMedium,
+                        textAlign = TextAlign.Center,
+                        color = Orange
+                    )
+                }
+
+                productInfo?.description?.let {
+                    Text(
+                        text = it,
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .height(1.dp)
-                            .padding(horizontal = 16.dp),
-                        color = Color.Gray
+                            .padding(10.dp)
+                            .fillMaxWidth(),
+                        style = Typography.bodySmall,
+                        textAlign = TextAlign.Center,
+                        color = Color.Black
+                    )
+                }
+
+                Divider(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(1.dp)
+                        .padding(horizontal = 16.dp),
+                    color = Color.Gray
+                )
+
+                productInfo?.workingHours?.let { ExpandableRow(it) }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = "Quantity",
+                        style = Typography.titleSmall,
+                        color = Color.Black
                     )
 
-                    productInfo?.workingHours?.let { ExpandableRow(it) }
-
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(10.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
+                        Button(
+                            onClick = {},
+                            modifier = Modifier
+                                .height(40.dp)
+                                .border(1.dp, Color.Black),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+                        ) {
+                            Text(text = "-")
+                        }
+
                         Text(
-                            text = "Quantity",
-                            style = Typography.titleSmall,
+                            text = "1",
+                            modifier = Modifier.padding(20.dp),
+                            textAlign = TextAlign.Justify
                         )
 
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
+                        Button(
+                            onClick = {},
+                            modifier = Modifier
+                                .height(40.dp)
+                                .border(1.dp, Color.Black),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
                         ) {
-                            Button(
-                                onClick = {},
-                                modifier = Modifier
-                                    .height(40.dp)
-                                    .border(1.dp, Color.Black),
-                                colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-                            ) {
-                                Text(text = "-")
-                            }
-
-                            Text(
-                                text = "1",
-                                modifier = Modifier.padding(20.dp),
-                                textAlign = TextAlign.Justify
-                            )
-
-                            Button(
-                                onClick = {},
-                                modifier = Modifier
-                                    .height(40.dp)
-                                    .border(1.dp, Color.Black),
-                                colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-                            ) {
-                                Text(text = "+")
-                            }
+                            Text(text = "+")
                         }
                     }
+                }
 
-                    Button(
-                        onClick = {},
-                        modifier = Modifier
-                            .height(60.dp)
-                            .width(200.dp)
-                            .padding(20.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xE48359)),
-                    ) {
-                        Text(text = "Add To Cart")
-                    }
+                Button(
+                    onClick = {},
+                    modifier = Modifier
+                        .height(60.dp)
+                        .width(200.dp)
+                        .padding(20.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xE48359)),
+                ) {
+                    Text(text = "Add To Cart", style = Typography.titleSmall)
                 }
             }
         }
+
     }
 }
 
@@ -242,7 +248,8 @@ fun ExpandableRow(workingHoursList: List<WorkingHoursDTO>) {
         ) {
             Text(
                 text = "Click to see pick up times",
-                style = Typography.titleSmall
+                style = Typography.titleSmall,
+                color = Color.Black
             )
         }
 
@@ -255,13 +262,16 @@ fun ExpandableRow(workingHoursList: List<WorkingHoursDTO>) {
             ) {
                 workingHoursList.forEach { workingHours ->
                     Row(
-                        modifier = Modifier.fillMaxWidth().padding(5.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(5.dp),
                         horizontalArrangement = Arrangement.Center
                     ) {
                         Text(
                             text = "${getDayName(workingHours.day)}   " +
                                     "${workingHours.openingHours} - ${workingHours.closingHours}",
                             style = Typography.displaySmall,
+                            color = Color.Black
                         )
                     }
                 }
