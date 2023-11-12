@@ -189,7 +189,6 @@ fun LogoImage(painterResource: Painter, modifier: Modifier = Modifier) {
 }
 
 
-// -- BUTTONS --
 @Composable
 fun ErrorTextComponent(text: String) {
     Text(
@@ -265,16 +264,6 @@ fun SellerCard(title: String, author: String, imageResource: Int) {
         Column(
             modifier = Modifier.fillMaxWidth()
         ) {
-//            Image(
-//                painter = painterResource(id = imageResource),
-//                contentDescription = null,
-//                contentScale = ContentScale.Crop,
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .height(150.dp)
-//                    .padding(13.dp)
-//                    .clip(RoundedCornerShape(10.dp))
-//            )
             Box(
                 modifier = Modifier
                     .fillMaxWidth()

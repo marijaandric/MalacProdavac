@@ -66,7 +66,7 @@ namespace back.PL.Controllers
             }
         }
 
-        [Authorize]
+        //[Authorize]
         [HttpGet("GetHomeProducts")]
         public async Task<IActionResult> GetHomeProducts(int id)
         {
