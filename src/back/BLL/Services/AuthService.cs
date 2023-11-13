@@ -1,6 +1,7 @@
 ﻿using back.BLL.Dtos;
 using back.DAL.Repositories;
 using back.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Linq;
 using System.IdentityModel.Tokens.Jwt;
@@ -191,6 +192,52 @@ namespace back.BLL.Services
             }
 
             return await CreateToken(user);
+        }
+
+        public async Task<string> EditUser(EditUserDto values)
+        {
+            User newUser = await _authRepository.GetUser(values.Id);
+
+            if (values.Username.Length > 0)
+            {
+                if (_authRepository.CountUsers(values.Username) == 0) newUser.Username = values.Username;
+                else throw new ArgumentException("Username taken!");
+            }
+
+            if (values.Address.Length > 0)
+            {
+                if (CheckAddress(values.Address))
+                {
+                    newUser.Address = values.Address;
+                    (double, double) coordinates = await GetCoordinates(values.Address);
+                    newUser.Latitude = (float)coordinates.Item1;
+                    newUser.Longitude = (float)coordinates.Item2;
+                }
+                else throw new ArgumentException("Invalid address!");
+            }
+            
+
+            if (values.RoleId != null) newUser.RoleId = (int)values.RoleId;
+            if (values.Image.Length > 0) newUser.Image = values.Image;
+            if (values.Name.Length > 0) newUser.Name = values.Name;
+
+            if (await _authRepository.EditUser(newUser)) return await CreateToken(newUser);
+            else throw new ArgumentException("Changes could not be saved!");
+        }
+
+        public async Task<bool> ChangePassword(ChangePasswordDto values)
+        {
+            User user = await _authRepository.GetUser(values.Id);
+
+            if (values.Password.Length == 0 || values.OldPassword.Length == 0) throw new ArgumentException("Check fields and try again!");
+
+            using (HMACSHA512 hmac = new HMACSHA512(user.PasswordSalt))
+            {
+                if (hmac.ComputeHash(Encoding.UTF8.GetBytes(values.OldPassword)).SequenceEqual(user.Password)) user.Password = hmac.ComputeHash(Encoding.UTF8.GetBytes(values.Password));
+                else throw new ArgumentException("Passwords do not match!");
+            };
+
+            return await _authRepository.EditUser(user);
         }
     }
 }

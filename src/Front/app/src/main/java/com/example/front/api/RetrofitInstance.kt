@@ -1,19 +1,23 @@
 package com.example.front.api
-import com.example.front.util.Contsnats
+import com.example.front.helper.interceptor.AuthorizationHeaderHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import javax.inject.Inject
 
-object RetrofitInstance {
+val url = com.example.front.util.Constants.BASE_URL
 
-    private val retrofit by lazy{
+class RetrofitInstance @Inject constructor(private val httpClient: AuthorizationHeaderHttpClient) {
+
+    private val retrofit: Retrofit by lazy {
         Retrofit.Builder()
-            .baseUrl(Contsnats.BASE_URL)
+            .baseUrl(url)
             .addConverterFactory(GsonConverterFactory.create())
+            .client(httpClient.okHttpClient)
             .build()
     }
 
-    val api: Api by lazy{
+    val api: Api by lazy {
         retrofit.create(Api::class.java)
     }
-
 }
+

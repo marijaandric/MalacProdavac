@@ -16,12 +16,15 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,27 +32,28 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.example.front.R
 import com.example.front.components.ProductCard
 import com.example.front.components.SearchTextField
 import com.example.front.components.SellerCard
-import com.example.front.repository.Repository
-import com.example.front.viewmodels.categories.CategoriesViewModel
+import com.example.front.components.Sidebar
+import com.example.front.navigation.Screen
 import com.example.front.viewmodels.home.HomeViewModel
 
 @Composable
-fun HomePage(navController: NavHostController) {
+fun HomePage(navController: NavHostController, homeViewModel: HomeViewModel) {
     val id = 1;
-    var viewModel: HomeViewModel
-    val repository = Repository()
-    viewModel = HomeViewModel(repository)
-    viewModel.getHomeProducts(id)
-    viewModel.getHomeShops(id)
+
+
+    LaunchedEffect(Unit) {
+        homeViewModel.getHomeProducts(id)
+        homeViewModel.getHomeShops(id)
+        homeViewModel.getUsername()
+    }
 
     LazyColumn(
         modifier = Modifier.background(MaterialTheme.colorScheme.background)
@@ -58,14 +62,15 @@ fun HomePage(navController: NavHostController) {
             Search()
         }
         item {
-            Sellers(viewModel)
+            Sellers(homeViewModel)
         }
         item {
-            Products(viewModel)
+            Products(homeViewModel)
         }
     }
-
-
+    Button(onClick = { navController.navigate(Screen.Product.route) }) {
+        Text(text = "Predji")
+    }
 }
 
 data class CardData(
@@ -82,7 +87,7 @@ fun Products(viewModel: HomeViewModel) {
         CardData(
             title = productsState.name,
             description = productsState.price.toString()+" din",
-            imageResource = R.drawable.jabuke
+            imageResource = R.drawable.imageplaceholder
         )
     }?.toList() ?: emptyList()
 
@@ -120,7 +125,7 @@ fun Sellers(viewModel: HomeViewModel) {
         CardData(
             title = shopState.name,
             description = shopState.address,
-            imageResource = R.drawable.jabuke
+            imageResource = R.drawable.imageplaceholder
         )
     }?.toList() ?: emptyList()
 
@@ -150,12 +155,11 @@ fun Sellers(viewModel: HomeViewModel) {
         }
     }
 }
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Search() {
     var value by remember {mutableStateOf("") }
-
+    val context = LocalContext.current
     Box(
         contentAlignment = Alignment.TopCenter
     ) {

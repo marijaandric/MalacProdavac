@@ -7,8 +7,9 @@ namespace back.BLL.Services
     {
         public Task<List<Category>> GetCategories();
         public Task<bool> SaveChosenCategories(ChosenCategoriesDto categoriesDto);
+        public Task<bool> UpdateChosenCategories(ChosenCategoriesDto categoriesDto);
         public Task<List<Category>> GetChosenCategories(int id);
-        public Task<List<Product>> GetHomeProducts(int id);
-        public Task<List<Shop>> GetHomeShops(int id);
+        public Task<List<ProductCard>> GetHomeProducts(int id);
+        public Task<List<ShopCard>> GetHomeShops(int id);
     }
 }

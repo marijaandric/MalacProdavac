@@ -1,16 +1,19 @@
 package com.example.front.components
 
 import android.graphics.BitmapFactory
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -19,23 +22,23 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,14 +46,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color.Companion.Gray
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -58,20 +57,18 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.front.R
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.example.front.model.ImageData
+import androidx.compose.ui.tooling.preview.Preview
+import com.example.front.model.DTO.ImageDataDTO
+import com.example.front.ui.theme.DarkBlue
 import com.example.front.ui.theme.LightBlue
 import com.example.front.ui.theme.MainBlue
 import com.example.front.ui.theme.Typography
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
-import kotlin.random.Random
 
 @Composable
 fun TitleTextComponent(value:String){
@@ -91,7 +88,8 @@ fun MyTextField(
     painterResource: Painter,
     value: String,
     onValueChange: (String) -> Unit,
-    isPassword: Boolean = false
+    isPassword: Boolean = false,
+    isLast: Boolean = false
 ) {
     OutlinedTextField(
         modifier = Modifier
@@ -113,14 +111,10 @@ fun MyTextField(
             )
         },
         visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
-        keyboardOptions = if (isPassword) {
-            KeyboardOptions.Default.copy(
-                imeAction = ImeAction.Done,
-                keyboardType = KeyboardType.Password
-            )
-        } else {
-            KeyboardOptions.Default
-        },
+        keyboardOptions = KeyboardOptions.Default.copy(
+            keyboardType =  if (isPassword) KeyboardType.Password else KeyboardType.Text,
+            imeAction = if (isLast) ImeAction.Done else ImeAction.Next
+        ),
         shape = RoundedCornerShape(20.dp)
     )
 }
@@ -197,12 +191,11 @@ fun LogoImage(painterResource: Painter, modifier: Modifier = Modifier) {
         modifier = Modifier
             .fillMaxWidth()
             .size(200.dp)
-            .then(modifier) // Combine the existing modifier with the one passed as an argument
+            .then(modifier)
     )
 }
 
 
-// -- BUTTONS --
 @Composable
 fun ErrorTextComponent(text: String) {
     Text(
@@ -268,7 +261,6 @@ fun BigBlueButton(text:String,onClick: () -> Unit,width:Float,modifier: Modifier
     }
 }
 
-
 @Composable
 fun SellerCard(title: String, author: String, imageResource: Int) {
     Card(
@@ -279,16 +271,33 @@ fun SellerCard(title: String, author: String, imageResource: Int) {
         Column(
             modifier = Modifier.fillMaxWidth()
         ) {
-            Image(
-                painter = painterResource(id = imageResource),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(150.dp)
-                    .padding(13.dp)
-                    .clip(RoundedCornerShape(10.dp))
-            )
+            ) {
+                Image(
+                    painter = painterResource(id = imageResource),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(150.dp)
+                        .padding(13.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                )
+
+                Image(
+                    painter = painterResource(id = R.drawable.srce),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(50.dp)
+                        .align(Alignment.TopEnd)
+                        .padding(8.dp)
+                )
+            }
+
 
             Column(
                 modifier = Modifier
@@ -349,26 +358,64 @@ fun ProductCard(title: String, price: String, imageResource: Int) {
 
 
 @Composable
-fun GalleryComponent(images: List<ImageData>, modifier: Modifier) {
+fun GalleryComponent(images: List<ImageDataDTO>, modifier: Modifier) {
     LazyRow(
-        modifier = Modifier.fillMaxWidth().then(modifier), // Use Modifier to set the width of the LazyRow
-        horizontalArrangement = Arrangement.spacedBy(8.dp) // Adjust the spacing as needed
+        modifier = Modifier
+            .fillMaxWidth()
+            .then(modifier),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(images) { image ->
-            ImageItem(image)
+            ImageItem(image = image)
         }
     }
 }
 
 @OptIn(ExperimentalEncodingApi::class)
 @Composable
-fun ImageItem(image:ImageData){
-    val byteArray = Base64.decode(image.base64Image)
+fun ImageItem(image: ImageDataDTO){
+    val byteArray = Base64.decode(image.image)
     val bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
     Image(bitmap = bitmap.asImageBitmap(),
         contentDescription = null,
         modifier = Modifier
-            .size(50.dp)
-            .clip(RoundedCornerShape(5.dp))
+            .size(100.dp)
+            .clip(RoundedCornerShape(10.dp))
     )
+}
+
+@OptIn(ExperimentalEncodingApi::class)
+@Composable
+fun ImageItemForProfilePic(image:String,onEditClick: () -> Unit){
+    val byteArray = Base64.decode(image)
+    val bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
+
+    Box{
+        Image(
+            bitmap = bitmap.asImageBitmap(),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .size(140.dp)
+                .clip(CircleShape)
+                .border(4.dp, Color.White, CircleShape)
+        )
+
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .background(MaterialTheme.colorScheme.onBackground, shape = CircleShape)
+                .padding(8.dp)
+                .clickable {
+                    onEditClick.invoke()
+                }
+        ) {
+            Icon(
+                imageVector = Icons.Default.Edit,
+                contentDescription = "Edit",
+                tint = Color.White,
+                modifier = Modifier.size(24.dp)
+            )
+        }
+    }
 }

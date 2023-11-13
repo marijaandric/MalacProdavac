@@ -44,5 +44,31 @@ namespace back.PL.Controllers
                 return BadRequest(new { Error = ex.Message });
             }
         }
+
+        [HttpPut("Edit")]
+        public async Task<IActionResult> Edit(EditUserDto editDto)
+        {
+            try
+            {
+                return Ok(new { Token = await _authService.EditUser(editDto) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
+
+        [HttpPut("ChangePassword")]
+        public async Task<IActionResult> ChangePassword(ChangePasswordDto editDto)
+        {
+            try
+            {
+                return Ok(new { Token = await _authService.ChangePassword(editDto) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
     }
 }

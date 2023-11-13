@@ -1,23 +1,25 @@
 package com.example.front.viewmodels.login
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.front.model.LoginDTO
-import com.example.front.model.LoginResponse
+import com.example.front.helper.DataStore.DataStoreManager
+import com.example.front.model.DTO.LoginDTO
 import com.example.front.repository.Repository
-import com.google.gson.Gson
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import org.json.JSONException
 import org.json.JSONObject
-import retrofit2.Response
+import javax.inject.Inject
 
 
-class LoginViewModel(private val repository: Repository) : ViewModel() {
+@HiltViewModel
+class LoginViewModel @Inject constructor(
+    private val repository: Repository,
+    private val dataStoreManager: DataStoreManager
+) : ViewModel() {
     val jwtToken: MutableLiveData<String?> = MutableLiveData()
     val errorMessage: MutableLiveData<String> = MutableLiveData()
-
     fun getLoginInfo(login: LoginDTO) {
         viewModelScope.launch {
             try {
@@ -27,13 +29,10 @@ class LoginViewModel(private val repository: Repository) : ViewModel() {
                     val responseBody = response.body()!!.token
                     if (responseBody != null)
                         jwtToken.value = responseBody
-
                     else {
                         errorMessage.value = "Response body is null"
                     }
-                }
-
-                else {
+                } else {
                     if (response.code() == 400) {
                         val errorResponse = response.errorBody()?.string()
                         if (errorResponse != null) {
@@ -52,7 +51,6 @@ class LoginViewModel(private val repository: Repository) : ViewModel() {
                             errorMessage.value = "Bad Request: An unknown error occurred 3"
                         }
                     } else {
-                        // Handle other errors
                         errorMessage.value = "Error: ${response.message()}"
                     }
                 }
@@ -62,4 +60,26 @@ class LoginViewModel(private val repository: Repository) : ViewModel() {
         }
     }
 
+    suspend fun performLogin(
+        userInput: String,
+        passwordInput: String
+    ): Boolean {
+        try {
+            val data = LoginDTO(userInput, passwordInput)
+            getLoginInfo(data)
+            val token = jwtToken.value
+            val errorMess = errorMessage.value
+            if (token != null && errorMess == null) {
+                dataStoreManager.storeToken(token)
+                return true
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return false
+    }
+
+    suspend fun setFirstTimeToFalse() {
+        dataStoreManager.setFirstTime()
+    }
 }

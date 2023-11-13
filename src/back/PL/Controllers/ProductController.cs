@@ -1,4 +1,7 @@
-﻿using back.BLL.Services;
+﻿using back.BLL.Dtos;
+using back.BLL.Dtos.HelpModels;
+using back.BLL.Services;
+using back.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace back.PL.Controllers
@@ -59,7 +62,20 @@ namespace back.PL.Controllers
         {
             try
             {
-                return Ok(new { Details = await _service.ProductDetails(productId, userId) });
+                return Ok(await _service.ProductDetails(productId, userId));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { ErrorMessage = ex.Message });
+            }
+        }
+
+        [HttpGet("ProductReviews")]
+        public async Task<IActionResult> GetProductReviews(int productId, int page)
+        {
+            try
+            {
+                return Ok(await _service.GetProductReviews(productId, page));
             }
             catch (Exception ex)
             {
@@ -99,6 +115,32 @@ namespace back.PL.Controllers
             try
             {
                 return Ok(new { success = await _service.RemoveFromCart(productId, userId) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
+
+        [HttpPost("Review")]
+        public async Task<IActionResult> LeaveReview(ReviewDto review)
+        {
+            try
+            {
+                return Ok(new { success = await _service.LeaveReview(review) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
+
+        [HttpPost("Question")]
+        public async Task<IActionResult> LeaveQuestion(QnADto question)
+        {
+            try
+            {
+                return Ok(new { success = await _service.LeaveQuestion(question) });
             }
             catch (Exception ex)
             {

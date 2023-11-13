@@ -1,13 +1,8 @@
 package com.example.front.screens.categories
 
-import android.util.Log
-import android.view.animation.OvershootInterpolator
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
@@ -37,10 +32,10 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,20 +48,16 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.front.components.MediumBlueButton
 import com.example.front.R
-import com.example.front.model.ChosenCategoriesDTO
+import com.example.front.model.DTO.ChosenCategoriesDTO
 import com.example.front.navigation.Screen
-import com.example.front.repository.Repository
 import com.example.front.viewmodels.categories.CategoriesViewModel
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun RegistrationCategories(navController: NavHostController) {
+fun RegistrationCategories(navController: NavHostController, categoriesViewModel: CategoriesViewModel) {
 
-    var viewModel: CategoriesViewModel
-    val repository = Repository()
-    viewModel = CategoriesViewModel(repository)
-    viewModel.getCategoriesInfo()
+    categoriesViewModel.getCategoriesInfo()
 
     LazyColumn(
         modifier = Modifier
@@ -81,7 +72,7 @@ fun RegistrationCategories(navController: NavHostController) {
         }
         item{
             //FlowRow {
-                Cards(viewModel,navController)
+                Cards(categoriesViewModel,navController)
             //}
         }
     }
@@ -119,9 +110,11 @@ fun Cards(viewModel: CategoriesViewModel, navController: NavHostController) {
     var selectedCategories by remember { mutableStateOf(mutableListOf<Int>()) }
     val state = viewModel.state.value
     val statePost = viewModel.stateChosenCategories.value
+    val coroutineScope = rememberCoroutineScope()
 
     if(statePost.isLoading == false)
     {
+        navController.popBackStack()
         navController.navigate(Screen.Home.route)
     }
 
@@ -197,17 +190,28 @@ fun Cards(viewModel: CategoriesViewModel, navController: NavHostController) {
         )
         {
             Spacer(modifier = Modifier.height(20.dp))
-            MediumBlueButton(text = "Continue", onClick = { ButtonClick(selectedCategories, viewModel) }, width = 0.90f, modifier = Modifier)
+            MediumBlueButton(text = "Continue",
+                onClick = {
+                    coroutineScope.launch {
+                        ButtonClick(selectedCategories, viewModel)
+                    }
+                },
+                width = 0.90f,
+                modifier = Modifier
+            )
         }
     }
 }
 
-fun ButtonClick(chosenCategories: List<Int>, viewModel: CategoriesViewModel)
+suspend fun ButtonClick(chosenCategories: List<Int>, viewModel: CategoriesViewModel)
 {
     // staviti neki alert
-    val id = 2;
-    val chosenCategoriesDTO = ChosenCategoriesDTO(userId = id, categoryIds = chosenCategories)
-    viewModel.postCategories(chosenCategoriesDTO)
+    val id = viewModel.getUserId()
+    println(id)
+    if (id != null){
+        val chosenCategoriesDTO = ChosenCategoriesDTO(userId = id, categoryIds = chosenCategories)
+        viewModel.postCategories(chosenCategoriesDTO)
+    }
 }
 
 

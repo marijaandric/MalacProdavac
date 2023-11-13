@@ -1,5 +1,6 @@
 ﻿using back.BLL.Dtos;
 using back.DAL.Repositories;
+using back.Models;
 
 namespace back.BLL.Services
 {
@@ -32,6 +33,31 @@ namespace back.BLL.Services
             if (shop == null) throw new ArgumentException("No shop found!");
 
             return shop;
+        }
+
+        public async Task<LikedShops> GetLike(int shopId, int userId)
+        {
+            LikedShops like = await _repository.GetLike(shopId, userId);
+            if (like == null) throw new ArgumentException("No like found!");
+
+            return like;
+        }
+        public async Task<bool> ToggleLike(int shopId, int userId)
+        {
+            if (await _repository.GetLike(shopId, userId) == null)
+            {
+                if (!await _repository.LikeShop(shopId, userId)) throw new ArgumentException("Shop could not be liked!");
+                return true;
+            }
+
+            if (!await _repository.DislikeShop(shopId, userId)) throw new ArgumentException("Shop could not be disliked!");
+            return true;
+        }
+
+        public async Task<bool> LeaveReview(ReviewDto review)
+        {
+            if (await _repository.LeaveReview(review)) return true;
+            throw new ArgumentException("Shop could not be reviewed!");
         }
     }
 }

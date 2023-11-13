@@ -1,4 +1,5 @@
 ﻿using back.BLL.Dtos;
+using back.BLL.Dtos.HelpModels;
 using back.DAL.Contexts;
 using back.Models;
 using Microsoft.EntityFrameworkCore;
@@ -63,11 +64,13 @@ namespace back.DAL.Repositories
             User currentUser = _context.Users.FirstOrDefault(x => x.Id == userId);
             float currLat = currentUser.Latitude;
             float currLong = currentUser.Longitude;
+            int usersShop = -1;
+            if (_context.Shop.Any(x => x.OwnerId == userId)) usersShop = (await _context.Shop.FirstOrDefaultAsync(x => x.OwnerId == userId)).Id;
 
             if (categories.Count == 0) categories = await _context.Categories.Select(x => x.Id).ToListAsync();
             if (specificShopId == -1)
             {
-                products = await _context.Products.Where(x => categories.Contains(x.CategoryId) && x.Name.ToLower().Contains(search.Trim().ToLower()))
+                products = await _context.Products.Where(x => categories.Contains(x.CategoryId) && x.Name.ToLower().Contains(search.Trim().ToLower()) && x.ShopId != usersShop)
                                     .GroupJoin(_context.ProductReviews.GroupBy(x => x.ProductId).Select(group => new
                                     {
                                         ProductId = group.Key,
@@ -77,15 +80,9 @@ namespace back.DAL.Repositories
                                         Id = p.Id,
                                         ShopId = p.ShopId,
                                         Name = p.Name,
-                                        Description = p.Description,
                                         Price = p.Price,
-                                        MetricId = p.MetricId,
-                                        CategoryId = p.CategoryId,
-                                        SubcategoryId = p.SubcategoryId,
-                                        SalePercentage = p.SalePercentage,
-                                        SaleMinQuantity = p.SaleMinQuantity,
-                                        SaleMessage = p.SaleMessage,
-                                        Rating = pr.DefaultIfEmpty().Select(x => x.avg).FirstOrDefault()
+                                        Rating = pr.DefaultIfEmpty().Select(x => x.avg).FirstOrDefault(),
+                                        Image = _context.ProductImages.FirstOrDefault(x => x.ProductId == p.Id).Image
                                     })
                                     .Where(x => x.Rating >= rating)
                                     .ToListAsync();
@@ -102,15 +99,9 @@ namespace back.DAL.Repositories
                                         Id = p.Id,
                                         ShopId = p.ShopId,
                                         Name = p.Name,
-                                        Description = p.Description,
                                         Price = p.Price,
-                                        MetricId = p.MetricId,
-                                        CategoryId = p.CategoryId,
-                                        SubcategoryId = p.SubcategoryId,
-                                        SalePercentage = p.SalePercentage,
-                                        SaleMinQuantity = p.SaleMinQuantity,
-                                        SaleMessage = p.SaleMessage,
-                                        Rating = pr.DefaultIfEmpty().Select(x => x.avg).FirstOrDefault()
+                                        Rating = pr.DefaultIfEmpty().Select(x => x.avg).FirstOrDefault(),
+                                        Image = _context.ProductImages.FirstOrDefault(x => x.ProductId == p.Id).Image
                                     })
                                     .Where(x => x.Rating >= rating)
                                     .ToListAsync();
@@ -170,13 +161,20 @@ namespace back.DAL.Repositories
                                                 }).ToListAsync();
             List<ProductQuestion> questions = await _context.ProductQuestions.Where(x => x.ProductId == productId).ToListAsync();
             List<ProductAnswer> answers = await _context.ProductAnswers.Where(x => questions.Select(x => x.Id).Contains(x.QuestionId)).ToListAsync();
-            List<(ProductQuestion, ProductAnswer)> qna = questions.GroupJoin(answers, q => q.Id, a => a.QuestionId, (q, a) => (q, a))
+            List<QuestionWithAnswer> qna = questions.GroupJoin(answers, q => q.Id, a => a.QuestionId, (q, a) => (q, a))
                                                         .SelectMany(
                                                             q => q.a.DefaultIfEmpty(),
                                                             (q, a) => (q.q, a)
-                                                        ).ToList(); 
-            Dictionary<string, int> sizes = await _context.ProductSizes.Where(x => x.ProductId == productId).Join(_context.Sizes, ps => ps.SizeId, s => s.Id, (ps, s) => new { s.Name, ps.Stock }).ToDictionaryAsync(key => key.Name, value => value.Stock);
-            Dictionary<int,string> images = await _context.ProductImages.Where(x => x.ProductId == productId).ToDictionaryAsync(key => key.Id, value => value.Image);
+                                                        ).Select(x => new QuestionWithAnswer
+                                                        {
+                                                            QuestionId = x.q.Id,
+                                                            AnswerId = x.a != null ? x.a.Id : -1,
+                                                            QuestionText = x.q.QuestionText,
+                                                            AnswerText = x.a != null ? x.a.AnswerText : null
+                                                        }
+                                                            ).ToList(); 
+            List<Stock> sizes = await _context.ProductSizes.Where(x => x.ProductId == productId).Join(_context.Sizes, ps => ps.SizeId, s => s.Id, (ps, s) => new Stock{ Size = s.Name, Quantity = ps.Stock }).ToListAsync();
+            List<ImageData> images = await _context.ProductImages.Where(x => x.ProductId == productId).Select(x => new ImageData{Id = x.Id, Image = x.Image}).ToListAsync();
             float average = 0;
             if (reviews.Count > 0) average = reviews.Select(x => x.Rating).Average();
 
@@ -200,12 +198,28 @@ namespace back.DAL.Repositories
                 IsOwner = product.ShopId == userId,
                 Rating = average,
                 WorkingHours = workingHours,
-                Reviews = reviews,
                 QuestionsAndAnswers = qna,
                 Sizes = sizes,
                 Images = images
             };
 
+        }
+
+        public async Task<List<ProductReviewExtended>> GetProductReviews(int productId, int page)
+        {
+            return await _context.ProductReviews.Where(x => x.ProductId == productId).Join(_context.Users, pr => pr.ReviewerId, u => u.Id, (pr, u) => new {pr, u}).Select(x => new ProductReviewExtended
+            {
+                ProductId = productId,
+                ReviewerId = x.pr.ReviewerId,
+                Comment = x.pr.Comment,
+                Rating = x.pr.Rating,
+                PostedOn = x.pr.PostedOn,
+                Image = x.u.Image,
+                Username = x.u.Username,
+                Product = null,
+                Reviewer = null
+                
+            }).Skip((page-1) * numberOfItems).Take(numberOfItems).ToListAsync();
         }
 
         #region likes
@@ -255,5 +269,32 @@ namespace back.DAL.Repositories
         }
 
         #endregion
+
+        public async Task<bool> LeaveReview(ReviewDto review)
+        {
+            _context.ProductReviews.AddAsync(new ProductReview
+            {
+                ReviewerId = review.UserId,
+                ProductId = review.Id,
+                Rating = review.Rating,
+                Comment = review.Comment,
+                PostedOn = DateTime.Now
+            });
+
+            return _context.SaveChanges() > 0;
+        }
+
+        public async Task<bool> LeaveQuestion(QnADto question)
+        {
+            _context.ProductQuestions.AddAsync(new ProductQuestion
+            {
+                PosterId = question.UserId,
+                ProductId = question.Id,
+                QuestionText = question.Text,
+                PostedOn = DateTime.Now
+            });
+
+            return _context.SaveChanges() > 0;
+        }
     }
 }

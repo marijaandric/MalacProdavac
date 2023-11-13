@@ -3,25 +3,32 @@ package com.example.front.viewmodels.home
 import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.front.model.CategoriesDTO
-import com.example.front.model.ChosenCategoriesDTO
+import com.example.front.helper.DataStore.DataStoreManager
 import com.example.front.repository.Repository
-import com.example.front.screens.categories.CategoriesState
 import com.example.front.screens.home.HomeProductsState
 import com.example.front.screens.home.HomeShopState
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import retrofit2.Response
+import javax.inject.Inject
 
-class HomeViewModel(private val repository: Repository) : ViewModel() {
+@HiltViewModel
+class HomeViewModel @Inject constructor(
+    private val repository: Repository,
+    private val dataStoreManager: DataStoreManager
+) : ViewModel() {
 
     private val _state = mutableStateOf(HomeProductsState())
     var state : State<HomeProductsState> = _state;
 
     private val _stateShop = mutableStateOf(HomeShopState())
     var stateShop : State<HomeShopState> = _stateShop;
+
+    private val _usernameFlow = MutableStateFlow("")
+    val usernameFlow: Flow<String> = _usernameFlow
 
 
     fun getHomeProducts(id: Int)
@@ -69,4 +76,11 @@ class HomeViewModel(private val repository: Repository) : ViewModel() {
             }
         }
     }
+
+    suspend fun getUsername() {
+        val retrievedUsername = dataStoreManager.getUsernameFromToken()
+        _usernameFlow.value = retrievedUsername ?: ""
+        println(retrievedUsername)
+    }
+
 }

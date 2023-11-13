@@ -1,6 +1,7 @@
 ﻿using back.BLL.Dtos;
 using back.BLL.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace back.PL.Controllers
 {
@@ -40,6 +41,18 @@ namespace back.PL.Controllers
             }
         }
 
+        [HttpPut("UpdateChosenCategories")]
+        public async Task<IActionResult> UpdateChosenCategories(ChosenCategoriesDto categoriesDto)
+        {
+            try
+            {
+                return Ok(await _service.UpdateChosenCategories(categoriesDto));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
         [HttpGet("GetChosenCategories")]
         public async Task<IActionResult> GetChosenCategories(int id)
         {
@@ -53,6 +66,7 @@ namespace back.PL.Controllers
             }
         }
 
+        //[Authorize]
         [HttpGet("GetHomeProducts")]
         public async Task<IActionResult> GetHomeProducts(int id)
         {

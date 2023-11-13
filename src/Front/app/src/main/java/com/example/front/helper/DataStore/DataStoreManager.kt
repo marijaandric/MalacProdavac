@@ -1,0 +1,107 @@
+package com.example.front.helper.DataStore
+
+import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
+import com.nimbusds.jwt.SignedJWT
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import javax.inject.Inject
+
+class DataStoreManager @Inject constructor(@ApplicationContext context: Context) {
+    private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "token_datastore")
+    private val dataStore: DataStore<Preferences> = context.dataStore
+
+    private val TOKEN_KEY = stringPreferencesKey("token")
+
+    suspend fun storeToken(token: String) {
+        dataStore.edit { preferences ->
+            preferences[TOKEN_KEY] = token
+        }
+    }
+
+    val tokenFlow: Flow<String?> = dataStore.data.map { preferences ->
+        preferences[TOKEN_KEY]
+    }
+
+    val JWT_SECRET = "10e13609875c047a26c74fcba54bde5b"
+
+    suspend fun getUsernameFromToken(): String? {
+        val token = this.tokenFlow.first()
+
+        return decodeTokenAndGetUsername(token)
+    }
+
+    fun decodeTokenAndGetUsername(token: String?): String? {
+        if (token.isNullOrBlank()) {
+            return "null"
+        }
+
+        try {
+            val signedJWT = SignedJWT.parse(token)
+            val claimsSet = signedJWT.jwtClaimsSet
+
+            return claimsSet.getClaim("name") as? String
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return null
+        }
+    }
+
+    suspend fun getUserIdFromToken(): Int? {
+        val token = this.tokenFlow.first()
+
+        return decodeTokenAndGetUserId(token)
+    }
+
+    private fun decodeTokenAndGetUserId(token: String?): Int? {
+        if (token.isNullOrBlank()) {
+            return null
+        }
+
+        try {
+            val signedJWT = SignedJWT.parse(token)
+            val claimsSet = signedJWT.jwtClaimsSet
+
+            val subClaim = claimsSet.getClaim("sub") as? String
+
+            if (subClaim?.toIntOrNull() != null) {
+                return subClaim.toInt()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return null
+        }
+        return null
+    }
+
+    suspend fun setFirstTime()
+    {
+        dataStore.edit { preferences ->
+            preferences[stringPreferencesKey("firstTimeInApp")] = "false"
+        }
+    }
+
+    suspend fun isFirstTime(): Boolean
+    {
+        val result = dataStore.data.first()[stringPreferencesKey("firstTimeInApp")]
+        if (result != null){
+            return false
+        }
+        return true
+    }
+
+    suspend fun isLoggedIn(): Boolean
+    {
+        val result = dataStore.data.first()[TOKEN_KEY]
+        if (result != null && result != ""){
+            return true
+        }
+        return false
+    }
+}

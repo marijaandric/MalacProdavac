@@ -5,21 +5,24 @@ import androidx.compose.runtime.State
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.front.model.CategoriesDTO
+import com.example.front.model.DTO.CategoriesDTO
 import com.example.front.repository.Repository
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import retrofit2.Response
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import androidx.compose.runtime.mutableStateOf
-import com.example.front.model.ChosenCategoriesDTO
+import com.example.front.helper.DataStore.DataStoreManager
+import com.example.front.model.DTO.ChosenCategoriesDTO
 import com.example.front.screens.categories.CategoriesState
 import com.example.front.screens.categories.ChosenCategoriesState
+import javax.inject.Inject
 
 
-class CategoriesViewModel(private val repository: Repository) : ViewModel() {
+@HiltViewModel
+class CategoriesViewModel @Inject constructor(
+    private val repository: Repository,
+    private val dataStoreManager: DataStoreManager
+) : ViewModel() {
     val myResponse: MutableLiveData<Response<List<CategoriesDTO>>> = MutableLiveData()
     private val _state = mutableStateOf(CategoriesState())
     var state : State<CategoriesState> = _state;
@@ -70,6 +73,11 @@ class CategoriesViewModel(private val repository: Repository) : ViewModel() {
                 _stateChosenCategories.value.error = e.message.toString()
             }
         }
+    }
+
+    suspend fun getUserId(): Int?
+    {
+        return dataStoreManager.getUserIdFromToken()
     }
 }
 
