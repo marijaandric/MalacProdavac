@@ -65,29 +65,28 @@ fun HomePage(navController: NavHostController, homeViewModel: HomeViewModel) {
             Sellers(homeViewModel)
         }
         item {
-            Products(homeViewModel)
+            Products(homeViewModel,navController)
         }
-    }
-    Button(onClick = { navController.navigate(Screen.Product.route) }) {
-        Text(text = "Predji")
     }
 }
 
 data class CardData(
     val title: String,
     val description: String,
-    val imageResource: Int
+    val imageResource: Int,
+    val id:Int
 )
 
 @Composable
-fun Products(viewModel: HomeViewModel) {
+fun Products(viewModel: HomeViewModel,navController: NavHostController) {
     val state = viewModel.state.value
 
     val products = state.products?.mapIndexed { index, productsState ->
         CardData(
             title = productsState.name,
             description = productsState.price.toString()+" din",
-            imageResource = R.drawable.imageplaceholder
+            imageResource = R.drawable.imageplaceholder,
+            id = productsState.id
         )
     }?.toList() ?: emptyList()
 
@@ -109,6 +108,7 @@ fun Products(viewModel: HomeViewModel) {
                         title = cardData.title,
                         price = cardData.description,
                         imageResource = cardData.imageResource,
+                        navController
                     )
                 }
             }
@@ -125,7 +125,8 @@ fun Sellers(viewModel: HomeViewModel) {
         CardData(
             title = shopState.name,
             description = shopState.address,
-            imageResource = R.drawable.imageplaceholder
+            imageResource = R.drawable.imageplaceholder,
+            id = shopState.id
         )
     }?.toList() ?: emptyList()
 
@@ -185,7 +186,7 @@ fun Search() {
                         .align(Alignment.CenterVertically),
                     tint = MaterialTheme.colorScheme.background
                 )
-                SearchTextField(valuee = value, placeh = "Search products and sellers", onValueChangee = { value = it })
+                SearchTextField(valuee = value, placeh = "Search products and sellers", onValueChangee = { value = it }, modifier = Modifier)
             }
             Image(
                 painter = painterResource(id = R.drawable.homepage),

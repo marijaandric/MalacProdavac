@@ -62,19 +62,25 @@ fun ProductPage(navHostController: NavHostController, productViewModel: ProductV
         modifier = Modifier.fillMaxSize(),
     ) {
         if (productViewModel.state.value.isLoading) {
-            CircularProgressIndicator(
+            Column(
                 modifier = Modifier
-                    .size(50.dp)
-                    .padding(8.dp),
-                color = Color.Magenta
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
             )
+            {
+                CircularProgressIndicator()
+            }
         } else {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1.5f)
             ) {
-                ProductImage(painterResource(id = R.drawable.jabukeproduct))
+                if (productInfo != null) {
+                    productInfo.images?.get(0)?.let { ProductImage(it.image) }
+                }
 
                 ToggleImageButton(modifier = Modifier.align(Alignment.TopEnd))
 

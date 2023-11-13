@@ -61,8 +61,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.front.R
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavHostController
 import com.example.front.model.DTO.ImageDataDTO
+import com.example.front.navigation.Screen
 import com.example.front.ui.theme.DarkBlue
 import com.example.front.ui.theme.LightBlue
 import com.example.front.ui.theme.MainBlue
@@ -121,13 +124,15 @@ fun MyTextField(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchTextField(valuee: String,placeh:String, onValueChangee: (String) -> Unit) {
+fun SearchTextField(valuee: String, placeh: String, onValueChangee: (String) -> Unit, modifier: Modifier) {
     var value = valuee
 
-    OutlinedTextField(value = value,
+    OutlinedTextField(
+        value = value,
         colors = TextFieldDefaults.outlinedTextFieldColors(
             cursorColor = MaterialTheme.colorScheme.onSurface,
-            containerColor = Color.White),
+            containerColor = Color.White
+        ),
         leadingIcon = {
             Icon(
                 imageVector = Icons.Default.Search,
@@ -136,8 +141,14 @@ fun SearchTextField(valuee: String,placeh:String, onValueChangee: (String) -> Un
         },
         onValueChange = onValueChangee,
         shape = RoundedCornerShape(50.dp),
-        modifier = Modifier.height(50.dp),
-        placeholder  = { Text(text = placeh) }
+        modifier = Modifier.height(50.dp).then(modifier),
+        placeholder = {
+            Text(
+                text = placeh,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth() // Ensure the Text takes up the full width
+            )
+        }
     )
 }
 
@@ -152,11 +163,13 @@ fun HeaderImage(painterResource: Painter) {
     )
 }
 
+@OptIn(ExperimentalEncodingApi::class)
 @Composable
-fun ProductImage(painterResource: Painter) {
-    Image(
-        painter = painterResource,
-        contentDescription = "",
+fun ProductImage(image: String) {
+    val byteArray = Base64.decode(image)
+    val bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
+    Image(bitmap = bitmap.asImageBitmap(),
+        contentDescription = null,
         modifier = Modifier.fillMaxWidth(),
         contentScale = ContentScale.FillWidth
     )
@@ -321,12 +334,13 @@ fun SellerCard(title: String, author: String, imageResource: Int) {
 
 
 @Composable
-fun ProductCard(title: String, price: String, imageResource: Int) {
+fun ProductCard(title: String, price: String, imageResource: Int, navController: NavHostController) {
     Card(
         modifier = Modifier
             .width(350.dp)
             .clip(RoundedCornerShape(20.dp))
             .padding(bottom = 15.dp)
+            .clickable { navController.navigate(Screen.Product.route)}
     ) {
         Row(
             modifier = Modifier.fillMaxWidth()

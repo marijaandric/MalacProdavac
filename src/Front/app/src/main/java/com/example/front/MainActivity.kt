@@ -59,7 +59,7 @@ import kotlinx.coroutines.launch
                         DrawerItem(icon = painterResource(id = R.drawable.navbar_home), label = "Home", route = Screen.Home.route, secondaryLabel = ""),
                         DrawerItem(icon = painterResource(id = R.drawable.navbar_cart2), label = "My cart", route = Screen.Home.route, secondaryLabel = ""),
                         DrawerItem(icon = painterResource(id = R.drawable.navbar_cart1), label = "My orders", route = Screen.Home.route, secondaryLabel = ""),
-                        DrawerItem(icon = painterResource(id = R.drawable.navbar_package), label = "Products", route = Screen.Home.route, secondaryLabel = ""),
+                        DrawerItem(icon = painterResource(id = R.drawable.navbar_package), label = "Products", route = Screen.AllProduct.route, secondaryLabel = ""),
                         DrawerItem(icon = painterResource(id = R.drawable.navbar_shop1), label = "Shops", route = Screen.Home.route, secondaryLabel = ""),
                         DrawerItem(icon = painterResource(id = R.drawable.navbar_bell), label = "Notifications", route = Screen.Home.route, secondaryLabel = ""),
                         DrawerItem(icon = painterResource(id = R.drawable.navbar_shop2), label = "My shop", route = Screen.Home.route, secondaryLabel = ""),
