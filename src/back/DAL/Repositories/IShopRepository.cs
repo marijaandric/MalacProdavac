@@ -12,5 +12,6 @@ namespace back.DAL.Repositories
         public Task<bool> LikeShop(int shopId, int userId);
         public Task<bool> DislikeShop(int shopId, int userId);
         public Task<bool> LeaveReview(ReviewDto review);
+        public Task<bool> ChangeShopPhoto(int id, string path);
     }
 }

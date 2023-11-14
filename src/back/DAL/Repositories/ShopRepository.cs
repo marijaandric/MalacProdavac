@@ -197,5 +197,12 @@ namespace back.DAL.Repositories
 
             return _context.SaveChanges() > 0;
         }
+
+        public async Task<bool> ChangeShopPhoto(int id, string path)
+        {
+            Shop s = await _context.Shop.FirstOrDefaultAsync(x => x.Id == id);
+            s.Image = path;
+            return await _context.SaveChangesAsync() > 0;
+        }
     }
 }

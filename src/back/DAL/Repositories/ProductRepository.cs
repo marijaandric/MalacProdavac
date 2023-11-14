@@ -299,5 +299,11 @@ namespace back.DAL.Repositories
 
             return _context.SaveChanges() > 0;
         }
+
+        public async Task<bool> AddProductPhoto(int id, string path)
+        {
+            _context.ProductImages.Add(new ProductImage { Image = path, ProductId = id });
+            return await _context.SaveChangesAsync() > 0;
+        }
     }
 }

@@ -19,5 +19,6 @@ namespace back.DAL.Repositories
         public Task<bool> UpdateCart(int productId, int userId, int quantity);
         public Task<bool> LeaveReview(ReviewDto review);
         public Task<bool> LeaveQuestion(QnADto question);
+        public Task<bool> AddProductPhoto(int id, string path);
     }
 }
