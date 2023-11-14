@@ -13,8 +13,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import androidx.compose.runtime.mutableStateOf
 import com.example.front.helper.DataStore.DataStoreManager
 import com.example.front.model.DTO.ChosenCategoriesDTO
-import com.example.front.screens.categories.CategoriesState
-import com.example.front.screens.categories.ChosenCategoriesState
+import com.example.front.screens.categories.states.CategoriesState
+import com.example.front.screens.categories.states.ChosenCategoriesState
 import javax.inject.Inject
 
 

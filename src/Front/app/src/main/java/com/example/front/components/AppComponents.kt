@@ -2,6 +2,7 @@ package com.example.front.components
 
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -262,7 +263,7 @@ fun BigBlueButton(text:String,onClick: () -> Unit,width:Float,modifier: Modifier
 }
 
 @Composable
-fun SellerCard(title: String, author: String, imageResource: Int) {
+fun SellerCard(title: String, author: String, imageResource: Int,isLiked: Boolean,onClick: () -> Unit ) {
     Card(
         modifier = Modifier
             .width(320.dp)
@@ -288,13 +289,16 @@ fun SellerCard(title: String, author: String, imageResource: Int) {
                 )
 
                 Image(
-                    painter = painterResource(id = R.drawable.srce),
+                    painter = painterResource(if(isLiked) R.drawable.srcefull else R.drawable.srce),
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .size(50.dp)
                         .align(Alignment.TopEnd)
                         .padding(8.dp)
+                        .clickable {
+                            onClick()
+                        }
                 )
             }
 
@@ -400,6 +404,7 @@ fun ImageItemForProfilePic(image:String,onEditClick: () -> Unit){
                 .clip(CircleShape)
                 .border(4.dp, Color.White, CircleShape)
         )
+
 
         Box(
             modifier = Modifier

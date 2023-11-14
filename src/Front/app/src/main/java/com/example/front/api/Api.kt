@@ -7,6 +7,7 @@ import com.example.front.model.DTO.LoginDTO
 import com.example.front.model.request.RegistrationRequest
 import com.example.front.model.response.LoginResponse
 import com.example.front.model.DTO.ShopDTO
+import com.example.front.model.DTO.ToggleLikeDTO
 import com.example.front.model.product.ProductInfo
 import com.example.front.model.user.MyProfileDTO
 import com.example.front.model.user.UserEditDTO
@@ -69,6 +70,12 @@ interface Api {
     suspend fun editUserProfile(
         @Body data : UserEditDTO
     ):Response<LoginResponse>
+
+    @POST("back/Shop/ToggleLike")
+    suspend fun toggleLike(
+        @Query("shopId") shopId : Int,
+        @Query("userId") userId : Int,
+    ): Response<ToggleLikeDTO>
 
 
 }

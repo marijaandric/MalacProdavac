@@ -7,8 +7,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.front.helper.DataStore.DataStoreManager
 import com.example.front.repository.Repository
-import com.example.front.screens.home.HomeProductsState
-import com.example.front.screens.home.HomeShopState
+import com.example.front.screens.home.states.HomeProductsState
+import com.example.front.screens.home.states.HomeShopState
+import com.example.front.screens.home.states.ToggleLikeState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,24 +28,31 @@ class HomeViewModel @Inject constructor(
     private val _stateShop = mutableStateOf(HomeShopState())
     var stateShop : State<HomeShopState> = _stateShop;
 
+    private val _stateLike = mutableStateOf(ToggleLikeState())
+    var stateLike : State<ToggleLikeState> = _stateLike;
+
     private val _usernameFlow = MutableStateFlow("")
     val usernameFlow: Flow<String> = _usernameFlow
 
 
-    fun getHomeProducts(id: Int)
+
+    fun getHomeProducts()
     {
         viewModelScope.launch {
             try{
-                val response = repository.getHomeProducts(id)
-                Log.d("RESPONSE",response.toString())
+                val id = dataStoreManager.getUserIdFromToken()
+                if(id != null)
+                {
+                    val response = repository.getHomeProducts(id)
 
-                if (response.isSuccessful) {
-                    val responseBody = response.body()
+                    if (response.isSuccessful) {
+                        val responseBody = response.body()
 
-                    _state.value = _state.value.copy(
-                        isLoading = false,
-                        products = response.body()
-                    )
+                        _state.value = _state.value.copy(
+                            isLoading = false,
+                            products = response.body()
+                        )
+                    }
                 }
             }
             catch (e:Exception)
@@ -54,25 +62,53 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun getHomeShops(id: Int)
+    fun getHomeShops()
     {
         viewModelScope.launch {
-            try{
-                val response = repository.getHomeShops(id)
-                Log.d("RESPONSE",response.toString())
+            val id = dataStoreManager.getUserIdFromToken()
+            if(id != null) {
+                try{
+                    val response = repository.getHomeShops(id)
 
-                if (response.isSuccessful) {
-                    val responseBody = response.body()
+                    if (response.isSuccessful) {
+                        val responseBody = response.body()
 
-                    _stateShop.value = _stateShop.value.copy(
-                        isLoading = false,
-                        shops = response.body()
-                    )
+                        _stateShop.value = _stateShop.value.copy(
+                            isLoading = false,
+                            shops = response.body()
+                        )
+                    }
+                }
+                catch (e:Exception)
+                {
+                    _stateShop.value.error = e.message.toString()
                 }
             }
-            catch (e:Exception)
-            {
-                _stateShop.value.error = e.message.toString()
+        }
+    }
+
+    fun changeLikedState(shopId:Int)
+    {
+        viewModelScope.launch {
+            val userId = dataStoreManager.getUserIdFromToken()
+            if(userId != null) {
+                try{
+                    val response = repository.toggleLike(shopId,userId)
+                    Log.d("Toggle RESPONSE",response.toString())
+
+                    if (response.isSuccessful) {
+                        val responseBody = response.body()
+
+                        _stateLike.value = _stateLike.value.copy(
+                            isLoading = false,
+                            success = response.body()
+                        )
+                    }
+                }
+                catch (e:Exception)
+                {
+                    _stateLike.value.error = e.message.toString()
+                }
             }
         }
     }
@@ -82,5 +118,17 @@ class HomeViewModel @Inject constructor(
         _usernameFlow.value = retrievedUsername ?: ""
         println(retrievedUsername)
     }
+
+    fun updateLikeStatus(index: Int, isLiked: Boolean) {
+        val currentState = stateShop.value
+        currentState?.shops?.get(index)?.let { shopState ->
+            val updatedShop = shopState.copy(liked = isLiked)
+            val updatedShops = currentState.shops!!.toMutableList()
+            updatedShops[index] = updatedShop
+            _stateShop.value = currentState.copy(shops = updatedShops)
+        }
+    }
+
+
 
 }
