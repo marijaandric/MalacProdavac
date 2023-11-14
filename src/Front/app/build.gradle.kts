@@ -124,6 +124,10 @@ dependencies {
     // photo picker
     implementation("io.coil-kt:coil-compose:2.3.0")
 
+    // mape
+    implementation("org.osmdroid:osmdroid-android:6.1.5")
+
+
 }
 
 kapt {

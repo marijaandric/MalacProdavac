@@ -31,6 +31,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.front.components.DrawerItem
 import com.example.front.navigation.Screen
 import com.example.front.navigation.SetupNavGraph
+import com.example.front.screens.sellers.SellersScreen
 import com.example.front.screens.userprofile.UserProfileScreen
 import com.example.front.ui.theme.FrontTheme
 import com.example.front.viewmodels.login.LoginViewModel
@@ -125,6 +126,7 @@ import kotlinx.coroutines.launch
                         },
                         content = {
                             SetupNavGraph(navController = navController)
+                            //SellersScreen()
                         }
                     )
                 }
