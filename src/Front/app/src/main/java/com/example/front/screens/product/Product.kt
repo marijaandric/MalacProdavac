@@ -20,6 +20,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -34,6 +37,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.front.R
@@ -51,7 +55,11 @@ import com.example.front.viewmodels.product.ProductViewModel
 
 @SuppressLint("SuspiciousIndentation")
 @Composable
-fun ProductPage(navHostController: NavHostController, productViewModel: ProductViewModel, productID: Int) {
+fun ProductPage(
+    navHostController: NavHostController,
+    productViewModel: ProductViewModel,
+    productID: Int
+) {
 
     LaunchedEffect(Unit) {
         productViewModel.getUserId()?.let { productViewModel.getProductInfo(productID, it) }
@@ -118,24 +126,29 @@ fun ProductPage(navHostController: NavHostController, productViewModel: ProductV
                     )
                 }
 
-                productInfo?.shopName?.let {
-                    Text(
-                        text = it,
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    productInfo?.shopName?.let {
+                        Text(
+                            text = it,
+                            modifier = Modifier
+                                .padding(5.dp),
+                            style = Typography.titleSmall,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+
+                    Image(
+                        painter = painterResource(R.drawable.strelica),
+                        contentDescription = "",
                         modifier = Modifier
-                            .padding(5.dp)
-                            .fillMaxWidth(),
-                        style = Typography.titleSmall,
-                        textAlign = TextAlign.Center
+                            .size(29.dp)
                     )
                 }
-
-                Image(
-                    painter = painterResource(R.drawable.strelica),
-                    contentDescription = "",
-                    modifier = Modifier
-                        .size(29.dp)
-                        .offset(x = 90.dp)
-                )
 
                 Text(
                     text = "${productInfo?.price} rsd",
@@ -222,15 +235,41 @@ fun ProductPage(navHostController: NavHostController, productViewModel: ProductV
                     }
                 }
 
-                Button(
-                    onClick = {},
-                    modifier = Modifier
-                        .height(60.dp)
-                        .width(200.dp)
-                        .padding(20.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xE48359)),
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
                 ) {
-                    Text(text = "Add To Cart", style = Typography.titleSmall)
+                    Button(
+                        onClick = {},
+                        modifier = Modifier
+                            .height(80.dp)
+                            .width(300.dp)
+                            .padding(20.dp),
+                    ) {
+                        Text(text = "Add To Cart", style = Typography.titleSmall)
+                    }
+                }
+                Divider(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(1.dp)
+                        .padding(horizontal = 16.dp),
+                    color = Color.Gray
+                )
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(30.dp), horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(text = "Product reviews", style = Typography.bodyLarge)
+                    Row {
+                        Text(text = "4.5", style = Typography.bodyLarge)
+                        Icon(
+                            imageVector = Icons.Default.Star,
+                            contentDescription = "Star icon"
+                        )
+                    }
                 }
             }
         }
@@ -297,4 +336,53 @@ fun getDayName(day: Int): String {
         else -> "Unknown Day"
     }
 }
-
+@Preview
+@Composable
+fun ReviewCard() {
+    Card(
+        modifier = Modifier
+            .width(350.dp)
+            .clip(RoundedCornerShape(20.dp))
+            .padding(5.dp)
+    )
+    {
+        Image(
+            painter = painterResource(R.drawable.navbar_profile),
+            contentDescription = "",
+            modifier = Modifier
+                .size(29.dp)
+                .padding(5.dp)
+        )
+        Column {
+            Text(text = "username")
+            Row() {
+                Icon(
+                    imageVector = Icons.Default.Star,
+                    contentDescription = "Star icon"
+                )
+                Icon(
+                    imageVector = Icons.Default.Star,
+                    contentDescription = "Star icon"
+                )
+                Icon(
+                    imageVector = Icons.Default.Star,
+                    contentDescription = "Star icon"
+                )
+                Icon(
+                    imageVector = Icons.Default.Star,
+                    contentDescription = "Star icon"
+                )
+                Icon(
+                    imageVector = Icons.Default.Star,
+                    contentDescription = "Star icon"
+                )
+            }
+        }
+        Column {
+            Text(text = "5 months")
+        }
+        Row(){
+            Text(text = "The apples are fresh and ripe. I recommend.")
+        }
+    }
+}
