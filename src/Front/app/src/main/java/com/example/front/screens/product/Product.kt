@@ -40,6 +40,7 @@ import com.example.front.R
 import com.example.front.components.GalleryComponent
 import com.example.front.components.ProductImage
 import com.example.front.components.ToggleImageButton
+import com.example.front.helper.DataStore.DataStoreManager
 import com.example.front.model.DTO.WorkingHoursDTO
 import com.example.front.navigation.Screen
 import com.example.front.ui.theme.Black
@@ -50,10 +51,10 @@ import com.example.front.viewmodels.product.ProductViewModel
 
 @SuppressLint("SuspiciousIndentation")
 @Composable
-fun ProductPage(navHostController: NavHostController, productViewModel: ProductViewModel) {
+fun ProductPage(navHostController: NavHostController, productViewModel: ProductViewModel, productID: Int) {
 
     LaunchedEffect(Unit) {
-        productViewModel.getProductInfo(1, 1)
+        productViewModel.getUserId()?.let { productViewModel.getProductInfo(productID, it) }
     }
 
     val productInfo = productViewModel.state.value.product

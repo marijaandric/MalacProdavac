@@ -2,6 +2,7 @@ package com.example.front.viewmodels.product
 
 import android.util.Log
 import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -42,5 +43,9 @@ class ProductViewModel @Inject constructor(
                 Log.d("Eroorrrrr", e.message.toString())
             }
         }
+    }
+    suspend fun getUserId(): Int?
+    {
+        return dataStoreManager.getUserIdFromToken()
     }
 }

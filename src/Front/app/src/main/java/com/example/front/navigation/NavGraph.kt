@@ -4,8 +4,10 @@ import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.example.front.screens.products.AllProducts
 import com.example.front.screens.home.HomePage
 import com.example.front.screens.categories.RegistrationCategories
@@ -48,10 +50,14 @@ fun SetupNavGraph(
             RegistrationCategories(navController = navController, categoriesViewModel)
         }
         composable(
-            route = Screen.Product.route
-        ){
-            ProductPage(navController, productViewModel)
+            route = "${Screen.Product.route}/{id}",
+            arguments = listOf(navArgument("id") { type = NavType.IntType })
+        ) { navBackStackEntry ->
+            val arguments = requireNotNull(navBackStackEntry.arguments)
+            val productId = arguments.getInt("id")
+            ProductPage(navController, productViewModel, productId)
         }
+
         composable(
             route = Screen.MyProfile.route
         )

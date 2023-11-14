@@ -181,7 +181,8 @@ fun Products(viewModel: HomeViewModel, navController: NavHostController) {
                         title = cardData.title,
                         price = cardData.description,
                         imageResource = cardData.imageResource,
-                        navController
+                        navController,
+                        cardData.id
                     )
                 }
             }

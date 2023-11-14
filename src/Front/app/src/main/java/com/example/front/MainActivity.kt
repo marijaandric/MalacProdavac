@@ -1,4 +1,4 @@
-    package com.example.front
+package com.example.front
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -37,9 +37,9 @@ import com.example.front.viewmodels.login.LoginViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
-    @AndroidEntryPoint
-    class MainActivity : ComponentActivity() {
-        lateinit var navController: NavHostController
+@AndroidEntryPoint
+class MainActivity : ComponentActivity() {
+    lateinit var navController: NavHostController
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,32 +49,84 @@ import kotlinx.coroutines.launch
             val scope = rememberCoroutineScope()
 
             FrontTheme {
-                Surface(modifier = Modifier
-                    .fillMaxSize()
-                    .background(color = MaterialTheme.colorScheme.background)) {
+                Surface(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(color = MaterialTheme.colorScheme.background)
+                ) {
                     navController = rememberNavController()
 
 
                     val items = listOf(
-                        DrawerItem(icon = painterResource(id = R.drawable.navbar_home), label = "Home", route = Screen.Home.route, secondaryLabel = ""),
-                        DrawerItem(icon = painterResource(id = R.drawable.navbar_cart2), label = "My cart", route = Screen.Home.route, secondaryLabel = ""),
-                        DrawerItem(icon = painterResource(id = R.drawable.navbar_cart1), label = "My orders", route = Screen.Home.route, secondaryLabel = ""),
-                        DrawerItem(icon = painterResource(id = R.drawable.navbar_package), label = "Products", route = Screen.AllProduct.route, secondaryLabel = ""),
-                        DrawerItem(icon = painterResource(id = R.drawable.navbar_shop1), label = "Shops", route = Screen.Home.route, secondaryLabel = ""),
-                        DrawerItem(icon = painterResource(id = R.drawable.navbar_bell), label = "Notifications", route = Screen.Home.route, secondaryLabel = ""),
-                        DrawerItem(icon = painterResource(id = R.drawable.navbar_shop2), label = "My shop", route = Screen.Home.route, secondaryLabel = ""),
-                        DrawerItem(icon = painterResource(id = R.drawable.navbar_message), label = "Messages", route = Screen.Home.route, secondaryLabel = ""),
-                        DrawerItem(icon = painterResource(id = R.drawable.navbar_profile), label = "Profile", route = Screen.MyProfile.route, secondaryLabel = ""),
-                        DrawerItem(icon = painterResource(id = R.drawable.navbar_car), label = "Deliveries", route = Screen.Home.route, secondaryLabel = ""),
+                        DrawerItem(
+                            icon = painterResource(id = R.drawable.navbar_home),
+                            label = "Home",
+                            route = Screen.Home.route,
+                            secondaryLabel = ""
+                        ),
+                        DrawerItem(
+                            icon = painterResource(id = R.drawable.navbar_cart2),
+                            label = "My cart",
+                            route = Screen.Home.route,
+                            secondaryLabel = ""
+                        ),
+                        DrawerItem(
+                            icon = painterResource(id = R.drawable.navbar_cart1),
+                            label = "My orders",
+                            route = Screen.Home.route,
+                            secondaryLabel = ""
+                        ),
+                        DrawerItem(
+                            icon = painterResource(id = R.drawable.navbar_package),
+                            label = "Products",
+                            route = Screen.Home.route,
+                            secondaryLabel = ""
+                        ),
+                        DrawerItem(
+                            icon = painterResource(id = R.drawable.navbar_shop1),
+                            label = "Shops",
+                            route = Screen.Home.route,
+                            secondaryLabel = ""
+                        ),
+                        DrawerItem(
+                            icon = painterResource(id = R.drawable.navbar_bell),
+                            label = "Notifications",
+                            route = Screen.Home.route,
+                            secondaryLabel = ""
+                        ),
+                        DrawerItem(
+                            icon = painterResource(id = R.drawable.navbar_shop2),
+                            label = "My shop",
+                            route = Screen.Home.route,
+                            secondaryLabel = ""
+                        ),
+                        DrawerItem(
+                            icon = painterResource(id = R.drawable.navbar_message),
+                            label = "Messages",
+                            route = Screen.Home.route,
+                            secondaryLabel = ""
+                        ),
+                        DrawerItem(
+                            icon = painterResource(id = R.drawable.navbar_profile),
+                            label = "Profile",
+                            route = Screen.MyProfile.route,
+                            secondaryLabel = ""
+                        ),
+                        DrawerItem(
+                            icon = painterResource(id = R.drawable.navbar_car),
+                            label = "Deliveries",
+                            route = Screen.Home.route,
+                            secondaryLabel = ""
+                        ),
                     )
                     ModalNavigationDrawer(
-                        drawerState=drawerState,
+                        drawerState = drawerState,
                         drawerContent = {
                             ModalDrawerSheet(
                                 modifier = Modifier
                                     .width(324.dp),
                                 drawerContainerColor = Color(0xFF294E68)
-                            ){
+                            ) {
 //                Box(
 //                    modifier = Modifier
 //                        .fillMaxWidth()
@@ -88,18 +140,22 @@ import kotlinx.coroutines.launch
                                         .height(56.dp)
                                 )
 
-                                items.forEach{item ->
+                                items.forEach { item ->
                                     NavigationDrawerItem(
-                                        modifier = Modifier
-
-                                        ,
+                                        modifier = Modifier,
                                         label = { Text(text = item.label) },
                                         selected = false,
                                         onClick = {
                                             scope.launch { drawerState.close() }
                                             navController.navigate(route = item.route)
                                         },
-                                        icon = { Icon(painter = item.icon, contentDescription = null, modifier = Modifier.height(24.dp)) },
+                                        icon = {
+                                            Icon(
+                                                painter = item.icon,
+                                                contentDescription = null,
+                                                modifier = Modifier.height(24.dp)
+                                            )
+                                        },
                                         colors = colors(
                                             unselectedContainerColor = Color(0xFF294E68),
                                             selectedContainerColor = Color(0xFF263e52),

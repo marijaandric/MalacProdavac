@@ -41,18 +41,18 @@ import com.example.front.components.ProductCard
 import com.example.front.components.SearchTextField
 import com.example.front.components.SellerCard
 import com.example.front.components.Sidebar
+import com.example.front.helper.DataStore.DataStoreManager
 import com.example.front.navigation.Screen
 import com.example.front.viewmodels.home.HomeViewModel
 
 @Composable
-fun HomePage(navController: NavHostController, homeViewModel: HomeViewModel) {
-    val id = 1;
-
-
+fun HomePage(
+    navController: NavHostController,
+    homeViewModel: HomeViewModel
+) {
     LaunchedEffect(Unit) {
-        homeViewModel.getHomeProducts(id)
-        homeViewModel.getHomeShops(id)
-        homeViewModel.getUsername()
+        homeViewModel.getUserId()?.let { homeViewModel.getHomeProducts(it) }
+        homeViewModel.getUserId()?.let { homeViewModel.getHomeShops(it) }
     }
 
     LazyColumn(
@@ -65,7 +65,7 @@ fun HomePage(navController: NavHostController, homeViewModel: HomeViewModel) {
             Sellers(homeViewModel)
         }
         item {
-            Products(homeViewModel,navController)
+            Products(homeViewModel, navController)
         }
     }
 }
@@ -74,41 +74,40 @@ data class CardData(
     val title: String,
     val description: String,
     val imageResource: Int,
-    val id:Int
+    val id: Int
 )
 
 @Composable
-fun Products(viewModel: HomeViewModel,navController: NavHostController) {
+fun Products(viewModel: HomeViewModel, navController: NavHostController) {
     val state = viewModel.state.value
 
     val products = state.products?.mapIndexed { index, productsState ->
         CardData(
             title = productsState.name,
-            description = productsState.price.toString()+" din",
+            description = productsState.price.toString() + " din",
             imageResource = R.drawable.imageplaceholder,
             id = productsState.id
         )
     }?.toList() ?: emptyList()
 
-    Column (
+    Column(
         modifier = Modifier
             .padding(16.dp, end = 0.dp, top = 20.dp)
-    ){
+    ) {
         Text(text = "Recommended products", modifier = Modifier.padding(bottom = 10.dp))
-        if(viewModel.state.value.isLoading)
-        {
+        if (viewModel.state.value.isLoading) {
             CircularProgressIndicator()
-        }
-        else{
+        } else {
             LazyColumn(
                 modifier = Modifier.heightIn(100.dp, 600.dp)
-            ){
+            ) {
                 items(products) { cardData ->
                     ProductCard(
                         title = cardData.title,
                         price = cardData.description,
                         imageResource = cardData.imageResource,
-                        navController
+                        navController,
+                        cardData.id
                     )
                 }
             }
@@ -131,19 +130,17 @@ fun Sellers(viewModel: HomeViewModel) {
     }?.toList() ?: emptyList()
 
 
-    Column (
+    Column(
         modifier = Modifier
             .padding(16.dp, end = 0.dp)
-    ){
+    ) {
         Text(text = "Recommended sellers", modifier = Modifier.padding(bottom = 10.dp))
         LazyRow(
             modifier = Modifier.heightIn(100.dp, 600.dp)
         ) {
-            if(viewModel.stateShop.value.isLoading)
-            {
+            if (viewModel.stateShop.value.isLoading) {
 
-            }
-            else{
+            } else {
                 items(sellers) { cardData ->
                     SellerCard(
                         title = cardData.title,
@@ -156,10 +153,11 @@ fun Sellers(viewModel: HomeViewModel) {
         }
     }
 }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Search() {
-    var value by remember {mutableStateOf("") }
+    var value by remember { mutableStateOf("") }
     val context = LocalContext.current
     Box(
         contentAlignment = Alignment.TopCenter
@@ -186,7 +184,12 @@ fun Search() {
                         .align(Alignment.CenterVertically),
                     tint = MaterialTheme.colorScheme.background
                 )
-                SearchTextField(valuee = value, placeh = "Search products and sellers", onValueChangee = { value = it }, modifier = Modifier)
+                SearchTextField(
+                    valuee = value,
+                    placeh = "Search products and sellers",
+                    onValueChangee = { value = it },
+                    modifier = Modifier
+                )
             }
             Image(
                 painter = painterResource(id = R.drawable.homepage),
