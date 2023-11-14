@@ -58,5 +58,12 @@ namespace back.DAL.Repositories
             user = newUser;
             return await Save();
         }
+
+        public async Task<bool> ChangeProfilePhoto(int id, string path)
+        {
+            User user = await _context.Users.FirstOrDefaultAsync(x => x.Id == id);
+            user.Image = path;
+            return await Save();
+        }
     }
 }

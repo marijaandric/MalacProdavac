@@ -1,7 +1,6 @@
 ﻿using back.BLL.Dtos;
 using back.DAL.Repositories;
 using back.Models;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Linq;
 using System.IdentityModel.Tokens.Jwt;
@@ -218,7 +217,6 @@ namespace back.BLL.Services
             
 
             if (values.RoleId != null) newUser.RoleId = (int)values.RoleId;
-            if (values.Image.Length > 0) newUser.Image = values.Image;
             if (values.Name.Length > 0) newUser.Name = values.Name;
 
             if (await _authRepository.EditUser(newUser)) return await CreateToken(newUser);
