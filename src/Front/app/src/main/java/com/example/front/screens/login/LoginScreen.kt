@@ -39,6 +39,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import com.example.front.viewmodels.categories.CategoriesViewModel
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.launch
 
 
@@ -103,9 +104,9 @@ fun LoginScreen(
                                 try {
                                     val success = viewModel.performLogin(userInput, passwordInput)
                                     if (success) {
-                                        navController.navigate(route = Screen.Home.route) {
-                                            popUpTo("auth") { inclusive = true }
-                                        }
+//                                        navController.navigate(route = Screen.Home.route) {
+//                                            popUpTo("auth") { inclusive = true }
+//                                        }
                                     } else {
                                         val errorMess = viewModel.errorMessage.value
                                         if (errorMess != null) {

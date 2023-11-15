@@ -1,9 +1,11 @@
     package com.example.front
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -29,17 +31,22 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.front.components.DrawerItem
+import com.example.front.helper.DataStore.DataStoreManager
 import com.example.front.navigation.Screen
 import com.example.front.navigation.SetupNavGraph
 import com.example.front.screens.userprofile.UserProfileScreen
 import com.example.front.ui.theme.FrontTheme
 import com.example.front.viewmodels.login.LoginViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import javax.inject.Inject
 
     @AndroidEntryPoint
     class MainActivity : ComponentActivity() {
         lateinit var navController: NavHostController
+        @Inject lateinit var dataStoreManager: DataStoreManager
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,6 +54,9 @@ import kotlinx.coroutines.launch
         setContent {
             val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
             val scope = rememberCoroutineScope()
+            val logged = runBlocking {
+                dataStoreManager.isLoggedIn()
+            }
 
             FrontTheme {
                 Surface(modifier = Modifier
@@ -67,14 +77,16 @@ import kotlinx.coroutines.launch
                         DrawerItem(icon = painterResource(id = R.drawable.navbar_profile), label = "Profile", route = Screen.MyProfile.route, secondaryLabel = ""),
                         DrawerItem(icon = painterResource(id = R.drawable.navbar_car), label = "Deliveries", route = Screen.Home.route, secondaryLabel = ""),
                     )
-                    ModalNavigationDrawer(
-                        drawerState=drawerState,
-                        drawerContent = {
-                            ModalDrawerSheet(
-                                modifier = Modifier
-                                    .width(324.dp),
-                                drawerContainerColor = Color(0xFF294E68)
-                            ){
+
+                    if (logged){
+                        ModalNavigationDrawer(
+                            drawerState=drawerState,
+                            drawerContent = {
+                                ModalDrawerSheet(
+                                    modifier = Modifier
+                                        .width(324.dp),
+                                    drawerContainerColor = Color(0xFF294E68)
+                                ){
 //                Box(
 //                    modifier = Modifier
 //                        .fillMaxWidth()
@@ -83,50 +95,61 @@ import kotlinx.coroutines.launch
 //                ) {
 //                    Text(text = "Header", style = MaterialTheme.typography.headlineLarge)
 //                }
-                                Spacer(
-                                    modifier = Modifier
-                                        .height(56.dp)
-                                )
-
-                                items.forEach{item ->
-                                    NavigationDrawerItem(
+                                    Spacer(
                                         modifier = Modifier
+                                            .height(56.dp)
+                                    )
 
-                                        ,
-                                        label = { Text(text = item.label) },
-                                        selected = false,
-                                        onClick = {
-                                            scope.launch { drawerState.close() }
-                                            navController.navigate(route = item.route)
-                                        },
-                                        icon = { Icon(painter = item.icon, contentDescription = null, modifier = Modifier.height(24.dp)) },
-                                        colors = colors(
-                                            unselectedContainerColor = Color(0xFF294E68),
-                                            selectedContainerColor = Color(0xFF263e52),
-                                            unselectedTextColor = Color.White,
-                                            selectedTextColor = Color.White,
-                                            unselectedIconColor = Color.White,
-                                            selectedIconColor = Color.White,
-                                        ),
-                                        shape = RectangleShape
+                                    items.forEach{item ->
+                                        NavigationDrawerItem(
+                                            modifier = Modifier
+
+                                            ,
+                                            label = { Text(text = item.label) },
+                                            selected = false,
+                                            onClick = {
+                                                scope.launch { drawerState.close() }
+                                                navController.navigate(route = item.route)
+                                            },
+                                            icon = { Icon(painter = item.icon, contentDescription = null, modifier = Modifier.height(24.dp)) },
+                                            colors = colors(
+                                                unselectedContainerColor = Color(0xFF294E68),
+                                                selectedContainerColor = Color(0xFF263e52),
+                                                unselectedTextColor = Color.White,
+                                                selectedTextColor = Color.White,
+                                                unselectedIconColor = Color.White,
+                                                selectedIconColor = Color.White,
+                                            ),
+                                            shape = RectangleShape
+                                        )
+                                    }
+
+                                    Text(
+                                        text = "Logout",
+                                        modifier = Modifier
+                                            .clickable {
+                                                //pokaze modal da potvrdi da zeli da se izloguje
+                                                //ukloni token
+                                                //vodi na Login
+                                                runBlocking {
+                                                    dataStoreManager.storeToken("")
+                                                }
+                                                val intent = Intent(this@MainActivity, MainActivity::class.java)
+                                                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+                                                startActivity(intent)
+                                                finish()
+                                            }
                                     )
                                 }
-
-//                Text(
-//                    text = "Logout",
-//                    modifier = Modifier
-//                        .clickable {
-//                            //pokaze modal da potvrdi da zeli da se izloguje
-//                                //ukloni token
-//                            //vodi na Login
-//                        }
-//                )
+                            },
+                            content = {
+                                SetupNavGraph(navController = navController)
                             }
-                        },
-                        content = {
-                            SetupNavGraph(navController = navController)
-                        }
-                    )
+                        )
+                    } else {
+                        SetupNavGraph(navController = navController)
+                    }
+
                 }
             }
         }
