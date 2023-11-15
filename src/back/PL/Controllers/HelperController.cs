@@ -17,8 +17,14 @@ namespace back.PL.Controllers
         [HttpPost("UploadImage")]
         public async Task<IActionResult> UploadImage (IFormFile image, int type, int id)
         {
-            if (image != null) return Ok(await _service.UploadImage(image, type, id));
-            return BadRequest("Greska");
+            try
+            {
+                return Ok(new { Success = await _service.UploadImage(image, type, id) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
         }
     }
 }

@@ -22,6 +22,7 @@ namespace back.BLL.Services
         }
 
         public string defaultImagePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..\\..\\..\\images\\default.png");
+        string imagesFolderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..\\..\\..\\images");
 
         #region registrationHelperMethods
         public string CreateUsername(string name, string lastname)
@@ -226,6 +227,22 @@ namespace back.BLL.Services
             };
 
             return await _authRepository.EditUser(user);
+        }
+
+        public async Task<bool> DeleteProfilePhoto(int userId)
+        {
+            string img = await _authRepository.DeleteProfilePhoto(userId);
+            if (img == null) throw new ArgumentException("No image found!");
+
+            string path = Path.Combine(imagesFolderPath, img);
+
+            if (File.Exists(path))
+            {
+                File.Delete(path);
+                return true;
+            }
+
+            return false;
         }
     }
 }

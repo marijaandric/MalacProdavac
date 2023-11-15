@@ -20,5 +20,6 @@ namespace back.DAL.Repositories
         public Task<bool> LeaveReview(ReviewDto review);
         public Task<bool> LeaveQuestion(QnADto question);
         public Task<bool> AddProductPhoto(int id, string path);
+        public Task<string> DeleteProductPhoto(int photoId);
     }
 }

@@ -1,12 +1,16 @@
 package com.example.front.viewmodels.login
 
+import android.content.Context
+import android.content.Intent
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.front.MainActivity
 import com.example.front.helper.DataStore.DataStoreManager
 import com.example.front.model.DTO.LoginDTO
 import com.example.front.repository.Repository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
 import org.json.JSONException
 import org.json.JSONObject
@@ -16,7 +20,8 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val repository: Repository,
-    private val dataStoreManager: DataStoreManager
+    private val dataStoreManager: DataStoreManager,
+    @ApplicationContext private val context: Context
 ) : ViewModel() {
     val jwtToken: MutableLiveData<String?> = MutableLiveData()
     val errorMessage: MutableLiveData<String> = MutableLiveData()
@@ -71,6 +76,10 @@ class LoginViewModel @Inject constructor(
             val errorMess = errorMessage.value
             if (token != null && errorMess == null) {
                 dataStoreManager.storeToken(token)
+
+                val intent = Intent(context.applicationContext, MainActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+                context.startActivity(intent)
                 return true
             }
         } catch (e: Exception) {

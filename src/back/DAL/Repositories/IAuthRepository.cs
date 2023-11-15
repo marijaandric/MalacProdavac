@@ -13,5 +13,6 @@ namespace back.DAL.Repositories
         public Task<Role> GetRole(string roleName);
         public Task<bool> EditUser(User newUser);
         public Task<bool> ChangeProfilePhoto(int id, string path);
+        public Task<string> DeleteProfilePhoto(int userId);
     }
 }
