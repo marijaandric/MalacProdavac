@@ -13,6 +13,8 @@ namespace back.DAL.Repositories
             _context = context;
         }
 
+        public string imagePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..\\..\\..\\images");
+
         public async Task<bool> Save()
         {
             var save = await _context.SaveChangesAsync();
@@ -76,7 +78,7 @@ namespace back.DAL.Repositories
                 ShopId = p.ShopId,
                 Name = p.Name,
                 Price = p.Price,
-                Image = _context.ProductImages.FirstOrDefault(i => i.ProductId == p.Id).Image,
+                Image = Path.Combine(imagePath, _context.ProductImages.FirstOrDefault(i => i.ProductId == p.Id).Image),
                 Rating = pr.DefaultIfEmpty().Select(x => x.avg).FirstOrDefault(),
             }).Where(x => x.ShopId != shopId).Take(take)).ToList();
 
@@ -93,7 +95,7 @@ namespace back.DAL.Repositories
                                 ShopId = p.ShopId,
                                 Name = p.Name,
                                 Price = p.Price,
-                                Image = _context.ProductImages.FirstOrDefault(i => i.ProductId == p.Id).Image,
+                                Image = Path.Combine(imagePath, _context.ProductImages.FirstOrDefault(i => i.ProductId == p.Id).Image),
                                 Rating = pr.DefaultIfEmpty().Select(x => x.avg).FirstOrDefault()
                             })
                             .Take(3).ToListAsync();
@@ -117,7 +119,7 @@ namespace back.DAL.Repositories
                 Id = s.Id,
                 Name = s.Name,
                 Address = s.Address,
-                Image = s.Image,
+                Image = Path.Combine(imagePath, s.Image),
                 WorkingHours = _context.WorkingHours.Where(x => x.ShopId == s.Id).ToList(),
                 Liked = _context.LikedShops.Any(x => x.ShopId == s.Id && x.UserId == id),
                 Rating = _context.ShopReviews.Where(x => x.ShopId == s.Id).Count() > 0 ? _context.ShopReviews.Where(x => x.ShopId == s.Id).Average(x => x.Rating) : 0
@@ -131,7 +133,7 @@ namespace back.DAL.Repositories
                     Id = s.Id,
                     Name = s.Name,
                     Address = s.Address,
-                    Image = s.Image,
+                    Image = Path.Combine(imagePath, s.Image),
                     WorkingHours = _context.WorkingHours.Where(x => x.ShopId == s.Id).ToList(),
                     Liked = _context.LikedShops.Any(x => x.ShopId == s.Id && x.UserId == id),
                     Rating = _context.ShopReviews.Where(x => x.ShopId == s.Id).Count() > 0 ? _context.ShopReviews.Where(x => x.ShopId == s.Id).Average(x => x.Rating) : 0

@@ -15,6 +15,9 @@ namespace back.DAL.Repositories
             _context = context;
         }
 
+        public string imagePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..\\..\\..\\images");
+
+
         #region filterHelp
         public List<ProductCard> SortProducts(int sort, List<ProductCard> products)
         {
@@ -82,7 +85,7 @@ namespace back.DAL.Repositories
                                         Name = p.Name,
                                         Price = p.Price,
                                         Rating = pr.DefaultIfEmpty().Select(x => x.avg).FirstOrDefault(),
-                                        Image = _context.ProductImages.FirstOrDefault(x => x.ProductId == p.Id).Image
+                                        Image = Path.Combine(imagePath, _context.ProductImages.FirstOrDefault(x => x.ProductId == p.Id).Image)
                                     })
                                     .Where(x => x.Rating >= rating)
                                     .ToListAsync();
@@ -101,7 +104,7 @@ namespace back.DAL.Repositories
                                         Name = p.Name,
                                         Price = p.Price,
                                         Rating = pr.DefaultIfEmpty().Select(x => x.avg).FirstOrDefault(),
-                                        Image = _context.ProductImages.FirstOrDefault(x => x.ProductId == p.Id).Image
+                                        Image = Path.Combine(imagePath, _context.ProductImages.FirstOrDefault(x => x.ProductId == p.Id).Image)
                                     })
                                     .Where(x => x.Rating >= rating)
                                     .ToListAsync();
@@ -159,7 +162,7 @@ namespace back.DAL.Repositories
                                                     Comment = pr.Comment,
                                                     PostedOn = pr.PostedOn,
                                                     Username = _context.Users.FirstOrDefault(x => x.Id == pr.ReviewerId).Username,
-                                                    Image = _context.Users.FirstOrDefault(x => x.Id == pr.ReviewerId).Image,
+                                                    Image = Path.Combine(imagePath, _context.Users.FirstOrDefault(x => x.Id == pr.ReviewerId).Image),
                                                     Product = null 
                                                 }).ToListAsync();
             List<ProductQuestion> questions = await _context.ProductQuestions.Where(x => x.ProductId == productId).ToListAsync();
@@ -177,7 +180,7 @@ namespace back.DAL.Repositories
                                                         }
                                                             ).ToList(); 
             List<Stock> sizes = await _context.ProductSizes.Where(x => x.ProductId == productId).Join(_context.Sizes, ps => ps.SizeId, s => s.Id, (ps, s) => new Stock{ Size = s.Name, Quantity = ps.Stock }).ToListAsync();
-            List<ImageData> images = await _context.ProductImages.Where(x => x.ProductId == productId).Select(x => new ImageData{Id = x.Id, Image = x.Image}).ToListAsync();
+            List<ImageData> images = await _context.ProductImages.Where(x => x.ProductId == productId).Select(x => new ImageData{Id = x.Id, Image = Path.Combine(imagePath, x.Image)}).ToListAsync();
             float average = 0;
             if (reviews.Count > 0) average = reviews.Select(x => x.Rating).Average();
 
@@ -217,7 +220,7 @@ namespace back.DAL.Repositories
                 Comment = x.pr.Comment,
                 Rating = x.pr.Rating,
                 PostedOn = x.pr.PostedOn,
-                Image = x.u.Image,
+                Image = Path.Combine(imagePath, x.u.Image),
                 Username = x.u.Username,
                 Product = null,
                 Reviewer = null

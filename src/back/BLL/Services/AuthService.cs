@@ -157,17 +157,7 @@ namespace back.BLL.Services
             user.Password = passwordHash;
             user.PasswordSalt = passwordSalt;
 
-            if (File.Exists(defaultImagePath))
-            {
-
-                using (var stream = new FileStream(defaultImagePath, FileMode.Open))
-                {
-                    var bytes = new byte[stream.Length];
-                    await stream.ReadAsync(bytes, 0, (int)stream.Length);
-
-                    user.Image = Convert.ToBase64String(bytes);
-                }
-            }
+            if (File.Exists(defaultImagePath)) user.Image = "default.png";
 
             var coordinates = await GetCoordinates(userDto.Address);
             user.Latitude = (float)coordinates.Item1;

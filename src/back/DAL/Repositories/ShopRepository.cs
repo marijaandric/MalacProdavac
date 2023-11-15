@@ -16,6 +16,8 @@ namespace back.DAL.Repositories
             _context = context;
         }
 
+        public string imagePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..\\..\\..\\images");
+
         #region filterHelp
         public List<ShopCard> SortShops(int sort, List<ShopCard> shops)
         {
@@ -74,7 +76,7 @@ namespace back.DAL.Repositories
                         Id = s.Id,
                         Name = s.Name,
                         Address = s.Address,
-                        Image = s.Image,
+                        Image = Path.Combine(imagePath, s.Image),
                         WorkingHours = _context.WorkingHours.Where(x => x.ShopId == s.Id).ToList(),
                         Liked = _context.LikedShops.Any(x => x.ShopId == s.Id && x.UserId == userId),
                         Rating = sr.DefaultIfEmpty().Select(x => x.AvgRating).FirstOrDefault()
@@ -150,7 +152,7 @@ namespace back.DAL.Repositories
                 Id = shop.Id,
                 Name = shop.Name,
                 Address = shop.Address,
-                Image = shop.Image,
+                Image = Path.Combine(imagePath, shop.Image),
                 Rating = avg,
                 Liked = _context.LikedShops.Any(x => x.ShopId == shopId && x.UserId ==  userId),
                 BoughtFrom = _context.Orders.Join(_context.OrderItems, o => o.Id, oi => oi.OrderId, (o, oi) => new { o, oi })
