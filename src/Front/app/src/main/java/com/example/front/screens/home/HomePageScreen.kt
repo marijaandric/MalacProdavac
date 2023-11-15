@@ -1,5 +1,6 @@
 package com.example.front.screens.home
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Button
@@ -46,13 +48,12 @@ import com.example.front.navigation.Screen
 import com.example.front.viewmodels.home.HomeViewModel
 
 @Composable
-fun HomePage(
-    navController: NavHostController,
-    homeViewModel: HomeViewModel
-) {
+fun HomePage(navController: NavHostController, homeViewModel: HomeViewModel) {
+
     LaunchedEffect(Unit) {
-        homeViewModel.getUserId()?.let { homeViewModel.getHomeProducts(it) }
-        homeViewModel.getUserId()?.let { homeViewModel.getHomeShops(it) }
+        homeViewModel.getHomeProducts()
+        homeViewModel.getHomeShops()
+        homeViewModel.getUsername()
     }
 
     LazyColumn(
@@ -71,10 +72,11 @@ fun HomePage(
 }
 
 data class CardData(
+    val id: Int,
     val title: String,
     val description: String,
     val imageResource: Int,
-    val id: Int
+    var isLiked: Boolean
 )
 
 @Composable
@@ -83,10 +85,11 @@ fun Products(viewModel: HomeViewModel, navController: NavHostController) {
 
     val products = state.products?.mapIndexed { index, productsState ->
         CardData(
+            id = productsState.id,
             title = productsState.name,
-            description = productsState.price.toString() + " din",
+            description = productsState.price.toString()+" din",
             imageResource = R.drawable.imageplaceholder,
-            id = productsState.id
+            isLiked = false
         )
     }?.toList() ?: emptyList()
 
@@ -122,10 +125,11 @@ fun Sellers(viewModel: HomeViewModel) {
 
     val sellers = state.shops?.mapIndexed { index, shopState ->
         CardData(
+            id = shopState.id,
             title = shopState.name,
             description = shopState.address,
             imageResource = R.drawable.imageplaceholder,
-            id = shopState.id
+            isLiked = shopState.liked
         )
     }?.toList() ?: emptyList()
 
@@ -140,12 +144,18 @@ fun Sellers(viewModel: HomeViewModel) {
         ) {
             if (viewModel.stateShop.value.isLoading) {
 
-            } else {
-                items(sellers) { cardData ->
+            }
+            else{
+                itemsIndexed(sellers) { index, cardData ->
                     SellerCard(
                         title = cardData.title,
                         author = cardData.description,
                         imageResource = cardData.imageResource,
+                        isLiked = cardData.isLiked,
+                        onClick = {
+                            viewModel.updateLikeStatus(index, !cardData.isLiked)
+                            viewModel.changeLikedState(cardData.id)
+                        }
                     )
                     Spacer(modifier = Modifier.width(16.dp))
                 }

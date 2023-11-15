@@ -1,13 +1,9 @@
 package com.example.front.screens.userprofile
 
-import android.R.attr.bitmap
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
-import android.graphics.ImageDecoder
 import android.net.Uri
-import android.os.Build
-import android.provider.MediaStore
-import android.util.Base64
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -56,9 +52,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asAndroidBitmap
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
@@ -78,7 +71,6 @@ import com.example.front.components.MyTextField
 import com.example.front.model.user.UserEditDTO
 import com.example.front.viewmodels.myprofile.MyProfileViewModel
 import kotlinx.coroutines.delay
-import java.io.ByteArrayOutputStream
 
 
 @Composable
@@ -508,24 +500,9 @@ fun TopCenterImages(myProfileViewModel: MyProfileViewModel) {
                 else{
                     if(myProfileViewModel.state.value.info!!.image.isNotEmpty())
                     {
-                        ImageItemForProfilePic(image = myProfileViewModel.state.value.info!!.image, onEditClick = {
+                        ImageItemForProfilePic(image = myProfileViewModel.state.value!!.info!!.image, onEditClick = {
                             photoPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-                            uri?.let {
-                                if (Build.VERSION.SDK_INT < 28)
-                                {
-                                    bitmap.value = MediaStore.Images.Media.getBitmap(context.contentResolver, it)
-                                }else{
-                                    val source = ImageDecoder.createSource(context.contentResolver, it)
-                                    bitmap.value = ImageDecoder.decodeBitmap(source)
-                                }
-
-                                bitmap.value?.let{btm ->
-                                    //imagee = convertImageBitmapToBase64(btm.asImageBitmap())
-                                }
-
-                            }
                         })
-
                     }
                 }
 
@@ -553,15 +530,6 @@ fun TopCenterImages(myProfileViewModel: MyProfileViewModel) {
         EditDialog(onDismiss = { showDialog.value = false },myProfileViewModel)
     }
 }
-
-private fun convertImageBitmapToBase64(imageBitmap: ImageBitmap): String {
-    val androidBitmap: Bitmap = imageBitmap.asAndroidBitmap()
-    val byteArrayOutputStream = ByteArrayOutputStream()
-    androidBitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream)
-    val byteArray = byteArrayOutputStream.toByteArray()
-    return Base64.encodeToString(byteArray, Base64.DEFAULT)
-}
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
