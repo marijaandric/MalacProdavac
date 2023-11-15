@@ -36,7 +36,7 @@ namespace back.DAL.Repositories
             {
                 Id = userId,
                 Name = user.Name,
-                Image = user.Image
+                Image = user.Image,
                 Role = role,
                 RoleId = user.RoleId,
                 Username = user.Username,
