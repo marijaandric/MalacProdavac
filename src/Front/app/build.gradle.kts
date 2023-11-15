@@ -4,6 +4,7 @@ plugins {
     id("org.jetbrains.kotlin.plugin.serialization") version "1.8.0"
     kotlin("kapt")
     id("com.google.dagger.hilt.android")
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 }
 
 android {
@@ -126,8 +127,13 @@ dependencies {
 
     //Coil
     implementation("io.coil-kt:coil-compose:1.4.0")
-    // mape
-    //implementation("com.google.maps.android:maps-compose:2.15.0")
+
+    // google mape
+    implementation("com.google.maps.android:maps-compose:2.15.0")
+    implementation("com.google.android.gms:play-services-maps:18.1.0")
+
+    // osm
+    implementation ("org.osmdroid:osmdroid-android:6.1.10")
 
 
 
