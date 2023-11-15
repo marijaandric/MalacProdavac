@@ -10,10 +10,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.front.helper.DataStore.DataStoreManager
 import com.example.front.model.user.UserEditDTO
 import com.example.front.repository.Repository
-import com.example.front.screens.home.HomeProductsState
-import com.example.front.screens.home.HomeShopState
-import com.example.front.screens.userprofile.EditState
-import com.example.front.screens.userprofile.MyProfileState
+import com.example.front.screens.userprofile.states.EditState
+import com.example.front.screens.userprofile.states.MyProfileState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -78,6 +76,13 @@ class MyProfileViewModel @Inject constructor(
                 Log.d("Error", _stateEdit.value!!.error)
             }
         }
+    }
+
+    fun changeImage(imagee: String)
+    {
+        _state.value = _state.value!!.copy(
+            info = _state.value.info!!.copy(image = imagee)
+        )
     }
 
 }

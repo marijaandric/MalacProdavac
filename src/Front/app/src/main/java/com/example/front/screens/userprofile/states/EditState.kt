@@ -1,4 +1,4 @@
-package com.example.front.screens.userprofile
+package com.example.front.screens.userprofile.states
 
 import com.example.front.model.response.LoginResponse
 

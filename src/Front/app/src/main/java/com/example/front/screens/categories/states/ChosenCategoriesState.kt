@@ -1,4 +1,4 @@
-package com.example.front.screens.categories
+package com.example.front.screens.categories.states
 
 data class ChosenCategoriesState (
     var isLoading : Boolean = true,

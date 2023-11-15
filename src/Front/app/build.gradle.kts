@@ -126,6 +126,10 @@ dependencies {
 
     //Coil
     implementation("io.coil-kt:coil-compose:1.4.0")
+    // mape
+    implementation("org.osmdroid:osmdroid-android:6.1.5")
+
+
 }
 
 kapt {

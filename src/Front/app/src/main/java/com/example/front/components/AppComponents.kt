@@ -2,6 +2,7 @@ package com.example.front.components
 
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -27,6 +28,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -294,7 +296,7 @@ fun BigBlueButton(text: String, onClick: () -> Unit, width: Float, modifier: Mod
 }
 
 @Composable
-fun SellerCard(title: String, author: String, imageResource: Int) {
+fun SellerCard(title: String, author: String, imageResource: Int,isLiked: Boolean,onClick: () -> Unit ) {
     Card(
         modifier = Modifier
             .width(320.dp)
@@ -320,13 +322,16 @@ fun SellerCard(title: String, author: String, imageResource: Int) {
                 )
 
                 Image(
-                    painter = painterResource(id = R.drawable.srce),
+                    painter = painterResource(if(isLiked) R.drawable.srcefull else R.drawable.srce),
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .size(50.dp)
                         .align(Alignment.TopEnd)
                         .padding(8.dp)
+                        .clickable {
+                            onClick()
+                        }
                 )
             }
 
@@ -464,6 +469,7 @@ fun ImageItemForProfilePic(image: String, onEditClick: () -> Unit) {
                 .border(4.dp, Color.White, CircleShape)
         )
 
+
         Box(
             modifier = Modifier
                 .align(Alignment.TopEnd)
@@ -478,6 +484,43 @@ fun ImageItemForProfilePic(image: String, onEditClick: () -> Unit) {
                 contentDescription = "Edit",
                 tint = Color.White,
                 modifier = Modifier.size(24.dp)
+            )
+        }
+    }
+}
+
+@Composable
+fun SmallElipseAndTitle(title:String) {
+    Box(
+        contentAlignment = Alignment.CenterStart,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.elipsemala),
+            contentDescription = "Elipse",
+            contentScale = ContentScale.FillWidth,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Box(
+            modifier = Modifier.padding(start=16.dp, end = 16.dp)
+                .fillMaxWidth(),
+            contentAlignment = Alignment.CenterStart
+        )
+        {
+            Icon(
+                imageVector = Icons.Default.Menu,
+                contentDescription = "Menu icon",
+                modifier = Modifier
+                    .padding(end = 10.dp)
+                    .size(50.dp)
+                    .align(Alignment.CenterStart),
+                tint = MaterialTheme.colorScheme.background,
+            )
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleLarge.copy(color = MaterialTheme.colorScheme.background),
+                modifier = Modifier.align(Alignment.Center)
             )
         }
     }

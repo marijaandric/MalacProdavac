@@ -1,4 +1,4 @@
-package com.example.front.screens.home
+package com.example.front.screens.home.states
 
 import com.example.front.model.DTO.ShopDTO
 
