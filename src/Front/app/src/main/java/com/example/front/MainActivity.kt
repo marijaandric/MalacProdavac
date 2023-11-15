@@ -125,8 +125,8 @@ import kotlinx.coroutines.launch
                             }
                         },
                         content = {
-                            SetupNavGraph(navController = navController)
-                            //SellersScreen()
+                            //SetupNavGraph(navController = navController)
+                            SellersScreen()
                         }
                     )
                 }

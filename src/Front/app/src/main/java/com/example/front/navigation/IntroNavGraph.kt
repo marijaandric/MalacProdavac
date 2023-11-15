@@ -33,10 +33,9 @@ fun NavGraphBuilder.introNavGraph(
         }
         composable(route=Screen.Intro1.route)
         {
-            Log.e("USAO SAM", "USAOOOOO")
             Intro("Welcome to MalacProdavac","","intro1",0,navController = navController)
             val desc = "Showcase your products and engage with local customers! Increase your visibility and sales."
-            val desc2 = "Showcase your products and engage with local customers! Increase your visibility and sales."
+            val desc2 = "Explore a wide range of local products and services. Support your community."
             val desc3 = "Efficiently manage your delivery schedule. Connect with local businesses and earn more."
             val pagerState = rememberPagerState(
                 initialPageOffsetFraction = 0f
@@ -58,7 +57,7 @@ fun NavGraphBuilder.introNavGraph(
         {
             val desc = "Showcase your products and engage with local customers! Increase your visibility and sales."
             Intro("Business owners",desc,"intro2",1,navController = navController)
-            val desc2 = "Showcase your products and engage with local customers! Increase your visibility and sales."
+            val desc2 = "Explore a wide range of local products and services. Support your community."
             val desc3 = "Efficiently manage your delivery schedule. Connect with local businesses and earn more."
             val pagerState = rememberPagerState(
                 initialPage = 1,
@@ -80,10 +79,10 @@ fun NavGraphBuilder.introNavGraph(
         }
         composable(route = Screen.Intro3.route)
         {
-            val desc = "Explore a wide range of local products and services. Support your community."
-            Intro("Customers",desc,"intro3",2,navController = navController)
-            val desc2 = "Showcase your products and engage with local customers! Increase your visibility and sales."
+            val desc = "Showcase your products and engage with local customers. Increase your visibility and sales."
+            val desc2 = "Explore a wide range of local products and services. Support your community."
             val desc3 = "Efficiently manage your delivery schedule. Connect with local businesses and earn more."
+            Intro("Customers",desc2,"intro3",2,navController = navController)
             val pagerState = rememberPagerState(
                 initialPage = 2,
                 initialPageOffsetFraction = 0f
@@ -103,14 +102,14 @@ fun NavGraphBuilder.introNavGraph(
         }
         composable(route = Screen.Intro4.route)
         {
-            val desc = "Efficiently manage your delivery schedule. Connect with local businesses and earn more."
-            Intro("Delivery people",desc,"intro4",3,navController = navController)
+            val desc = "Showcase your products and engage with local customers. Increase your visibility and sales."
+            val desc2 = "Explore a wide range of local products and services. Support your community."
+            val desc3 = "Efficiently manage your delivery schedule. Connect with local businesses and earn more."
+            Intro("Delivery people",desc3,"intro4",3,navController = navController)
             val pagerState = rememberPagerState(
                 initialPage = 3,
                 initialPageOffsetFraction = 0f
             )
-            val desc2 = "Showcase your products and engage with local customers! Increase your visibility and sales."
-            val desc3 = "Efficiently manage your delivery schedule. Connect with local businesses and earn more."
             Scaffold() {
                 HorizontalPager(pageCount = 4,state = pagerState) { page->
                     val pageContent = when (page) {
