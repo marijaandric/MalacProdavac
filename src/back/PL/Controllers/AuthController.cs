@@ -70,5 +70,18 @@ namespace back.PL.Controllers
                 return BadRequest(new { Error = ex.Message });
             }
         }
+
+        [HttpPut("DefaultProfilePhoto")]
+        public async Task<IActionResult> DefaultProfilePhoto(int userId)
+        {
+            try
+            {
+                return Ok(new { Success = await _authService.DeleteProfilePhoto(userId) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
     }
 }

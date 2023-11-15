@@ -147,5 +147,18 @@ namespace back.PL.Controllers
                 return BadRequest(new { Error = ex.Message });
             }
         }
+
+        [HttpDelete("DeleteProductImage")]
+        public async Task<IActionResult> DeleteProductImage(int imageId)
+        {
+            try
+            {
+                return Ok(new { Success = await _service.DeleteProductPhoto(imageId) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
     }
 }

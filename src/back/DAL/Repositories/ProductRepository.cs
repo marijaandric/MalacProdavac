@@ -10,6 +10,7 @@ namespace back.DAL.Repositories
     {
         Context _context;
         int numberOfItems = 10;
+        int numberOfReviews = 3;
         public ProductRepository(Context context)
         {
             _context = context;
@@ -210,7 +211,24 @@ namespace back.DAL.Repositories
 
         public async Task<List<ProductReviewExtended>> GetProductReviews(int productId, int page)
         {
-            return await _context.ProductReviews.Where(x => x.ProductId == productId).Join(_context.Users, pr => pr.ReviewerId, u => u.Id, (pr, u) => new {pr, u}).Select(x => new ProductReviewExtended
+            if (page == 0)
+            {
+                return await _context.ProductReviews.Where(x => x.ProductId == productId).Join(_context.Users, pr => pr.ReviewerId, u => u.Id, (pr, u) => new { pr, u }).Select(x => new ProductReviewExtended
+                {
+                    ProductId = productId,
+                    ReviewerId = x.pr.ReviewerId,
+                    Comment = x.pr.Comment,
+                    Rating = x.pr.Rating,
+                    PostedOn = x.pr.PostedOn,
+                    Image = x.u.Image,
+                    Username = x.u.Username,
+                    Product = null,
+                    Reviewer = null
+
+                }).Take(1).ToListAsync();
+            }
+
+            return await _context.ProductReviews.Where(x => x.ProductId == productId).Join(_context.Users, pr => pr.ReviewerId, u => u.Id, (pr, u) => new { pr, u }).Select(x => new ProductReviewExtended
             {
                 ProductId = productId,
                 ReviewerId = x.pr.ReviewerId,
@@ -221,8 +239,8 @@ namespace back.DAL.Repositories
                 Username = x.u.Username,
                 Product = null,
                 Reviewer = null
-                
-            }).Skip((page-1) * numberOfItems).Take(numberOfItems).ToListAsync();
+
+            }).Skip((page - 1) * numberOfReviews).Take(numberOfReviews).ToListAsync();            
         }
 
         #region likes
@@ -304,6 +322,15 @@ namespace back.DAL.Repositories
         {
             _context.ProductImages.Add(new ProductImage { Image = path, ProductId = id });
             return await _context.SaveChangesAsync() > 0;
+        }
+
+        public async Task<string> DeleteProductPhoto(int photoId)
+        {
+            ProductImage pi = await _context.ProductImages.FirstOrDefaultAsync(x => x.Id == photoId);
+            string name = pi.Image;
+            _context.ProductImages.Remove(pi);
+            await _context.SaveChangesAsync();
+            return name;
         }
     }
 }
