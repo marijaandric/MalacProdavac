@@ -14,9 +14,11 @@ namespace back.BLL.Services
             _repository = repository;
         }
 
-        public async Task<List<ProductCard>> GetProducts(int userId, List<int> categories, int rating, bool open, int range, string location, int sort, string search, int page, int specificShopId)
+        string imagesFolderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..\\..\\..\\images");
+
+        public async Task<List<ProductCard>> GetProducts(int userId, List<int> categories, int rating, bool open, int range, string location, int sort, string search, int page, int specificShopId, bool favorite)
         {
-            List<ProductCard> products = await _repository.GetProducts(userId, categories, rating, open, range, location, sort, search, page, specificShopId);
+            List<ProductCard> products = await _repository.GetProducts(userId, categories, rating, open, range, location, sort, search, page, specificShopId, favorite);
             if (products.Count == 0) throw new ArgumentException("No products found.");
             return products;
         }
@@ -86,6 +88,22 @@ namespace back.BLL.Services
         {
             if (await _repository.LeaveQuestion(question)) return true;
             throw new ArgumentException("Question could not be saved!");
+        }
+
+        public async Task<bool> DeleteProductPhoto(int photoId)
+        {
+            string img = await _repository.DeleteProductPhoto(photoId);
+            if (img == null) throw new ArgumentException("No image found!");
+
+            string path = Path.Combine(imagesFolderPath, img);
+
+            if (File.Exists(path))
+            {
+                File.Delete(path);
+                return true;
+            }
+
+            return false;
         }
     }
 }

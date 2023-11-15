@@ -17,11 +17,11 @@ namespace back.PL.Controllers
         }
 
         [HttpGet("GetProducts")]
-        public async Task<IActionResult> GetProducts(int userId, [FromQuery] List<int> categories, int rating, bool open, int range, string location, int sort, string search, int page)
+        public async Task<IActionResult> GetProducts(int userId, [FromQuery] List<int> categories, int rating, bool open, int range, string location, int sort, string search, int page, bool favorite)
         {
             try
             {
-                return Ok(await _service.GetProducts(userId, categories, rating, open, range, location, sort, search, page, -1));
+                return Ok(await _service.GetProducts(userId, categories, rating, open, range, location, sort, search, page, -1, favorite));
             }
             catch (Exception ex)
             {
@@ -141,6 +141,19 @@ namespace back.PL.Controllers
             try
             {
                 return Ok(new { success = await _service.LeaveQuestion(question) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
+
+        [HttpDelete("DeleteProductImage")]
+        public async Task<IActionResult> DeleteProductImage(int imageId)
+        {
+            try
+            {
+                return Ok(new { Success = await _service.DeleteProductPhoto(imageId) });
             }
             catch (Exception ex)
             {

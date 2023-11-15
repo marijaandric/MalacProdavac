@@ -55,7 +55,7 @@ namespace back.DAL.Repositories
 
         #endregion
 
-        public async Task<List<ShopCard>> GetShops(int userId, List<int> categories, int rating, bool open, int range, string location, int sort, string search, int page)
+        public async Task<List<ShopCard>> GetShops(int userId, List<int> categories, int rating, bool open, int range, string location, int sort, string search, int page, bool favorite)
         {
             User currentUser = _context.Users.FirstOrDefault(x => x.Id == userId);
             float currLat = currentUser.Latitude;
@@ -80,9 +80,14 @@ namespace back.DAL.Repositories
                         Rating = sr.DefaultIfEmpty().Select(x => x.AvgRating).FirstOrDefault()
                     })
                 .Where(x => x.Rating >= rating)
-                .Join(_context.ShopCategories.Where(x => categories.Contains(x.CategoryId)), s => s.Id, sr => sr.ShopId, (s, sr) => s).Distinct()
+                .Join(_context.ShopCategories.Where(x => categories.Contains(x.CategoryId)), s => s.Id, sr => sr.ShopId, (s, sr) => s)
+                .GroupBy(x => x.Id).Select(x => x.First())
                 .ToListAsync();
             
+            if (favorite)
+            {
+                shops = shops.Join(_context.LikedShops.Where(x => x.UserId == userId), s => s.Id, ls => ls.ShopId, (s, ls) => s).ToList();
+            }
 
             if (open)
             {
@@ -191,6 +196,13 @@ namespace back.DAL.Repositories
             });
 
             return _context.SaveChanges() > 0;
+        }
+
+        public async Task<bool> ChangeShopPhoto(int id, string path)
+        {
+            Shop s = await _context.Shop.FirstOrDefaultAsync(x => x.Id == id);
+            s.Image = path;
+            return await _context.SaveChangesAsync() > 0;
         }
     }
 }

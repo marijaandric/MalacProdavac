@@ -1,7 +1,6 @@
 ﻿using back.BLL.Dtos;
 using back.DAL.Repositories;
 using back.Models;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Linq;
 using System.IdentityModel.Tokens.Jwt;
@@ -23,6 +22,7 @@ namespace back.BLL.Services
         }
 
         public string defaultImagePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..\\..\\..\\images\\default.png");
+        string imagesFolderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..\\..\\..\\images");
 
         #region registrationHelperMethods
         public string CreateUsername(string name, string lastname)
@@ -158,17 +158,7 @@ namespace back.BLL.Services
             user.Password = passwordHash;
             user.PasswordSalt = passwordSalt;
 
-            if (File.Exists(defaultImagePath))
-            {
-
-                using (var stream = new FileStream(defaultImagePath, FileMode.Open))
-                {
-                    var bytes = new byte[stream.Length];
-                    await stream.ReadAsync(bytes, 0, (int)stream.Length);
-
-                    user.Image = Convert.ToBase64String(bytes);
-                }
-            }
+            if (File.Exists(defaultImagePath)) user.Image = "default.png";
 
             var coordinates = await GetCoordinates(userDto.Address);
             user.Latitude = (float)coordinates.Item1;
@@ -218,7 +208,6 @@ namespace back.BLL.Services
             
 
             if (values.RoleId != null) newUser.RoleId = (int)values.RoleId;
-            if (values.Image.Length > 0) newUser.Image = values.Image;
             if (values.Name.Length > 0) newUser.Name = values.Name;
 
             if (await _authRepository.EditUser(newUser)) return await CreateToken(newUser);
@@ -238,6 +227,22 @@ namespace back.BLL.Services
             };
 
             return await _authRepository.EditUser(user);
+        }
+
+        public async Task<bool> DeleteProfilePhoto(int userId)
+        {
+            string img = await _authRepository.DeleteProfilePhoto(userId);
+            if (img == null) throw new ArgumentException("No image found!");
+
+            string path = Path.Combine(imagesFolderPath, img);
+
+            if (File.Exists(path))
+            {
+                File.Delete(path);
+                return true;
+            }
+
+            return false;
         }
     }
 }

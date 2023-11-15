@@ -1,4 +1,4 @@
-    package com.example.front
+package com.example.front
 
 import android.content.Intent
 import android.os.Bundle
@@ -59,23 +59,75 @@ import javax.inject.Inject
             }
 
             FrontTheme {
-                Surface(modifier = Modifier
-                    .fillMaxSize()
-                    .background(color = MaterialTheme.colorScheme.background)) {
+                Surface(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(color = MaterialTheme.colorScheme.background)
+                ) {
                     navController = rememberNavController()
 
 
                     val items = listOf(
-                        DrawerItem(icon = painterResource(id = R.drawable.navbar_home), label = "Home", route = Screen.Home.route, secondaryLabel = ""),
-                        DrawerItem(icon = painterResource(id = R.drawable.navbar_cart2), label = "My cart", route = Screen.Home.route, secondaryLabel = ""),
-                        DrawerItem(icon = painterResource(id = R.drawable.navbar_cart1), label = "My orders", route = Screen.Home.route, secondaryLabel = ""),
-                        DrawerItem(icon = painterResource(id = R.drawable.navbar_package), label = "Products", route = Screen.Home.route, secondaryLabel = ""),
-                        DrawerItem(icon = painterResource(id = R.drawable.navbar_shop1), label = "Shops", route = Screen.Home.route, secondaryLabel = ""),
-                        DrawerItem(icon = painterResource(id = R.drawable.navbar_bell), label = "Notifications", route = Screen.Home.route, secondaryLabel = ""),
-                        DrawerItem(icon = painterResource(id = R.drawable.navbar_shop2), label = "My shop", route = Screen.Home.route, secondaryLabel = ""),
-                        DrawerItem(icon = painterResource(id = R.drawable.navbar_message), label = "Messages", route = Screen.Home.route, secondaryLabel = ""),
-                        DrawerItem(icon = painterResource(id = R.drawable.navbar_profile), label = "Profile", route = Screen.MyProfile.route, secondaryLabel = ""),
-                        DrawerItem(icon = painterResource(id = R.drawable.navbar_car), label = "Deliveries", route = Screen.Home.route, secondaryLabel = ""),
+                        DrawerItem(
+                            icon = painterResource(id = R.drawable.navbar_home),
+                            label = "Home",
+                            route = Screen.Home.route,
+                            secondaryLabel = ""
+                        ),
+                        DrawerItem(
+                            icon = painterResource(id = R.drawable.navbar_cart2),
+                            label = "My cart",
+                            route = Screen.Home.route,
+                            secondaryLabel = ""
+                        ),
+                        DrawerItem(
+                            icon = painterResource(id = R.drawable.navbar_cart1),
+                            label = "My orders",
+                            route = Screen.Home.route,
+                            secondaryLabel = ""
+                        ),
+                        DrawerItem(
+                            icon = painterResource(id = R.drawable.navbar_package),
+                            label = "Products",
+                            route = Screen.Home.route,
+                            secondaryLabel = ""
+                        ),
+                        DrawerItem(
+                            icon = painterResource(id = R.drawable.navbar_shop1),
+                            label = "Shops",
+                            route = Screen.Home.route,
+                            secondaryLabel = ""
+                        ),
+                        DrawerItem(
+                            icon = painterResource(id = R.drawable.navbar_bell),
+                            label = "Notifications",
+                            route = Screen.Home.route,
+                            secondaryLabel = ""
+                        ),
+                        DrawerItem(
+                            icon = painterResource(id = R.drawable.navbar_shop2),
+                            label = "My shop",
+                            route = Screen.Home.route,
+                            secondaryLabel = ""
+                        ),
+                        DrawerItem(
+                            icon = painterResource(id = R.drawable.navbar_message),
+                            label = "Messages",
+                            route = Screen.Home.route,
+                            secondaryLabel = ""
+                        ),
+                        DrawerItem(
+                            icon = painterResource(id = R.drawable.navbar_profile),
+                            label = "Profile",
+                            route = Screen.MyProfile.route,
+                            secondaryLabel = ""
+                        ),
+                        DrawerItem(
+                            icon = painterResource(id = R.drawable.navbar_car),
+                            label = "Deliveries",
+                            route = Screen.Home.route,
+                            secondaryLabel = ""
+                        ),
                     )
 
                     if (logged){

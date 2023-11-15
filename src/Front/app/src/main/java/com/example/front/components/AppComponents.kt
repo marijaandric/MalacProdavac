@@ -1,6 +1,10 @@
 package com.example.front.components
 
 import android.graphics.BitmapFactory
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -57,17 +61,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.front.R
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavHostController
+import coil.compose.rememberAsyncImagePainter
+import coil.compose.rememberImagePainter
 import com.example.front.model.DTO.ImageDataDTO
+import com.example.front.navigation.Screen
 import com.example.front.ui.theme.DarkBlue
 import com.example.front.ui.theme.LightBlue
 import com.example.front.ui.theme.MainBlue
 import com.example.front.ui.theme.Typography
+import java.io.File
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
 @Composable
-fun TitleTextComponent(value:String){
+fun TitleTextComponent(value: String) {
     Text(
         text = value,
         modifier = Modifier
@@ -108,7 +118,7 @@ fun MyTextField(
         },
         visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
         keyboardOptions = KeyboardOptions.Default.copy(
-            keyboardType =  if (isPassword) KeyboardType.Password else KeyboardType.Text,
+            keyboardType = if (isPassword) KeyboardType.Password else KeyboardType.Text,
             imeAction = if (isLast) ImeAction.Done else ImeAction.Next
         ),
         shape = RoundedCornerShape(20.dp)
@@ -117,13 +127,20 @@ fun MyTextField(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchTextField(valuee: String,placeh:String, onValueChangee: (String) -> Unit) {
+fun SearchTextField(
+    valuee: String,
+    placeh: String,
+    onValueChangee: (String) -> Unit,
+    modifier: Modifier
+) {
     var value = valuee
 
-    OutlinedTextField(value = value,
+    OutlinedTextField(
+        value = value,
         colors = TextFieldDefaults.outlinedTextFieldColors(
             cursorColor = MaterialTheme.colorScheme.onSurface,
-            containerColor = Color.White),
+            containerColor = Color.White
+        ),
         leadingIcon = {
             Icon(
                 imageVector = Icons.Default.Search,
@@ -132,8 +149,16 @@ fun SearchTextField(valuee: String,placeh:String, onValueChangee: (String) -> Un
         },
         onValueChange = onValueChangee,
         shape = RoundedCornerShape(50.dp),
-        modifier = Modifier.height(50.dp),
-        placeholder  = { Text(text = placeh) }
+        modifier = Modifier
+            .height(50.dp)
+            .then(modifier),
+        placeholder = {
+            Text(
+                text = placeh,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth() // Ensure the Text takes up the full width
+            )
+        }
     )
 }
 
@@ -148,18 +173,22 @@ fun HeaderImage(painterResource: Painter) {
     )
 }
 
+@OptIn(ExperimentalEncodingApi::class)
 @Composable
-fun ProductImage(painterResource: Painter) {
+fun ProductImage(image: String) {
+    val imageUrl = "http://softeng.pmf.kg.ac.rs:10015/images/${image}"
+
+    val painter: Painter = rememberAsyncImagePainter(model = imageUrl)
     Image(
-        painter = painterResource,
-        contentDescription = "",
+        painter = painter,
+        contentDescription = null,
         modifier = Modifier.fillMaxWidth(),
         contentScale = ContentScale.FillWidth
     )
 }
 
 @Composable
-fun ToggleImageButton(modifier:Modifier) {
+fun ToggleImageButton(modifier: Modifier) {
     var isToggled by remember { mutableStateOf(false) }
 
     val currentImage = if (isToggled) painterResource(id = R.drawable.srcefull)
@@ -203,8 +232,9 @@ fun ErrorTextComponent(text: String) {
         fontWeight = FontWeight(200)
     )
 }
+
 @Composable
-fun MediumBlueButton(text:String,onClick: () -> Unit,width:Float,modifier: Modifier) {
+fun MediumBlueButton(text: String, onClick: () -> Unit, width: Float, modifier: Modifier) {
     val primaryColor = MainBlue
     Button(
         onClick = onClick,
@@ -216,13 +246,15 @@ fun MediumBlueButton(text:String,onClick: () -> Unit,width:Float,modifier: Modif
         colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
         shape = RoundedCornerShape(20)
     ) {
-        Text(text = text,
-            style = Typography.bodyLarge)
+        Text(
+            text = text,
+            style = Typography.bodyLarge
+        )
     }
 }
 
 @Composable
-fun CardButton(text:String,onClick: () -> Unit,width:Float,modifier: Modifier,color : Color) {
+fun CardButton(text: String, onClick: () -> Unit, width: Float, modifier: Modifier, color: Color) {
     val primaryColor = MainBlue
     Button(
         onClick = onClick,
@@ -233,14 +265,16 @@ fun CardButton(text:String,onClick: () -> Unit,width:Float,modifier: Modifier,co
         colors = ButtonDefaults.buttonColors(containerColor = color),
         shape = RoundedCornerShape(20)
     ) {
-        Text(text = text,
-            style = Typography.bodyLarge)
+        Text(
+            text = text,
+            style = Typography.bodyLarge
+        )
     }
 }
 
 
 @Composable
-fun BigBlueButton(text:String,onClick: () -> Unit,width:Float,modifier: Modifier) {
+fun BigBlueButton(text: String, onClick: () -> Unit, width: Float, modifier: Modifier) {
     val primaryColor = MainBlue
     Button(
         onClick = onClick,
@@ -252,8 +286,10 @@ fun BigBlueButton(text:String,onClick: () -> Unit,width:Float,modifier: Modifier
         colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
         shape = RoundedCornerShape(30)
     ) {
-        Text(text = text,
-            style = Typography.labelSmall)
+        Text(
+            text = text,
+            style = Typography.labelSmall
+        )
     }
 }
 
@@ -306,8 +342,20 @@ fun SellerCard(title: String, author: String, imageResource: Int) {
                     modifier = Modifier.padding(top = 10.dp)
                 )
                 {
-                    CardButton(text = "More info", onClick = { /*TODO*/ }, width = 0.52f, modifier = Modifier.padding(end=8.dp), color = MaterialTheme.colorScheme.secondary)
-                    CardButton(text = "Products", onClick = { /*TODO*/ }, width = 1f, modifier = Modifier, color = MaterialTheme.colorScheme.primary)
+                    CardButton(
+                        text = "More info",
+                        onClick = { /*TODO*/ },
+                        width = 0.52f,
+                        modifier = Modifier.padding(end = 8.dp),
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                    CardButton(
+                        text = "Products",
+                        onClick = { /*TODO*/ },
+                        width = 1f,
+                        modifier = Modifier,
+                        color = MaterialTheme.colorScheme.primary
+                    )
                 }
             }
         }
@@ -315,14 +363,20 @@ fun SellerCard(title: String, author: String, imageResource: Int) {
 }
 
 
-
 @Composable
-fun ProductCard(title: String, price: String, imageResource: Int) {
+fun ProductCard(
+    title: String,
+    price: String,
+    imageResource: Int,
+    navController: NavHostController,
+    id:Int
+) {
     Card(
         modifier = Modifier
             .width(350.dp)
             .clip(RoundedCornerShape(20.dp))
             .padding(bottom = 15.dp)
+            .clickable { navController.navigate("${Screen.Product.route}/$id") }
     ) {
         Row(
             modifier = Modifier.fillMaxWidth()
@@ -341,16 +395,25 @@ fun ProductCard(title: String, price: String, imageResource: Int) {
                 modifier = Modifier.padding(8.dp)
             ) {
                 Text(text = title, fontWeight = FontWeight.Bold, fontSize = 17.sp)
-                Text(text = price, fontWeight = FontWeight.Bold,fontSize = 15.sp, modifier = Modifier.padding(bottom=25.dp,top=5.dp), color = MaterialTheme.colorScheme.secondary)
-                CardButton(text = "Add to cart", onClick = { /*TODO*/ }, width = 0.9f, modifier = Modifier, color = MaterialTheme.colorScheme.secondary)
+                Text(
+                    text = price,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 15.sp,
+                    modifier = Modifier.padding(bottom = 25.dp, top = 5.dp),
+                    color = MaterialTheme.colorScheme.secondary
+                )
+                CardButton(
+                    text = "Add to cart",
+                    onClick = { /*TODO*/ },
+                    width = 0.9f,
+                    modifier = Modifier,
+                    color = MaterialTheme.colorScheme.secondary
+                )
             }
 
         }
-
-
     }
 }
-
 
 
 @Composable
@@ -369,10 +432,12 @@ fun GalleryComponent(images: List<ImageDataDTO>, modifier: Modifier) {
 
 @OptIn(ExperimentalEncodingApi::class)
 @Composable
-fun ImageItem(image: ImageDataDTO){
-    val byteArray = Base64.decode(image.image)
-    val bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
-    Image(bitmap = bitmap.asImageBitmap(),
+fun ImageItem(image: ImageDataDTO) {
+    val imageUrl = "http://softeng.pmf.kg.ac.rs:10015/images/${image.image}"
+
+    val painter: Painter = rememberAsyncImagePainter(model = imageUrl)
+    Image(
+        painter = painter,
         contentDescription = null,
         modifier = Modifier
             .size(100.dp)
@@ -380,14 +445,17 @@ fun ImageItem(image: ImageDataDTO){
     )
 }
 
+
 @OptIn(ExperimentalEncodingApi::class)
 @Composable
-fun ImageItemForProfilePic(image:String,onEditClick: () -> Unit){
-    val byteArray = Base64.decode(image)
-    val bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
-    Box{
+fun ImageItemForProfilePic(image: String, onEditClick: () -> Unit) {
+    val imageUrl = "http://softeng.pmf.kg.ac.rs:10015/images/${image}"
+
+    val painter: Painter = rememberAsyncImagePainter(model = imageUrl)
+
+    Box {
         Image(
-            bitmap = bitmap.asImageBitmap(),
+            painter = painter,
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier

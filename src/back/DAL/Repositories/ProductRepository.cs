@@ -10,6 +10,7 @@ namespace back.DAL.Repositories
     {
         Context _context;
         int numberOfItems = 10;
+        int numberOfReviews = 3;
         public ProductRepository(Context context)
         {
             _context = context;
@@ -58,7 +59,7 @@ namespace back.DAL.Repositories
 
         #endregion
 
-        public async Task<List<ProductCard>> GetProducts(int userId, List<int> categories, int rating, bool open, int range, string location, int sort, string search, int page, int specificShopId)
+        public async Task<List<ProductCard>> GetProducts(int userId, List<int> categories, int rating, bool open, int range, string location, int sort, string search, int page, int specificShopId, bool favorite)
         {
             List<ProductCard> products;
             User currentUser = _context.Users.FirstOrDefault(x => x.Id == userId);
@@ -101,13 +102,16 @@ namespace back.DAL.Repositories
                                         Name = p.Name,
                                         Price = p.Price,
                                         Rating = pr.DefaultIfEmpty().Select(x => x.avg).FirstOrDefault(),
-                                        Image = _context.ProductImages.FirstOrDefault(x => x.ProductId == p.Id).Image
+                                        Image =  _context.ProductImages.FirstOrDefault(x => x.ProductId == p.Id).Image
                                     })
                                     .Where(x => x.Rating >= rating)
                                     .ToListAsync();
             }
                 
-            
+            if (favorite)
+            {
+                products = products.Join(_context.LikedProducts.Where(x => x.UserId == userId), p => p.Id, lp => lp.ProductId, (p, lp) => p).ToList();
+            }
 
             if (open)
             {
@@ -207,7 +211,24 @@ namespace back.DAL.Repositories
 
         public async Task<List<ProductReviewExtended>> GetProductReviews(int productId, int page)
         {
-            return await _context.ProductReviews.Where(x => x.ProductId == productId).Join(_context.Users, pr => pr.ReviewerId, u => u.Id, (pr, u) => new {pr, u}).Select(x => new ProductReviewExtended
+            if (page == 0)
+            {
+                return await _context.ProductReviews.Where(x => x.ProductId == productId).Join(_context.Users, pr => pr.ReviewerId, u => u.Id, (pr, u) => new { pr, u }).Select(x => new ProductReviewExtended
+                {
+                    ProductId = productId,
+                    ReviewerId = x.pr.ReviewerId,
+                    Comment = x.pr.Comment,
+                    Rating = x.pr.Rating,
+                    PostedOn = x.pr.PostedOn,
+                    Image = x.u.Image,
+                    Username = x.u.Username,
+                    Product = null,
+                    Reviewer = null
+
+                }).Take(1).ToListAsync();
+            }
+
+            return await _context.ProductReviews.Where(x => x.ProductId == productId).Join(_context.Users, pr => pr.ReviewerId, u => u.Id, (pr, u) => new { pr, u }).Select(x => new ProductReviewExtended
             {
                 ProductId = productId,
                 ReviewerId = x.pr.ReviewerId,
@@ -218,8 +239,8 @@ namespace back.DAL.Repositories
                 Username = x.u.Username,
                 Product = null,
                 Reviewer = null
-                
-            }).Skip((page-1) * numberOfItems).Take(numberOfItems).ToListAsync();
+
+            }).Skip((page - 1) * numberOfReviews).Take(numberOfReviews).ToListAsync();            
         }
 
         #region likes
@@ -295,6 +316,21 @@ namespace back.DAL.Repositories
             });
 
             return _context.SaveChanges() > 0;
+        }
+
+        public async Task<bool> AddProductPhoto(int id, string path)
+        {
+            _context.ProductImages.Add(new ProductImage { Image = path, ProductId = id });
+            return await _context.SaveChangesAsync() > 0;
+        }
+
+        public async Task<string> DeleteProductPhoto(int photoId)
+        {
+            ProductImage pi = await _context.ProductImages.FirstOrDefaultAsync(x => x.Id == photoId);
+            string name = pi.Image;
+            _context.ProductImages.Remove(pi);
+            await _context.SaveChangesAsync();
+            return name;
         }
     }
 }

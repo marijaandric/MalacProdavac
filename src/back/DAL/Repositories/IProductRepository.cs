@@ -6,7 +6,7 @@ namespace back.DAL.Repositories
 {
     public interface IProductRepository
     {
-        public Task<List<ProductCard>> GetProducts(int userId, List<int> categories, int rating, bool open, int range, string location, int sort, string search, int page, int specificShopId);
+        public Task<List<ProductCard>> GetProducts(int userId, List<int> categories, int rating, bool open, int range, string location, int sort, string search, int page, int specificShopId, bool favorite);
         public int ProductPages();
         public Task<ProductInfo> ProductDetails(int productId, int userId);
         public Task<List<ProductReviewExtended>> GetProductReviews(int productId, int page);
@@ -19,5 +19,7 @@ namespace back.DAL.Repositories
         public Task<bool> UpdateCart(int productId, int userId, int quantity);
         public Task<bool> LeaveReview(ReviewDto review);
         public Task<bool> LeaveQuestion(QnADto question);
+        public Task<bool> AddProductPhoto(int id, string path);
+        public Task<string> DeleteProductPhoto(int photoId);
     }
 }

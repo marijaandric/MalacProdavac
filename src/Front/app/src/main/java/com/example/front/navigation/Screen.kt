@@ -12,4 +12,5 @@ sealed class Screen(val route:String){
     object Categories:Screen(route = "choose_categories")
     object Product:Screen(route = "product")
     object MyProfile:Screen(route="my_profile")
+    object AllProduct:Screen(route="products")
 }

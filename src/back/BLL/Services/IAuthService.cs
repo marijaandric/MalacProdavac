@@ -9,5 +9,6 @@ namespace back.BLL.Services
         public Task<string> Register(UserDto userDto);
         public Task<string> EditUser(EditUserDto values);
         public Task<bool> ChangePassword(ChangePasswordDto values);
+        public Task<bool> DeleteProfilePhoto(int userId);
     }
 }

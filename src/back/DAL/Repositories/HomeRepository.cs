@@ -76,7 +76,7 @@ namespace back.DAL.Repositories
                 ShopId = p.ShopId,
                 Name = p.Name,
                 Price = p.Price,
-                Image = _context.ProductImages.FirstOrDefault(i => i.ProductId == p.Id).Image,
+                Image =  _context.ProductImages.FirstOrDefault(i => i.ProductId == p.Id).Image,
                 Rating = pr.DefaultIfEmpty().Select(x => x.avg).FirstOrDefault(),
             }).Where(x => x.ShopId != shopId).Take(take)).ToList();
 

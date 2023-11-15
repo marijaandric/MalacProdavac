@@ -27,9 +27,6 @@ class HomeViewModel @Inject constructor(
     private val _stateShop = mutableStateOf(HomeShopState())
     var stateShop : State<HomeShopState> = _stateShop;
 
-    private val _usernameFlow = MutableStateFlow("")
-    val usernameFlow: Flow<String> = _usernameFlow
-
 
     fun getHomeProducts(id: Int)
     {
@@ -77,10 +74,9 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    suspend fun getUsername() {
-        val retrievedUsername = dataStoreManager.getUsernameFromToken()
-        _usernameFlow.value = retrievedUsername ?: ""
-        println(retrievedUsername)
+    suspend fun getUserId(): Int?
+    {
+        return dataStoreManager.getUserIdFromToken()
     }
 
 }
