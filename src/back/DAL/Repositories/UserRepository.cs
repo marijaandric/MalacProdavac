@@ -16,8 +16,6 @@ namespace back.DAL.Repositories
             _context = context;
         }
 
-        public string imagePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..\\..\\..\\images");
-
         public async Task<MyProfileInfo> GetMyProfile(int userId)
         {
             User user = await _context.Users.FirstOrDefaultAsync(x => x.Id == userId);
@@ -38,7 +36,7 @@ namespace back.DAL.Repositories
             {
                 Id = userId,
                 Name = user.Name,
-                Image = Path.Combine(imagePath, user.Image),
+                Image = user.Image
                 Role = role,
                 RoleId = user.RoleId,
                 Username = user.Username,
@@ -71,7 +69,7 @@ namespace back.DAL.Repositories
             {
                 Id = targetId,
                 Name = user.Name,
-                Image = Path.Combine(imagePath, user.Image),
+                Image = user.Image,
                 Role = role,
                 RoleId = user.RoleId,
                 Username = user.Username,
@@ -97,7 +95,7 @@ namespace back.DAL.Repositories
                             Comment = x.Comment,
                             PostedOn = x.PostedOn,
                             Username = user.Username,
-                            Image = Path.Combine(imagePath, user.Image),
+                            Image = user.Image,
                             Product = null
                         }).ToListAsync();
         }
@@ -112,7 +110,7 @@ namespace back.DAL.Repositories
                             Comment = x.Comment,
                             PostedOn = x.PostedOn,
                             Username = _context.Users.FirstOrDefault(u => u.Id == x.ReviewerId).Username,
-                            Image = Path.Combine(imagePath, _context.Users.FirstOrDefault(i => i.Id == x.ReviewerId).Image),
+                            Image = _context.Users.FirstOrDefault(i => i.Id == x.ReviewerId).Image,
                             Shop = null
             }).FirstOrDefaultAsync();
         }
@@ -134,7 +132,7 @@ namespace back.DAL.Repositories
                             Name = p.Name,
                             Price = p.Price,
                             Rating = pr.AvgRating,
-                            Image = Path.Combine(imagePath, _context.ProductImages.FirstOrDefault(x => x.ProductId == p.Id).Image)
+                            Image = _context.ProductImages.FirstOrDefault(x => x.ProductId == p.Id).Image
                         })
                         .Skip((page - 1) * numberOfItems).Take(numberOfItems).ToListAsync();
         }
