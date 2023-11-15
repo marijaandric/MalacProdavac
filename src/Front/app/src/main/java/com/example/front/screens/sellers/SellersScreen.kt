@@ -33,9 +33,6 @@ import androidx.compose.ui.viewinterop.AndroidView
 import com.example.front.R
 import com.example.front.components.SearchTextField
 import com.example.front.components.SmallElipseAndTitle
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory
-import org.osmdroid.util.GeoPoint
-import org.osmdroid.views.MapView
 import java.io.File
 
 @Preview
@@ -58,7 +55,6 @@ fun Mapa() {
 }
 
 
-
 @Composable
 fun SearchAndFilters() {
     var value by remember { mutableStateOf("") }
@@ -70,7 +66,8 @@ fun SearchAndFilters() {
         horizontalArrangement = Arrangement.Center
     )
     {
-        SearchTextField(valuee = value, placeh = "Search sellers", onValueChangee = { value = it })
+        //SearchTextField(valuee = value, placeh = "Search sellers", onValueChangee = { value = it })
+        SearchTextField(valuee = value, placeh = "Search sellers", onValueChangee = { value = it }, modifier = Modifier)
         Image(
             // ako budemo imali dark i light ovde mozda neki if i promena slike
             painter = painterResource(id = R.drawable.filters),

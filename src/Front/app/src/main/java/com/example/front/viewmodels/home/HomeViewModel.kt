@@ -36,14 +36,14 @@ class HomeViewModel @Inject constructor(
 
 
 
-    fun getHomeProducts()
+    fun getHomeProducts(i: Int)
     {
         viewModelScope.launch {
             try{
                 val id = dataStoreManager.getUserIdFromToken()
                 if(id != null)
                 {
-                    val response = repository.getHomeProducts(id)
+                    val response = repository.getHomeProducts(i)
 
                     if (response.isSuccessful) {
                         val responseBody = response.body()
@@ -62,13 +62,13 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun getHomeShops()
+    fun getHomeShops(i: Int)
     {
         viewModelScope.launch {
             val id = dataStoreManager.getUserIdFromToken()
             if(id != null) {
                 try{
-                    val response = repository.getHomeShops(id)
+                    val response = repository.getHomeShops(i)
 
                     if (response.isSuccessful) {
                         val responseBody = response.body()

@@ -162,7 +162,8 @@ fun Products(viewModel: HomeViewModel, navController: NavHostController) {
             title = productsState.name,
             description = productsState.price.toString() + " din",
             imageResource = R.drawable.imageplaceholder,
-            id = productsState.id
+            id = productsState.id,
+            isLiked = false
         )
     }?.toList() ?: emptyList()
 
