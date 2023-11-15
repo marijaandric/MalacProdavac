@@ -176,9 +176,9 @@ fun HeaderImage(painterResource: Painter) {
 @OptIn(ExperimentalEncodingApi::class)
 @Composable
 fun ProductImage(image: String) {
-    val imagePath = "C:/Faks/Mobitelni/malacprodavac/src/back/$image"
+    val imageUrl = "http://softeng.pmf.kg.ac.rs:10015/images/${image}"
 
-    val painter: Painter = rememberAsyncImagePainter(model = File(imagePath))
+    val painter: Painter = rememberAsyncImagePainter(model = imageUrl)
     Image(
         painter = painter,
         contentDescription = null,
@@ -433,9 +433,9 @@ fun GalleryComponent(images: List<ImageDataDTO>, modifier: Modifier) {
 @OptIn(ExperimentalEncodingApi::class)
 @Composable
 fun ImageItem(image: ImageDataDTO) {
-    val imagePath = "http://softeng.pmf.kg.ac.rs:10015/images/${image.image}"
+    val imageUrl = "http://softeng.pmf.kg.ac.rs:10015/images/${image.image}"
 
-    val painter: Painter = rememberAsyncImagePainter(model = File(imagePath))
+    val painter: Painter = rememberAsyncImagePainter(model = imageUrl)
     Image(
         painter = painter,
         contentDescription = null,
@@ -445,15 +445,17 @@ fun ImageItem(image: ImageDataDTO) {
     )
 }
 
+
 @OptIn(ExperimentalEncodingApi::class)
 @Composable
 fun ImageItemForProfilePic(image: String, onEditClick: () -> Unit) {
-    val byteArray = Base64.decode(image)
-    val bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
+    val imageUrl = "http://softeng.pmf.kg.ac.rs:10015/images/${image}"
+
+    val painter: Painter = rememberAsyncImagePainter(model = imageUrl)
 
     Box {
         Image(
-            bitmap = bitmap.asImageBitmap(),
+            painter = painter,
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier
