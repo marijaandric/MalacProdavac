@@ -64,12 +64,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
+import coil.compose.rememberAsyncImagePainter
+import coil.compose.rememberImagePainter
 import com.example.front.model.DTO.ImageDataDTO
 import com.example.front.navigation.Screen
 import com.example.front.ui.theme.DarkBlue
 import com.example.front.ui.theme.LightBlue
 import com.example.front.ui.theme.MainBlue
 import com.example.front.ui.theme.Typography
+import java.io.File
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
@@ -173,10 +176,11 @@ fun HeaderImage(painterResource: Painter) {
 @OptIn(ExperimentalEncodingApi::class)
 @Composable
 fun ProductImage(image: String) {
-    val byteArray = Base64.decode(image)
-    val bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
+    val imagePath = "C:/Faks/Mobitelni/malacprodavac/src/back/$image"
+
+    val painter: Painter = rememberAsyncImagePainter(model = File(imagePath))
     Image(
-        bitmap = bitmap.asImageBitmap(),
+        painter = painter,
         contentDescription = null,
         modifier = Modifier.fillMaxWidth(),
         contentScale = ContentScale.FillWidth
@@ -429,10 +433,11 @@ fun GalleryComponent(images: List<ImageDataDTO>, modifier: Modifier) {
 @OptIn(ExperimentalEncodingApi::class)
 @Composable
 fun ImageItem(image: ImageDataDTO) {
-    val byteArray = Base64.decode(image.image)
-    val bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
+    val imagePath = "http://softeng.pmf.kg.ac.rs:10015/images/${image.image}"
+
+    val painter: Painter = rememberAsyncImagePainter(model = File(imagePath))
     Image(
-        bitmap = bitmap.asImageBitmap(),
+        painter = painter,
         contentDescription = null,
         modifier = Modifier
             .size(100.dp)

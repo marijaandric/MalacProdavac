@@ -34,6 +34,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -68,7 +69,8 @@ fun ProductPage(
     val productInfo = productViewModel.state.value.product
 
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize().background(Color.White),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         if (productViewModel.state.value.isLoading) {
             Column(
@@ -86,6 +88,7 @@ fun ProductPage(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1.5f)
+                    .align(Alignment.CenterHorizontally)
             ) {
                 if (productInfo != null) {
                     productInfo.images?.get(0)?.let { ProductImage(it.image) }
@@ -196,7 +199,8 @@ fun ProductPage(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(10.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
                         text = "Quantity",
@@ -256,19 +260,27 @@ fun ProductPage(
                         .padding(horizontal = 16.dp),
                     color = Color.Gray
                 )
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(30.dp), horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(text = "Product reviews", style = Typography.bodyLarge)
-                    Row {
-                        Text(text = "4.5", style = Typography.bodyLarge)
-                        Icon(
-                            imageVector = Icons.Default.Star,
-                            contentDescription = "Star icon"
-                        )
+                Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(30.dp), horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(text = "Product reviews", style = Typography.bodyLarge)
+                        Row {
+                            Text(text = "4.5", style = Typography.bodyLarge)
+                            Icon(
+                                imageVector = Icons.Default.Star,
+                                contentDescription = "Star icon"
+                            )
+                        }
+                    }
+                    Row() {
+                        Column() {
+                            ReviewCard()
+                            ReviewCard()
+                            ReviewCard()
+                        }
                     }
                 }
             }
@@ -343,46 +355,55 @@ fun ReviewCard() {
         modifier = Modifier
             .width(350.dp)
             .clip(RoundedCornerShape(20.dp))
-            .padding(5.dp)
+            .padding(5.dp),
     )
     {
-        Image(
-            painter = painterResource(R.drawable.navbar_profile),
-            contentDescription = "",
+        Row(
             modifier = Modifier
-                .size(29.dp)
-                .padding(5.dp)
-        )
-        Column {
-            Text(text = "username")
-            Row() {
-                Icon(
-                    imageVector = Icons.Default.Star,
-                    contentDescription = "Star icon"
-                )
-                Icon(
-                    imageVector = Icons.Default.Star,
-                    contentDescription = "Star icon"
-                )
-                Icon(
-                    imageVector = Icons.Default.Star,
-                    contentDescription = "Star icon"
-                )
-                Icon(
-                    imageVector = Icons.Default.Star,
-                    contentDescription = "Star icon"
-                )
-                Icon(
-                    imageVector = Icons.Default.Star,
-                    contentDescription = "Star icon"
-                )
+                .fillMaxWidth()
+                .padding(10.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column() {
+                Row() {
+                    Image(
+                        painter = painterResource(R.drawable.navbar_profile),
+                        contentDescription = "",
+                        modifier = Modifier.size(40.dp)
+                    )
+                    Text(text = "username", style = Typography.bodySmall, modifier = Modifier.padding(10.dp))
+                }
+                Row(modifier = Modifier.padding(top = 10.dp,bottom = 10.dp)) {
+                    Icon(
+                        imageVector = Icons.Default.Star,
+                        contentDescription = "Star icon"
+                    )
+                    Icon(
+                        imageVector = Icons.Default.Star,
+                        contentDescription = "Star icon"
+                    )
+                    Icon(
+                        imageVector = Icons.Default.Star,
+                        contentDescription = "Star icon"
+                    )
+                    Icon(
+                        imageVector = Icons.Default.Star,
+                        contentDescription = "Star icon"
+                    )
+                    Icon(
+                        imageVector = Icons.Default.Star,
+                        contentDescription = "Star icon"
+                    )
+                }
+                Row(modifier = Modifier.padding(top = 10.dp,bottom = 10.dp)) {
+                    Text(text = "The apples are fresh and ripe. I recommend.", style = Typography.bodySmall)
+                }
             }
-        }
-        Column {
-            Text(text = "5 months")
-        }
-        Row(){
-            Text(text = "The apples are fresh and ripe. I recommend.")
+            Column {
+                Row() {
+                    Text(text = "5 months", style = Typography.bodySmall)
+                }
+            }
         }
     }
 }

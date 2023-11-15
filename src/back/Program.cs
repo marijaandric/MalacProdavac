@@ -65,14 +65,22 @@ app.UseAuthentication();
 
 app.UseAuthorization();
 
-app.UseStaticFiles();
 
 app.UseDirectoryBrowser(new DirectoryBrowserOptions
 {
     FileProvider = new PhysicalFileProvider(
-        Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images")),
+        Path.Combine(Directory.GetCurrentDirectory(), "images")),
     RequestPath = "/images"
 });
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(
+        Path.Combine(Directory.GetCurrentDirectory(), "images")),
+    RequestPath = "/images"
+});
+
+app.UseStaticFiles();
+
 
 app.MapControllers();
 

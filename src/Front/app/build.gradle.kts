@@ -124,6 +124,8 @@ dependencies {
     // photo picker
     implementation("io.coil-kt:coil-compose:2.3.0")
 
+    //Coil
+    implementation("io.coil-kt:coil-compose:1.4.0")
 }
 
 kapt {
