@@ -13,6 +13,5 @@ namespace back.BLL.Dtos.Infos
         public List<string> Categories { get; set; }
         public List<string> Subcategories { get; set; }
         public List<WorkingHours> WorkingHours { get; set; }
-        public List<ShopReviewExtended> Reviews { get; set; }
     }
 }
