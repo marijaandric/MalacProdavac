@@ -129,6 +129,7 @@ dependencies {
     // mape
     //implementation("com.google.maps.android:maps-compose:2.15.0")
 
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1")
 
 
 }

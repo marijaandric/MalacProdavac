@@ -10,6 +10,7 @@ import com.example.front.model.response.LoginResponse
 import com.example.front.model.DTO.ShopDTO
 import com.example.front.model.DTO.ToggleLikeDTO
 import com.example.front.model.product.ProductInfo
+import com.example.front.model.product.ProductReviewUserInfo
 import com.example.front.model.user.MyProfileDTO
 import com.example.front.model.user.UserEditDTO
 import retrofit2.Response
@@ -54,5 +55,9 @@ class Repository @Inject constructor(private val api: Api) {
 
     suspend fun toggleLike(shopId:Int, userId: Int): Response<ToggleLikeDTO>{
         return api.toggleLike(shopId,userId)
+    }
+
+    suspend fun getReviewsForProduct(productId: Int, page: Int): Response<List<ProductReviewUserInfo>> {
+        return api.getReviewsForProduct(productId,page)
     }
 }

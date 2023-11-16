@@ -25,34 +25,43 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import coil.compose.rememberAsyncImagePainter
 import com.example.front.R
 import com.example.front.components.GalleryComponent
 import com.example.front.components.ProductImage
 import com.example.front.components.ToggleImageButton
 import com.example.front.helper.DataStore.DataStoreManager
 import com.example.front.model.DTO.WorkingHoursDTO
+import com.example.front.model.product.ProductReviewUserInfo
 import com.example.front.navigation.Screen
 import com.example.front.ui.theme.Black
 import com.example.front.ui.theme.DarkBlue
 import com.example.front.ui.theme.Orange
 import com.example.front.ui.theme.Typography
 import com.example.front.viewmodels.product.ProductViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 @SuppressLint("SuspiciousIndentation")
 @Composable
@@ -64,12 +73,21 @@ fun ProductPage(
 
     LaunchedEffect(Unit) {
         productViewModel.getUserId()?.let { productViewModel.getProductInfo(productID, it) }
+        productViewModel.getReviewsForProduct(productID, 0)
+    }
+
+    DisposableEffect(productID) {
+        onDispose {
+            productViewModel.resetReviewState()
+        }
     }
 
     val productInfo = productViewModel.state.value.product
 
     Column(
-        modifier = Modifier.fillMaxSize().background(Color.White),
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         if (productViewModel.state.value.isLoading) {
@@ -260,7 +278,10 @@ fun ProductPage(
                         .padding(horizontal = 16.dp),
                     color = Color.Gray
                 )
-                Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -268,20 +289,111 @@ fun ProductPage(
                     ) {
                         Text(text = "Product reviews", style = Typography.bodyLarge)
                         Row {
-                            Text(text = "4.5", style = Typography.bodyLarge)
+                            if (productInfo != null) {
+                                Text(text = "${productInfo.rating}", style = Typography.bodyLarge)
+                            }
                             Icon(
                                 imageVector = Icons.Default.Star,
                                 contentDescription = "Star icon"
                             )
                         }
                     }
-                    Row() {
-                        Column() {
-                            ReviewCard()
-                            ReviewCard()
-                            ReviewCard()
+                    Divider(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(1.dp)
+                            .padding(horizontal = 16.dp),
+                        color = Color.Gray
+                    )
+                    Row(modifier = Modifier.padding(10.dp)) {
+                        val reviews = productViewModel.stateReview.value.reviews
+
+                        if (reviews.isNullOrEmpty()) {
+                            Text("No reviews available", style = Typography.bodySmall)
+                        } else {
+                            Column {
+                                // Display the first review
+                                ReviewCard(productReviewUserInfo = reviews[0])
+
+                                var reviewCounter by remember { mutableStateOf(1) }
+                                var showAllReviews by remember { mutableStateOf(false) }
+
+                                // Display reviews
+                                if (showAllReviews) {
+                                    for (i in 1..reviewCounter) {
+                                        ReviewCard(productReviewUserInfo = reviews[i - 1])
+                                    }
+                                }
+                                Row(modifier = Modifier.fillMaxWidth(),Arrangement.SpaceBetween) {
+                                    // Button to load more reviews
+                                    if (!showAllReviews && reviews.size > reviewCounter) {
+                                        Button(
+                                            onClick = {
+                                                // Increment the review counter by 3
+                                                reviewCounter += 3
+
+                                                // Fetch more reviews
+                                                GlobalScope.launch {
+                                                    productViewModel.getReviewsForProduct(
+                                                        productID,
+                                                        reviewCounter
+                                                    )
+                                                }
+                                            }
+                                        ) {
+                                            Text("Load 3 more reviews")
+                                        }
+                                    }
+
+                                    // Button to toggle between showing all reviews and showing only a few
+                                    Button(
+                                        onClick = {
+                                            // Toggle the value
+                                            showAllReviews = !showAllReviews
+
+                                            // If showing all reviews, fetch all reviews
+                                            if (showAllReviews) {
+                                                GlobalScope.launch {
+                                                    productViewModel.getReviewsForProduct(
+                                                        productID,
+                                                        reviews.size
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    ) {
+                                        Text(if (showAllReviews) "Show less reviews" else "Show all reviews")
+                                    }
+                                }
+
+                                // DisposableEffect to fetch more reviews when reviewCounter changes
+                                DisposableEffect(reviewCounter) {
+                                    if (showAllReviews) {
+                                        GlobalScope.launch {
+                                            productViewModel.getReviewsForProduct(productID, reviews.size)
+                                        }
+                                    }
+                                    onDispose {
+                                        // Cleanup if needed
+                                    }
+                                }
+                            }
                         }
                     }
+
+
+
+
+
+
+
+                    Divider(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(1.dp)
+                            .padding(horizontal = 16.dp),
+                        color = Color.Gray
+                    )
                 }
             }
         }
@@ -348,9 +460,9 @@ fun getDayName(day: Int): String {
         else -> "Unknown Day"
     }
 }
-@Preview
+
 @Composable
-fun ReviewCard() {
+fun ReviewCard(productReviewUserInfo: ProductReviewUserInfo) {
     Card(
         modifier = Modifier
             .width(350.dp)
@@ -366,42 +478,39 @@ fun ReviewCard() {
         ) {
             Column() {
                 Row() {
+                    val imageUrl =
+                        "http://softeng.pmf.kg.ac.rs:10015/images/${productReviewUserInfo.image}"
+
+                    val painter: Painter = rememberAsyncImagePainter(model = imageUrl)
                     Image(
-                        painter = painterResource(R.drawable.navbar_profile),
+                        painter = painter,
                         contentDescription = "",
                         modifier = Modifier.size(40.dp)
                     )
-                    Text(text = "username", style = Typography.bodySmall, modifier = Modifier.padding(10.dp))
-                }
-                Row(modifier = Modifier.padding(top = 10.dp,bottom = 10.dp)) {
-                    Icon(
-                        imageVector = Icons.Default.Star,
-                        contentDescription = "Star icon"
-                    )
-                    Icon(
-                        imageVector = Icons.Default.Star,
-                        contentDescription = "Star icon"
-                    )
-                    Icon(
-                        imageVector = Icons.Default.Star,
-                        contentDescription = "Star icon"
-                    )
-                    Icon(
-                        imageVector = Icons.Default.Star,
-                        contentDescription = "Star icon"
-                    )
-                    Icon(
-                        imageVector = Icons.Default.Star,
-                        contentDescription = "Star icon"
+                    Text(
+                        text = "${productReviewUserInfo.username}",
+                        style = Typography.bodySmall,
+                        modifier = Modifier.padding(10.dp)
                     )
                 }
-                Row(modifier = Modifier.padding(top = 10.dp,bottom = 10.dp)) {
-                    Text(text = "The apples are fresh and ripe. I recommend.", style = Typography.bodySmall)
+                Row(modifier = Modifier.padding(top = 10.dp, bottom = 10.dp)) {
+                    for (i in 1..productReviewUserInfo.rating) {
+                        Icon(
+                            imageVector = Icons.Default.Star,
+                            contentDescription = "Star icon"
+                        )
+                    }
+                }
+                Row(modifier = Modifier.padding(top = 10.dp, bottom = 10.dp)) {
+                    Text(text = "${productReviewUserInfo.comment}", style = Typography.bodySmall)
                 }
             }
             Column {
                 Row() {
-                    Text(text = "5 months", style = Typography.bodySmall)
+                    Text(
+                        text = "Posted ${productReviewUserInfo.getDaysSincePosted()} days ago",
+                        style = Typography.bodySmall
+                    )
                 }
             }
         }
