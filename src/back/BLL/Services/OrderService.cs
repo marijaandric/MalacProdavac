@@ -1,4 +1,5 @@
-﻿using back.BLL.Dtos;
+﻿using back.BLL.Dtos.Cards;
+using back.BLL.Dtos.Infos;
 using back.DAL.Repositories;
 
 namespace back.BLL.Services
@@ -17,6 +18,14 @@ namespace back.BLL.Services
             if (orders.Count == 0) throw new ArgumentException("No orders!");
 
             return orders;
+        }
+
+        public async Task<OrderInfo> OrderDetails(int orderId)
+        {
+            OrderInfo info = await _repository.OrderDetails(orderId);
+            if (info == null) throw new ArgumentException("No order found!");
+
+            return info;
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using back.BLL.Dtos;
+﻿using back.BLL.Dtos.Cards;
 
 namespace back.BLL.Services
 {

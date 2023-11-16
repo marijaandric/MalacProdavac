@@ -1,7 +1,7 @@
 ﻿using back.BLL.Dtos.HelpModels;
 using back.Models;
 
-namespace back.BLL.Dtos
+namespace back.BLL.Dtos.Infos
 {
     public class ShopInfo : Shop
     {

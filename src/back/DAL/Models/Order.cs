@@ -13,7 +13,7 @@ namespace back.Models
         public int PaymentMethod { get; set; }
         public int DeliveryMethod { get; set; }
         public int Status { get; set; }
-
+        public string ShippingAddress { get; set; }
         public User User { get; set; }
     }
 }

@@ -2,12 +2,12 @@
 using back.DAL.Models;
 using back.Models;
 
-namespace back.BLL.Dtos
+namespace back.BLL.Dtos.Infos
 {
     public class ProductInfo : Product
     {
         public string ShopName { get; set; }
-        public string Metric {  get; set; }
+        public string Metric { get; set; }
         public string Category { get; set; }
         public string Subcategory { get; set; }
         public bool Liked { get; set; }

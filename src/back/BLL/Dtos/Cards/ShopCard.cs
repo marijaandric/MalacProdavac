@@ -1,6 +1,6 @@
 ﻿using back.Models;
 
-namespace back.BLL.Dtos
+namespace back.BLL.Dtos.Cards
 {
     public class ShopCard
     {

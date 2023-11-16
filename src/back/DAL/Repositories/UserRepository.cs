@@ -1,6 +1,7 @@
 ﻿using System.Formats.Tar;
-using back.BLL.Dtos;
+using back.BLL.Dtos.Cards;
 using back.BLL.Dtos.HelpModels;
+using back.BLL.Dtos.Infos;
 using back.DAL.Contexts;
 using back.Models;
 using Microsoft.EntityFrameworkCore;

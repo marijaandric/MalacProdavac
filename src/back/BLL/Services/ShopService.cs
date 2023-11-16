@@ -1,4 +1,6 @@
 ﻿using back.BLL.Dtos;
+using back.BLL.Dtos.Cards;
+using back.BLL.Dtos.Infos;
 using back.DAL.Repositories;
 using back.Models;
 
