@@ -292,7 +292,7 @@ fun BigBlueButton(text: String, onClick: () -> Unit, width: Float, modifier: Mod
     ) {
         Text(
             text = text,
-            style = Typography.labelSmall
+            style = Typography.labelSmall.copy(MaterialTheme.colorScheme.background)
         )
     }
 }
@@ -602,7 +602,7 @@ fun Tabs(
                 text = firstTab,
                 style = MaterialTheme.typography.titleLarge.copy(
                     color = MaterialTheme.colorScheme.onTertiary,
-                    fontSize = if(isFilters) 20.sp else 13.sp
+                    fontSize = if(!isFilters) 20.sp else 16.sp
                 ),
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
@@ -613,7 +613,7 @@ fun Tabs(
                     contentDescription = "Crtica",
                     contentScale = ContentScale.FillWidth,
                     modifier = Modifier
-                        .width(if(isFilters) 30.dp else 20.dp)
+                        .width(if(!isFilters) 30.dp else 20.dp)
                         .align(Alignment.CenterHorizontally)
                         .padding(top = 10.dp)
                 )
@@ -629,7 +629,7 @@ fun Tabs(
                 text = secondTab,
                 style = MaterialTheme.typography.titleLarge.copy(
                     color = MaterialTheme.colorScheme.onTertiary,
-                    if(isFilters) 20.sp else 13.sp
+                    if(!isFilters) 20.sp else 16.sp
                 ),
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
@@ -640,7 +640,7 @@ fun Tabs(
                     contentDescription = "Crtica",
                     contentScale = ContentScale.FillWidth,
                     modifier = Modifier
-                        .width(if(isFilters) 30.dp else 20.dp)
+                        .width(if(!isFilters) 30.dp else 20.dp)
                         .align(Alignment.CenterHorizontally)
                         .padding(top = 10.dp)
                 )
