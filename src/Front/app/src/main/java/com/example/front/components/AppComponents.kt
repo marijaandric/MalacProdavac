@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -420,6 +422,60 @@ fun ProductCard(
     }
 }
 
+@Composable
+fun ShopCard(
+    title: String,
+    price: String,
+    imageResource: Int,
+    navController: NavHostController,
+    id:Int,
+    workingHours: String
+) {
+    Card(
+        modifier = Modifier
+            .clip(RoundedCornerShape(20.dp))
+            .padding(bottom = 15.dp)
+            .fillMaxWidth()
+            .clickable { },
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Image(
+                painter = painterResource(id = imageResource),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(120.dp)
+                    .padding(10.dp)
+                    .clip(RoundedCornerShape(10.dp))
+            )
+
+            Column(
+                modifier = Modifier.padding(8.dp),
+            ) {
+                Text(text = title, fontWeight = FontWeight.Bold, fontSize = 17.sp)
+                Text(
+                    text = price,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 15.sp,
+                    modifier = Modifier.padding(top = 5.dp),
+                    color = MaterialTheme.colorScheme.onTertiary
+                )
+
+                Text(
+                    text = workingHours,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 15.sp,
+                    modifier = Modifier.padding(top = 15.dp),
+                    color = MaterialTheme.colorScheme.secondary
+                )
+            }
+
+        }
+    }
+}
+
 
 @Composable
 fun GalleryComponent(images: List<ImageDataDTO>, modifier: Modifier) {
@@ -503,7 +559,8 @@ fun SmallElipseAndTitle(title:String) {
         )
 
         Box(
-            modifier = Modifier.padding(start=16.dp, end = 16.dp)
+            modifier = Modifier
+                .padding(start = 16.dp, end = 16.dp)
                 .fillMaxWidth(),
             contentAlignment = Alignment.CenterStart
         )
@@ -522,6 +579,72 @@ fun SmallElipseAndTitle(title:String) {
                 style = MaterialTheme.typography.titleLarge.copy(color = MaterialTheme.colorScheme.background),
                 modifier = Modifier.align(Alignment.Center)
             )
+        }
+    }
+}
+
+@Composable
+fun Tabs(
+    onShopsSelected: () -> Unit,
+    onFavoritesSelected: () -> Unit,
+    selectedColumnIndex: Boolean,
+    firstTab: String,
+    secondTab: String,
+    isFilters: Boolean
+) {
+    Row {
+        Column(
+            modifier = Modifier
+                .padding(start = 20.dp)
+                .clickable { onShopsSelected() }
+        ) {
+            Text(
+                text = firstTab,
+                style = MaterialTheme.typography.titleLarge.copy(
+                    color = MaterialTheme.colorScheme.onTertiary,
+                    fontSize = if(isFilters) 20.sp else 13.sp
+                ),
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+
+            if (selectedColumnIndex) {
+                Image(
+                    painter = painterResource(id = R.drawable.crtica),
+                    contentDescription = "Crtica",
+                    contentScale = ContentScale.FillWidth,
+                    modifier = Modifier
+                        .width(if(isFilters) 30.dp else 20.dp)
+                        .align(Alignment.CenterHorizontally)
+                        .padding(top = 10.dp)
+                )
+            }
+        }
+
+        Column(
+            modifier = Modifier
+                .padding(start = 30.dp)
+                .clickable { onFavoritesSelected() }
+        ) {
+            Text(
+                text = secondTab,
+                style = MaterialTheme.typography.titleLarge.copy(
+                    color = MaterialTheme.colorScheme.onTertiary,
+                    if(isFilters) 20.sp else 13.sp
+                ),
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+
+            if (!selectedColumnIndex) {
+                Image(
+                    painter = painterResource(id = R.drawable.crtica),
+                    contentDescription = "Crtica",
+                    contentScale = ContentScale.FillWidth,
+                    modifier = Modifier
+                        .width(if(isFilters) 30.dp else 20.dp)
+                        .align(Alignment.CenterHorizontally)
+                        .padding(top = 10.dp)
+                )
+            }
         }
     }
 }
