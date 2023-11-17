@@ -1,4 +1,5 @@
-﻿using back.BLL.Dtos.Cards;
+﻿using back.BLL.Dtos;
+using back.BLL.Dtos.Cards;
 using back.BLL.Dtos.Infos;
 using back.DAL.Repositories;
 
@@ -27,5 +28,12 @@ namespace back.BLL.Services
 
             return info;
         }
+
+        public async Task<bool> InsertOrder(OrderDto order)
+        {
+            if (!await _repository.InsertOrder(order)) throw new ArgumentException("Order could not be processed!");
+            return true;
+        }
+
     }
 }

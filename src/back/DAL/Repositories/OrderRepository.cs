@@ -1,6 +1,8 @@
-﻿using back.BLL.Dtos.Cards;
+﻿using back.BLL.Dtos;
+using back.BLL.Dtos.Cards;
 using back.BLL.Dtos.Infos;
 using back.DAL.Contexts;
+using back.DAL.Models;
 using back.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -80,6 +82,47 @@ namespace back.DAL.Repositories
                 PaymentMethod = order.DeliveryMethod,
                 ShippingAddress = order.ShippingAddress 
             };
+        }
+
+        public async Task<bool> InsertOrder(OrderDto order)
+        {
+            Order newOrder = new Order
+            {
+                UserId = order.UserId,
+                CreatedOn = DateTime.Now,
+                DeliveryMethod = order.DeliveryMethod,
+                PaymentMethod = order.PaymentMethod,
+                ShippingAddress = order.ShippingAddress,
+                Status = (await _context.OrderStatuses.FirstOrDefaultAsync(x => x.Name == "Pending")).Id
+            };
+
+            _context.Orders.AddAsync(newOrder);
+            await _context.SaveChangesAsync();
+
+            foreach (var item in order.Products)
+            {
+                Product product = _context.Products.FirstOrDefault(x => x.Id == item.Id);
+                float total;
+
+                int count = order.Products.Where(x => x.Id == item.Id).Sum(x => x.Quantity);
+                if (product.SalePercentage != null && product.SaleMinQuantity <= order.Products.Where(x => x.Id == item.Id).Sum(x => x.Quantity)) total = product.Price * item.Quantity * (100 - product.SalePercentage) / 100;
+                else total = product.Price * item.Quantity;
+
+                _context.OrderItems.AddAsync(new OrderItem
+                {
+                    ProductId = item.Id,
+                    Quantity = item.Quantity,
+                    SizeId = item.SizeId,
+                    Price = total,
+                    OrderId = newOrder.Id,
+                });
+
+                ProductSize ps = await _context.ProductSizes.FirstOrDefaultAsync(x => x.ProductId == item.Id && x.SizeId == item.SizeId);
+                ps.Stock -= item.Quantity;
+
+            }
+
+            return await _context.SaveChangesAsync() > 0;
         }
     }
 }

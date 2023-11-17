@@ -1,4 +1,5 @@
-﻿using back.BLL.Services;
+﻿using back.BLL.Dtos;
+using back.BLL.Services;
 using back.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -38,6 +39,19 @@ namespace back.PL.Controllers
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost("InsertOrder")]
+        public async Task<IActionResult> InsertOrder(OrderDto order)
+        {
+            try
+            {
+                return Ok(new { Success = await _service.InsertOrder(order) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
             }
         }
     }
