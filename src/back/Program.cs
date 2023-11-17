@@ -5,12 +5,19 @@ using back.DAL.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddDbContext<Context>();
+
+FirebaseApp.Create(new AppOptions
+{
+    Credential = GoogleCredential.FromFile("path/to/your/serviceAccountKey.json")
+});
 
 builder.Services.AddAuthentication(x =>
 {

@@ -4,6 +4,7 @@ using back.BLL.Dtos.HelpModels;
 using back.BLL.Dtos.Infos;
 using back.DAL.Contexts;
 using back.Models;
+using FirebaseAdmin.Messaging;
 using Microsoft.EntityFrameworkCore;
 
 namespace back.DAL.Repositories
@@ -295,16 +296,52 @@ namespace back.DAL.Repositories
 
         public async Task<bool> LeaveReview(ReviewDto review)
         {
-            _context.ProductReviews.AddAsync(new ProductReview
+            // Add the review to the database asynchronously.
+            var newReview = new ProductReview
             {
                 ReviewerId = review.UserId,
                 ProductId = review.Id,
                 Rating = review.Rating,
                 Comment = review.Comment,
                 PostedOn = DateTime.Now
-            });
+            };
 
-            return _context.SaveChanges() > 0;
+            _context.ProductReviews.AddAsync(newReview);
+
+            await _context.SaveChangesAsync();
+
+            // Get the owner's FCM token (replace this with your logic to retrieve the owner's FCM token).
+            string ownerFcmToken = GetOwnerFcmToken(review.ProductOwnerId);
+
+            if (!string.IsNullOrEmpty(ownerFcmToken))
+            {
+                // Send a notification to the owner using FCM.
+                var message = new Message
+                {
+                    Token = ownerFcmToken,
+                    Notification = new FirebaseAdmin.Messaging.Notification
+                    {
+                        Title = "New Review",
+                        Body = $"A new review has been added for your product."
+                    },
+                    Data = new Dictionary<string, string>
+            {
+                { "productId", review.Id.ToString() },
+                { "reviewerId", review.UserId.ToString() }
+            }
+                };
+
+                var result = await FirebaseMessaging.DefaultInstance.SendAsync(message);
+
+                // Check the result and handle it as needed.
+                if (result != null)
+                {
+                    // Notification sent successfully.
+                    // You can log or handle the result accordingly.
+                }
+            }
+
+            return true; // Assuming the review is always added successfully.
         }
 
         public async Task<bool> LeaveQuestion(QnADto question)
