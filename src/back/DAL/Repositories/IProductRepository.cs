@@ -1,5 +1,7 @@
 ﻿using back.BLL.Dtos;
+using back.BLL.Dtos.Cards;
 using back.BLL.Dtos.HelpModels;
+using back.BLL.Dtos.Infos;
 using back.Models;
 
 namespace back.DAL.Repositories

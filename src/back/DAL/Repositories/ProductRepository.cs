@@ -1,5 +1,7 @@
 ﻿using back.BLL.Dtos;
+using back.BLL.Dtos.Cards;
 using back.BLL.Dtos.HelpModels;
+using back.BLL.Dtos.Infos;
 using back.DAL.Contexts;
 using back.Models;
 using Microsoft.EntityFrameworkCore;
@@ -180,7 +182,7 @@ namespace back.DAL.Repositories
             List<Stock> sizes = await _context.ProductSizes.Where(x => x.ProductId == productId).Join(_context.Sizes, ps => ps.SizeId, s => s.Id, (ps, s) => new Stock{ Size = s.Name, Quantity = ps.Stock }).ToListAsync();
             List<ImageData> images = await _context.ProductImages.Where(x => x.ProductId == productId).Select(x => new ImageData{Id = x.Id, Image = x.Image}).ToListAsync();
             float average = 0;
-            if (reviews.Count > 0) average = reviews.Select(x => x.Rating).Average();
+            if (_context.ProductReviews.Where(x => x.ProductId == productId).Count() > 0) average = _context.ProductReviews.Where(x => x.ProductId == productId).Select(x => x.Rating).Average();
 
             return new ProductInfo
             {

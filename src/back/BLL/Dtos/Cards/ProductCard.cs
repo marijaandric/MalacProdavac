@@ -1,5 +1,4 @@
-﻿
-namespace back.BLL.Dtos
+﻿namespace back.BLL.Dtos.Cards
 {
     public class ProductCard
     {
@@ -8,6 +7,6 @@ namespace back.BLL.Dtos
         public string? Name { get; set; }
         public float Price { get; set; }
         public float Rating { get; set; }
-        public string Image {  get; set; }
+        public string Image { get; set; }
     }
 }

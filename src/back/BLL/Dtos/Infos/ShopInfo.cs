@@ -1,7 +1,7 @@
 ﻿using back.BLL.Dtos.HelpModels;
 using back.Models;
 
-namespace back.BLL.Dtos
+namespace back.BLL.Dtos.Infos
 {
     public class ShopInfo : Shop
     {
@@ -13,6 +13,5 @@ namespace back.BLL.Dtos
         public List<string> Categories { get; set; }
         public List<string> Subcategories { get; set; }
         public List<WorkingHours> WorkingHours { get; set; }
-        public List<ShopReviewExtended> Reviews { get; set; }
     }
 }

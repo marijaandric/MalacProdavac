@@ -1,4 +1,7 @@
 ﻿using back.BLL.Dtos;
+using back.BLL.Dtos.Cards;
+using back.BLL.Dtos.HelpModels;
+using back.BLL.Dtos.Infos;
 using back.Models;
 
 namespace back.DAL.Repositories
@@ -13,5 +16,6 @@ namespace back.DAL.Repositories
         public Task<bool> DislikeShop(int shopId, int userId);
         public Task<bool> LeaveReview(ReviewDto review);
         public Task<bool> ChangeShopPhoto(int id, string path);
+        public Task<List<ShopReviewExtended>> GetShopReviews(int shopId, int page);
     }
 }

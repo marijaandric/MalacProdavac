@@ -77,7 +77,7 @@ fun SetupNavGraph(
             route = Screen.AllSellers.route
         )
         {
-            SellersScreen()
+            SellersScreen(navController = navController)
         }
 
         introNavGraph(navController = navController, splashViewModel)

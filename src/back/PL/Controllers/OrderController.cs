@@ -1,5 +1,7 @@
 ﻿using back.BLL.Services;
+using back.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace back.PL.Controllers
 {
@@ -19,6 +21,19 @@ namespace back.PL.Controllers
             try
             {
                 return Ok(await _service.GetOrders(userId, status, page));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("OrderDetails")]
+        public async Task<IActionResult> OrderDetails(int orderId)
+        {
+            try
+            {
+                return Ok(await _service.OrderDetails(orderId));
             }
             catch (Exception ex)
             {

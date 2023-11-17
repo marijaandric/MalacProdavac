@@ -1,4 +1,7 @@
 ﻿using back.BLL.Dtos;
+using back.BLL.Dtos.Cards;
+using back.BLL.Dtos.HelpModels;
+using back.BLL.Dtos.Infos;
 using back.Models;
 
 namespace back.BLL.Services
@@ -11,5 +14,6 @@ namespace back.BLL.Services
         public Task<LikedShops> GetLike(int shopId, int userId);
         public Task<bool> ToggleLike(int shopId, int userId);
         public Task<bool> LeaveReview(ReviewDto review);
+        public Task<List<ShopReviewExtended>> GetShopReviews(int shopId, int page);
     }
 }
