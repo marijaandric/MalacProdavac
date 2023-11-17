@@ -1,5 +1,6 @@
 ﻿using back.BLL.Dtos;
 using back.BLL.Dtos.Cards;
+using back.BLL.Dtos.HelpModels;
 using back.BLL.Dtos.Infos;
 using back.DAL.Repositories;
 using back.Models;
@@ -60,6 +61,14 @@ namespace back.BLL.Services
         {
             if (await _repository.LeaveReview(review)) return true;
             throw new ArgumentException("Shop could not be reviewed!");
+        }
+
+        public async Task<List<ShopReviewExtended>> GetShopReviews(int shopId, int page)
+        {
+            List<ShopReviewExtended> reviews = await _repository.GetShopReviews(shopId, page);
+            if (reviews.Count == 0) throw new ArgumentException("No reviews found!");
+
+            return reviews;
         }
     }
 }

@@ -66,6 +66,19 @@ namespace back.PL.Controllers
             }
         }
 
+        [HttpGet("ShopReviews")]
+        public async Task<IActionResult> GetShopReviews(int shopId, int page)
+        {
+            try
+            {
+                return Ok(await _service.GetShopReviews(shopId, page));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { ErrorMessage = ex.Message });
+            }
+        }
+
         [HttpPost("ToggleLike")]
         public async Task<IActionResult> ToggleLike(int shopId, int userId)
         {
