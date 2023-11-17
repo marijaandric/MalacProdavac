@@ -3,7 +3,6 @@ package com.example.front.screens.sellers
 import android.annotation.SuppressLint
 import android.content.Context
 import android.view.ViewGroup
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -20,14 +19,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Checkbox
 import androidx.compose.material.Icon
 import androidx.compose.material.RadioButton
 import androidx.compose.material.RadioButtonDefaults
@@ -38,50 +35,36 @@ import androidx.compose.material.SwitchDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.example.front.R
 import com.example.front.components.BigBlueButton
-import com.example.front.components.CardButton
-import com.example.front.components.MyTextField
-import com.example.front.components.ProductCard
 import com.example.front.components.SearchTextField
 import com.example.front.components.ShopCard
 import com.example.front.components.SmallElipseAndTitle
 import com.example.front.components.Tabs
-import com.example.front.components.ToggleImageButton
-import com.example.front.model.user.UserEditDTO
-import com.example.front.screens.categories.ClickableCard
 import com.example.front.screens.home.CardData
-import com.example.front.viewmodels.myprofile.MyProfileViewModel
+import com.example.front.viewmodels.shops.ShopsViewModel
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.CameraPositionState
@@ -102,9 +85,15 @@ val defaultCameraPosition = CameraPosition.fromLatLngZoom(location, 4f)
 
 
 @Composable
-fun SellersScreen(navController: NavHostController) {
+fun SellersScreen(navController: NavHostController, shopsViewModel: ShopsViewModel) {
 
     var selectedColumnIndex by remember { mutableStateOf(true) }
+
+    LaunchedEffect(Unit) {
+//        shopsViewModel.getUserId()?.let { shopsViewModel.getProducts(it,listOf(),null,false,null,"",0,"E",1,false) }
+        shopsViewModel.getProducts(1,listOf(),null,true,0,"none",0,"E",1,false)
+        shopsViewModel.getProducts(1,listOf(),null,true,0,"none",0,"E",1,true)
+    }
 
     LazyColumn(
         modifier = Modifier
@@ -131,14 +120,32 @@ fun SellersScreen(navController: NavHostController) {
         item{
             if(selectedColumnIndex)
             {
-                AllSellers(navController)
+                if(shopsViewModel.state.value.error.contains("Error"))
+                {
+                    Text("No shops found")
+                }
+                else if(shopsViewModel.state.value.isLoading)
+                {
+                    CircularProgressIndicator()
+                }
+                else{
+                    AllSellers(navController, shopsViewModel)
+                }
             }
             else{
-                FavItems(navController)
+                if(shopsViewModel.stateFav.value.error.contains("Error"))
+                {
+                    Text("No shops found")
+                }
+                else if(shopsViewModel.stateFav.value.isLoading)
+                {
+                    CircularProgressIndicator()
+                }
+                else{
+                    FavItems(navController, shopsViewModel)
+                }
             }
         }
-
-
     }
 }
 
@@ -151,30 +158,18 @@ data class CardData(
 )
 
 @Composable
-fun FavItems(navController: NavHostController) {
-    val products = listOf(
+fun FavItems(navController: NavHostController, shopsViewModel: ShopsViewModel) {
+    val state = shopsViewModel.stateFav.value
+    val shops = state.shops?.mapIndexed { index, productsState ->
         CardData(
-            id = 1,
-            title = "Radionica 'Vlado'",
-            description = "Kraljevo 123",
-            imageResource = R.drawable.imageplaceholder,
-            isLiked = false
-        ),
-        CardData(
-            id = 1,
-            title = "Vocnjak Miljkovic",
-            description = "Address 123",
-            imageResource = R.drawable.imageplaceholder,
-            isLiked = false
-        ),
-        CardData(
-            id = 1,
-            title = "Drangulije Ivana",
-            description = "Tavnik 123",
+            id = productsState.id,
+            title = productsState.name,
+            description = productsState.address.toString(),
             imageResource = R.drawable.imageplaceholder,
             isLiked = false
         )
-    )
+    }?.toList() ?: emptyList()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -182,36 +177,24 @@ fun FavItems(navController: NavHostController) {
             .padding(top = 20.dp)
     ) {
         Text("Your Favorites", style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold), modifier = Modifier.padding(start=16.dp))
-        ShopsComponent(products,navController)
+        ShopsComponent(shops,navController)
     }
 }
 
 @Composable
-fun AllSellers(navController: NavHostController) {
+fun AllSellers(navController: NavHostController, shopsViewModel: ShopsViewModel) {
 
-    val products = listOf(
+    val state = shopsViewModel.state.value
+    val shops = state.shops?.mapIndexed { index, productsState ->
         CardData(
-            id = 1,
-            title = "Radionica 'Vlado'",
-            description = "Kraljevo 123",
-            imageResource = R.drawable.imageplaceholder,
-            isLiked = false
-        ),
-        CardData(
-            id = 1,
-            title = "Vocnjak Miljkovic",
-            description = "Address 123",
-            imageResource = R.drawable.imageplaceholder,
-            isLiked = false
-        ),
-        CardData(
-            id = 1,
-            title = "Drangulije Ivana",
-            description = "Tavnik 123",
+            id = productsState.id,
+            title = productsState.name,
+            description = productsState.address.toString(),
             imageResource = R.drawable.imageplaceholder,
             isLiked = false
         )
-    )
+    }?.toList() ?: emptyList()
+
 
     Column(
         modifier = Modifier
@@ -228,7 +211,7 @@ fun AllSellers(navController: NavHostController) {
             Osm()
         }
         Text("Uncover Sellers Around You!", style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold), modifier = Modifier.padding(20.dp,top=0.dp,bottom = 0.dp))
-        ShopsComponent(products,navController)
+        ShopsComponent(shops,navController)
     }
 }
 

@@ -57,7 +57,7 @@ namespace back.DAL.Repositories
 
         #endregion
 
-        public async Task<List<ShopCard>> GetShops(int userId, List<int> categories, int rating, bool open, int range, string location, int sort, string search, int page, bool favorite)
+        public async Task<List<ShopCard>> GetShops(int userId, List<int> categories, int rating, bool open, int range, string? location, int sort, string? search, int page, bool favorite)
         {
             User currentUser = _context.Users.FirstOrDefault(x => x.Id == userId);
             float currLat = currentUser.Latitude;

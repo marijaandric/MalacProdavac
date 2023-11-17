@@ -60,4 +60,8 @@ class Repository @Inject constructor(private val api: Api) {
     suspend fun getReviewsForProduct(productId: Int, page: Int): Response<List<ProductReviewUserInfo>> {
         return api.getReviewsForProduct(productId,page)
     }
+
+    suspend fun getShops(userId: Int,categories:List<Int>?, rating:Int?,open:Boolean?,range:Int?, location:String?,sort:Int,search:String?,page:Int,favorite:Boolean): Response<List<ShopDTO>>{
+        return api.getShops(userId,categories,rating,open,range,location,sort,search,page,favorite)
+    }
 }

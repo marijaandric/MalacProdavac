@@ -21,6 +21,7 @@ import com.example.front.viewmodels.login.LoginViewModel
 import com.example.front.viewmodels.myprofile.MyProfileViewModel
 import com.example.front.viewmodels.product.ProductViewModel
 import com.example.front.viewmodels.register.RegisterViewModel
+import com.example.front.viewmodels.shops.ShopsViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -35,6 +36,8 @@ fun SetupNavGraph(
     val productViewModel: ProductViewModel = hiltViewModel()
     val splashViewModel: SplashAndIntroViewModel = hiltViewModel()
     val myProfileViewModel : MyProfileViewModel = hiltViewModel()
+    val shopsViewModel: ShopsViewModel = hiltViewModel()
+
     NavHost(
         navController = navController,
         //startDestination = "intro"
@@ -77,7 +80,7 @@ fun SetupNavGraph(
             route = Screen.AllSellers.route
         )
         {
-            SellersScreen(navController = navController)
+            SellersScreen(navController = navController,shopsViewModel)
         }
 
         introNavGraph(navController = navController, splashViewModel)

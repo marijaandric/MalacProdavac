@@ -84,4 +84,18 @@ interface Api {
         @Query("page") page: Int
     ): Response<List<ProductReviewUserInfo>>
 
+    @GET("back/Shop/GetShops")
+    suspend fun getShops(
+        @Query("userId") userId: Int,
+        @Query("categories") categories: List<Int>?,
+        @Query("rating") rating: Int?,
+        @Query("open") open: Boolean?,
+        @Query("range") range: Int?,
+        @Query("location") location: String?,
+        @Query("sort") sort: Int,
+        @Query("search") search: String?,
+        @Query("page") page: Int,
+        @Query("favorite") favorite: Boolean?,
+    ):Response<List<ShopDTO>>
+
 }

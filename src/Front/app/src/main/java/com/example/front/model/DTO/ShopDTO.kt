@@ -12,5 +12,6 @@ data class ShopDTO (
     @SerializedName("longitude") val longitude: Float,
     @SerializedName("image") val image: String?,
     @SerializedName("owner") val owner: UserDTO?,
-    @SerializedName("liked") val liked: Boolean
+    @SerializedName("liked") val liked: Boolean,
+    @SerializedName("workingHours") val workingHours: List<WorkingHoursDTO>
 )
