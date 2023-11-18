@@ -104,4 +104,32 @@ class DataStoreManager @Inject constructor(@ApplicationContext context: Context)
         }
         return false
     }
+
+    suspend fun getRoleId(): Int?
+    {
+        val token = this.tokenFlow.first()
+
+        return decodeTokenAndGetUserRoleId(token)
+    }
+
+    private fun decodeTokenAndGetUserRoleId(token: String?): Int? {
+        if (token.isNullOrBlank()) {
+            return null
+        }
+
+        try {
+            val signedJWT = SignedJWT.parse(token)
+            val claimsSet = signedJWT.jwtClaimsSet
+
+            val roleClaim = claimsSet.getClaim("role") as? String
+
+            if (roleClaim?.toIntOrNull() != null) {
+                return roleClaim.toInt()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return null
+        }
+        return null
+    }
 }

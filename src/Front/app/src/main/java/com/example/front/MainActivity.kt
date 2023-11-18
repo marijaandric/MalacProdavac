@@ -4,11 +4,15 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -22,15 +26,18 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.front.components.DrawerItem
+import com.example.front.components.DrawerItems
 import com.example.front.helper.DataStore.DataStoreManager
 import com.example.front.navigation.Screen
 import com.example.front.navigation.SetupNavGraph
@@ -79,71 +86,11 @@ import javax.inject.Inject
                 ) {
                     navController = rememberNavController()
 
-
-                    val items = listOf(
-                        DrawerItem(
-                            icon = painterResource(id = R.drawable.navbar_home),
-                            label = "Home",
-                            route = Screen.Home.route,
-                            secondaryLabel = ""
-                        ),
-                        DrawerItem(
-                            icon = painterResource(id = R.drawable.navbar_cart2),
-                            label = "My cart",
-                            route = Screen.Home.route,
-                            secondaryLabel = ""
-                        ),
-                        DrawerItem(
-                            icon = painterResource(id = R.drawable.navbar_cart1),
-                            label = "My orders",
-                            route = Screen.Home.route,
-                            secondaryLabel = ""
-                        ),
-                        DrawerItem(
-                            icon = painterResource(id = R.drawable.navbar_package),
-                            label = "Products",
-                            route = Screen.Home.route,
-                            secondaryLabel = ""
-                        ),
-                        DrawerItem(
-                            icon = painterResource(id = R.drawable.navbar_shop1),
-                            label = "Shops",
-                            route = Screen.Home.route,
-                            secondaryLabel = ""
-                        ),
-                        DrawerItem(
-                            icon = painterResource(id = R.drawable.navbar_bell),
-                            label = "Notifications",
-                            route = Screen.Home.route,
-                            secondaryLabel = ""
-                        ),
-                        DrawerItem(
-                            icon = painterResource(id = R.drawable.navbar_shop2),
-                            label = "My shop",
-                            route = Screen.Home.route,
-                            secondaryLabel = ""
-                        ),
-                        DrawerItem(
-                            icon = painterResource(id = R.drawable.navbar_message),
-                            label = "Messages",
-                            route = Screen.Home.route,
-                            secondaryLabel = ""
-                        ),
-                        DrawerItem(
-                            icon = painterResource(id = R.drawable.navbar_profile),
-                            label = "Profile",
-                            route = Screen.MyProfile.route,
-                            secondaryLabel = ""
-                        ),
-                        DrawerItem(
-                            icon = painterResource(id = R.drawable.navbar_car),
-                            label = "Deliveries",
-                            route = Screen.Home.route,
-                            secondaryLabel = ""
-                        ),
-                    )
+                    val items = DrawerItems
 
                     if (logged){
+                        val roleId = runBlocking { dataStoreManager.getRoleId() }
+                        val filteredItems = items.filter { it.roleId == roleId || it.roleId == 1 }
                         ModalNavigationDrawer(
                             drawerState=drawerState,
                             drawerContent = {
@@ -152,31 +99,20 @@ import javax.inject.Inject
                                         .width(324.dp),
                                     drawerContainerColor = Color(0xFF294E68)
                                 ){
-//                Box(
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .padding(vertical = 64.dp),
-//                    contentAlignment = Alignment.Center
-//                ) {
-//                    Text(text = "Header", style = MaterialTheme.typography.headlineLarge)
-//                }
                                     Spacer(
                                         modifier = Modifier
                                             .height(56.dp)
                                     )
 
-                                    items.forEach{item ->
+                                    filteredItems.forEach{item ->
                                         NavigationDrawerItem(
-                                            modifier = Modifier
-
-                                            ,
                                             label = { Text(text = item.label) },
                                             selected = false,
                                             onClick = {
                                                 scope.launch { drawerState.close() }
                                                 navController.navigate(route = item.route)
                                             },
-                                            icon = { Icon(painter = item.icon, contentDescription = null, modifier = Modifier.height(24.dp)) },
+                                            icon = { Icon(painter = painterResource(id = item.icon), contentDescription = null, modifier = Modifier.height(24.dp)) },
                                             colors = colors(
                                                 unselectedContainerColor = Color(0xFF294E68),
                                                 selectedContainerColor = Color(0xFF263e52),
@@ -188,23 +124,40 @@ import javax.inject.Inject
                                             shape = RectangleShape
                                         )
                                     }
-
-                                    Text(
-                                        text = "Logout",
+                                    Spacer(modifier = Modifier.weight(1f))
+                                    Row(
                                         modifier = Modifier
-                                            .clickable {
-                                                //pokaze modal da potvrdi da zeli da se izloguje
-                                                //ukloni token
-                                                //vodi na Login
-                                                runBlocking {
-                                                    dataStoreManager.storeToken("")
-                                                }
-                                                val intent = Intent(this@MainActivity, MainActivity::class.java)
-                                                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
-                                                startActivity(intent)
-                                                finish()
-                                            }
+                                            .fillMaxWidth()
+                                            .padding(start = 12.dp, bottom = 12.dp)
+                                        ,
+                                        verticalAlignment = Alignment.CenterVertically
                                     )
+                                    {
+                                        Image(
+                                            painter = painterResource(id = R.drawable.logout),
+                                            contentDescription = null,
+                                            modifier = Modifier.height(24.dp)
+                                        )
+                                        Text(
+                                            text = "Logout",
+                                            modifier = Modifier
+                                                .clickable {
+                                                    //pokaze modal da potvrdi da zeli da se izloguje
+                                                    //ukloni token
+                                                    //vodi na Login
+                                                    runBlocking {
+                                                        dataStoreManager.storeToken("")
+                                                    }
+                                                    val intent = Intent(this@MainActivity, MainActivity::class.java)
+                                                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+                                                    startActivity(intent)
+                                                    finish()
+                                                }
+                                            ,
+                                            fontSize = 16.sp,
+                                            color = Color.White
+                                        )
+                                    }
                                 }
                             },
                             content = {
