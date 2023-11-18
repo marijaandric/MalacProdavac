@@ -12,11 +12,13 @@ namespace back.DAL.Repositories
     public class ProductRepository : IProductRepository
     {
         Context _context;
+        FirebaseMessaging _firebaseMessaging;
         int numberOfItems = 10;
         int numberOfReviews = 3;
-        public ProductRepository(Context context)
+        public ProductRepository(Context context, FirebaseMessaging firebaseMessaging)
         {
             _context = context;
+            _firebaseMessaging = firebaseMessaging;
         }
 
         #region filterHelp
@@ -296,53 +298,54 @@ namespace back.DAL.Repositories
 
         public async Task<bool> LeaveReview(ReviewDto review)
         {
-            // Add the review to the database asynchronously.
-            var newReview = new ProductReview
+            try
             {
-                ReviewerId = review.UserId,
-                ProductId = review.Id,
-                Rating = review.Rating,
-                Comment = review.Comment,
-                PostedOn = DateTime.Now
-            };
-
-            _context.ProductReviews.AddAsync(newReview);
-
-            await _context.SaveChangesAsync();
-
-            // Get the owner's FCM token (replace this with your logic to retrieve the owner's FCM token).
-            string ownerFcmToken = GetOwnerFcmToken(review.ProductOwnerId);
-
-            if (!string.IsNullOrEmpty(ownerFcmToken))
-            {
-                // Send a notification to the owner using FCM.
-                var message = new Message
+                var newReview = new ProductReview
                 {
-                    Token = ownerFcmToken,
-                    Notification = new FirebaseAdmin.Messaging.Notification
-                    {
-                        Title = "New Review",
-                        Body = $"A new review has been added for your product."
-                    },
-                    Data = new Dictionary<string, string>
-            {
-                { "productId", review.Id.ToString() },
-                { "reviewerId", review.UserId.ToString() }
-            }
+                    ReviewerId = review.UserId,
+                    ProductId = review.Id,
+                    Rating = review.Rating,
+                    Comment = review.Comment,
+                    PostedOn = DateTime.Now
                 };
 
-                var result = await FirebaseMessaging.DefaultInstance.SendAsync(message);
+                await _context.ProductReviews.AddAsync(newReview);
+                await _context.SaveChangesAsync();
 
-                // Check the result and handle it as needed.
-                if (result != null)
-                {
-                    // Notification sent successfully.
-                    // You can log or handle the result accordingly.
-                }
+                await SendNotificationAsync("New Review", "You have a new review to review!");
+
+                return true;
             }
-
-            return true; // Assuming the review is always added successfully.
+            catch (Exception)
+            {
+                return false;
+            }
         }
+
+        private async Task SendNotificationAsync(string title, string body)
+        {
+            try
+            {
+                var fcmToken = "user_or_topic_fcm_token";
+
+                var message = new Message
+                {
+                    Notification = new FirebaseAdmin.Messaging.Notification
+                    {
+                        Title = title,
+                        Body = body
+                    },
+                    Token = fcmToken
+                };
+
+                var result = await FirebaseMessaging.DefaultInstance.SendAsync(message, CancellationToken.None);
+            }
+            catch (Exception)
+            {
+                
+            }
+        }
+
 
         public async Task<bool> LeaveQuestion(QnADto question)
         {

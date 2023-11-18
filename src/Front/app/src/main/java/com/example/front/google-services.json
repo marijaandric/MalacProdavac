@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "44886636380",
-    "project_id": "smalltrades-547de",
-    "storage_bucket": "smalltrades-547de.appspot.com"
+    "project_number": "242271553340",
+    "project_id": "front-26b45",
+    "storage_bucket": "front-26b45.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:44886636380:android:744c601697e3207f84b399",
+        "mobilesdk_app_id": "1:242271553340:android:30c117a4bcc6c05aafc039",
         "android_client_info": {
           "package_name": "com.example.front"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDrGMg6umgRiTt78tNwBmoldlKjg2fhnA8"
+          "current_key": "AIzaSyAFyRTzlSHbAyL3bk4SNRe6F6e1B72Yrs0"
         }
       ],
       "services": {

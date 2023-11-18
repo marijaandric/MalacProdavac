@@ -38,6 +38,7 @@ import com.example.front.screens.sellers.SellersScreen
 import com.example.front.screens.userprofile.UserProfileScreen
 import com.example.front.ui.theme.FrontTheme
 import com.example.front.viewmodels.login.LoginViewModel
+import com.google.firebase.FirebaseApp
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -53,6 +54,7 @@ import javax.inject.Inject
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            FirebaseApp.initializeApp(this)
             val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
             val scope = rememberCoroutineScope()
             val logged = runBlocking {
