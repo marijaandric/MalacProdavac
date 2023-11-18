@@ -37,6 +37,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.front.components.DrawerItem
+import com.example.front.components.DrawerItems
 import com.example.front.helper.DataStore.DataStoreManager
 import com.example.front.navigation.Screen
 import com.example.front.navigation.SetupNavGraph
@@ -73,71 +74,11 @@ import javax.inject.Inject
                 ) {
                     navController = rememberNavController()
 
-
-                    val items = listOf(
-                        DrawerItem(
-                            icon = painterResource(id = R.drawable.navbar_home),
-                            label = "Home",
-                            route = Screen.Home.route,
-                            secondaryLabel = ""
-                        ),
-                        DrawerItem(
-                            icon = painterResource(id = R.drawable.navbar_cart2),
-                            label = "My cart",
-                            route = Screen.Home.route,
-                            secondaryLabel = ""
-                        ),
-                        DrawerItem(
-                            icon = painterResource(id = R.drawable.navbar_cart1),
-                            label = "My orders",
-                            route = Screen.Home.route,
-                            secondaryLabel = ""
-                        ),
-                        DrawerItem(
-                            icon = painterResource(id = R.drawable.navbar_package),
-                            label = "Products",
-                            route = Screen.Home.route,
-                            secondaryLabel = ""
-                        ),
-                        DrawerItem(
-                            icon = painterResource(id = R.drawable.navbar_shop1),
-                            label = "Shops",
-                            route = Screen.Home.route,
-                            secondaryLabel = ""
-                        ),
-                        DrawerItem(
-                            icon = painterResource(id = R.drawable.navbar_bell),
-                            label = "Notifications",
-                            route = Screen.Home.route,
-                            secondaryLabel = ""
-                        ),
-                        DrawerItem(
-                            icon = painterResource(id = R.drawable.navbar_shop2),
-                            label = "My shop",
-                            route = Screen.Home.route,
-                            secondaryLabel = ""
-                        ),
-                        DrawerItem(
-                            icon = painterResource(id = R.drawable.navbar_message),
-                            label = "Messages",
-                            route = Screen.Home.route,
-                            secondaryLabel = ""
-                        ),
-                        DrawerItem(
-                            icon = painterResource(id = R.drawable.navbar_profile),
-                            label = "Profile",
-                            route = Screen.MyProfile.route,
-                            secondaryLabel = ""
-                        ),
-                        DrawerItem(
-                            icon = painterResource(id = R.drawable.navbar_car),
-                            label = "Deliveries",
-                            route = Screen.Home.route,
-                            secondaryLabel = ""
-                        ),
-                    )
+                    val items = DrawerItems
 
                     if (logged){
+                        val roleId = runBlocking { dataStoreManager.getRoleId() }
+                        val filteredItems = items.filter { it.roleId == roleId || it.roleId == 1 }
                         ModalNavigationDrawer(
                             drawerState=drawerState,
                             drawerContent = {
@@ -146,31 +87,20 @@ import javax.inject.Inject
                                         .width(324.dp),
                                     drawerContainerColor = Color(0xFF294E68)
                                 ){
-//                Box(
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .padding(vertical = 64.dp),
-//                    contentAlignment = Alignment.Center
-//                ) {
-//                    Text(text = "Header", style = MaterialTheme.typography.headlineLarge)
-//                }
                                     Spacer(
                                         modifier = Modifier
                                             .height(56.dp)
                                     )
 
-                                    items.forEach{item ->
+                                    filteredItems.forEach{item ->
                                         NavigationDrawerItem(
-                                            modifier = Modifier
-
-                                            ,
                                             label = { Text(text = item.label) },
                                             selected = false,
                                             onClick = {
                                                 scope.launch { drawerState.close() }
                                                 navController.navigate(route = item.route)
                                             },
-                                            icon = { Icon(painter = item.icon, contentDescription = null, modifier = Modifier.height(24.dp)) },
+                                            icon = { Icon(painter = painterResource(id = item.icon), contentDescription = null, modifier = Modifier.height(24.dp)) },
                                             colors = colors(
                                                 unselectedContainerColor = Color(0xFF294E68),
                                                 selectedContainerColor = Color(0xFF263e52),
@@ -186,7 +116,6 @@ import javax.inject.Inject
                                     Row(
                                         modifier = Modifier
                                             .fillMaxWidth()
-//                                            .height(24.dp)
                                             .padding(start = 12.dp, bottom = 12.dp)
                                         ,
                                         verticalAlignment = Alignment.CenterVertically
