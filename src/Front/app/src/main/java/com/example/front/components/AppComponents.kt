@@ -32,6 +32,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -463,13 +464,25 @@ fun ShopCard(
                     color = MaterialTheme.colorScheme.onTertiary
                 )
 
-                Text(
-                    text = workingHours,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 15.sp,
-                    modifier = Modifier.padding(top = 15.dp),
-                    color = MaterialTheme.colorScheme.secondary
+                Row(
+                    modifier = Modifier.padding(top = 20.dp)
                 )
+                {
+                    Icon(
+                        imageVector = Icons.Default.Star,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(20.dp),
+                        tint = MaterialTheme.colorScheme.secondary
+                    )
+                    Text(
+                        text = workingHours,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 13.sp,
+                        modifier = Modifier.padding(start = 5.dp),
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                }
             }
 
         }
