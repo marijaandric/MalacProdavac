@@ -39,6 +39,7 @@ import com.example.front.screens.userprofile.UserProfileScreen
 import com.example.front.ui.theme.FrontTheme
 import com.example.front.viewmodels.login.LoginViewModel
 import com.google.firebase.FirebaseApp
+import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -49,7 +50,16 @@ import javax.inject.Inject
     class MainActivity : ComponentActivity() {
         lateinit var navController: NavHostController
         @Inject lateinit var dataStoreManager: DataStoreManager
-
+        private fun obtainAndSaveFcmToken() {
+            FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val fcmToken = task.result
+                    //saveTokenToBackend(fcmToken)
+                } else {
+                    // Handle the error
+                }
+            }
+        }
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
