@@ -70,5 +70,34 @@ namespace back.BLL.Services
 
             return reviews;
         }
+
+        public async Task<bool> InsertShop(ShopDto shop)
+        {
+            (double, double) coords = await HelperService.GetCoordinates(shop.Address);
+            Shop s = new Shop
+            {
+                Address = shop.Address,
+                Image = shop.Image,
+                Name = shop.Name,
+                OwnerId = shop.OwnerId,
+                PIB = shop.PIB,
+                Latitude = (float)coords.Item1,
+                Longitude = (float)coords.Item2
+            };
+
+            if (!await _repository.InsertShop(s)) throw new ArgumentException("Shop couldn't be saved!");
+            if (!await _repository.InsertShopCategories(shop.Categories, s.Id))
+            {
+                //brisanje prethodnog ?
+                throw new ArgumentException("Categories could not be saved!");
+            }
+            if (!await _repository.InsertWorkingHours(shop.WorkingHours, s.Id))
+            {
+                //brisanje prethodnog ?
+                throw new ArgumentException("Working hours could not be saved!");
+            }
+
+            return true;
+        }
     }
 }

@@ -9,6 +9,7 @@ namespace back.Models
         public int Id { get; set; }
         [ForeignKey("Owner")]
         public int OwnerId { get; set; }
+        public int PIB { get; set; }
         public string? Name { get; set; }
         public string? Address { get; set; }
         public float? Latitude { get; set; }

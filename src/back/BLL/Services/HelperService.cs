@@ -1,5 +1,5 @@
 ﻿using back.DAL.Repositories;
-using back.Models;
+using Newtonsoft.Json.Linq;
 
 namespace back.BLL.Services
 {
@@ -68,6 +68,28 @@ namespace back.BLL.Services
 
             return uniqueFileName;
         }
+
+        public static async Task<(double, double)> GetCoordinates(string address)
+        {
+            var bingMapsApiKey = "Aj_nYJhXf_C_QoPf7gOQch6KOhTJo2iX2VIyvOlwb7hDpGCtS8rOhyQYp5kAbR54";
+
+            var urlBuilder = new UriBuilder("http://dev.virtualearth.net/REST/v1/Locations");
+            urlBuilder.Query = $"q={Uri.EscapeDataString(address)}&key={bingMapsApiKey}";
+            var url = urlBuilder.ToString();
+
+            HttpClient _httpClient = new HttpClient();
+
+            var response = await _httpClient.GetAsync(url);
+            var responseString = await response.Content.ReadAsStringAsync();
+
+            var data = JObject.Parse(responseString);
+            var latitude = data["resourceSets"][0]["resources"][0]["point"]["coordinates"][0].Value<double>();
+            var longitude = data["resourceSets"][0]["resources"][0]["point"]["coordinates"][1].Value<double>();
+
+
+            return (latitude, longitude);
+        }
+
 
     }
 }

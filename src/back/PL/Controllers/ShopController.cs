@@ -104,5 +104,18 @@ namespace back.PL.Controllers
                 return BadRequest(new { Error = ex.Message });
             }
         }
+
+        [HttpPost("NewShop")]
+        public async Task<IActionResult> NewShop(ShopDto shop)
+        {
+            try
+            {
+                return Ok(new { Success = await _service.InsertShop(shop) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
     }
 }

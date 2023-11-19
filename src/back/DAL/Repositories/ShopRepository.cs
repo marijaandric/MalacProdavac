@@ -226,5 +226,23 @@ namespace back.DAL.Repositories
             s.Image = path;
             return await _context.SaveChangesAsync() > 0;
         }
+
+        public async Task<bool> InsertShop(Shop shop)
+        {
+            await _context.Shop.AddAsync(shop);
+            return await _context.SaveChangesAsync() > 0;
+        }
+
+        public async Task<bool> InsertWorkingHours(List<WorkingHoursDto> workingHours, int shopId)
+        {
+            foreach (var wh in workingHours) await _context.WorkingHours.AddAsync(new WorkingHours {  Day = wh.Day, OpeningHours = TimeSpan.Parse(wh.OpeningHours), ClosingHours = TimeSpan.Parse(wh.ClosingHours), ShopId = shopId});
+            return await _context.SaveChangesAsync() > 0;
+        }
+
+        public async Task<bool> InsertShopCategories(List<int> shopCategories, int shopId)
+        {
+            foreach (var sc in shopCategories) await _context.ShopCategories.AddAsync(new ShopCategory {  CategoryId = sc, ShopId = shopId});
+            return await _context.SaveChangesAsync() > 0;
+        }
     }
 }
