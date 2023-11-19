@@ -63,6 +63,7 @@ import com.example.front.components.ShopCard
 import com.example.front.components.SmallElipseAndTitle
 import com.example.front.components.Tabs
 import com.example.front.viewmodels.shops.ShopsViewModel
+import org.osmdroid.util.GeoPoint
 
 @Composable
 fun SellersScreen(navController: NavHostController, shopsViewModel: ShopsViewModel) {
@@ -234,6 +235,12 @@ fun AllSellers(navController: NavHostController, shopsViewModel: ShopsViewModel)
         )
     }?.toList() ?: emptyList()
 
+    val coordinates = mutableListOf<GeoPoint>()
+    for(shop in state.shops!!)
+    {
+        coordinates.add(GeoPoint(shop.latitude.toDouble(),shop.longitude.toDouble()))
+    }
+
 
     Column(
         modifier = Modifier
@@ -247,7 +254,7 @@ fun AllSellers(navController: NavHostController, shopsViewModel: ShopsViewModel)
                 .padding(20.dp)
         ) {
 
-            Osm()
+            Osm(coordinates)
         }
         Text("Uncover Sellers Around You!", style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold), modifier = Modifier.padding(20.dp,top=0.dp,bottom = 0.dp))
         ShopsComponent(shops,navController)
@@ -618,7 +625,7 @@ fun MapFilters(
                 .padding(16.dp)
         ) {
 
-            Osm()
+            OsmFilter()
         }
 
     }

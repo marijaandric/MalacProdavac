@@ -138,6 +138,8 @@ dependencies {
 
     // osm
     implementation ("org.osmdroid:osmdroid-android:6.1.10")
+    implementation ("com.google.android.gms:play-services-location:17.1.0")
+
 
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1")
 
