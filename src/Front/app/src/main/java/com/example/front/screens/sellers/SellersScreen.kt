@@ -1,5 +1,6 @@
 package com.example.front.screens.sellers
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -38,6 +39,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -52,6 +54,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.front.R
 import com.example.front.components.BigBlueButton
@@ -60,8 +63,6 @@ import com.example.front.components.ShopCard
 import com.example.front.components.SmallElipseAndTitle
 import com.example.front.components.Tabs
 import com.example.front.viewmodels.shops.ShopsViewModel
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.LatLng
 
 @Composable
 fun SellersScreen(navController: NavHostController, shopsViewModel: ShopsViewModel) {
@@ -365,7 +366,8 @@ fun Overlay(onDismiss: () -> Unit, shopsViewModel:ShopsViewModel) {
                 ) {
                     Text(
                         "Sort", style = MaterialTheme.typography.titleMedium.copy(color = MaterialTheme.colorScheme.onBackground), modifier = Modifier
-                            .padding(bottom = 40.dp).align(Alignment.CenterHorizontally)
+                            .padding(bottom = 40.dp)
+                            .align(Alignment.CenterHorizontally)
                     )
 
                     Text(
@@ -401,20 +403,17 @@ fun Overlay(onDismiss: () -> Unit, shopsViewModel:ShopsViewModel) {
 }
 
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FiltersDialog(onDismiss: () -> Unit, shopsViewModel: ShopsViewModel) {
     val overlayColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)
-
     var selectedColumnIndex by remember { mutableStateOf(true) }
 
-    var selectedCategories by remember { mutableStateOf(mutableListOf<Int>()) }
-    var review by remember { mutableStateOf(0) }
-    var open by remember { mutableStateOf<Boolean?>(null) }
-    var location by remember { mutableStateOf("") }
-    var range by remember { mutableStateOf(50f) }
-
+    var selectedCategories by remember { mutableStateOf(shopsViewModel.filtersState.value.categories!!.toMutableList()) }
+    var review by remember { mutableStateOf(shopsViewModel.filtersState.value.rating) }
+    var open by remember { mutableStateOf(if(shopsViewModel.filtersState.value.open != null)shopsViewModel.filtersState.value.open else false ) }
+    var location by remember { mutableStateOf(if(shopsViewModel.filtersState.value.location == null) "" else shopsViewModel.filtersState.value.location.toString()) }
+    var range by remember {mutableStateOf(if(shopsViewModel.filtersState.value.range != null) shopsViewModel.filtersState.value.range!!.toFloat() else 0f)}
 
     Dialog(
         properties = DialogProperties(usePlatformDefaultWidth = false),
@@ -458,6 +457,9 @@ fun FiltersDialog(onDismiss: () -> Unit, shopsViewModel: ShopsViewModel) {
                         Text(
                             "Cancel", style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.primary), modifier = Modifier
                                 .padding(bottom = 20.dp)
+                                .clickable {
+                                    onDismiss()
+                                }
                         )
                         Text(
                             "Filters", style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onBackground), modifier = Modifier
@@ -467,6 +469,9 @@ fun FiltersDialog(onDismiss: () -> Unit, shopsViewModel: ShopsViewModel) {
                         Text(
                             "Reset", style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.secondary), modifier = Modifier
                                 .padding(bottom = 20.dp)
+                                .clickable {
+                                    shopsViewModel.withoutFilters()
+                                }
                         )
                     }
 
@@ -484,10 +489,10 @@ fun FiltersDialog(onDismiss: () -> Unit, shopsViewModel: ShopsViewModel) {
                     {
                         CardGrid(onCategorySelected={selectedCategories=it},
                         onReviewSelected={review=it},
-                        onOpenChanged={open=it})
+                        onOpenChanged={open=it}, shopsViewModel)
                     }
                     else{
-                        MapFilters(onSearchChange={location=it},onSliderChange={range=it})
+                        MapFilters(onSearchChange={location=it},onSliderChange={range=it},shopsViewModel)
                     }
                     BigBlueButton(text = "Show Results", onClick = {
                         shopsViewModel.DialogFilters(selectedCategories,review,open,location,range.toInt())
@@ -499,14 +504,29 @@ fun FiltersDialog(onDismiss: () -> Unit, shopsViewModel: ShopsViewModel) {
     }
 }
 
+
 @Composable
 fun MapFilters(
     onSearchChange: (String) -> Unit,
-    onSliderChange: (Float) -> Unit
+    onSliderChange: (Float) -> Unit,
+    shopsViewModel: ShopsViewModel
 ){
-    var value by remember { mutableStateOf("") }
-    var switchState by remember { mutableStateOf(true) }
-    var sliderValue by remember { mutableStateOf(50f) }
+    var value by remember { mutableStateOf(if(shopsViewModel.filtersState.value.location == null) "" else shopsViewModel.filtersState.value.location.toString()) }
+    var switchState by remember { mutableStateOf(shopsViewModel.filtersState.value.range != 0) }
+    var sliderValue by remember { mutableStateOf(if(shopsViewModel.filtersState.value.range != null) shopsViewModel.filtersState.value.range!!.toFloat() else 0f) }
+
+    LaunchedEffect(shopsViewModel.filtersState.value) {
+        val filtersState = shopsViewModel.filtersState.value
+
+        val location = filtersState.location
+        val switch = shopsViewModel.filtersState.value.range != 0
+        val slider =if(shopsViewModel.filtersState.value.range != null) shopsViewModel.filtersState.value.range!!.toFloat() else 0f
+
+        value = location!!
+        switchState = switch
+        sliderValue = slider
+
+    }
 
     Column {
         Spacer(modifier = Modifier.height(16.dp))
@@ -589,24 +609,46 @@ fun MapFilters(
     }
 }
 
+
 @Composable
 fun CardGrid(
     onCategorySelected: (MutableList<Int>) -> Unit,
     onReviewSelected: (Int) -> Unit,
-    onOpenChanged: (Boolean) -> Unit
+    onOpenChanged: (Boolean) -> Unit,
+    shopsViewModel: ShopsViewModel
 ){
-    var selectedCategories by remember { mutableStateOf(mutableListOf<Int>()) }
-    var radiobutton1 by remember { mutableStateOf(false) }
-    var radiobutton2 by remember { mutableStateOf(false) }
-    var radiobutton3 by remember { mutableStateOf(false) }
-    var switchState by remember { mutableStateOf(false) }
+    var selectedCategories by remember { mutableStateOf(shopsViewModel.filtersState.value.categories!!.toMutableList()) }
+    var radio = shopsViewModel.filtersState.value.rating
+    var radiobutton1 by remember { mutableStateOf(!(radio == null || radio!=4)) }
+    var radiobutton2 by remember { mutableStateOf(!(radio ==null || radio!=3)) }
+    var radiobutton3 by remember { mutableStateOf(!(radio ==null || radio!=2)) }
+    var switchState by remember { mutableStateOf(if(shopsViewModel.filtersState.value.open != null)shopsViewModel.filtersState.value.open else false ) }
+    var indikator by remember { mutableStateOf(0) }
 
     val cardData = listOf(
         "Food", "Drink", "Footwear", "Clothes", "Jewerly", "Tools", "Furniture", "Pottery", "Beauty", "Health", "Decor", "Other"
     )
 
-    val brojevi = (1..12).map { it }
-    val kombinovanaLista = cardData.zip(brojevi)
+    var brojevi = (1..12).map { it }
+    var kombinovanaLista = cardData.zip(brojevi)
+
+
+    LaunchedEffect(shopsViewModel.filtersState.value) {
+        val filtersState = shopsViewModel.filtersState.value
+
+        val categ = filtersState.categories!!.toMutableList()
+        val newRadio = filtersState.rating
+        val newSwitchState = if(shopsViewModel.filtersState.value.open != null)shopsViewModel.filtersState.value.open else false
+
+        selectedCategories = categ
+        indikator+=14
+        radio = newRadio
+        radiobutton1 = !(newRadio == null || newRadio != 4)
+        radiobutton2 = !(newRadio == null || newRadio != 3)
+        radiobutton3 = !(newRadio == null || newRadio != 2)
+        switchState = newSwitchState
+    }
+
 
     Column {
         Text(text = "Categories", modifier = Modifier.padding(top = 16.dp,bottom = 10.dp, start = 10.dp), style=MaterialTheme.typography.displaySmall)
@@ -615,7 +657,7 @@ fun CardGrid(
             columns = GridCells.Fixed(3),
             contentPadding = PaddingValues(0.dp)
         ) {
-            items(kombinovanaLista ) { (cardText,number) ->
+            items(kombinovanaLista,key={(_, number) -> number+indikator }) { (cardText,number) ->
                 FilterCard(cardText = cardText, onClick = {
                     if (selectedCategories.contains(number)) {
                         selectedCategories.remove(number)
@@ -624,16 +666,16 @@ fun CardGrid(
                         selectedCategories.add(number)
                         onCategorySelected(selectedCategories)
                     }
-                })
+                },selectedCategories.contains(number) )
             }
         }
         Text(text = "Customer Review", modifier = Modifier.padding(top = 16.dp,bottom = 10.dp, start = 10.dp), style=MaterialTheme.typography.displaySmall)
         ReviewStars(brojZvezdica = 4, onClick={radiobutton1=true; radiobutton2=false; radiobutton3 =false; onReviewSelected(4)}, radiobutton1)
         ReviewStars(brojZvezdica = 3, onClick={radiobutton1=false; radiobutton2=true; radiobutton3 =false; onReviewSelected(3)}, radiobutton2)
         ReviewStars(brojZvezdica = 2, onClick={radiobutton1=false; radiobutton2=false; radiobutton3 =true;onReviewSelected(2)}, radiobutton3)
-        OpenNow(switchState, onCheckedChange={
-            switchState = !switchState
-            onOpenChanged(switchState)
+        OpenNow(switchState!!, onCheckedChange={
+            switchState = !switchState!!
+            onOpenChanged(switchState!!)
         })
     }
 
@@ -668,8 +710,6 @@ fun OpenNow(switchState:Boolean, onCheckedChange : () -> Unit) {
 
 @Composable
 fun ReviewStars(brojZvezdica:Int, onClick: () -> Unit, isClicked:Boolean) {
-    var selectedRating by remember { mutableStateOf(brojZvezdica) }
-
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -708,9 +748,10 @@ fun ReviewStars(brojZvezdica:Int, onClick: () -> Unit, isClicked:Boolean) {
 }
 
 @Composable
-fun FilterCard(cardText: String, onClick: () -> Unit) {
+fun FilterCard(cardText: String, onClick: () -> Unit, isClicked: Boolean) {
+
     var isCardClicked by remember {
-        mutableStateOf(false)
+        mutableStateOf(isClicked)
     }
     Card(
         modifier = Modifier

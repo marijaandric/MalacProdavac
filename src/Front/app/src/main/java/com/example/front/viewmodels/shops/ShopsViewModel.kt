@@ -34,7 +34,6 @@ class ShopsViewModel @Inject constructor(
     private val _usernameFlow = MutableStateFlow("")
     val usernameFlow: Flow<String> = _usernameFlow
 
-
     // defaultni filteri
     private val _filtersState = mutableStateOf(FiltersDTO(0,null, null, null,null, null, 0, null, 1))
     var filtersState: State<FiltersDTO> = _filtersState;
@@ -45,6 +44,7 @@ class ShopsViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val response = repository.getShops(userId,categories,rating,open,range,location,sort,search,page,favorite)
+                Log.d("VALUES",_filtersState.value.toString())
                 Log.d("TAAAAG",response.body().toString())
                 _filtersState.value = _filtersState.value.copy(
                     userId = userId, categories = categories, rating = rating, open = open, range = range, location = location, sort = sort, search =search, page = page
@@ -154,6 +154,13 @@ class ShopsViewModel @Inject constructor(
             isLoading = true,
             shops = emptyList(),
             error = ""
+        )
+    }
+
+    fun withoutFilters()
+    {
+        _filtersState.value = _filtersState.value.copy(
+            1, listOf(), null, null,0, "none", 0, "E", 1
         )
     }
 }
