@@ -284,5 +284,11 @@ namespace back.DAL.Repositories
             foreach (var sc in shopCategories) _context.ShopCategories.Remove(new ShopCategory { CategoryId = sc, ShopId = shopId });
             return await _context.SaveChangesAsync() > 0;
         }
+
+        public async Task<bool> DeleteShop(int shopId)
+        {
+            _context.Shop.Remove(await _context.Shop.FirstOrDefaultAsync(x => x.Id == shopId));
+            return await _context.SaveChangesAsync() > 0;
+        }
     }
 }

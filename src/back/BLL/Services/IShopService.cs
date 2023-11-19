@@ -17,5 +17,6 @@ namespace back.BLL.Services
         public Task<List<ShopReviewExtended>> GetShopReviews(int shopId, int page);
         public Task<bool> InsertShop(ShopDto shop);
         public Task<bool> EditShop(EditShopDto shop);
+        public Task<bool> DeleteShop(int shopId);
     }
 }
