@@ -20,5 +20,9 @@ namespace back.DAL.Repositories
         public Task<bool> InsertShop(Shop shop);
         public Task<bool> InsertWorkingHours(List<WorkingHoursDto> workingHours, int shopId);
         public Task<bool> InsertShopCategories(List<int> shopCategories, int shopId);
+        public Task<bool> EditShop(EditShopDto shop);
+        public Task<bool> EditWorkingHours(List<WorkingHoursDto> workingHours, int shopId);
+        public Task<bool> DeleteShopCategories(List<int> shopCategories, int shopId);
+        public Task<List<ShopCategory>> GetShopCategories(int shopId);
     }
 }

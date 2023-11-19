@@ -99,5 +99,25 @@ namespace back.BLL.Services
 
             return true;
         }
+
+        public async Task<bool> EditShop(EditShopDto shop)
+        {
+
+            if (!await _repository.EditShop(shop)) throw new ArgumentException("Could not change shop info!");
+            
+            if (shop.WorkingHours != null && !await _repository.EditWorkingHours(shop.WorkingHours, shop.Id)) throw new ArgumentException("Working hours could not be changed!");
+
+            if (shop.Categories != null)
+            {
+                List<int> existing = (await _repository.GetShopCategories(shop.Id)).Select(x => x.CategoryId).ToList();
+                List<int> newCategories = shop.Categories.Where(x => !existing.Contains(x)).ToList();
+                List<int> toDelete = existing.Where(x => !shop.Categories.Contains(x)).ToList();
+
+                if (toDelete.Count > 0 && !await _repository.DeleteShopCategories(toDelete, shop.Id)) throw new ArgumentException("Database error on deleting deselected categories!");
+                if (newCategories.Count > 0 && !await _repository.InsertShopCategories(newCategories, shop.Id)) throw new ArgumentException("Database error on inserting new categories!");
+            }
+            
+            return true;
+        }
     }
 }

@@ -2,6 +2,7 @@
 using back.BLL.Dtos.Cards;
 using back.BLL.Dtos.HelpModels;
 using back.BLL.Dtos.Infos;
+using back.BLL.Services;
 using back.DAL.Contexts;
 using back.Models;
 using Microsoft.EntityFrameworkCore;
@@ -242,6 +243,45 @@ namespace back.DAL.Repositories
         public async Task<bool> InsertShopCategories(List<int> shopCategories, int shopId)
         {
             foreach (var sc in shopCategories) await _context.ShopCategories.AddAsync(new ShopCategory {  CategoryId = sc, ShopId = shopId});
+            return await _context.SaveChangesAsync() > 0;
+        }
+
+        public async Task<bool> EditShop(EditShopDto shop)
+        {
+            if (shop.Image == null && shop.PIB == null && shop.Address == null && shop.Name == null) return true;
+
+            Shop s = await _context.Shop.FirstOrDefaultAsync(x => x.Id == shop.Id);
+            if (shop.Image != null) s.Image = shop.Image;
+            if (shop.PIB != null) s.PIB = (int)shop.PIB;
+            if (shop.Address != null)
+            {
+                (double, double) coords = await HelperService.GetCoordinates(shop.Address);
+                s.Latitude = (float)coords.Item1;
+                s.Longitude = (float)coords.Item2;
+            }
+            if (shop.Name != null) s.Name = shop.Name;
+
+            return await _context.SaveChangesAsync() > 0;
+        }
+
+        public async Task<bool> EditWorkingHours(List<WorkingHoursDto> workingHours, int shopId)
+        {
+            foreach (var wh in workingHours)
+            {
+                WorkingHours curr = await _context.WorkingHours.FirstOrDefaultAsync(x => x.ShopId == shopId && x.Day == wh.Day);
+               curr = new WorkingHours { Day = wh.Day, OpeningHours = TimeSpan.Parse(wh.OpeningHours), ClosingHours = TimeSpan.Parse(wh.ClosingHours), ShopId = shopId };
+            }
+
+            return await _context.SaveChangesAsync() > 0;
+        }
+
+        public async Task<List<ShopCategory>> GetShopCategories(int shopId)
+        {
+            return await _context.ShopCategories.Where(x => x.ShopId == shopId).ToListAsync();
+        }
+        public async Task<bool> DeleteShopCategories(List<int> shopCategories, int shopId)
+        {
+            foreach (var sc in shopCategories) _context.ShopCategories.Remove(new ShopCategory { CategoryId = sc, ShopId = shopId });
             return await _context.SaveChangesAsync() > 0;
         }
     }
