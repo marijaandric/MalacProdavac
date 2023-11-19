@@ -424,6 +424,11 @@ fun FiltersDialog(onDismiss: () -> Unit, shopsViewModel: ShopsViewModel) {
                 .background(overlayColor)
                 .pointerInput(Unit) {
                     detectTapGestures { offset ->
+                        shopsViewModel.changeCategories(selectedCategories)
+                        shopsViewModel.changeRating(review)
+                        shopsViewModel.changeOpen(open)
+                        shopsViewModel.changeLocation(location)
+                        shopsViewModel.changeRange(range.toInt())
                         onDismiss()
                     }
                 }
@@ -458,6 +463,11 @@ fun FiltersDialog(onDismiss: () -> Unit, shopsViewModel: ShopsViewModel) {
                             "Cancel", style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.primary), modifier = Modifier
                                 .padding(bottom = 20.dp)
                                 .clickable {
+                                    shopsViewModel.changeCategories(selectedCategories)
+                                    shopsViewModel.changeRating(review)
+                                    shopsViewModel.changeOpen(open)
+                                    shopsViewModel.changeLocation(location)
+                                    shopsViewModel.changeRange(range.toInt())
                                     onDismiss()
                                 }
                         )
@@ -470,6 +480,11 @@ fun FiltersDialog(onDismiss: () -> Unit, shopsViewModel: ShopsViewModel) {
                             "Reset", style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.secondary), modifier = Modifier
                                 .padding(bottom = 20.dp)
                                 .clickable {
+                                    shopsViewModel.changeCategories(selectedCategories)
+                                    shopsViewModel.changeRating(review)
+                                    shopsViewModel.changeOpen(open)
+                                    shopsViewModel.changeLocation(location)
+                                    shopsViewModel.changeRange(range.toInt())
                                     shopsViewModel.withoutFilters()
                                 }
                         )

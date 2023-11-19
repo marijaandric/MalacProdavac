@@ -163,4 +163,35 @@ class ShopsViewModel @Inject constructor(
             1, listOf(), null, null,0, "none", 0, "E", 1
         )
     }
+
+    fun changeCategories(categories: List<Int>?)
+    {
+        _filtersState.value = _filtersState.value.copy(
+            categories = categories
+        )
+    }
+    fun changeRating(rating: Int?)
+    {
+        _filtersState.value = _filtersState.value.copy(
+            rating = rating
+        )
+    }
+    fun changeOpen(open: Boolean?)
+    {
+        _filtersState.value = _filtersState.value.copy(
+            open = open
+        )
+    }
+    fun changeRange(range: Int?)
+    {
+        _filtersState.value = _filtersState.value.copy(
+            range = range
+        )
+    }
+    fun changeLocation(location: String?)
+    {
+        _filtersState.value = _filtersState.value.copy(
+            location = location
+        )
+    }
 }
