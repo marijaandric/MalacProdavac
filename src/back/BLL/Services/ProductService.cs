@@ -107,5 +107,26 @@ namespace back.BLL.Services
 
             return false;
         }
+
+        public async Task<bool> AddProduct(ProductDto product)
+        {
+            Product newProduct = new Product
+            {
+                CategoryId = product.CategoryId,
+                Description = product.Description,
+                MetricId = product.MetrticId,
+                Price = product.Price,
+                Name = product.Name,
+                SaleMessage = product.SaleMessage,
+                SaleMinQuantity = product.SaleMinQuantity,
+                SalePercentage = product.SalePercentage,
+                ShopId = product.ShopId,
+                SubcategoryId = product.SubcategoryId
+            };
+
+            if (!await _repository.AddProduct(newProduct)) throw new ArgumentException("The product could not be added!");
+
+            return true;
+        }
     }
 }
