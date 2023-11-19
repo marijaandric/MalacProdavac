@@ -374,5 +374,12 @@ namespace back.DAL.Repositories
             await _context.SaveChangesAsync();
             return name;
         }
+
+        public async Task<bool> AddProduct(Product product)
+        {
+            await _context.Products.AddAsync(product);
+            return await _context.SaveChangesAsync() > 0;
+        }
+
     }
 }

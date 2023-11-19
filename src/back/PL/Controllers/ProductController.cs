@@ -158,5 +158,18 @@ namespace back.PL.Controllers
                 return BadRequest(new { Error = ex.Message });
             }
         }
+
+        [HttpPost("AddProduct")]
+        public async Task<IActionResult> AddProduct(ProductDto product)
+        {
+            try
+            {
+                return Ok(new { Success = await _service.AddProduct(product) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
     }
 }
