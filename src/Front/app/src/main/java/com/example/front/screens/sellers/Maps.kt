@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.drawable.BitmapDrawable
 import android.location.LocationManager
@@ -77,7 +78,14 @@ private fun mapView(context: Context, coordinates: List<GeoPoint>): MapView {
     }
 
     val marker = Marker(mapView)
+    val originalBitmap = BitmapFactory.decodeResource(context.resources, R.drawable.currentlocation)
+    val currPic = Bitmap.createScaledBitmap(originalBitmap, 100, 100, false)
+
+    marker.icon = BitmapDrawable(context.resources, currPic)
+    marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
     marker.position = geoPoint
+    val title = "Your Current Position!"
+    marker.title = title
     mapView.overlays.add(marker)
 
     return mapView
