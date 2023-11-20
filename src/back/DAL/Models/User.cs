@@ -25,5 +25,7 @@ namespace back.Models
 
         public Role Role { get; set; }
 
+        public String? FCMToken { get; set; }
+
     }
 }

@@ -70,7 +70,7 @@ data class CardData(
     val id: Int,
     val title: String,
     val description: String,
-    val imageResource: Int,
+    val imageResource: String,
     var isLiked: Boolean
 )
 
@@ -83,7 +83,7 @@ fun Products(viewModel: HomeViewModel, navController: NavHostController) {
             id = productsState.id,
             title = productsState.name,
             description = productsState.price.toString()+" din",
-            imageResource = R.drawable.imageplaceholder,
+            imageResource = productsState.image,
             isLiked = false
         )
     }?.toList() ?: emptyList()
@@ -123,7 +123,7 @@ fun Sellers(viewModel: HomeViewModel) {
             id = shopState.id,
             title = shopState.name,
             description = shopState.address,
-            imageResource = R.drawable.imageplaceholder,
+            imageResource = shopState.image.toString(),
             isLiked = shopState.liked
         )
     }?.toList() ?: emptyList()

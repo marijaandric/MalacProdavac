@@ -74,5 +74,15 @@ namespace back.DAL.Repositories
             await _context.SaveChangesAsync();
             return name;
         }
+
+        public async Task<bool> SaveFcmToken(int id, string token)
+        {
+            User user = await _context.Users.FirstOrDefaultAsync(x => x.Id == id);
+
+            user.FCMToken = token;
+            
+            await _context.SaveChangesAsync();
+            return true;
+        }
     }
 }

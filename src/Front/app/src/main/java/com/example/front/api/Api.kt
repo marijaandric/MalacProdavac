@@ -98,4 +98,9 @@ interface Api {
         @Query("favorite") favorite: Boolean?,
     ):Response<List<ShopDTO>>
 
+    @GET("/back/Auth/FCMTokenSave")
+    suspend fun SaveFCMToken(
+        @Query("userId") userID: Int,
+        @Query("token") token: String
+    ): Response<Boolean>
 }

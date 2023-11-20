@@ -85,4 +85,9 @@ class MyProfileViewModel @Inject constructor(
         )
     }
 
+    suspend fun getUserId(): Int?
+    {
+        return dataStoreManager.getUserIdFromToken()
+    }
+
 }

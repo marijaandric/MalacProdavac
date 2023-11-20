@@ -72,8 +72,10 @@ fun SellersScreen(navController: NavHostController, shopsViewModel: ShopsViewMod
 
     LaunchedEffect(Unit) {
 //        shopsViewModel.getUserId()?.let { shopsViewModel.getProducts(it,listOf(),null,false,null,"",0,"E",1,false) }
-        shopsViewModel.getShops(1,listOf(),null,false,0,"none",0,"E",1,false)
-        shopsViewModel.getShops(1,listOf(),null,false,0,"none",0,"E",1,true)
+        shopsViewModel.getUserId()
+            ?.let { shopsViewModel.getShops(it,listOf(),null,false,0,"none",0,"E",1,false) }
+        shopsViewModel.getUserId()
+            ?.let { shopsViewModel.getShops(it,listOf(),null,false,0,"none",0,"E",1,true) }
     }
 
     LazyColumn(
@@ -190,7 +192,7 @@ data class DataCard(
     val id: Int,
     val title: String,
     val description: String,
-    val imageResource: Int,
+    val imageResource: String,
     var isLiked: Boolean,
     var rating: Float
 )
@@ -203,7 +205,7 @@ fun FavItems(navController: NavHostController, shopsViewModel: ShopsViewModel) {
             id = productsState.id,
             title = productsState.name,
             description = productsState.address.toString(),
-            imageResource = R.drawable.imageplaceholder,
+            imageResource = productsState.image.toString(),
             isLiked = false,
             rating = productsState.rating
         )
@@ -228,8 +230,8 @@ fun AllSellers(navController: NavHostController, shopsViewModel: ShopsViewModel)
         DataCard(
             id = productsState.id,
             title = productsState.name,
-            description = productsState.address.toString(),
-            imageResource = R.drawable.imageplaceholder,
+            description = productsState.address,
+            imageResource = productsState.image.toString(),
             isLiked = false,
             rating = productsState.rating
         )

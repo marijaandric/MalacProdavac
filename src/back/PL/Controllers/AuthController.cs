@@ -83,5 +83,18 @@ namespace back.PL.Controllers
                 return BadRequest(new { Error = ex.Message });
             }
         }
+
+        [HttpPut("FCMTokenSave")]
+        public async Task<IActionResult> SaveFCMToken(int userId, string token)
+        {
+            try
+            {
+                return Ok(new { Success = await _authService.SaveFcmToken(userId,token) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
     }
 }

@@ -324,26 +324,7 @@ fun ProductPage(
                                         ReviewCard(productReviewUserInfo = reviews[i - 1])
                                     }
                                 }
-                                Row(modifier = Modifier.fillMaxWidth(),Arrangement.SpaceBetween) {
-                                    // Button to load more reviews
-                                    if (!showAllReviews && reviews.size > reviewCounter) {
-                                        Button(
-                                            onClick = {
-                                                // Increment the review counter by 3
-                                                reviewCounter += 3
-
-                                                // Fetch more reviews
-                                                GlobalScope.launch {
-                                                    productViewModel.getReviewsForProduct(
-                                                        productID,
-                                                        reviewCounter
-                                                    )
-                                                }
-                                            }
-                                        ) {
-                                            Text("Load 3 more reviews")
-                                        }
-                                    }
+                                Row(modifier = Modifier.fillMaxWidth(),Arrangement.Center) {
 
                                     // Button to toggle between showing all reviews and showing only a few
                                     Button(

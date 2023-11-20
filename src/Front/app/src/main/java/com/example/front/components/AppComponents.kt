@@ -299,7 +299,7 @@ fun BigBlueButton(text: String, onClick: () -> Unit, width: Float, modifier: Mod
 }
 
 @Composable
-fun SellerCard(title: String, author: String, imageResource: Int,isLiked: Boolean,onClick: () -> Unit ) {
+fun SellerCard(title: String, author: String, imageResource: String,isLiked: Boolean,onClick: () -> Unit ) {
     Card(
         modifier = Modifier
             .width(320.dp)
@@ -313,8 +313,11 @@ fun SellerCard(title: String, author: String, imageResource: Int,isLiked: Boolea
                     .fillMaxWidth()
                     .height(150.dp)
             ) {
+                val imageUrl = "http://softeng.pmf.kg.ac.rs:10015/images/${imageResource}"
+
+                val painter: Painter = rememberAsyncImagePainter(model = imageUrl)
                 Image(
-                    painter = painterResource(id = imageResource),
+                    painter = painter,
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
@@ -375,7 +378,7 @@ fun SellerCard(title: String, author: String, imageResource: Int,isLiked: Boolea
 fun ProductCard(
     title: String,
     price: String,
-    imageResource: Int,
+    imageResource: String,
     navController: NavHostController,
     id:Int
 ) {
@@ -386,11 +389,14 @@ fun ProductCard(
             .padding(bottom = 15.dp)
             .clickable { navController.navigate("${Screen.Product.route}/$id") }
     ) {
+        val imageUrl = "http://softeng.pmf.kg.ac.rs:10015/images/${imageResource}"
+
+        val painter: Painter = rememberAsyncImagePainter(model = imageUrl)
         Row(
             modifier = Modifier.fillMaxWidth()
         ) {
             Image(
-                painter = painterResource(id = imageResource),
+                painter = painter,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
@@ -427,7 +433,7 @@ fun ProductCard(
 fun ShopCard(
     title: String,
     price: String,
-    imageResource: Int,
+    imageResource: String,
     navController: NavHostController,
     id:Int,
     workingHours: String
@@ -442,8 +448,11 @@ fun ShopCard(
         Row(
             modifier = Modifier.fillMaxWidth(),
         ) {
+            val imageUrl = "http://softeng.pmf.kg.ac.rs:10015/images/${imageResource}"
+
+            val painter: Painter = rememberAsyncImagePainter(model = imageUrl)
             Image(
-                painter = painterResource(id = imageResource),
+                painter = painter,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier

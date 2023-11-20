@@ -56,6 +56,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -67,6 +68,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
+import coil.compose.rememberAsyncImagePainter
 import com.example.front.R
 import com.example.front.components.CardButton
 import com.example.front.components.ImageItemForProfilePic
@@ -78,11 +80,9 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun UserProfileScreen(navController: NavHostController, myProfileViewModel: MyProfileViewModel) {
-    val id = 1;
-
 
     LaunchedEffect(Unit) {
-        myProfileViewModel.getMyProfileInfo(id)
+        myProfileViewModel.getUserId()?.let { myProfileViewModel.getMyProfileInfo(it) }
     }
     if(myProfileViewModel.state.value.isLoading)
     {
@@ -211,6 +211,9 @@ fun Info(myProfileViewModel: MyProfileViewModel) {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
+                                val imageUrl = "http://softeng.pmf.kg.ac.rs:10015/images/${myProfileViewModel.state.value.info?.image}"
+
+                                val painter: Painter = rememberAsyncImagePainter(model = imageUrl)
                                 Icon(
                                     imageVector = Icons.Default.Person,
                                     contentDescription = "Profile Icon",
@@ -704,3 +707,5 @@ fun EditDialog(onDismiss: () -> Unit,myProfileViewModel: MyProfileViewModel) {
         }
     }
 }
+
+

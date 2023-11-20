@@ -244,5 +244,10 @@ namespace back.BLL.Services
 
             return false;
         }
+
+        public async Task<bool> SaveFcmToken(int id, string token)
+        {
+            return await _authRepository.SaveFcmToken(id, token);
+        }
     }
 }

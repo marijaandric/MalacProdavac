@@ -326,7 +326,7 @@ namespace back.DAL.Repositories
         {
             try
             {
-                var fcmToken = "user_or_topic_fcm_token";
+                var fcmToken = "cIGqClIpQC-pPfLh22_FDi:APA91bH0eIrd72fLRVl_EwdvMXNbWmZWyVZ_2kpQonclfeS6wHUX6G_Qy8Kc9_oHWcDO0oNJ8LyMGPc9aj7491vjqEmtf4u-SmhIrCWXCsNw0RfL94-P2uE0Gh0gUj9uPnA46a1ILGOH";
 
                 var message = new Message
                 {

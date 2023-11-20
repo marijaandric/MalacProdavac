@@ -147,6 +147,7 @@ dependencies {
     //Firebase
     implementation(platform("com.google.firebase:firebase-bom:32.5.0"))
     implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.accompanist:accompanist-permissions:0.30.1")
 }
 
 kapt {

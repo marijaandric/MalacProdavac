@@ -161,7 +161,7 @@ fun Products(viewModel: HomeViewModel, navController: NavHostController) {
         CardData(
             title = productsState.name,
             description = productsState.price.toString() + " din",
-            imageResource = R.drawable.imageplaceholder,
+            imageResource = productsState.image,
             id = productsState.id,
             isLiked = false
         )
