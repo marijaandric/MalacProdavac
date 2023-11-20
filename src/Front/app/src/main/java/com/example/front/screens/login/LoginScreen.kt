@@ -67,14 +67,26 @@ fun LoginScreen(
             Box(
                 modifier = Modifier.fillMaxSize()
             ) {
-                HeaderImage(
-                    painterResource(id = R.drawable.loginheaderimage),
-                )
+                Box(
 
-                // Logo Image
-                LogoImage(
-                    painterResource(id = R.drawable.logowithwhitebackground),
                 )
+                {
+                    HeaderImage(
+                        painterResource(id = R.drawable.loginheaderimage),
+                    )
+
+                    // Logo Image
+                    Box(
+                        modifier = Modifier.align(Alignment.BottomCenter)
+                            .padding(top=30.dp)
+                    )
+                    {
+                        LogoImage(
+                            painterResource(id = R.drawable.logowithwhitebackground),
+                        )
+                    }
+
+                }
 
                 Column(
                     modifier = Modifier

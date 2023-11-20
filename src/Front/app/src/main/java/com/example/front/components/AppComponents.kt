@@ -32,6 +32,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -51,9 +52,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -260,23 +263,59 @@ fun MediumBlueButton(text: String, onClick: () -> Unit, width: Float, modifier: 
 
 @Composable
 fun CardButton(text: String, onClick: () -> Unit, width: Float, modifier: Modifier, color: Color) {
-    val primaryColor = MainBlue
     Button(
         onClick = onClick,
         modifier = Modifier
             .fillMaxWidth(width)
-            .height(38.dp)
+            .height(32.dp)
             .then(modifier),
         colors = ButtonDefaults.buttonColors(containerColor = color),
-        shape = RoundedCornerShape(20)
+        shape = RoundedCornerShape(30)
     ) {
         Text(
             text = text,
-            style = Typography.bodyLarge
+            style = Typography.labelSmall.copy(color=MaterialTheme.colorScheme.background)
         )
     }
 }
 
+@Composable
+fun ButtonWithIcon(
+    text: String,
+    onClick: () -> Unit,
+    width: Float,
+    modifier: Modifier = Modifier,
+    color: Color,
+    imagePainter: Painter? = null,
+    imageModifier: Modifier = Modifier
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth(width)
+            .height(32.dp)
+            .clip(RoundedCornerShape(30))
+            .background(color)
+            .then(modifier)
+            .clickable(onClick = onClick),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
+        if (imagePainter != null) {
+            Image(
+                painter = imagePainter,
+                contentDescription = null,
+                modifier = Modifier
+                    .size(23.dp)
+                    .then(imageModifier)
+                    .padding(end = 4.dp)
+            )
+        }
+        Text(
+            text = text,
+            style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.background)
+        )
+    }
+}
 
 @Composable
 fun BigBlueButton(text: String, onClick: () -> Unit, width: Float, modifier: Modifier) {
@@ -302,16 +341,17 @@ fun BigBlueButton(text: String, onClick: () -> Unit, width: Float, modifier: Mod
 fun SellerCard(title: String, author: String, imageResource: String,isLiked: Boolean,onClick: () -> Unit ) {
     Card(
         modifier = Modifier
-            .width(320.dp)
+            .width(280.dp)
             .clip(RoundedCornerShape(20.dp))
     ) {
         Column(
             modifier = Modifier.fillMaxWidth()
+                .background(color=MaterialTheme.colorScheme.surface)
         ) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(150.dp)
+                    .height(120.dp)
             ) {
                 val imageUrl = "http://softeng.pmf.kg.ac.rs:10015/images/${imageResource}"
 
@@ -322,7 +362,7 @@ fun SellerCard(title: String, author: String, imageResource: String,isLiked: Boo
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(150.dp)
+                        .height(120.dp)
                         .padding(13.dp)
                         .clip(RoundedCornerShape(10.dp))
                 )
@@ -347,8 +387,8 @@ fun SellerCard(title: String, author: String, imageResource: String,isLiked: Boo
                     .fillMaxWidth()
                     .padding(start = 16.dp, bottom = 16.dp, end = 16.dp)
             ) {
-                Text(text = title, fontWeight = FontWeight.Bold, fontSize = 15.sp)
-                Text(text = author, fontSize = 13.sp)
+                Text(text = title, fontWeight = FontWeight.Bold, fontSize = 17.sp)
+                Text(text = author, fontSize = 14.sp)
                 Row(
                     modifier = Modifier.padding(top = 10.dp)
                 )
@@ -384,9 +424,9 @@ fun ProductCard(
 ) {
     Card(
         modifier = Modifier
-            .width(350.dp)
             .clip(RoundedCornerShape(20.dp))
-            .padding(bottom = 15.dp)
+            .fillMaxWidth(0.9f)
+            .padding(bottom = 15.dp, end = 16.dp)
             .clickable { navController.navigate("${Screen.Product.route}/$id") }
     ) {
         val imageUrl = "http://softeng.pmf.kg.ac.rs:10015/images/${imageResource}"
@@ -394,6 +434,7 @@ fun ProductCard(
         val painter: Painter = rememberAsyncImagePainter(model = imageUrl)
         Row(
             modifier = Modifier.fillMaxWidth()
+                .background(color=MaterialTheme.colorScheme.surface)
         ) {
             Image(
                 painter = painter,
@@ -401,12 +442,12 @@ fun ProductCard(
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(120.dp)
-                    .padding(10.dp)
+                    .padding(13.dp)
                     .clip(RoundedCornerShape(10.dp))
             )
 
             Column(
-                modifier = Modifier.padding(8.dp)
+                modifier = Modifier.padding(10.dp)
             ) {
                 Text(text = title, fontWeight = FontWeight.Bold, fontSize = 17.sp)
                 Text(
@@ -416,15 +457,15 @@ fun ProductCard(
                     modifier = Modifier.padding(bottom = 25.dp, top = 5.dp),
                     color = MaterialTheme.colorScheme.secondary
                 )
-                CardButton(
+                ButtonWithIcon(
                     text = "Add to cart",
                     onClick = { /*TODO*/ },
-                    width = 0.9f,
+                    width = 0.8f,
                     modifier = Modifier,
-                    color = MaterialTheme.colorScheme.secondary
+                    color = MaterialTheme.colorScheme.secondary,
+                    imagePainter = painterResource(id = R.drawable.cart)
                 )
             }
-
         }
     }
 }
@@ -446,7 +487,8 @@ fun ShopCard(
             .clickable { },
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth()
+                .background(color=MaterialTheme.colorScheme.surface),
         ) {
             val imageUrl = "http://softeng.pmf.kg.ac.rs:10015/images/${imageResource}"
 
@@ -474,7 +516,7 @@ fun ShopCard(
                 )
 
                 Row(
-                    modifier = Modifier.padding(top = 20.dp)
+                    modifier = Modifier.padding(top = 25.dp)
                 )
                 {
                     Icon(
@@ -487,7 +529,7 @@ fun ShopCard(
                     Text(
                         text = workingHours,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 13.sp,
+                        fontSize = 15.sp,
                         modifier = Modifier.padding(start = 5.dp),
                         color = MaterialTheme.colorScheme.secondary
                     )

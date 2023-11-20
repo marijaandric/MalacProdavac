@@ -256,7 +256,7 @@ fun AllSellers(navController: NavHostController, shopsViewModel: ShopsViewModel)
                 .padding(20.dp)
         ) {
 
-            Osm(coordinates)
+            Osm(shopsViewModel)
         }
         Text("Uncover Sellers Around You!", style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold), modifier = Modifier.padding(20.dp,top=0.dp,bottom = 0.dp))
         ShopsComponent(shops,navController)
@@ -627,7 +627,7 @@ fun MapFilters(
                 .padding(16.dp)
         ) {
 
-            OsmFilter()
+            Osm(shopsViewModel)
         }
 
     }

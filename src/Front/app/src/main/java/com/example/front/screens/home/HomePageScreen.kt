@@ -33,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.front.R
@@ -91,10 +92,17 @@ fun Products(viewModel: HomeViewModel, navController: NavHostController) {
     Column(
         modifier = Modifier
             .padding(16.dp, end = 0.dp, top = 20.dp)
+            .fillMaxWidth()
     ) {
-        Text(text = "Recommended products", modifier = Modifier.padding(bottom = 10.dp))
+        Text(text = "Recommended products",  style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),modifier = Modifier.padding(bottom = 10.dp))
         if (viewModel.state.value.isLoading) {
-            CircularProgressIndicator()
+            Box(
+                modifier=Modifier.padding(top=50.dp).fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            )
+            {
+                CircularProgressIndicator()
+            }
         } else {
             LazyColumn(
                 modifier = Modifier.heightIn(100.dp, 600.dp)
@@ -133,14 +141,22 @@ fun Sellers(viewModel: HomeViewModel) {
         modifier = Modifier
             .padding(16.dp, end = 0.dp)
     ) {
-        Text(text = "Recommended sellers", modifier = Modifier.padding(bottom = 10.dp))
-        LazyRow(
-            modifier = Modifier.heightIn(100.dp, 600.dp)
-        ) {
-            if (viewModel.stateShop.value.isLoading) {
-
+        Text(text = "Recommended sellers", style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold), modifier = Modifier.padding(bottom = 10.dp),)
+        if(viewModel.stateShop.value.isLoading)
+        {
+            Box(
+                modifier=Modifier.padding(top=20.dp)
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            )
+            {
+                CircularProgressIndicator()
             }
-            else{
+        }
+        else{
+            LazyRow(
+                modifier = Modifier.heightIn(100.dp, 600.dp)
+            ) {
                 itemsIndexed(sellers) { index, cardData ->
                     SellerCard(
                         title = cardData.title,
@@ -156,6 +172,7 @@ fun Sellers(viewModel: HomeViewModel) {
                 }
             }
         }
+
     }
 }
 
@@ -165,7 +182,7 @@ fun Search() {
     var value by remember { mutableStateOf("") }
     val context = LocalContext.current
     Box(
-        contentAlignment = Alignment.TopCenter
+        contentAlignment = Alignment.TopCenter,
     ) {
         Image(
             painter = painterResource(id = R.drawable.elipse),
@@ -177,14 +194,14 @@ fun Search() {
         Column()
         {
             Row(
-                modifier = Modifier.padding(top = 35.dp)
+                modifier = Modifier.padding(top = 35.dp, end = 16.dp)
             )
             {
                 Icon(
                     imageVector = Icons.Default.Menu,
                     contentDescription = "Search icon",
                     modifier = Modifier
-                        .padding(end = 10.dp)
+                        .padding(end = 10.dp,start = 16.dp)
                         .size(50.dp)
                         .align(Alignment.CenterVertically),
                     tint = MaterialTheme.colorScheme.background
