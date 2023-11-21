@@ -126,6 +126,15 @@ namespace back.BLL.Services
 
             if (!await _repository.AddProduct(newProduct)) throw new ArgumentException("The product could not be added!");
 
+            foreach (StockDto size in product.Sizes)
+            {
+                if (!await _repository.AddProductSize(newProduct.Id, size.SizeId, size.Quantity))
+                {
+                    await _repository.DeleteProduct(newProduct.Id);
+                    throw new ArgumentException("Error with saving sizes, deleting product!");
+                }
+            }
+
             return true;
         }
     }

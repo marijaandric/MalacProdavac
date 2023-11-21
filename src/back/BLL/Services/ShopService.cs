@@ -88,12 +88,12 @@ namespace back.BLL.Services
             if (!await _repository.InsertShop(s)) throw new ArgumentException("Shop couldn't be saved!");
             if (!await _repository.InsertShopCategories(shop.Categories, s.Id))
             {
-                //brisanje prethodnog ?
+                await _repository.DeleteShop(s.Id);
                 throw new ArgumentException("Categories could not be saved!");
             }
             if (!await _repository.InsertWorkingHours(shop.WorkingHours, s.Id))
             {
-                //brisanje prethodnog ?
+                await _repository.DeleteShop(s.Id);
                 throw new ArgumentException("Working hours could not be saved!");
             }
 

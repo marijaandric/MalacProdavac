@@ -24,6 +24,10 @@ namespace back.DAL.Repositories
         public Task<bool> AddProductPhoto(int id, string path);
         public Task<string> DeleteProductPhoto(int photoId);
         public Task<bool> AddProduct(Product product);
+        public Task<bool> AddProductSize(int id, int sizeId, int quantity);
+        public Task<bool> EditProduct(EditProductDto product);
+        public Task<bool> EditProductSize(int id, int sizeId, int quantity);
+        public Task<bool> DeleteProduct(int productId);
 
     }
 }

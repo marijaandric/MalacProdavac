@@ -3,6 +3,7 @@ using back.BLL.Dtos.Cards;
 using back.BLL.Dtos.HelpModels;
 using back.BLL.Dtos.Infos;
 using back.DAL.Contexts;
+using back.DAL.Models;
 using back.Models;
 using FirebaseAdmin.Messaging;
 using Microsoft.EntityFrameworkCore;
@@ -381,5 +382,38 @@ namespace back.DAL.Repositories
             return await _context.SaveChangesAsync() > 0;
         }
 
+        public async Task<bool> AddProductSize(int id, int sizeId, int quantity)
+        {
+            await _context.ProductSizes.AddAsync(new ProductSize { ProductId = id, SizeId = sizeId, Stock = quantity });
+            return await _context.SaveChangesAsync() > 0;
+        }
+
+        public async Task<bool> DeleteProduct(int productId)
+        {
+            Product p = await _context.Products.FirstOrDefaultAsync(x => x.Id == productId);
+            _context.Products.Remove(p);
+
+            return await _context.SaveChangesAsync() > 0;
+        }
+
+        public async Task<bool> EditProduct(EditProductDto product)
+        {
+            Product p = await _context.Products.FirstOrDefaultAsync(x => x.Id == product.Id);
+
+            if (product.Name != null) p.Name = product.Name;
+            if (product.Description != null) p.Description = product.Description;
+            if (product.SaleMinQuantity != null) p.SaleMinQuantity = (int)product.SaleMinQuantity;
+            if (product.SalePercentage != null) p.SalePercentage = (float)product.SalePercentage;
+            if (product.SaleMessage != null) p.SaleMessage = product.SaleMessage;
+
+            return await _context.SaveChangesAsync() > 0;
+        }
+
+        public async Task<bool> EditProductSize(int id, int sizeId, int quantity)
+        {
+            ProductSize ps = await _context.ProductSizes.FirstOrDefaultAsync(x => x.ProductId == id && x.SizeId == sizeId);
+            ps.Stock = quantity;
+            return await _context.SaveChangesAsync() > 0;
+        }
     }
 }
