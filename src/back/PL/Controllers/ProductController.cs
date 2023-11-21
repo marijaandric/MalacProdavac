@@ -185,5 +185,18 @@ namespace back.PL.Controllers
                 return BadRequest(new { Error = ex.Message });
             }
         }
+
+        [HttpDelete("DeleteProduct")]
+        public async Task<IActionResult> DeleteProduct(int productId)
+        {
+            try
+            {
+                return Ok(new { Success = await _service.DeleteProduct(productId) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
     }
 }

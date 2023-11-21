@@ -19,5 +19,7 @@ namespace back.BLL.Services
         public Task<bool> DeleteProductPhoto(int photoId);
         public Task<bool> AddProduct(ProductDto product);
         public Task<bool> EditProduct(EditProductDto productDto);
+        public Task<bool> DeleteProduct(int productId);
+
     }
 }
