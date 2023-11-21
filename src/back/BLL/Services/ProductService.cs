@@ -131,7 +131,22 @@ namespace back.BLL.Services
                 if (!await _repository.AddProductSize(newProduct.Id, size.SizeId, size.Quantity))
                 {
                     await _repository.DeleteProduct(newProduct.Id);
-                    throw new ArgumentException("Error with saving sizes, deleting product!");
+                    throw new ArgumentException("Error on saving sizes, deleting product!");
+                }
+            }
+
+            return true;
+        }
+
+        public async Task<bool> EditProduct(EditProductDto productDto)
+        {
+            if (!await _repository.EditProduct(productDto)) throw new ArgumentException("Product could not be saved!");
+
+            if (productDto.Sizes != null && productDto.Sizes.Count > 0)
+            {
+                foreach (var size in productDto.Sizes)
+                {
+                    if (!await _repository.EditProductSize(productDto.Id, size.SizeId, size.Quantity)) throw new ArgumentException("Error on updating sizes!");
                 }
             }
 

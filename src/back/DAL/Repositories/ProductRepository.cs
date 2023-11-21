@@ -398,6 +398,8 @@ namespace back.DAL.Repositories
 
         public async Task<bool> EditProduct(EditProductDto product)
         {
+            if (product.Name == null && product.Description == null && product.SaleMinQuantity == null && product.SalePercentage == null && product.SaleMessage == null) return true; 
+
             Product p = await _context.Products.FirstOrDefaultAsync(x => x.Id == product.Id);
 
             if (product.Name != null) p.Name = product.Name;
