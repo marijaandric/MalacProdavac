@@ -59,13 +59,11 @@ namespace back.DAL.Repositories
 
         #endregion
 
-        public async Task<List<ShopCard>> GetShops(int userId, List<int> categories, int rating, bool open, int range, string? location, int sort, string? search, int page, bool favorite)
+        public async Task<List<ShopCard>> GetShops(int userId, List<int>? categories, int? rating, bool? open, int? range, string? location, int sort, string? search, int page, bool? favorite, float? currLat, float? currLong)
         {
-            User currentUser = _context.Users.FirstOrDefault(x => x.Id == userId);
-            float currLat = currentUser.Latitude;
-            float currLong = currentUser.Longitude;
-
-            if (categories.Count == 0) categories = await _context.Categories.Select(x => x.Id).ToListAsync();
+            if (categories == null || categories.Count == 0) categories = await _context.Categories.Select(x => x.Id).ToListAsync();
+            if (search == null) search = "";
+            if (rating == null) rating = 0;
 
             List<ShopCard>  shops = await _context.Shop
                     .Where(x => x.Name.ToLower().Contains(search.Trim().ToLower()) && x.OwnerId != userId)
@@ -88,12 +86,12 @@ namespace back.DAL.Repositories
                 .GroupBy(x => x.Id).Select(x => x.First())
                 .ToListAsync();
             
-            if (favorite)
+            if (favorite != null && favorite == true)
             {
                 shops = shops.Join(_context.LikedShops.Where(x => x.UserId == userId), s => s.Id, ls => ls.ShopId, (s, ls) => s).ToList();
             }
 
-            if (open)
+            if (open != null && open == true)
             {
                 shops = shops
                         .Join(_context.WorkingHours, s => s.Id, w => w.ShopId, (s, w) => new { s , w })
@@ -103,13 +101,13 @@ namespace back.DAL.Repositories
                         .ToList();
             }
 
-            if (location.Trim().Length > 0 && location != "none")
+            if (location != null && location.Trim().Length > 0)
             {
                 shops = shops.Where(x => x.Address.Trim().ToLower().Contains(location.Trim().ToLower())).ToList();
             }
-            else if (range > 0)
+            else if (range != null && range > 0)
             {
-                shops = shops.Where(x => CalculateDistance((float)x.Latitude, (float)x.Longitude, currLat, currLong) <= range).ToList();
+                shops = shops.Where(x => CalculateDistance((float)x.Latitude, (float)x.Longitude, (float)currLat, (float)currLong) <= range).ToList();
             }
 
             shops = SortShops(sort, shops);

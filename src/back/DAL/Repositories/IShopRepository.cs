@@ -8,7 +8,7 @@ namespace back.DAL.Repositories
 {
     public interface IShopRepository
     {
-        public Task<List<ShopCard>> GetShops(int userId, List<int> categories, int rating, bool open, int range, string location, int sort, string search, int page, bool favorite);
+        public Task<List<ShopCard>> GetShops(int userId, List<int>? categories, int? rating, bool? open, int? range, string? location, int sort, string? search, int page, bool? favorite, float? currLat, float? currLong);
         public int ShopPages();
         public Task<ShopInfo> ShopDetails(int shopId, int userId);
         public Task<LikedShops> GetLike(int shopId, int userId);

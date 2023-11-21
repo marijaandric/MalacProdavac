@@ -64,17 +64,17 @@ namespace back.DAL.Repositories
 
         #endregion
 
-        public async Task<List<ProductCard>> GetProducts(int userId, List<int> categories, int rating, bool open, int range, string location, int sort, string search, int page, int specificShopId, bool favorite)
+        public async Task<List<ProductCard>> GetProducts(int userId, List<int>? categories, int? rating, bool? open, int? range, string? location, int sort, string? search, int page, int? specificShopId, bool? favorite, float? currLat, float? currLong)
         {
             List<ProductCard> products;
-            User currentUser = _context.Users.FirstOrDefault(x => x.Id == userId);
-            float currLat = currentUser.Latitude;
-            float currLong = currentUser.Longitude;
             int usersShop = -1;
             if (_context.Shop.Any(x => x.OwnerId == userId)) usersShop = (await _context.Shop.FirstOrDefaultAsync(x => x.OwnerId == userId)).Id;
 
-            if (categories.Count == 0) categories = await _context.Categories.Select(x => x.Id).ToListAsync();
-            if (specificShopId == -1)
+            if (categories == null || categories.Count == 0) categories = await _context.Categories.Select(x => x.Id).ToListAsync();
+            if (search == null) search = "";
+            if (rating == null) rating = 0;
+
+            if (specificShopId == null)
             {
                 products = await _context.Products.Where(x => categories.Contains(x.CategoryId) && x.Name.ToLower().Contains(search.Trim().ToLower()) && x.ShopId != usersShop)
                                     .GroupJoin(_context.ProductReviews.GroupBy(x => x.ProductId).Select(group => new
@@ -113,12 +113,12 @@ namespace back.DAL.Repositories
                                     .ToListAsync();
             }
                 
-            if (favorite)
+            if (favorite != null && favorite == true)
             {
                 products = products.Join(_context.LikedProducts.Where(x => x.UserId == userId), p => p.Id, lp => lp.ProductId, (p, lp) => p).ToList();
             }
 
-            if (open)
+            if (open != null && open == true)
             {
                 products = products
                         .Join(_context.Shop.Join(_context.WorkingHours, s => s.Id, w => w.ShopId, (s, w) => w), p => p.ShopId, w => w.ShopId, (p, w) => new {p, w})
@@ -128,13 +128,13 @@ namespace back.DAL.Repositories
                         .ToList();
             }
 
-            if (location.Trim().Length > 0 && location != "none")
+            if (location != null && location.Trim().Length > 0)
             {
                 products = products.Join(_context.Shop.Where(x => x.Address.Trim().ToLower().Contains(location.Trim().ToLower())), p => p.ShopId, s => s.Id, (p, s) => p).ToList();
             }
-            else if (range > 0)
+            else if (range != null && range > 0)
             {
-                products = products.Join(_context.Shop, p => p.ShopId, s => s.Id, (p, s) => (p, s)).Where(x => CalculateDistance((float)x.s.Latitude, (float)x.s.Longitude, currLat, currLong) <= range).Select(x => x.p).ToList();
+                products = products.Join(_context.Shop, p => p.ShopId, s => s.Id, (p, s) => (p, s)).Where(x => CalculateDistance((float)x.s.Latitude, (float)x.s.Longitude, (float)currLat, (float)currLong) <= range).Select(x => x.p).ToList();
             }
 
             products = SortProducts(sort, products);

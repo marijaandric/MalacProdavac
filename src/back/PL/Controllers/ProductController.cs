@@ -1,4 +1,5 @@
-﻿using back.BLL.Dtos;
+﻿using System.Runtime.InteropServices;
+using back.BLL.Dtos;
 using back.BLL.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,11 +16,11 @@ namespace back.PL.Controllers
         }
 
         [HttpGet("GetProducts")]
-        public async Task<IActionResult> GetProducts(int userId, [FromQuery] List<int> categories, int rating, bool open, int range, string location, int sort, string search, int page, bool favorite)
+        public async Task<IActionResult> GetProducts(int userId, [FromQuery]List<int>? categories, int? rating, bool? open, int? range, string? location, int sort, string? search, int page, int? specificShopId, bool? favorite, float? currLat, float? currLong)
         {
             try
             {
-                return Ok(await _service.GetProducts(userId, categories, rating, open, range, location, sort, search, page, -1, favorite));
+                return Ok(await _service.GetProducts(userId, categories, rating, open, range, location, sort, search, page, specificShopId, favorite, currLat, currLong));
             }
             catch (Exception ex)
             {

@@ -15,9 +15,9 @@ namespace back.BLL.Services
             _repository = repository;
         }
 
-        public async Task<List<ShopCard>> GetShops(int userId, List<int> categories, int rating, bool open, int range, string location, int sort, string search, int page, bool favorite)
+        public async Task<List<ShopCard>> GetShops(int userId, List<int>? categories, int? rating, bool? open, int? range, string? location, int sort, string? search, int page, bool? favorite, float? currLat, float? currLong)
         {
-            List<ShopCard> shops = await _repository.GetShops(userId, categories, rating, open, range, location, sort, search, page, favorite);
+            List<ShopCard> shops = await _repository.GetShops(userId, categories, rating, open, range, location, sort, search, page, favorite, currLat, currLong);
             if (shops.Count == 0) throw new ArgumentException("No shops found.");
             return shops;
         }
