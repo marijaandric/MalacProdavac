@@ -96,6 +96,8 @@ interface Api {
         @Query("search") search: String?,
         @Query("page") page: Int,
         @Query("favorite") favorite: Boolean?,
+        @Query("currLat") currLat: Float?,
+        @Query("currLong") currLong: Float?
     ):Response<List<ShopDTO>>
 
     @GET("/back/Auth/FCMTokenSave")

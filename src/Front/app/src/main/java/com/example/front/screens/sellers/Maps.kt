@@ -38,7 +38,7 @@ import org.osmdroid.views.overlay.Marker
 
 
 @Composable
-fun Osm(shopsViewModel: ShopsViewModel) {
+fun Osm(shopsViewModel: ShopsViewModel) : GeoPoint {
     val context = LocalContext.current
     val yourUserAgent = "YourUserAgentName"
     Configuration.getInstance().userAgentValue = yourUserAgent
@@ -48,6 +48,7 @@ fun Osm(shopsViewModel: ShopsViewModel) {
         modifier = Modifier,
         factory = { mapView(context, shopsViewModel) },
     )
+    return getCurrentLocation(context)
 }
 
 private fun mapView(context: Context, shopsViewModel: ShopsViewModel): MapView {
@@ -129,20 +130,4 @@ private fun getCurrentLocation(context: Context): GeoPoint {
 }
 
 private const val MY_PERMISSIONS_REQUEST_LOCATION = 123
-
-fun onRequestPermissionsResult(
-    requestCode: Int,
-    permissions: Array<out String>,
-    grantResults: IntArray
-) {
-    when (requestCode) {
-        MY_PERMISSIONS_REQUEST_LOCATION -> {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Log.d("LOKACIJA", "Permission granted, re-running location retrieval")
-            } else {
-                Log.d("LOKACIJA", "Permission denied")
-            }
-        }
-    }
-}
 

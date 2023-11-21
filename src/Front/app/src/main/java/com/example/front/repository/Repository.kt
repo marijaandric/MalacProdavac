@@ -61,8 +61,8 @@ class Repository @Inject constructor(private val api: Api) {
         return api.getReviewsForProduct(productId,page)
     }
 
-    suspend fun getShops(userId: Int,categories:List<Int>?, rating:Int?,open:Boolean?,range:Int?, location:String?,sort:Int,search:String?,page:Int,favorite:Boolean): Response<List<ShopDTO>>{
-        return api.getShops(userId,categories,rating,open,range,location,sort,search,page,favorite)
+    suspend fun getShops(userId: Int,categories:List<Int>?, rating:Int?,open:Boolean?,range:Int?, location:String?,sort:Int,search:String?,page:Int,favorite:Boolean, currLat: Float?, currLong: Float?): Response<List<ShopDTO>>{
+        return api.getShops(userId,categories,rating,open,range,location,sort,search,page,favorite, currLat, currLong)
     }
     suspend fun saveFCMToken(userID:Int, token: String) : Response<Boolean>{
         return api.SaveFCMToken(userID,token)

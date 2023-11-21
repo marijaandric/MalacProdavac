@@ -13,6 +13,7 @@ import com.example.front.screens.home.HomePage
 import com.example.front.screens.categories.RegistrationCategories
 import com.example.front.screens.product.ProductPage
 import com.example.front.screens.sellers.SellersScreen
+import com.example.front.screens.shop.ShopScreen
 import com.example.front.screens.userprofile.UserProfileScreen
 import com.example.front.viewmodels.splasintro.SplashAndIntroViewModel
 import com.example.front.viewmodels.categories.CategoriesViewModel
@@ -81,6 +82,12 @@ fun SetupNavGraph(
         )
         {
             SellersScreen(navController = navController,shopsViewModel)
+        }
+        composable(
+            route = Screen.Shop.route
+        )
+        {
+            ShopScreen()
         }
 
         introNavGraph(navController = navController, splashViewModel)

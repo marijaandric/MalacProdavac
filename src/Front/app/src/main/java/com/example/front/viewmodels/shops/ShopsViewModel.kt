@@ -17,6 +17,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import org.osmdroid.util.GeoPoint
 import javax.inject.Inject
 
 @HiltViewModel
@@ -35,19 +36,18 @@ class ShopsViewModel @Inject constructor(
     val usernameFlow: Flow<String> = _usernameFlow
 
     // defaultni filteri
-    private val _filtersState = mutableStateOf(FiltersDTO(0,null, null, null,null, null, 0, null, 1))
+    private val _filtersState = mutableStateOf(FiltersDTO(0,null, null, null,null, null, 0, null, 1, null, null))
     var filtersState: State<FiltersDTO> = _filtersState;
 
 
-    fun getShops(userId: Int,categories:List<Int>?, rating:Int?,open:Boolean?,range:Int?, location:String?,sort:Int,search:String?,page:Int,favorite:Boolean) {
+    fun getShops(userId: Int,categories:List<Int>?, rating:Int?,open:Boolean?,range:Int?, location:String?,sort:Int,search:String?,page:Int,favorite:Boolean,currLat:Float?, currLong:Float?) {
         inicijalnoStanje()
         viewModelScope.launch {
             try {
-                val response = repository.getShops(userId,categories,rating,open,range,location,sort,search,page,favorite)
-                Log.d("VALUES",_filtersState.value.toString())
-                Log.d("TAAAAG",response.body().toString())
+                val response = repository.getShops(userId,categories,rating,open,range,location,sort,search,page,favorite, currLat, currLong)
+
                 _filtersState.value = _filtersState.value.copy(
-                    userId = userId, categories = categories, rating = rating, open = open, range = range, location = location, sort = sort, search =search, page = page
+                    userId = userId, categories = categories, rating = rating, open = open, range = range, location = location, sort = sort, search =search, page = page, currLat = currLat, currLon = currLong
                 )
                 if (response.isSuccessful) {
                     val responseBody = response.body()
@@ -72,13 +72,13 @@ class ShopsViewModel @Inject constructor(
                     if(!favorite)
                     {
                         _state.value = _state.value.copy(
-                            error = "Error"
+                            error = "NotFound"
                         )
                     }
                     else
                     {
                         _stateFav.value = _stateFav.value.copy(
-                            error = "Error"
+                            error = "NotFound"
                         )
                     }
                 }
@@ -103,8 +103,8 @@ class ShopsViewModel @Inject constructor(
         _filtersState.value = _filtersState.value.copy(
             sort = s
         )
-        getShops(_filtersState.value.userId,_filtersState.value.categories,_filtersState.value.rating,_filtersState.value.open,_filtersState.value.range,_filtersState.value.location,_filtersState.value.sort,_filtersState.value.search,_filtersState.value.page, true)
-        getShops(_filtersState.value.userId,_filtersState.value.categories,_filtersState.value.rating,_filtersState.value.open,_filtersState.value.range,_filtersState.value.location,_filtersState.value.sort,_filtersState.value.search,_filtersState.value.page, false)
+        getShops(_filtersState.value.userId,_filtersState.value.categories,_filtersState.value.rating,_filtersState.value.open,_filtersState.value.range,_filtersState.value.location,_filtersState.value.sort,_filtersState.value.search,_filtersState.value.page, true, _filtersState.value.currLat, _filtersState.value.currLon)
+        getShops(_filtersState.value.userId,_filtersState.value.categories,_filtersState.value.rating,_filtersState.value.open,_filtersState.value.range,_filtersState.value.location,_filtersState.value.sort,_filtersState.value.search,_filtersState.value.page, false, _filtersState.value.currLat, _filtersState.value.currLon)
     }
 
     fun ChangePage(s:Int)
@@ -112,8 +112,8 @@ class ShopsViewModel @Inject constructor(
         _filtersState.value = _filtersState.value.copy(
             page = s
         )
-        getShops(_filtersState.value.userId,_filtersState.value.categories,_filtersState.value.rating,_filtersState.value.open,_filtersState.value.range,_filtersState.value.location,_filtersState.value.sort,_filtersState.value.search,_filtersState.value.page, true)
-        getShops(_filtersState.value.userId,_filtersState.value.categories,_filtersState.value.rating,_filtersState.value.open,_filtersState.value.range,_filtersState.value.location,_filtersState.value.sort,_filtersState.value.search,_filtersState.value.page, false)
+        getShops(_filtersState.value.userId,_filtersState.value.categories,_filtersState.value.rating,_filtersState.value.open,_filtersState.value.range,_filtersState.value.location,_filtersState.value.sort,_filtersState.value.search,_filtersState.value.page, true, _filtersState.value.currLat, _filtersState.value.currLon)
+        getShops(_filtersState.value.userId,_filtersState.value.categories,_filtersState.value.rating,_filtersState.value.open,_filtersState.value.range,_filtersState.value.location,_filtersState.value.sort,_filtersState.value.search,_filtersState.value.page, false, _filtersState.value.currLat, _filtersState.value.currLon)
     }
 
     fun Search(s:String)
@@ -121,8 +121,8 @@ class ShopsViewModel @Inject constructor(
         _filtersState.value = _filtersState.value.copy(
             search = s
         )
-        getShops(_filtersState.value.userId,_filtersState.value.categories,_filtersState.value.rating,_filtersState.value.open,_filtersState.value.range,_filtersState.value.location,_filtersState.value.sort,_filtersState.value.search,_filtersState.value.page, true)
-        getShops(_filtersState.value.userId,_filtersState.value.categories,_filtersState.value.rating,_filtersState.value.open,_filtersState.value.range,_filtersState.value.location,_filtersState.value.sort,_filtersState.value.search,_filtersState.value.page, false)
+        getShops(_filtersState.value.userId,_filtersState.value.categories,_filtersState.value.rating,_filtersState.value.open,_filtersState.value.range,_filtersState.value.location,_filtersState.value.sort,_filtersState.value.search,_filtersState.value.page, true, _filtersState.value.currLat, _filtersState.value.currLon)
+        getShops(_filtersState.value.userId,_filtersState.value.categories,_filtersState.value.rating,_filtersState.value.open,_filtersState.value.range,_filtersState.value.location,_filtersState.value.sort,_filtersState.value.search,_filtersState.value.page, false, _filtersState.value.currLat, _filtersState.value.currLon)
     }
 
     fun DialogFilters(categories: List<Int>?, rating: Int?, open: Boolean?, location: String?, range: Int?)
@@ -134,8 +134,8 @@ class ShopsViewModel @Inject constructor(
             location = location,
             range = range
         )
-        getShops(_filtersState.value.userId,_filtersState.value.categories,_filtersState.value.rating,_filtersState.value.open,_filtersState.value.range,_filtersState.value.location,_filtersState.value.sort,_filtersState.value.search,_filtersState.value.page, true)
-        getShops(_filtersState.value.userId,_filtersState.value.categories,_filtersState.value.rating,_filtersState.value.open,_filtersState.value.range,_filtersState.value.location,_filtersState.value.sort,_filtersState.value.search,_filtersState.value.page, false)
+        getShops(_filtersState.value.userId,_filtersState.value.categories,_filtersState.value.rating,_filtersState.value.open,_filtersState.value.range,_filtersState.value.location,_filtersState.value.sort,_filtersState.value.search,_filtersState.value.page, true, _filtersState.value.currLat, _filtersState.value.currLon)
+        getShops(_filtersState.value.userId,_filtersState.value.categories,_filtersState.value.rating,_filtersState.value.open,_filtersState.value.range,_filtersState.value.location,_filtersState.value.sort,_filtersState.value.search,_filtersState.value.page, false, _filtersState.value.currLat, _filtersState.value.currLon)
     }
 
     suspend fun getUserId(): Int?
@@ -160,7 +160,7 @@ class ShopsViewModel @Inject constructor(
     fun withoutFilters()
     {
         _filtersState.value = _filtersState.value.copy(
-            1, listOf(), null, null,0, "none", 0, "E", 1
+            1, listOf(), null, null,0, null, 0, null, 1
         )
     }
 
@@ -192,6 +192,15 @@ class ShopsViewModel @Inject constructor(
     {
         _filtersState.value = _filtersState.value.copy(
             location = location
+        )
+    }
+
+    fun changeCoordinates(geoPoint: GeoPoint?)
+    {
+        Log.d("Promena", geoPoint.toString())
+        _filtersState.value = _filtersState.value.copy(
+            currLat = geoPoint!!.latitude.toFloat(),
+            currLon = geoPoint!!.longitude.toFloat(),
         )
     }
 }

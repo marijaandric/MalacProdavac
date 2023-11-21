@@ -49,11 +49,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.core.location.LocationManagerCompat.getCurrentLocation
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.front.R
@@ -71,12 +73,14 @@ fun SellersScreen(navController: NavHostController, shopsViewModel: ShopsViewMod
     var selectedColumnIndex by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
-//        shopsViewModel.getUserId()?.let { shopsViewModel.getProducts(it,listOf(),null,false,null,"",0,"E",1,false) }
         shopsViewModel.getUserId()
-            ?.let { shopsViewModel.getShops(it,listOf(),null,false,0,"none",0,"E",1,false) }
+            ?.let { shopsViewModel.getShops(it,listOf(),null,false,0,null,0,null,1,false, null, null) }
         shopsViewModel.getUserId()
-            ?.let { shopsViewModel.getShops(it,listOf(),null,false,0,"none",0,"E",1,true) }
+            ?.let { shopsViewModel.getShops(it,listOf(),null,false,0,null,0,null,1,true, null, null) }
     }
+
+    val x = Osm(shopsViewModel = shopsViewModel)
+    shopsViewModel.changeCoordinates(x)
 
     LazyColumn(
         modifier = Modifier
@@ -103,7 +107,7 @@ fun SellersScreen(navController: NavHostController, shopsViewModel: ShopsViewMod
         item{
             if(selectedColumnIndex)
             {
-                if(shopsViewModel.state.value.error.contains("Error"))
+                if(shopsViewModel.state.value.error.contains("NotFound"))
                 {
                     Box(
                         modifier = Modifier
@@ -144,7 +148,7 @@ fun SellersScreen(navController: NavHostController, shopsViewModel: ShopsViewMod
                 }
             }
             else{
-                if(shopsViewModel.stateFav.value.error.contains("Error"))
+                if(shopsViewModel.stateFav.value.error.contains("NotFound"))
                 {
                     Box(
                         modifier = Modifier
@@ -273,7 +277,7 @@ fun ShopsComponent(products: List<DataCard>, navController: NavHostController) {
             modifier = Modifier.heightIn(100.dp, 600.dp)
         ) {
             items(products) { cardData ->
-                var rating: String = "Be the first to rate this store"
+                var rating: String = "Rate this store first!"
                 if(cardData.rating > 0f)
                 {
                     rating = cardData.rating.toString()
