@@ -289,5 +289,10 @@ namespace back.DAL.Repositories
             _context.Shop.Remove(await _context.Shop.FirstOrDefaultAsync(x => x.Id == shopId));
             return await _context.SaveChangesAsync() > 0;
         }
+
+        public async Task<string> GetShopName(int id)
+        {
+            return (await _context.Shop.FirstOrDefaultAsync(x => x.Id == id)).Name;
+        }
     }
 }

@@ -417,5 +417,10 @@ namespace back.DAL.Repositories
             ps.Stock = quantity;
             return await _context.SaveChangesAsync() > 0;
         }
+
+        public async Task<List<int>> GetShopFollowers(int shopId)
+        {
+            return await _context.LikedShops.Where(x => x.ShopId == shopId).Select(x => x.UserId).ToListAsync();
+        }
     }
 }

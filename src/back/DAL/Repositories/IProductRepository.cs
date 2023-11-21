@@ -28,6 +28,7 @@ namespace back.DAL.Repositories
         public Task<bool> EditProduct(EditProductDto product);
         public Task<bool> EditProductSize(int id, int sizeId, int quantity);
         public Task<bool> DeleteProduct(int productId);
+        public Task<List<int>> GetShopFollowers(int shopId);
 
     }
 }

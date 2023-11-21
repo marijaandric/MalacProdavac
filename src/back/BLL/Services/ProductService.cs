@@ -10,10 +10,14 @@ namespace back.BLL.Services
     public class ProductService : IProductService
     {
         IProductRepository _repository;
+        INotificationRepository _notificationRepository;
+        IShopRepository _shopRepository;
 
-        public ProductService(IProductRepository repository)
+        public ProductService(IProductRepository repository, INotificationRepository notificationRepository, IShopRepository shopRepository)
         {
             _repository = repository;
+            _notificationRepository = notificationRepository;
+            _shopRepository = shopRepository;
         }
 
         string imagesFolderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..\\..\\..\\images");
@@ -134,6 +138,15 @@ namespace back.BLL.Services
                     throw new ArgumentException("Error on saving sizes, deleting product!");
                 }
             }
+
+            List<int> usersToNotify = await _repository.GetShopFollowers(product.ShopId);
+
+            foreach(int user in usersToNotify)
+            {
+                string shopName = await _shopRepository.GetShopName(newProduct.ShopId);
+                if (await _notificationRepository.InsertNotification(user, 2, "New product!", shopName + " has added new product: " + newProduct.Name + ".\n. Tap to learn more.", newProduct.Id)) Console.WriteLine("Notification sent!");
+            }
+            
 
             return true;
         }
