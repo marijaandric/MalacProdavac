@@ -18,5 +18,6 @@ namespace back.BLL.Services
         public Task<bool> InsertShop(ShopDto shop);
         public Task<bool> EditShop(EditShopDto shop);
         public Task<bool> DeleteShop(int shopId);
+        public Task<bool> InsertProductDisplay(ProductDisplayDto productDisplay);
     }
 }

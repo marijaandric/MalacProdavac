@@ -125,5 +125,22 @@ namespace back.BLL.Services
             if (!await _repository.DeleteShop(shopId)) throw new ArgumentException("Shop couldn't be deleted!");
             return true;
         }
+
+        public async Task<bool> InsertProductDisplay(ProductDisplayDto productDisplay)
+        {
+            ProductDisplay pd = new ProductDisplay
+            {
+                Address = productDisplay.Address,
+                EndDate = productDisplay.EndDate,
+                EndTime = TimeSpan.Parse(productDisplay.EndTime),
+                ShopId = productDisplay.ShopId,
+                StartDate = productDisplay.StartDate,
+                StartTime = TimeSpan.Parse(productDisplay.StartTime)
+            };
+
+            if (!await _repository.InsertProductDisplay(pd)) throw new ArgumentException("Display could not be added!");
+
+            return true;
+        }
     }
 }

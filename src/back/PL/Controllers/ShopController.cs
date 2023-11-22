@@ -1,5 +1,6 @@
 ﻿using back.BLL.Dtos;
 using back.BLL.Services;
+using back.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace back.PL.Controllers
@@ -141,6 +142,19 @@ namespace back.PL.Controllers
             catch (Exception ex)
             {
                 return BadRequest(new { Error = ex.Message });
+            }
+        }
+
+        [HttpPost("NewProductDisplay")]
+        public async Task<IActionResult> NewProductDisplay(ProductDisplayDto productDisplay)
+        {
+            try
+            {
+                return Ok(new { Success = await _service.InsertProductDisplay(productDisplay) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new {Error =  ex.Message});
             }
         }
     }

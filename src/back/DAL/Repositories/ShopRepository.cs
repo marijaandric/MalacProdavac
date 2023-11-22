@@ -294,5 +294,11 @@ namespace back.DAL.Repositories
         {
             return (await _context.Shop.FirstOrDefaultAsync(x => x.Id == id)).Name;
         }
+
+        public async Task<bool> InsertProductDisplay(ProductDisplay productDisplay)
+        {
+            await _context.ProductDisplays.AddAsync(productDisplay);
+            return await _context.SaveChangesAsync() > 0;
+        }
     }
 }

@@ -26,5 +26,6 @@ namespace back.DAL.Repositories
         public Task<List<ShopCategory>> GetShopCategories(int shopId);
         public Task<bool> DeleteShop(int shopId);
         public Task<string> GetShopName(int id);
+        public Task<bool> InsertProductDisplay(ProductDisplay productDisplay);
     }
 }

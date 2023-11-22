@@ -11,8 +11,8 @@ namespace back.Models
         public int ShopId { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
-        public DateTime StartTime { get; set; }
-        public DateTime EndTime { get; set; }
+        public TimeSpan StartTime { get; set; }
+        public TimeSpan EndTime { get; set; }
         public string? Address { get; set; }
 
         public Shop Shop { get; set; }
