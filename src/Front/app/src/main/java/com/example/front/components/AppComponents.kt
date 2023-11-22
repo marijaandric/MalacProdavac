@@ -654,7 +654,7 @@ fun Tabs(
     selectedColumnIndex: Boolean,
     firstTab: String,
     secondTab: String,
-    isFilters: Boolean
+    isFilters: Boolean,
 ) {
     Row {
         Column(
