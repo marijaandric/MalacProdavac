@@ -143,7 +143,7 @@ namespace back.BLL.Services
 
             foreach(int user in usersToNotify)
             {
-                string shopName = await _shopRepository.GetShopName(newProduct.ShopId);
+                string shopName = (await _shopRepository.GetShop(newProduct.ShopId)).Name;
                 if (await _notificationRepository.InsertNotification(user, 2, "New product!", shopName + " has added new product: " + newProduct.Name + ".\nTap to learn more.", newProduct.Id)) Console.WriteLine("Notification sent!");
             }
             
@@ -190,7 +190,7 @@ namespace back.BLL.Services
 
                 foreach (int user in usersToNotify)
                 {
-                    string shopName = await _shopRepository.GetShopName(editedProduct.ShopId);
+                    string shopName = (await _shopRepository.GetShop(editedProduct.ShopId)).Name;
 
                     if (editedProduct.SaleMinQuantity > 1)
                         if (await _notificationRepository.InsertNotification(user, 2, editedProduct.Name + " on sale!", shopName + " is having " + editedProduct.SalePercentage + "% off on all " + editedProduct.Name.ToLower() + " orders over " + editedProduct.SaleMinQuantity + " " + await _repository.GetMetric(editedProduct.MetricId) + "s.\nTap to learn more.", editedProduct.Id)) Console.WriteLine("Notification sent!");
@@ -205,7 +205,7 @@ namespace back.BLL.Services
 
                 foreach (int user in usersToNotify)
                 {
-                    string shopName = await _shopRepository.GetShopName(editedProduct.ShopId);
+                    string shopName = (await _shopRepository.GetShop(editedProduct.ShopId)).Name;
                     if (await _notificationRepository.InsertNotification(user, 2, "Back in stock!", editedProduct.Name + " is back in stock in " + shopName + ".\nTap to learn more.", editedProduct.Id)) Console.WriteLine("Notification sent!");
                 }
             }

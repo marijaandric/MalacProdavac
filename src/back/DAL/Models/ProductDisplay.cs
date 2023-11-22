@@ -14,6 +14,8 @@ namespace back.Models
         public TimeSpan StartTime { get; set; }
         public TimeSpan EndTime { get; set; }
         public string? Address { get; set; }
+        public float Latitude { get; set; }
+        public float Longitude { get; set; }
 
         public Shop Shop { get; set; }
     }

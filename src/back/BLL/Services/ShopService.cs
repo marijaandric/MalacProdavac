@@ -10,9 +10,11 @@ namespace back.BLL.Services
     public class ShopService : IShopService
     {
         IShopRepository _repository;
-        public ShopService(IShopRepository repository)
+        INotificationRepository _notificationRepository;
+        public ShopService(IShopRepository repository, INotificationRepository notificationRepository)
         {
             _repository = repository;
+            _notificationRepository = notificationRepository;
         }
 
         public async Task<List<ShopCard>> GetShops(int userId, List<int>? categories, int? rating, bool? open, int? range, string? location, int sort, string? search, int page, bool? favorite, float? currLat, float? currLong)
@@ -128,6 +130,8 @@ namespace back.BLL.Services
 
         public async Task<bool> InsertProductDisplay(ProductDisplayDto productDisplay)
         {
+            (double, double) displayCoords = await HelperService.GetCoordinates(productDisplay.Address);
+
             ProductDisplay pd = new ProductDisplay
             {
                 Address = productDisplay.Address,
@@ -135,10 +139,28 @@ namespace back.BLL.Services
                 EndTime = TimeSpan.Parse(productDisplay.EndTime),
                 ShopId = productDisplay.ShopId,
                 StartDate = productDisplay.StartDate,
-                StartTime = TimeSpan.Parse(productDisplay.StartTime)
+                StartTime = TimeSpan.Parse(productDisplay.StartTime),
+                Latitude = (float)displayCoords.Item1,
+                Longitude = (float)displayCoords.Item2
             };
 
             if (!await _repository.InsertProductDisplay(pd)) throw new ArgumentException("Display could not be added!");
+
+            Shop shop = await _repository.GetShop(productDisplay.ShopId);
+            List<int> nearbyCustomers = await _repository.GetNearbyUsers((float)displayCoords.Item1, (float)displayCoords.Item2, shop.OwnerId);
+            string shopName = shop.Name;
+
+            foreach (int id in nearbyCustomers)
+            {
+                if (productDisplay.StartDate != productDisplay.EndDate)
+                {
+                    if (await _notificationRepository.InsertNotification(id, 3, shopName + " product display!", shopName + " is displaying their products at " + productDisplay.Address + " between " + productDisplay.StartDate.ToShortDateString() + " and " + productDisplay.EndDate.ToShortDateString() + ", starting from " + productDisplay.StartTime + " to " + productDisplay.EndTime + ".\nTap to learn more.", productDisplay.ShopId)) Console.WriteLine("Notification sent to " + id);
+                }
+                else
+                {
+                    if (await _notificationRepository.InsertNotification(id, 3, shopName + " product display!", shopName + " is displaying their products at " + productDisplay.Address + " on " + productDisplay.StartDate.ToShortDateString() + ", starting from " + productDisplay.StartTime + " to " + productDisplay.EndTime + ".\nTap to learn more.", productDisplay.ShopId)) Console.WriteLine("Notification sent to " + id);
+                }
+            }
 
             return true;
         }
