@@ -8,12 +8,14 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.example.front.screens.cart.Cart
 import com.example.front.screens.products.AllProducts
 import com.example.front.screens.home.HomePage
 import com.example.front.screens.categories.RegistrationCategories
 import com.example.front.screens.product.ProductPage
 import com.example.front.screens.sellers.SellersScreen
 import com.example.front.screens.userprofile.UserProfileScreen
+import com.example.front.viewmodels.cart.CartViewModel
 import com.example.front.viewmodels.splasintro.SplashAndIntroViewModel
 import com.example.front.viewmodels.categories.CategoriesViewModel
 import com.example.front.viewmodels.home.HomeViewModel
@@ -37,6 +39,7 @@ fun SetupNavGraph(
     val splashViewModel: SplashAndIntroViewModel = hiltViewModel()
     val myProfileViewModel : MyProfileViewModel = hiltViewModel()
     val shopsViewModel: ShopsViewModel = hiltViewModel()
+    val cartViewModel: CartViewModel = hiltViewModel()
 
     NavHost(
         navController = navController,
@@ -81,6 +84,12 @@ fun SetupNavGraph(
         )
         {
             SellersScreen(navController = navController,shopsViewModel)
+        }
+        composable(
+            route = Screen.Cart.route
+        )
+        {
+            Cart(cartViewModel, navController)
         }
 
         introNavGraph(navController = navController, splashViewModel)

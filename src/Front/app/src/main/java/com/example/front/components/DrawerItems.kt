@@ -5,7 +5,7 @@ import com.example.front.navigation.Screen
 
 val DrawerItems = listOf(
     DrawerItem(icon = R.drawable.navbar_home, label = "Home", route = Screen.Home.route, secondaryLabel = "",roleId=1),
-    DrawerItem(icon = R.drawable.navbar_cart2, label = "My cart", route = Screen.Home.route, secondaryLabel = "",roleId=1),
+    DrawerItem(icon = R.drawable.navbar_cart2, label = "My cart", route = Screen.Cart.route, secondaryLabel = "",roleId=1),
     DrawerItem(icon = R.drawable.navbar_cart1, label = "My orders", route = Screen.Home.route, secondaryLabel = "",roleId=1),
     DrawerItem(icon = R.drawable.navbar_package, label = "Products", route = Screen.AllProduct.route, secondaryLabel = "",roleId=1),
     DrawerItem(icon = R.drawable.navbar_shop1, label = "Shops", route = Screen.AllSellers.route, secondaryLabel = "",roleId=1),
