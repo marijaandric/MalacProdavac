@@ -1,5 +1,6 @@
 package com.example.front.screens.shop
 
+import android.util.Log
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
@@ -29,6 +30,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -42,6 +44,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -49,6 +52,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.navigation.NavHostController
+import coil.compose.rememberAsyncImagePainter
 import com.example.front.R
 import com.example.front.components.ButtonWithIcon
 import com.example.front.components.SearchTextField
@@ -56,12 +61,17 @@ import com.example.front.components.ShopProductCard
 import com.example.front.components.SmallElipseAndTitle
 import com.example.front.components.ToggleImageButton
 import com.example.front.screens.categories.ClickableCard
+import com.example.front.viewmodels.oneshop.OneShopViewModel
+import com.example.front.viewmodels.shops.ShopsViewModel
 import kotlinx.coroutines.delay
 
-@Preview
 @Composable
-fun ShopScreen() {
+fun ShopScreen(navController: NavHostController, shopViewModel: OneShopViewModel) {
     var selectedColumnIndex by remember { mutableStateOf(true) }
+    LaunchedEffect(Unit) {
+        shopViewModel.getShopDetails(1,2)
+    }
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -71,19 +81,35 @@ fun ShopScreen() {
         item{
             SmallElipseAndTitle(title = "Shop")
         }
-        item{
-            //shop for user
-            ProfilePic()
+        if(shopViewModel.state.value.isLoading)
+        {
+            item{
+                Box(
+                    modifier = Modifier.fillMaxSize()
+                        .padding(top = 100.dp),
+                    contentAlignment = Alignment.Center
+                )
+                {
+                    CircularProgressIndicator()
+                }
+            }
         }
-        item{
-            ShopInfo()
+        else{
+            item{
+                //shop for user
+                ProfilePic(shopViewModel)
+            }
+            item{
+                ShopInfo(shopViewModel)
+            }
         }
+
     }
 }
 
 
 @Composable
-fun ShopInfo() {
+fun ShopInfo(shopViewModel: OneShopViewModel) {
     var isImageClicked by remember { mutableStateOf(true) }
     var firstTime by remember { mutableStateOf(true) }
 
@@ -163,8 +189,8 @@ fun ShopInfo() {
                     )
                 }
 
-                Info(isImageClicked)
-                Products(isImageClicked)
+                Info(isImageClicked,shopViewModel)
+                Products(isImageClicked,)
 
             }
         }
@@ -223,7 +249,8 @@ fun Products(isImageClicked: Boolean) {
 }
 
 @Composable
-fun Info(isImageClicked: Boolean) {
+fun Info(isImageClicked: Boolean, shopViewModel: OneShopViewModel) {
+    val state = shopViewModel.state.value.shop
     var showText by remember { mutableStateOf(false) }
     var firstTime by remember { mutableStateOf(true) }
     if(isImageClicked) {
@@ -244,6 +271,7 @@ fun Info(isImageClicked: Boolean) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    // -- SHOP CATEGORIES
                     Image(
                         painter = painterResource(id = R.drawable.categories),
                         contentDescription = "Placeholder",
@@ -257,7 +285,7 @@ fun Info(isImageClicked: Boolean) {
                     )
                 }
                 Text(
-                    text = "Food",
+                    text = state!!.categories.joinToString(", "),
                     modifier = Modifier.padding(top = 8.dp),
                     style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onBackground)
                 )
@@ -272,18 +300,34 @@ fun Info(isImageClicked: Boolean) {
                         modifier = Modifier
                             .size(30.dp)
                     )
+
+
+                }
+
+                // -- SUBCATEGORIES --
+                Text(
+                    text = "Shop subcategories",
+                    modifier = Modifier.padding(start = 8.dp),
+                    style = MaterialTheme.typography.titleSmall.copy(color=MaterialTheme.colorScheme.onSurface)
+                )
+                if(state!!.subcategories!!.isEmpty())
+                {
                     Text(
-                        text = "Shop subcategories",
+                        text = "-",
                         modifier = Modifier.padding(start = 8.dp),
-                        style = MaterialTheme.typography.titleSmall.copy(color=MaterialTheme.colorScheme.onSurface)
+                        style =MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onBackground)
                     )
                 }
-                Text(
-                    text = "Fruit, Vegetables",
-                    modifier = Modifier.padding(top = 8.dp),
-                    style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onBackground)
-                )
+                else{
+                    Text(
+                        text = state!!.subcategories!!.joinToString(", "),
+                        modifier = Modifier.padding(start = 8.dp),
+                        style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onBackground)
+                    )
+                }
 
+
+                // -- PICK UP TIME --
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.padding(top = 16.dp)
@@ -300,16 +344,32 @@ fun Info(isImageClicked: Boolean) {
                         style = MaterialTheme.typography.titleSmall.copy(color=MaterialTheme.colorScheme.onSurface)
                     )
                 }
-                Text(
-                    text = "Mon - Fri: 9:00 - 18:00",
-                    modifier = Modifier.padding(top = 8.dp),
-                    style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onBackground)
-                )
-                Text(
-                    text = "Avalska 78, Kragujevac, Serbia",
-                    modifier = Modifier.padding(top = 8.dp),
-                    style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onBackground)
-                )
+
+                val workingHours = shopViewModel.state.value.shop!!.workingHours
+
+                if (workingHours != null) {
+                    for (workingHour in workingHours) {
+                        val dayOfWeek = when (workingHour.day) {
+                            1 -> "Mon"
+                            2 -> "Tue"
+                            3 -> "Wen"
+                            4 -> "Tru"
+                            5 -> "Fri"
+                            6 -> "Sut"
+                            7 -> "Sun"
+                            else -> {"-"}
+                        }
+                        val openingHours = workingHour.openingHours
+                        val closingHours = workingHour.closingHours
+                        Text(
+                        text = "$dayOfWeek: $openingHours - $closingHours",
+                        modifier = Modifier.padding(top = 8.dp),
+                        style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onBackground)
+                        )
+                    }
+                }
+
+                // -- REVIEWS --
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.padding(top = 16.dp)
@@ -342,7 +402,8 @@ fun Info(isImageClicked: Boolean) {
 }
 
 @Composable
-fun ProfilePic() {
+fun ProfilePic(shopViewModel: OneShopViewModel) {
+    val state = shopViewModel.state.value
     Box(
         modifier = Modifier
             .padding(top = 50.dp, end = 16.dp, start = 16.dp)
@@ -351,15 +412,35 @@ fun ProfilePic() {
     )
     {
         ToggleImageButton(modifier = Modifier.align(Alignment.TopEnd))
-        Image(
-            painter = painterResource(id = R.drawable.imageplaceholder),
-            contentDescription = "Placeholder",
-            contentScale = ContentScale.Crop,
-            modifier = Modifier//.fillMaxWidth(0.3f)
-                .size(140.dp)
-                .clip(CircleShape)
-                .border(4.dp, Color.White, CircleShape)
-        )
+
+        if(shopViewModel.state.value.shop!!.image == null)
+        {
+            Image(
+                painter = painterResource(id = R.drawable.imageplaceholder),
+                contentDescription = "Placeholder",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier//.fillMaxWidth(0.3f)
+                    .size(140.dp)
+                    .clip(CircleShape)
+                    .border(4.dp, Color.White, CircleShape)
+            )
+        }
+        else
+        {
+            val image = shopViewModel.state.value.shop!!.image
+            val imageUrl = "http://softeng.pmf.kg.ac.rs:10015/images/${image}"
+
+            val painter: Painter = rememberAsyncImagePainter(model = imageUrl)
+            Image(
+                painter = painter,
+                contentDescription = "Placeholder",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(140.dp)
+                    .clip(CircleShape)
+                    .border(4.dp, Color.White, CircleShape)
+            )
+        }
     }
     Box(
         modifier = Modifier
@@ -371,8 +452,8 @@ fun ProfilePic() {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = "ELBrkito Shop", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-            Text(text = "Bagremar, Kragujevac", style = MaterialTheme.typography.titleSmall,color = MaterialTheme.colorScheme.primary)
+            Text(text = state.shop!!.name, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            Text(text = state.shop!!.address, style = MaterialTheme.typography.titleSmall,color = MaterialTheme.colorScheme.primary)
             RatingBar(rating = 3.5f)
             Row(
                 modifier = Modifier

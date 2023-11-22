@@ -7,6 +7,7 @@ import com.example.front.model.DTO.LoginDTO
 import com.example.front.model.request.RegistrationRequest
 import com.example.front.model.response.LoginResponse
 import com.example.front.model.DTO.ShopDTO
+import com.example.front.model.DTO.ShopDetailsDTO
 import com.example.front.model.DTO.ShopPagesDTO
 import com.example.front.model.DTO.ToggleLikeDTO
 import com.example.front.model.product.ProductInfo
@@ -109,4 +110,10 @@ interface Api {
 
     @GET("back/Shop/ShopPages")
     suspend fun getShopPages():Response<ShopPagesDTO>
+
+    @GET("back/Shop/ShopDetails")
+    suspend fun getShopDetails(
+        @Query("shopId") shopId: Int,
+        @Query("userId") userId: Int
+    ):Response<ShopDetailsDTO>
 }
