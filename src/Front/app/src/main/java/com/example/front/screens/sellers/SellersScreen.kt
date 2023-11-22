@@ -60,6 +60,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.front.R
 import com.example.front.components.BigBlueButton
+import com.example.front.components.Paginator
 import com.example.front.components.SearchTextField
 import com.example.front.components.ShopCard
 import com.example.front.components.SmallElipseAndTitle
@@ -71,6 +72,12 @@ import org.osmdroid.util.GeoPoint
 fun SellersScreen(navController: NavHostController, shopsViewModel: ShopsViewModel) {
 
     var selectedColumnIndex by remember { mutableStateOf(true) }
+
+    var currentPage by remember { mutableStateOf(1) }
+    val totalPages = 10
+
+    var currentPageFav by remember { mutableStateOf(1) }
+    val totalPagesFav = 10
 
     LaunchedEffect(Unit) {
         shopsViewModel.getUserId()
@@ -145,6 +152,17 @@ fun SellersScreen(navController: NavHostController, shopsViewModel: ShopsViewMod
                 }
                 else{
                     AllSellers(navController, shopsViewModel)
+                    shopsViewModel.getShopPages()
+                    Log.d("SHOP PAGE", shopsViewModel.statePageCount.value.toString())
+                    Paginator(
+                        currentPage = currentPage,
+                        totalPages = totalPages,
+                        onPageSelected = { newPage ->
+                            if (newPage in 1..totalPages) {
+                                currentPage = newPage
+                            }
+                        }
+                    )
                 }
             }
             else{
@@ -186,6 +204,15 @@ fun SellersScreen(navController: NavHostController, shopsViewModel: ShopsViewMod
                 }
                 else{
                     FavItems(navController, shopsViewModel)
+                    Paginator(
+                        currentPage = currentPageFav,
+                        totalPages = totalPagesFav,
+                        onPageSelected = { newPage ->
+                            if (newPage in 1..totalPagesFav) {
+                                currentPageFav = newPage
+                            }
+                        }
+                    )
                 }
             }
         }
@@ -308,7 +335,6 @@ fun SearchAndFilters(shopsViewModel: ShopsViewModel) {
         horizontalArrangement = Arrangement.Center
     )
     {
-        //SearchTextField(valuee = value, placeh = "Search sellers", onValueChangee = { value = it })
         SearchTextField(valuee = value, placeh = "Search sellers", onValueChangee = { value = it; shopsViewModel.Search(value) }, modifier = Modifier.fillMaxWidth(0.75f))
         Image(
             // ako budemo imali dark i light ovde mozda neki if i promena slike
