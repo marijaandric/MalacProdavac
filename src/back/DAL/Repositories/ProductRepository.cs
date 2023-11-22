@@ -388,6 +388,11 @@ namespace back.DAL.Repositories
             return await _context.SaveChangesAsync() > 0;
         }
 
+        public async Task<List<ProductSize>> GetProductSizes(int productId)
+        {
+            return await _context.ProductSizes.Where(x => x.ProductId == productId).ToListAsync();
+        }
+
         public async Task<bool> DeleteProduct(int productId)
         {
             Product p = await _context.Products.FirstOrDefaultAsync(x => x.Id == productId);
@@ -421,6 +426,16 @@ namespace back.DAL.Repositories
         public async Task<List<int>> GetShopFollowers(int shopId)
         {
             return await _context.LikedShops.Where(x => x.ShopId == shopId).Select(x => x.UserId).ToListAsync();
+        }
+
+        public async Task<Product> GetProduct(int id)
+        {
+            return await _context.Products.FirstOrDefaultAsync(x => x.Id == id);
+        }
+
+        public async Task<string> GetMetric(int metricId)
+        {
+            return (await _context.Metrics.FirstOrDefaultAsync(x => x.Id == metricId)).Name;
         }
     }
 }

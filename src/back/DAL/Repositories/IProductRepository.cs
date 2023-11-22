@@ -2,6 +2,7 @@
 using back.BLL.Dtos.Cards;
 using back.BLL.Dtos.HelpModels;
 using back.BLL.Dtos.Infos;
+using back.DAL.Models;
 using back.Models;
 
 namespace back.DAL.Repositories
@@ -25,10 +26,13 @@ namespace back.DAL.Repositories
         public Task<string> DeleteProductPhoto(int photoId);
         public Task<bool> AddProduct(Product product);
         public Task<bool> AddProductSize(int id, int sizeId, int quantity);
+        public Task<List<ProductSize>> GetProductSizes(int productId);
         public Task<bool> EditProduct(EditProductDto product);
         public Task<bool> EditProductSize(int id, int sizeId, int quantity);
         public Task<bool> DeleteProduct(int productId);
         public Task<List<int>> GetShopFollowers(int shopId);
+        public Task<Product> GetProduct(int id);
+        public Task<string> GetMetric(int metricId);
 
     }
 }
