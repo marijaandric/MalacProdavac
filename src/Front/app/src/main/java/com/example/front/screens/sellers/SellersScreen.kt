@@ -74,7 +74,7 @@ fun SellersScreen(navController: NavHostController, shopsViewModel: ShopsViewMod
     var selectedColumnIndex by remember { mutableStateOf(true) }
 
     var currentPage by remember { mutableStateOf(1) }
-    val totalPages = 10
+    var totalPages = 10
 
     var currentPageFav by remember { mutableStateOf(1) }
     val totalPagesFav = 10
@@ -153,13 +153,14 @@ fun SellersScreen(navController: NavHostController, shopsViewModel: ShopsViewMod
                 else{
                     AllSellers(navController, shopsViewModel)
                     shopsViewModel.getShopPages()
-                    Log.d("SHOP PAGE", shopsViewModel.statePageCount.value.toString())
+                    totalPages = shopsViewModel.statePageCount.value
                     Paginator(
                         currentPage = currentPage,
                         totalPages = totalPages,
                         onPageSelected = { newPage ->
                             if (newPage in 1..totalPages) {
                                 currentPage = newPage
+                                shopsViewModel.ChangePage(currentPage)
                             }
                         }
                     )
