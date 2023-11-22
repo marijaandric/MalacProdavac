@@ -9,25 +9,27 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -40,7 +42,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -48,13 +49,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import coil.compose.ImagePainter
-import coil.compose.rememberAsyncImagePainter
 import com.example.front.R
 import com.example.front.components.ButtonWithIcon
+import com.example.front.components.SearchTextField
+import com.example.front.components.ShopProductCard
 import com.example.front.components.SmallElipseAndTitle
-import com.example.front.components.Tabs
 import com.example.front.components.ToggleImageButton
+import com.example.front.screens.categories.ClickableCard
 import kotlinx.coroutines.delay
 
 @Preview
@@ -74,16 +75,6 @@ fun ShopScreen() {
             //shop for user
             ProfilePic()
         }
-//        item{
-//            Tabs(
-//                onShopsSelected = { selectedColumnIndex = true },
-//                onFavoritesSelected = { selectedColumnIndex = false },
-//                selectedColumnIndex = selectedColumnIndex,
-//                "Info",
-//                "Products",
-//                false
-//            )
-//        }
         item{
             ShopInfo()
         }
@@ -173,7 +164,59 @@ fun ShopInfo() {
                 }
 
                 Info(isImageClicked)
+                Products(isImageClicked)
 
+            }
+        }
+    }
+}
+
+@Composable
+fun Products(isImageClicked: Boolean) {
+    var showElseText by remember { mutableStateOf(false) }
+    var value by remember {
+        mutableStateOf("")
+    }
+
+    val data = listOf(
+        1,2,3,4
+    )
+
+    LaunchedEffect(!isImageClicked) {
+        delay(200)
+        showElseText = true
+    }
+    if(showElseText && !isImageClicked) {
+        Column() {
+            Row(
+                modifier = Modifier.padding(top=50.dp),
+                verticalAlignment = Alignment.CenterVertically
+            )
+            {
+                SearchTextField(valuee = value, placeh = "Search products", onValueChangee = {}, modifier = Modifier.fillMaxWidth(0.75f))
+                Image(
+                    painter = painterResource(id = R.drawable.filters),
+                    contentDescription = "Placeholder",
+                    modifier = Modifier
+                        .size(40.dp)
+                        .padding(start = 10.dp)
+                )
+                Image(
+                    painter = painterResource(id = R.drawable.sort),
+                    contentDescription = "Placeholder",
+                    modifier = Modifier
+                        .size(40.dp)
+                        .padding(start = 10.dp)
+                )
+            }
+            LazyVerticalGrid (columns = GridCells.Fixed(2),
+                modifier = Modifier
+                    .padding(start = 20.dp, end = 20.dp, top = 20.dp, bottom = 25.dp)
+                    .heightIn(400.dp, 600.dp)
+            ) {
+                items(data) { card ->
+                    ShopProductCard(R.drawable.imageplaceholder, "Card 3", "120 din/kom" ,onClick={})
+                }
             }
         }
     }
@@ -195,7 +238,7 @@ fun Info(isImageClicked: Boolean) {
 
             Column(
                 modifier = Modifier
-                    .padding(top = 60.dp)
+                    .padding(top = 50.dp, start = 5.dp)
                     .zIndex(2f)
             ) {
                 Row(
@@ -210,13 +253,13 @@ fun Info(isImageClicked: Boolean) {
                     Text(
                         text = "Shop categories",
                         modifier = Modifier.padding(start = 8.dp),
-                        style = MaterialTheme.typography.titleSmall.copy(color=MaterialTheme.colorScheme.onBackground)
+                        style = MaterialTheme.typography.titleSmall.copy(color=MaterialTheme.colorScheme.onSurface)
                     )
                 }
                 Text(
                     text = "Food",
                     modifier = Modifier.padding(top = 8.dp),
-                    style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.background)
+                    style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onBackground)
                 )
 
                 Row(
@@ -232,14 +275,67 @@ fun Info(isImageClicked: Boolean) {
                     Text(
                         text = "Shop subcategories",
                         modifier = Modifier.padding(start = 8.dp),
-                        style = MaterialTheme.typography.titleSmall.copy(color=MaterialTheme.colorScheme.onBackground)
+                        style = MaterialTheme.typography.titleSmall.copy(color=MaterialTheme.colorScheme.onSurface)
                     )
                 }
                 Text(
                     text = "Fruit, Vegetables",
                     modifier = Modifier.padding(top = 8.dp),
-                    style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.background)
+                    style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onBackground)
                 )
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(top = 16.dp)
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.clock),
+                        contentDescription = "Placeholder",
+                        modifier = Modifier
+                            .size(30.dp)
+                    )
+                    Text(
+                        text = "Pick up time",
+                        modifier = Modifier.padding(start = 8.dp),
+                        style = MaterialTheme.typography.titleSmall.copy(color=MaterialTheme.colorScheme.onSurface)
+                    )
+                }
+                Text(
+                    text = "Mon - Fri: 9:00 - 18:00",
+                    modifier = Modifier.padding(top = 8.dp),
+                    style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onBackground)
+                )
+                Text(
+                    text = "Avalska 78, Kragujevac, Serbia",
+                    modifier = Modifier.padding(top = 8.dp),
+                    style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onBackground)
+                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(top = 16.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Star,
+                        contentDescription = "Search icon",
+                        modifier = Modifier.size(30.dp)
+                    )
+                    Text(
+                        text = "Reviews",
+                        modifier = Modifier.padding(start = 8.dp),
+                        style = MaterialTheme.typography.titleSmall.copy(color=MaterialTheme.colorScheme.onSurface)
+                    )
+                }
+                Text(
+                    text = "View all reviews",
+                    modifier = Modifier.padding(top = 8.dp),
+                    style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onBackground)
+                )
+                Text(
+                    text = "Leave a review",
+                    modifier = Modifier.padding(top = 8.dp),
+                    style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onBackground)
+                )
+                Spacer(modifier = Modifier.height(40.dp))
             }
         }
     }

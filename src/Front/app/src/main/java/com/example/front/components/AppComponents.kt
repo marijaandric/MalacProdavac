@@ -37,6 +37,7 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -345,8 +346,9 @@ fun SellerCard(title: String, author: String, imageResource: String,isLiked: Boo
             .clip(RoundedCornerShape(20.dp))
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth()
-                .background(color=MaterialTheme.colorScheme.surface)
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(color = MaterialTheme.colorScheme.surface)
         ) {
             Box(
                 modifier = Modifier
@@ -433,8 +435,9 @@ fun ProductCard(
 
         val painter: Painter = rememberAsyncImagePainter(model = imageUrl)
         Row(
-            modifier = Modifier.fillMaxWidth()
-                .background(color=MaterialTheme.colorScheme.surface)
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(color = MaterialTheme.colorScheme.surface)
         ) {
             Image(
                 painter = painter,
@@ -471,6 +474,50 @@ fun ProductCard(
 }
 
 @Composable
+fun ShopProductCard(imageRes: Int, text: String, price: String, onClick: () -> Unit = {}) {
+    Card(
+        modifier = Modifier
+            .clip(MaterialTheme.shapes.medium)
+            .clickable(onClick = onClick)
+            .height(200.dp)
+            .width(100.dp)
+            .padding(8.dp)
+    )
+    {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.primary)
+                .padding(5.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Image(
+                painter = painterResource(id = imageRes),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.6f)
+                    .clip(RoundedCornerShape(20.dp))
+                    .padding(start = 5.dp, end = 5.dp)
+            )
+
+            Text(
+                text = text,
+                style = MaterialTheme.typography.titleSmall.copy(color=Color.White),
+                modifier = Modifier.padding(top = 8.dp),
+            )
+            Text(
+                text = price,
+                style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Light, fontSize = 12.sp,color=Color.White),
+                modifier = Modifier.padding(top = 8.dp),
+            )
+        }
+    }
+}
+
+@Composable
 fun ShopCard(
     title: String,
     price: String,
@@ -487,8 +534,9 @@ fun ShopCard(
             .clickable { },
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth()
-                .background(color=MaterialTheme.colorScheme.surface),
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(color = MaterialTheme.colorScheme.surface),
         ) {
             val imageUrl = "http://softeng.pmf.kg.ac.rs:10015/images/${imageResource}"
 
@@ -677,7 +725,7 @@ fun Tabs(
                     contentDescription = "Crtica",
                     contentScale = ContentScale.FillWidth,
                     modifier = Modifier
-                        .width(if(!isFilters) 30.dp else 20.dp)
+                        .width(if (!isFilters) 30.dp else 20.dp)
                         .align(Alignment.CenterHorizontally)
                         .padding(top = 10.dp)
                 )
@@ -704,7 +752,7 @@ fun Tabs(
                     contentDescription = "Crtica",
                     contentScale = ContentScale.FillWidth,
                     modifier = Modifier
-                        .width(if(!isFilters) 30.dp else 20.dp)
+                        .width(if (!isFilters) 30.dp else 20.dp)
                         .align(Alignment.CenterHorizontally)
                         .padding(top = 10.dp)
                 )
