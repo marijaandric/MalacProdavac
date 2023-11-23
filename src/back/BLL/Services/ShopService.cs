@@ -188,5 +188,12 @@ namespace back.BLL.Services
 
             return true;
         }
+
+        public async Task<bool> DeleteProductDisplay(int id)
+        {
+            if (!await _repository.DeleteProductDisplay(id)) throw new ArgumentException("Product display could not be deleted!");
+
+            return true;
+        }
     }
 }

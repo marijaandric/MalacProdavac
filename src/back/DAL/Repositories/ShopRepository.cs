@@ -330,5 +330,13 @@ namespace back.DAL.Repositories
         {
             return await _context.ProductDisplays.FirstOrDefaultAsync(x => x.Id == id);
         }
+
+        public async Task<bool> DeleteProductDisplay(int id)
+        {
+            ProductDisplay pd = await _context.ProductDisplays.FirstOrDefaultAsync(x => x.Id == id);
+            _context.ProductDisplays.Remove(pd);
+
+            return await _context.SaveChangesAsync() > 0;
+        }
     }
 }

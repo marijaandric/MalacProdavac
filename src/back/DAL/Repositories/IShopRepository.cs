@@ -30,5 +30,6 @@ namespace back.DAL.Repositories
         public Task<List<int>> GetNearbyUsers(float latitude, float longitude, int ownerId);
         public Task<bool> EditProductDisplay(EditProductDisplayDto productDisplayDto);
         public Task<ProductDisplay> GetProductDisplay(int id);
+        public Task<bool> DeleteProductDisplay(int id);
     }
 }
