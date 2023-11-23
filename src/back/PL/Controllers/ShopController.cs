@@ -157,5 +157,18 @@ namespace back.PL.Controllers
                 return BadRequest(new {Error =  ex.Message});
             }
         }
+
+        [HttpPut("EditProductDisplay")]
+        public async Task<IActionResult> EditProductDisplay(EditProductDisplayDto productDisplay)
+        {
+            try
+            {
+                return Ok(new { Success = await _service.EditProductDisplay(productDisplay) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
     }
 }

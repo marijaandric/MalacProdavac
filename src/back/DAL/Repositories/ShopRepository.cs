@@ -306,5 +306,29 @@ namespace back.DAL.Repositories
             int range = 15;
             return (await _context.Users.Select(x => new {id = x.Id, lat = x.LatestLatitude, lon = x.LatestLongitude }).ToListAsync()).Where(x => x.id != ownerId && CalculateDistance(x.lat, x.lon, latitude, longitude) <= range).Select(x => x.id).ToList();
         }
+
+        public async Task<bool> EditProductDisplay(EditProductDisplayDto productDisplayDto)
+        {
+            ProductDisplay pd = await _context.ProductDisplays.FirstOrDefaultAsync(x => x.Id == productDisplayDto.Id);
+
+            if (productDisplayDto.StartDate != null) pd.StartDate = (DateTime)productDisplayDto.StartDate;
+            if (productDisplayDto.StartTime != null) pd.StartTime = TimeSpan.Parse(productDisplayDto.StartTime);
+            if (productDisplayDto.EndDate != null) pd.EndDate = (DateTime)productDisplayDto.EndDate;
+            if (productDisplayDto.EndTime != null) pd.EndTime = TimeSpan.Parse(productDisplayDto.EndTime);
+            if (productDisplayDto.Address != null)
+            {
+                (double, double) coords = await HelperService.GetCoordinates(productDisplayDto.Address);
+                pd.Address = productDisplayDto.Address;
+                pd.Latitude = (float)coords.Item1;
+                pd.Longitude = (float)coords.Item2;
+            }
+
+            return await _context.SaveChangesAsync() > 0;
+        }
+
+        public async Task<ProductDisplay> GetProductDisplay(int id)
+        {
+            return await _context.ProductDisplays.FirstOrDefaultAsync(x => x.Id == id);
+        }
     }
 }
