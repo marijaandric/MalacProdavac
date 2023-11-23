@@ -574,13 +574,12 @@ fun MapFilters(
         val filtersState = shopsViewModel.filtersState.value
 
         val location = filtersState.location
-        val switch = shopsViewModel.filtersState.value.range != 0
+        val switch = if(shopsViewModel.filtersState.value.range == null)false else if(shopsViewModel.filtersState.value.range != 0) true else false
         val slider =if(shopsViewModel.filtersState.value.range != null) shopsViewModel.filtersState.value.range!!.toFloat() else 0f
 
-        value = location!!
+        value = if(location == null) "" else location.toString()
         switchState = switch
         sliderValue = slider
-
     }
 
     Column {

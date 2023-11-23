@@ -27,6 +27,8 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
@@ -60,6 +62,7 @@ import com.example.front.components.SearchTextField
 import com.example.front.components.ShopProductCard
 import com.example.front.components.SmallElipseAndTitle
 import com.example.front.components.ToggleImageButton
+import com.example.front.components.ToggleImageButtonFunction
 import com.example.front.screens.categories.ClickableCard
 import com.example.front.viewmodels.oneshop.OneShopViewModel
 import com.example.front.viewmodels.shops.ShopsViewModel
@@ -68,8 +71,13 @@ import kotlinx.coroutines.delay
 @Composable
 fun ShopScreen(navController: NavHostController, shopViewModel: OneShopViewModel) {
     var selectedColumnIndex by remember { mutableStateOf(true) }
+    var id : Int = 0
     LaunchedEffect(Unit) {
-        shopViewModel.getShopDetails(1,2)
+        shopViewModel.getUserId()
+            ?.let {
+                shopViewModel.getShopDetails(it, 2)
+                id = it
+            }
     }
 
     LazyColumn(
@@ -85,7 +93,8 @@ fun ShopScreen(navController: NavHostController, shopViewModel: OneShopViewModel
         {
             item{
                 Box(
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier
+                        .fillMaxSize()
                         .padding(top = 100.dp),
                     contentAlignment = Alignment.Center
                 )
@@ -97,7 +106,7 @@ fun ShopScreen(navController: NavHostController, shopViewModel: OneShopViewModel
         else{
             item{
                 //shop for user
-                ProfilePic(shopViewModel)
+                ProfilePic(shopViewModel,id)
             }
             item{
                 ShopInfo(shopViewModel)
@@ -402,7 +411,7 @@ fun Info(isImageClicked: Boolean, shopViewModel: OneShopViewModel) {
 }
 
 @Composable
-fun ProfilePic(shopViewModel: OneShopViewModel) {
+fun ProfilePic(shopViewModel: OneShopViewModel,id: Int) {
     val state = shopViewModel.state.value
     Box(
         modifier = Modifier
@@ -411,7 +420,49 @@ fun ProfilePic(shopViewModel: OneShopViewModel) {
         contentAlignment = Alignment.Center
     )
     {
-        ToggleImageButton(modifier = Modifier.align(Alignment.TopEnd))
+        if(!shopViewModel.state.value.shop!!.isOwner)
+        {
+            ToggleImageButtonFunction(modifier = Modifier.align(Alignment.TopEnd), onClick={
+                shopViewModel.changeToggleLike(id, shopViewModel.state.value.shop!!.id)
+            })
+        }
+        else{
+            Icon(
+                imageVector = Icons.Default.Edit,
+                contentDescription = "Search icon",
+                modifier = Modifier
+                    .size(40.dp)
+                    .align(Alignment.TopStart)
+                    .clickable {
+
+                    },
+                tint = MaterialTheme.colorScheme.primary
+            )
+        }
+
+
+        Image(
+            painter = painterResource(id = if(shopViewModel.state.value.shop!!.isOwner) R.drawable.addshop else R.drawable.navbar_message),
+            contentDescription = "Search icon",
+            modifier = Modifier
+                .size(40.dp)
+                .align(Alignment.TopStart)
+                .clickable {
+
+                },
+        )
+
+        Icon(
+            imageVector = Icons.Default.Email,
+            contentDescription = "Search icon",
+            modifier = Modifier
+                .size(40.dp)
+                .align(Alignment.TopStart)
+                .clickable {
+
+                },
+            tint = MaterialTheme.colorScheme.primary
+        )
 
         if(shopViewModel.state.value.shop!!.image == null)
         {
@@ -419,7 +470,7 @@ fun ProfilePic(shopViewModel: OneShopViewModel) {
                 painter = painterResource(id = R.drawable.imageplaceholder),
                 contentDescription = "Placeholder",
                 contentScale = ContentScale.Crop,
-                modifier = Modifier//.fillMaxWidth(0.3f)
+                modifier = Modifier
                     .size(140.dp)
                     .clip(CircleShape)
                     .border(4.dp, Color.White, CircleShape)
@@ -455,18 +506,6 @@ fun ProfilePic(shopViewModel: OneShopViewModel) {
             Text(text = state.shop!!.name, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
             Text(text = state.shop!!.address, style = MaterialTheme.typography.titleSmall,color = MaterialTheme.colorScheme.primary)
             RatingBar(rating = 3.5f)
-            Row(
-                modifier = Modifier
-                    .padding(top = 16.dp, bottom = 20.dp)
-                    .fillMaxWidth(0.8f)
-            )
-            {
-                ButtonWithIcon(text = "Message owner", onClick = { /*TODO*/ }, width = 0.48f, color =  MaterialTheme.colorScheme.primary,
-                    imagePainter = painterResource(id = R.drawable.navbar_message), modifier = Modifier.padding(end=10.dp))
-                Spacer(modifier = Modifier.width(10.dp))
-                ButtonWithIcon(text = "Report shop", onClick = { /*TODO*/ }, width = 0.92f, color =  MaterialTheme.colorScheme.primary,
-                    imagePainter = painterResource(id = R.drawable.navbar_bell))
-            }
         }
     }
 }

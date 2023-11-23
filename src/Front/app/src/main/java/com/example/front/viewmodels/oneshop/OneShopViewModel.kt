@@ -43,4 +43,19 @@ class OneShopViewModel @Inject constructor(
             }
         }
     }
+
+    suspend fun getUserId(): Int?
+    {
+        return dataStoreManager.getUserIdFromToken()
+    }
+
+    fun changeToggleLike(userId:Int, shopId: Int){
+        viewModelScope.launch {
+            try {
+                val response = repository.toggleLike(userId, shopId)
+            } catch (e: Exception) {
+                Log.d("Error", "Error - cant change")
+            }
+        }
+    }
 }

@@ -216,6 +216,27 @@ fun ToggleImageButton(modifier: Modifier) {
     )
 }
 
+@Composable
+fun ToggleImageButtonFunction(modifier: Modifier, onClick: () -> Unit) {
+    var isToggled by remember { mutableStateOf(false) }
+
+    val currentImage = if (isToggled) painterResource(id = R.drawable.srcefull)
+    else painterResource(id = R.drawable.srce)
+
+    Image(
+        painter = currentImage,
+        contentDescription = "",
+        modifier = Modifier
+            .size(50.dp)
+            .padding(5.dp)
+            .then(modifier)
+            .clickable {
+                isToggled = !isToggled
+                onClick()
+            }
+    )
+}
+
 
 @Composable
 fun LogoImage(painterResource: Painter, modifier: Modifier = Modifier) {
