@@ -32,6 +32,9 @@ class ShopsViewModel @Inject constructor(
     private val _stateFav = mutableStateOf(ShopsState())
     var stateFav: State<ShopsState> = _stateFav;
 
+    private val _statePageCount = mutableStateOf(1)
+    var statePageCount: State<Int> = _statePageCount;
+
     private val _usernameFlow = MutableStateFlow("")
     val usernameFlow: Flow<String> = _usernameFlow
 
@@ -94,6 +97,26 @@ class ShopsViewModel @Inject constructor(
                         error = e.message.toString()
                     )
                 }
+            }
+        }
+    }
+
+    fun getShopPages()
+    {
+        viewModelScope.launch {
+            try {
+                val response = repository.getShopPages()
+                if (response.isSuccessful) {
+                    val responseBody = response.body()
+                    _statePageCount.value = responseBody!!.pageCount
+                }
+                else{
+                    _statePageCount.value = 0;
+                }
+            }
+            catch (e: Exception)
+            {
+                _statePageCount.value = 0;
             }
         }
     }

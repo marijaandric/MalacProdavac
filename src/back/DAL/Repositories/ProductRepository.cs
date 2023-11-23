@@ -143,8 +143,9 @@ namespace back.DAL.Repositories
             return products.Skip((page-1) * numberOfItems).Take(numberOfItems).ToList();
         }
 
-        public int ProductPages()
+        public int ProductPages(int? userId)
         {
+            if (userId != null) return (int)Math.Ceiling((double)_context.Products.Join(_context.LikedProducts.Where(x => x.UserId == userId), p => p.Id, lp => lp.ProductId, (p, lp) => p).Distinct().Count() / numberOfItems);
             return (int)Math.Ceiling((double)_context.Products.Count()/numberOfItems);
         }
 
@@ -413,6 +414,11 @@ namespace back.DAL.Repositories
             return await _context.SaveChangesAsync() > 0;
         }
 
+        public async Task<List<ProductSize>> GetProductSizes(int productId)
+        {
+            return await _context.ProductSizes.Where(x => x.ProductId == productId).ToListAsync();
+        }
+
         public async Task<bool> DeleteProduct(int productId)
         {
             Product p = await _context.Products.FirstOrDefaultAsync(x => x.Id == productId);
@@ -423,6 +429,8 @@ namespace back.DAL.Repositories
 
         public async Task<bool> EditProduct(EditProductDto product)
         {
+            if (product.Name == null && product.Description == null && product.SaleMinQuantity == null && product.SalePercentage == null && product.SaleMessage == null) return true; 
+
             Product p = await _context.Products.FirstOrDefaultAsync(x => x.Id == product.Id);
 
             if (product.Name != null) p.Name = product.Name;
@@ -439,6 +447,21 @@ namespace back.DAL.Repositories
             ProductSize ps = await _context.ProductSizes.FirstOrDefaultAsync(x => x.ProductId == id && x.SizeId == sizeId);
             ps.Stock = quantity;
             return await _context.SaveChangesAsync() > 0;
+        }
+
+        public async Task<List<int>> GetShopFollowers(int shopId)
+        {
+            return await _context.LikedShops.Where(x => x.ShopId == shopId).Select(x => x.UserId).ToListAsync();
+        }
+
+        public async Task<Product> GetProduct(int id)
+        {
+            return await _context.Products.FirstOrDefaultAsync(x => x.Id == id);
+        }
+
+        public async Task<string> GetMetric(int metricId)
+        {
+            return (await _context.Metrics.FirstOrDefaultAsync(x => x.Id == metricId)).Name;
         }
     }
 }

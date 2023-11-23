@@ -115,8 +115,9 @@ namespace back.DAL.Repositories
             return shops.Skip((page - 1) * numberOfItems).Take(numberOfItems).ToList();
         }
 
-        public int ShopPages()
+        public int ShopPages(int? userId)
         {
+            if (userId != null) return (int)Math.Ceiling((double)_context.Shop.Join(_context.LikedShops.Where(x => x.UserId == userId), s => s.Id, ls => ls.ShopId, (s, ls) => s).Distinct().Count() / numberOfItems);
             return (int)Math.Ceiling((double)_context.Shop.Count()/numberOfItems);
         }
         
@@ -153,7 +154,8 @@ namespace back.DAL.Repositories
                 Categories = categories,
                 Subcategories = subcategories,
                 WorkingHours = workingHours,
-                PIB = shop.PIB
+                PIB = shop.PIB,
+                ProductDisplayId = (await _context.ProductDisplays.FirstOrDefaultAsync(x => x.ShopId == shop.Id)).Id
             };
         }
 
@@ -287,6 +289,55 @@ namespace back.DAL.Repositories
         public async Task<bool> DeleteShop(int shopId)
         {
             _context.Shop.Remove(await _context.Shop.FirstOrDefaultAsync(x => x.Id == shopId));
+            return await _context.SaveChangesAsync() > 0;
+        }
+
+        public async Task<Shop> GetShop(int shopId)
+        {
+            return (await _context.Shop.FirstOrDefaultAsync(x => x.Id == shopId));
+        }
+
+        public async Task<bool> InsertProductDisplay(ProductDisplay productDisplay)
+        {
+            await _context.ProductDisplays.AddAsync(productDisplay);
+            return await _context.SaveChangesAsync() > 0;
+        }
+
+        public async Task<List<int>> GetNearbyUsers(float latitude, float longitude, int ownerId)
+        {
+            int range = 15;
+            return (await _context.Users.Select(x => new {id = x.Id, lat = x.LatestLatitude, lon = x.LatestLongitude }).ToListAsync()).Where(x => x.id != ownerId && CalculateDistance(x.lat, x.lon, latitude, longitude) <= range).Select(x => x.id).ToList();
+        }
+
+        public async Task<bool> EditProductDisplay(EditProductDisplayDto productDisplayDto)
+        {
+            ProductDisplay pd = await _context.ProductDisplays.FirstOrDefaultAsync(x => x.Id == productDisplayDto.Id);
+
+            if (productDisplayDto.StartDate != null) pd.StartDate = (DateTime)productDisplayDto.StartDate;
+            if (productDisplayDto.StartTime != null) pd.StartTime = TimeSpan.Parse(productDisplayDto.StartTime);
+            if (productDisplayDto.EndDate != null) pd.EndDate = (DateTime)productDisplayDto.EndDate;
+            if (productDisplayDto.EndTime != null) pd.EndTime = TimeSpan.Parse(productDisplayDto.EndTime);
+            if (productDisplayDto.Address != null)
+            {
+                (double, double) coords = await HelperService.GetCoordinates(productDisplayDto.Address);
+                pd.Address = productDisplayDto.Address;
+                pd.Latitude = (float)coords.Item1;
+                pd.Longitude = (float)coords.Item2;
+            }
+
+            return await _context.SaveChangesAsync() > 0;
+        }
+
+        public async Task<ProductDisplay> GetProductDisplay(int id)
+        {
+            return await _context.ProductDisplays.FirstOrDefaultAsync(x => x.Id == id);
+        }
+
+        public async Task<bool> DeleteProductDisplay(int id)
+        {
+            ProductDisplay pd = await _context.ProductDisplays.FirstOrDefaultAsync(x => x.Id == id);
+            _context.ProductDisplays.Remove(pd);
+
             return await _context.SaveChangesAsync() > 0;
         }
     }

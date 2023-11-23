@@ -1,6 +1,7 @@
 ﻿using back.BLL.Dtos;
 using back.BLL.Services;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 
 namespace back.PL.Controllers
 {
@@ -96,5 +97,19 @@ namespace back.PL.Controllers
                 return BadRequest(new { Error = ex.Message });
             }
         }
+
+        [HttpPut("LatestCoordinates")]
+        public async Task<IActionResult> SaveLatestCoordinates(int userId, float lat, float lon)
+        {
+            try
+            {
+                return Ok(new { Success = await _authService.SaveLatestCoordinates(userId, lat, lon) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
+
     }
 }

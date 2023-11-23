@@ -10,9 +10,11 @@ namespace back.BLL.Services
     public class ShopService : IShopService
     {
         IShopRepository _repository;
-        public ShopService(IShopRepository repository)
+        INotificationRepository _notificationRepository;
+        public ShopService(IShopRepository repository, INotificationRepository notificationRepository)
         {
             _repository = repository;
+            _notificationRepository = notificationRepository;
         }
 
         public async Task<List<ShopCard>> GetShops(int userId, List<int>? categories, int? rating, bool? open, int? range, string? location, int sort, string? search, int page, bool? favorite, float? currLat, float? currLong)
@@ -22,9 +24,9 @@ namespace back.BLL.Services
             return shops;
         }
 
-        public int ShopPages()
+        public int ShopPages(int? userId)
         {
-            int total = _repository.ShopPages();
+            int total = _repository.ShopPages(userId);
             if (total == 0) throw new ArgumentException("No pages.");
 
             return total;
@@ -124,6 +126,83 @@ namespace back.BLL.Services
         {
             if (!await _repository.DeleteShop(shopId)) throw new ArgumentException("Shop couldn't be deleted!");
             return true;
+        }
+
+        public async Task<bool> InsertProductDisplay(ProductDisplayDto productDisplay)
+        {
+            (double, double) displayCoords = await HelperService.GetCoordinates(productDisplay.Address);
+
+            ProductDisplay pd = new ProductDisplay
+            {
+                Address = productDisplay.Address,
+                EndDate = productDisplay.EndDate,
+                EndTime = TimeSpan.Parse(productDisplay.EndTime),
+                ShopId = productDisplay.ShopId,
+                StartDate = productDisplay.StartDate,
+                StartTime = TimeSpan.Parse(productDisplay.StartTime),
+                Latitude = (float)displayCoords.Item1,
+                Longitude = (float)displayCoords.Item2
+            };
+
+            if (!await _repository.InsertProductDisplay(pd)) throw new ArgumentException("Display could not be added!");
+
+            Shop shop = await _repository.GetShop(productDisplay.ShopId);
+            List<int> nearbyCustomers = await _repository.GetNearbyUsers((float)displayCoords.Item1, (float)displayCoords.Item2, shop.OwnerId);
+            string shopName = shop.Name;
+
+            foreach (int id in nearbyCustomers)
+            {
+                if (productDisplay.StartDate != productDisplay.EndDate)
+                {
+                    if (await _notificationRepository.InsertNotification(id, 3, shopName + " product display!", shopName + " is displaying their products at " + productDisplay.Address + " between " + productDisplay.StartDate.ToShortDateString() + " and " + productDisplay.EndDate.ToShortDateString() + ", starting from " + productDisplay.StartTime + " to " + productDisplay.EndTime + ".\nTap to learn more.", productDisplay.ShopId)) Console.WriteLine("Notification sent to " + id);
+                }
+                else
+                {
+                    if (await _notificationRepository.InsertNotification(id, 3, shopName + " product display!", shopName + " is displaying their products at " + productDisplay.Address + " on " + productDisplay.StartDate.ToShortDateString() + ", starting from " + productDisplay.StartTime + " to " + productDisplay.EndTime + ".\nTap to learn more.", productDisplay.ShopId)) Console.WriteLine("Notification sent to " + id);
+                }
+            }
+
+            return true;
+        }
+
+        public async Task<bool> EditProductDisplay(EditProductDisplayDto productDisplay)
+        {
+            if (!await _repository.EditProductDisplay(productDisplay)) throw new ArgumentException("Product display information could not be edited!");
+
+            ProductDisplay display = await _repository.GetProductDisplay(productDisplay.Id);
+            Shop shop = await _repository.GetShop(productDisplay.ShopId);
+            List<int> nearbyCustomers = await _repository.GetNearbyUsers(display.Latitude, display.Longitude, shop.OwnerId);
+            string shopName = shop.Name;
+
+            foreach (int id in nearbyCustomers)
+            {
+                if (display.StartDate != display.EndDate)
+                {
+                    if (await _notificationRepository.InsertNotification(id, 3, shopName + " product display update!", shopName + " has changed their product display information. Their products will be displayed at " + display.Address + " between " + display.StartDate.ToShortDateString() + " and " + display.EndDate.ToShortDateString() + ", starting from " + display.StartTime + " to " + productDisplay.EndTime + ".\nTap to learn more.", display.ShopId)) Console.WriteLine("Notification sent to " + id);
+                }
+                else
+                {
+                    if (await _notificationRepository.InsertNotification(id, 3, shopName + " product display update!", shopName + " has changed their product display information. Their products will be displayed at " + display.Address + " on " + display.StartDate.ToShortDateString() + ", starting from " + display.StartTime + " to " + display.EndTime + ".\nTap to learn more.", display.ShopId)) Console.WriteLine("Notification sent to " + id);
+                }
+            }
+
+            return true;
+        }
+
+        public async Task<bool> DeleteProductDisplay(int id)
+        {
+            if (!await _repository.DeleteProductDisplay(id)) throw new ArgumentException("Product display could not be deleted!");
+
+            return true;
+        }
+
+        public async Task<ProductDisplay> GetProductDisplay(int id)
+        {
+            ProductDisplay pd = await _repository.GetProductDisplay(id);
+
+            if (pd == null) throw new ArgumentException("Product display not found!");
+
+            return pd;
         }
     }
 }

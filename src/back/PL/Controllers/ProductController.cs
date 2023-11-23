@@ -44,11 +44,11 @@ namespace back.PL.Controllers
         }
 
         [HttpGet("ProductPages")]
-        public IActionResult ProductPages()
+        public IActionResult ProductPages(int? userId)
         {
             try
             {
-                return Ok( new { PageCount = _service.ProductPages() });
+                return Ok( new { PageCount = _service.ProductPages(userId) });
             }
             catch (Exception ex)
             {
@@ -166,6 +166,32 @@ namespace back.PL.Controllers
             try
             {
                 return Ok(new { Success = await _service.AddProduct(product) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
+
+        [HttpPut("EditProduct")]
+        public async Task<IActionResult> EditProduct(EditProductDto product)
+        {
+            try
+            {
+                return Ok(new { Success = await _service.EditProduct(product) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
+
+        [HttpDelete("DeleteProduct")]
+        public async Task<IActionResult> DeleteProduct(int productId)
+        {
+            try
+            {
+                return Ok(new { Success = await _service.DeleteProduct(productId) });
             }
             catch (Exception ex)
             {

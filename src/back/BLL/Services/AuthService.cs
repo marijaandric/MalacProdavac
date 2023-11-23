@@ -205,7 +205,7 @@ namespace back.BLL.Services
                 }
                 else throw new ArgumentException("Invalid address!");
             }
-            
+
 
             if (values.RoleId != null) newUser.RoleId = (int)values.RoleId;
             if (values.Name.Length > 0) newUser.Name = values.Name;
@@ -248,6 +248,12 @@ namespace back.BLL.Services
         public async Task<bool> SaveFcmToken(int id, string token)
         {
             return await _authRepository.SaveFcmToken(id, token);
+        }
+
+        public async Task<bool> SaveLatestCoordinates(int userId, float lat, float lon)
+        {
+            if (!await _authRepository.SaveLatestCoordinates(userId, lat, lon)) throw new ArgumentException("Coordinates could not be saved!");
+            return true;
         }
     }
 }

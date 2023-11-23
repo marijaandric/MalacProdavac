@@ -1,5 +1,6 @@
 ﻿using back.BLL.Dtos.Cards;
 using back.DAL.Contexts;
+using back.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace back.DAL.Repositories
@@ -41,6 +42,24 @@ namespace back.DAL.Repositories
                 ReferenceId = x.ReferenceId,
                 Read = x.Read
             }).ToListAsync();
+        }
+
+        public async Task<bool> InsertNotification(int userId, int type, string title, string description, int referenceId)
+        {
+            Notification notification = new Notification
+            {
+                UserId = userId,
+                CreatedOn = DateTime.Now,
+                Read = false,
+                TypeId = type,
+                ReferenceId = referenceId,
+                Text = description,
+                Title = title
+            };
+
+            await _context.Notifications.AddAsync(notification);
+
+            return await _context.SaveChangesAsync() > 0;
         }
     }
 }

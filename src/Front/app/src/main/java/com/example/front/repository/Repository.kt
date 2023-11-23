@@ -9,6 +9,8 @@ import com.example.front.model.DTO.LoginDTO
 import com.example.front.model.request.RegistrationRequest
 import com.example.front.model.response.LoginResponse
 import com.example.front.model.DTO.ShopDTO
+import com.example.front.model.DTO.ShopDetailsDTO
+import com.example.front.model.DTO.ShopPagesDTO
 import com.example.front.model.DTO.ToggleLikeDTO
 import com.example.front.model.product.ProductInfo
 import com.example.front.model.product.ProductReviewUserInfo
@@ -70,5 +72,13 @@ class Repository @Inject constructor(private val api: Api) {
         val res = api.saveFCMToken(userID,token)
         Log.d("Odgovor", res.toString())
         return res
+    }
+
+    suspend fun getShopPages():Response<ShopPagesDTO>{
+        return api.getShopPages()
+    }
+
+    suspend fun getShopDetails(userId: Int, shopId: Int):Response<ShopDetailsDTO>{
+        return api.getShopDetails(shopId,userId)
     }
 }

@@ -22,7 +22,8 @@ namespace back.Models
         public float Latitude { get; set; }
         public float Longitude { get; set; }
         public string? Image {  get; set; }
-
+        public float LatestLatitude { get; set; }
+        public float LatestLongitude { get; set; }
         public Role Role { get; set; }
 
         public String? FCMToken { get; set; }

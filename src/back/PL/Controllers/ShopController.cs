@@ -1,5 +1,6 @@
 ﻿using back.BLL.Dtos;
 using back.BLL.Services;
+using back.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace back.PL.Controllers
@@ -41,11 +42,11 @@ namespace back.PL.Controllers
         }
 
         [HttpGet("ShopPages")]
-        public IActionResult ShopPages() 
+        public IActionResult ShopPages(int? userId) 
         {
             try
             {
-                return Ok(new { PageCount = _service.ShopPages() });
+                return Ok(new { PageCount = _service.ShopPages(userId) });
             }
             catch (Exception ex)
             {
@@ -137,6 +138,58 @@ namespace back.PL.Controllers
             try
             {
                 return Ok(new { Success = await _service.DeleteShop(shopId) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
+
+        [HttpPost("NewProductDisplay")]
+        public async Task<IActionResult> NewProductDisplay(ProductDisplayDto productDisplay)
+        {
+            try
+            {
+                return Ok(new { Success = await _service.InsertProductDisplay(productDisplay) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new {Error =  ex.Message});
+            }
+        }
+
+        [HttpPut("EditProductDisplay")]
+        public async Task<IActionResult> EditProductDisplay(EditProductDisplayDto productDisplay)
+        {
+            try
+            {
+                return Ok(new { Success = await _service.EditProductDisplay(productDisplay) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
+
+        [HttpDelete("DeleteProductDisplay")]
+        public async Task<IActionResult> DeleteProductDisplay(int id)
+        {
+            try
+            {
+                return Ok(new { Success = await _service.DeleteProductDisplay(id) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
+
+        [HttpGet("GetProductDisplay")]
+        public async Task<IActionResult> GetProductDisplay(int id)
+        {
+            try
+            {
+                return Ok(new { Success = await _service.GetProductDisplay(id) });
             }
             catch (Exception ex)
             {

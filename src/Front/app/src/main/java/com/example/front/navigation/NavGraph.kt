@@ -20,6 +20,7 @@ import com.example.front.viewmodels.categories.CategoriesViewModel
 import com.example.front.viewmodels.home.HomeViewModel
 import com.example.front.viewmodels.login.LoginViewModel
 import com.example.front.viewmodels.myprofile.MyProfileViewModel
+import com.example.front.viewmodels.oneshop.OneShopViewModel
 import com.example.front.viewmodels.product.ProductViewModel
 import com.example.front.viewmodels.register.RegisterViewModel
 import com.example.front.viewmodels.shops.ShopsViewModel
@@ -38,11 +39,12 @@ fun SetupNavGraph(
     val splashViewModel: SplashAndIntroViewModel = hiltViewModel()
     val myProfileViewModel : MyProfileViewModel = hiltViewModel()
     val shopsViewModel: ShopsViewModel = hiltViewModel()
+    val oneShopViewModel : OneShopViewModel = hiltViewModel()
 
     NavHost(
         navController = navController,
-        startDestination = "intro"
-        //startDestination = "sellers"
+        //startDestination = "intro"
+        startDestination = "shop"
         ){
         composable(
             route = Screen.Home.route
@@ -87,7 +89,7 @@ fun SetupNavGraph(
             route = Screen.Shop.route
         )
         {
-            ShopScreen()
+            ShopScreen(navController = navController,oneShopViewModel)
         }
 
         introNavGraph(navController = navController, splashViewModel)
