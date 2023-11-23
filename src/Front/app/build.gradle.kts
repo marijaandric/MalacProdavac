@@ -6,6 +6,7 @@ plugins {
     id("com.google.dagger.hilt.android")
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
     id("com.google.gms.google-services")
+    id("io.realm.kotlin") version "1.11.0" apply false
 }
 
 android {
@@ -145,6 +146,9 @@ dependencies {
     //Firebase
     implementation(platform("com.google.firebase:firebase-bom:32.5.0"))
     implementation("com.google.firebase:firebase-analytics")
+
+    //Realm
+    implementation("io.realm.kotlin:library-base:1.11.0")
 }
 
 kapt {
