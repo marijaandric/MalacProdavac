@@ -195,5 +195,14 @@ namespace back.BLL.Services
 
             return true;
         }
+
+        public async Task<ProductDisplay> GetProductDisplay(int id)
+        {
+            ProductDisplay pd = await _repository.GetProductDisplay(id);
+
+            if (pd == null) throw new ArgumentException("Product display not found!");
+
+            return pd;
+        }
     }
 }

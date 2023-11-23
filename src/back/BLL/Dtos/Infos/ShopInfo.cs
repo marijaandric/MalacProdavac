@@ -1,5 +1,4 @@
-﻿using back.BLL.Dtos.HelpModels;
-using back.Models;
+﻿using back.Models;
 
 namespace back.BLL.Dtos.Infos
 {
@@ -10,6 +9,7 @@ namespace back.BLL.Dtos.Infos
         public bool BoughtFrom { get; set; }
         public bool Rated { get; set; }
         public bool IsOwner { get; set; }
+        public int ProductDisplayId { get; set; }
         public List<string> Categories { get; set; }
         public List<string> Subcategories { get; set; }
         public List<WorkingHours> WorkingHours { get; set; }
