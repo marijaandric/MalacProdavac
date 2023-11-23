@@ -100,8 +100,8 @@ interface Api {
         @Query("currLong") currLong: Float?
     ):Response<List<ShopDTO>>
 
-    @GET("/back/Auth/FCMTokenSave")
-    suspend fun SaveFCMToken(
+    @PUT("/back/Auth/FCMTokenSave")
+    suspend fun saveFCMToken(
         @Query("userId") userID: Int,
         @Query("token") token: String
     ): Response<Boolean>

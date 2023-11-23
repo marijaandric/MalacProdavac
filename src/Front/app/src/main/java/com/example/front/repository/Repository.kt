@@ -1,5 +1,6 @@
 package com.example.front.repository
 
+import android.util.Log
 import com.example.front.api.Api
 import com.example.front.model.DTO.CategoriesDTO
 import com.example.front.model.DTO.ChosenCategoriesDTO
@@ -65,6 +66,9 @@ class Repository @Inject constructor(private val api: Api) {
         return api.getShops(userId,categories,rating,open,range,location,sort,search,page,favorite, currLat, currLong)
     }
     suspend fun saveFCMToken(userID:Int, token: String) : Response<Boolean>{
-        return api.SaveFCMToken(userID,token)
+        Log.d("Repository", "USAO")
+        val res = api.saveFCMToken(userID,token)
+        Log.d("Odgovor", res.toString())
+        return res
     }
 }

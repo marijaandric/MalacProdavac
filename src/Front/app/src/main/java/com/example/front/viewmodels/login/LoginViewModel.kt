@@ -79,7 +79,6 @@ class LoginViewModel @Inject constructor(
                 val intent = Intent(context.applicationContext, MainActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
                 context.startActivity(intent)
-                updateFCMToken()
                 return true
             }
         } catch (e: Exception) {
@@ -90,11 +89,6 @@ class LoginViewModel @Inject constructor(
 
     suspend fun setFirstTimeToFalse() {
         dataStoreManager.setFirstTime()
-    }
-
-    suspend fun updateFCMToken(){
-        var token: String? = null
-        getUserId()?.let { token?.let { it1 -> repository.saveFCMToken(it, it1) } }
     }
     suspend fun getUserId(): Int?
     {

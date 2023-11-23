@@ -313,7 +313,9 @@ namespace back.DAL.Repositories
                 await _context.ProductReviews.AddAsync(newReview);
                 await _context.SaveChangesAsync();
 
-                await SendNotificationAsync("New Review", "You have a new review to review!");
+                int ownerID = 5;
+
+                await SendNotificationAsync("New Review", "You have a new review to review!",ownerID);
 
                 return true;
             }
@@ -323,29 +325,52 @@ namespace back.DAL.Repositories
             }
         }
 
-        private async Task SendNotificationAsync(string title, string body)
+        private async Task SendNotificationAsync(string title, string body, int userID)
         {
             try
             {
-                var fcmToken = "cIGqClIpQC-pPfLh22_FDi:APA91bH0eIrd72fLRVl_EwdvMXNbWmZWyVZ_2kpQonclfeS6wHUX6G_Qy8Kc9_oHWcDO0oNJ8LyMGPc9aj7491vjqEmtf4u-SmhIrCWXCsNw0RfL94-P2uE0Gh0gUj9uPnA46a1ILGOH";
+                var user = _context.Users.FirstOrDefault(u => u.Id == userID);
 
-                var message = new Message
+                if (user == null)
                 {
+                    Console.WriteLine("User not found.");
+                    return;
+                }
+
+                var fcmToken = user.FCMToken;
+
+                if (string.IsNullOrEmpty(fcmToken))
+                {
+                    Console.WriteLine("FCM token not available for the user.");
+                    return;
+                }
+
+                var message = new Message()
+                {
+                    Token = fcmToken,
                     Notification = new FirebaseAdmin.Messaging.Notification
                     {
                         Title = title,
-                        Body = body
+                        Body = body,
                     },
-                    Token = fcmToken
                 };
 
-                var result = await FirebaseMessaging.DefaultInstance.SendAsync(message, CancellationToken.None);
+                try
+                {
+                    var result = await FirebaseMessaging.DefaultInstance.SendAsync(message);
+                    Console.WriteLine($"Notification sent successfully: {result}");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error sending notification: {ex.Message}");
+                }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                
+                Console.WriteLine($"Error: {ex.Message}");
             }
         }
+
 
 
         public async Task<bool> LeaveQuestion(QnADto question)

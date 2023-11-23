@@ -11,13 +11,11 @@ using FirebaseAdmin.Messaging;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddDbContext<Context>();
 
 FirebaseApp.Create(new AppOptions
 {
-    Credential = GoogleCredential.FromFile("front-26b45-firebase-adminsdk-qok21-9f81f67333.json")
+    Credential = GoogleCredential.FromFile("front-6a640-firebase-adminsdk-nli5s-90e9291907.json")
 });
 
 builder.Services.AddAuthentication(x =>
