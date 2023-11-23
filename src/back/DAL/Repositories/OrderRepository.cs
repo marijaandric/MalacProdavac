@@ -93,7 +93,9 @@ namespace back.DAL.Repositories
                 DeliveryMethodId = order.DeliveryMethod,
                 PaymentMethodId = order.PaymentMethod,
                 ShippingAddress = order.ShippingAddress,
-                StatusId = (await _context.OrderStatuses.FirstOrDefaultAsync(x => x.Name == "Pending")).Id
+                StatusId = (await _context.OrderStatuses.FirstOrDefaultAsync(x => x.Name == "Pending")).Id,
+                PickupTime = order.PickupTime,
+                Accepted = false
             };
 
             _context.Orders.AddAsync(newOrder);

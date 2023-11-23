@@ -8,6 +8,8 @@ namespace back.BLL.Dtos
         public int PaymentMethod {  get; set; }
         public int DeliveryMethod { get; set; }
         public string? ShippingAddress { get; set; }
+        public DateTime? PickupTime { get; set; }
+        public bool? Accepted { get; set; }
         public List<ItemQuantity> Products { get; set; }
     }
 }
