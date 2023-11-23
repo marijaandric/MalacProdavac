@@ -155,7 +155,7 @@ namespace back.DAL.Repositories
                 Subcategories = subcategories,
                 WorkingHours = workingHours,
                 PIB = shop.PIB,
-                ProductDisplayId = (await _context.ProductDisplays.FirstOrDefaultAsync(x => x.ShopId == shop.Id)).Id
+                ProductDisplayId = await _context.ProductDisplays.FirstOrDefaultAsync(x => x.ShopId == shop.Id) != null ? (await _context.ProductDisplays.FirstOrDefaultAsync(x => x.ShopId == shop.Id)).Id : 0
             };
         }
 
