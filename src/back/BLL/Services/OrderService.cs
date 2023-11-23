@@ -13,7 +13,7 @@ namespace back.BLL.Services
             _repository = repository;
         }
 
-        public async Task<List<OrderCard>> GetOrders(int userId, int status, int page)
+        public async Task<List<OrderCard>> GetOrders(int userId, int? status, int page)
         {
             List<OrderCard> orders = await _repository.GetOrders(userId, status, page);
             if (orders.Count == 0) throw new ArgumentException("No orders!");

@@ -79,7 +79,6 @@ namespace back.BLL.Services
             Shop s = new Shop
             {
                 Address = shop.Address,
-                Image = shop.Image,
                 Name = shop.Name,
                 OwnerId = shop.OwnerId,
                 PIB = shop.PIB,

@@ -18,9 +18,9 @@ namespace back.DAL.Repositories
 
         int numberOfItems = 10;
 
-        public async Task<List<OrderCard>> GetOrders(int userId, int status, int page)
+        public async Task<List<OrderCard>> GetOrders(int userId, int? status, int page)
         {
-            if (status == -1)
+            if (status == null)
             {
                 return await _context.Orders.Where(x => x.UserId == userId).Skip(page - 1 * numberOfItems).Take(numberOfItems).Select(x => new OrderCard
                 {
@@ -28,18 +28,18 @@ namespace back.DAL.Repositories
                     Quantity = _context.OrderItems.Where(i => i.OrderId == x.Id).Count(),
                     Amount = _context.OrderItems.Where(i => i.OrderId == x.Id).Sum(i => i.Price),
                     CreatedOn = x.CreatedOn,
-                    Status = _context.OrderStatuses.FirstOrDefault(s => s.Id == x.Status).Name
+                    Status = _context.OrderStatuses.FirstOrDefault(s => s.Id == x.StatusId).Name
                     
                 }).ToListAsync();
             }
 
-            return await _context.Orders.Where(x => x.UserId == userId && x.Status == status).Skip(page - 1 * numberOfItems).Take(numberOfItems).Select(x => new OrderCard
+            return await _context.Orders.Where(x => x.UserId == userId && x.StatusId == status).Skip(page - 1 * numberOfItems).Take(numberOfItems).Select(x => new OrderCard
             {
                 Id = x.Id,
                 Quantity = _context.OrderItems.Where(i => i.OrderId == x.Id).Count(),
                 Amount = _context.OrderItems.Where(i => i.OrderId == x.Id).Sum(i => i.Price),
                 CreatedOn = x.CreatedOn,
-                Status = _context.OrderStatuses.FirstOrDefault(s => s.Id == x.Status).Name
+                Status = _context.OrderStatuses.FirstOrDefault(s => s.Id == x.StatusId).Name
 
             }).ToListAsync();
         }
@@ -52,9 +52,9 @@ namespace back.DAL.Repositories
                 Quantity = _context.OrderItems.Where(i => i.OrderId == x.Id).Count(),
                 Amount = _context.OrderItems.Where(i => i.OrderId == x.Id).Sum(i => i.Price),
                 CreatedOn = x.CreatedOn,
-                Status = _context.OrderStatuses.FirstOrDefault(s => s.Id == x.Status).Name,
-                DeliveryMethod = _context.DeliveryMethods.FirstOrDefault(dm => dm.Id == x.DeliveryMethod).Name,
-                PaymentMethod = _context.PaymentMethods.FirstOrDefault(pm => pm.Id == x.PaymentMethod).Name,
+                Status = _context.OrderStatuses.FirstOrDefault(s => s.Id == x.StatusId).Name,
+                DeliveryMethod = _context.DeliveryMethods.FirstOrDefault(dm => dm.Id == x.DeliveryMethodId).Name,
+                PaymentMethod = _context.PaymentMethods.FirstOrDefault(pm => pm.Id == x.PaymentMethodId).Name,
                 ShippingAddress = x.ShippingAddress
 
             }).FirstOrDefaultAsync(x => x.Id == orderId);
@@ -90,10 +90,10 @@ namespace back.DAL.Repositories
             {
                 UserId = order.UserId,
                 CreatedOn = DateTime.Now,
-                DeliveryMethod = order.DeliveryMethod,
-                PaymentMethod = order.PaymentMethod,
+                DeliveryMethodId = order.DeliveryMethod,
+                PaymentMethodId = order.PaymentMethod,
                 ShippingAddress = order.ShippingAddress,
-                Status = (await _context.OrderStatuses.FirstOrDefaultAsync(x => x.Name == "Pending")).Id
+                StatusId = (await _context.OrderStatuses.FirstOrDefaultAsync(x => x.Name == "Pending")).Id
             };
 
             _context.Orders.AddAsync(newOrder);

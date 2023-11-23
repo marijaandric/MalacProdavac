@@ -17,7 +17,7 @@ namespace back.PL.Controllers
         }
 
         [HttpGet("GetOrders")]
-        public async Task<IActionResult> GetOrders(int userId, int status, int page)
+        public async Task<IActionResult> GetOrders(int userId, int? status, int page)
         {
             try
             {
