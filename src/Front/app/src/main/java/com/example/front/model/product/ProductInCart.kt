@@ -2,13 +2,11 @@ package com.example.front.model.product
 
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
-import org.mongodb.kbson.ObjectId
 
 class ProductInCart : RealmObject {
     @PrimaryKey
-    var id: ObjectId = ObjectId.invoke()
+    var id: Int = 0
     var name: String = ""
-    var price: Double = 0.0
-    var count: Double = 0.0
-    var delivery: Boolean = false
+    var price: Float = 0.0f
+    var quantity: Double = 0.0
 }

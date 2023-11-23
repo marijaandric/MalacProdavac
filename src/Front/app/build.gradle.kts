@@ -6,7 +6,7 @@ plugins {
     id("com.google.dagger.hilt.android")
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
     id("com.google.gms.google-services")
-    id("io.realm.kotlin") version "1.11.0" apply false
+    id("io.realm.kotlin") version "1.11.0" apply true
 }
 
 android {

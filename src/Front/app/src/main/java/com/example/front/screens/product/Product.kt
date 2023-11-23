@@ -240,6 +240,7 @@ fun ProductPage(
                         }
 
                         Text(
+                            //// da se cuva kolicina
                             text = "1",
                             modifier = Modifier.padding(20.dp),
                             textAlign = TextAlign.Justify
@@ -262,7 +263,11 @@ fun ProductPage(
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Button(
-                        onClick = {},
+                        onClick = {
+                            // zove funkciju i salje podatke sa stranice
+                            productViewModel.addToCart(productID, productInfo?.name, productInfo?.price, 1)
+                            //// ispisuje obavestenje
+                        },
                         modifier = Modifier
                             .height(80.dp)
                             .width(300.dp)

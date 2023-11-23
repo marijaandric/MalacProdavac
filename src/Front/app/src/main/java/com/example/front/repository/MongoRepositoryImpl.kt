@@ -19,12 +19,19 @@ class MongoRepositoryImpl(val realm: Realm) : MongoRepository {
 
     override suspend fun updateProduct(product: ProductInCart) {
         realm.write {
-            val queriedPerson = query<ProductInCart>(query = "id == $0", product.id).first().find()
-            queriedPerson?.name = product.name
+            val existingProduct = query<ProductInCart>(query = "id == $0", product.id).first().find()
+            println("PROIZVODDD::: " + existingProduct?.name.toString())
+            if (existingProduct != null) {
+                existingProduct.name = product.name
+                existingProduct.price = product.price
+                existingProduct.quantity = product.quantity
+            } else {
+                copyToRealm(product)
+            }
         }
     }
 
-    override suspend fun deleteProduct(id: ObjectId) {
+    override suspend fun deleteProduct(id: Int) {
         realm.write {
             val product = query<ProductInCart>(query = "id == $0", id).first().find()
             try {

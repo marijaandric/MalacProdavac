@@ -2,24 +2,26 @@ package com.example.front.viewmodels.product
 
 import android.util.Log
 import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.front.helper.DataStore.DataStoreManager
-import com.example.front.model.product.ProductInfo
-import com.example.front.model.product.ProductReviewUserInfo
+import com.example.front.model.product.ProductInCart
+import com.example.front.repository.MongoRepository
 import com.example.front.repository.Repository
 import com.example.front.screens.product.ProductProductState
 import com.example.front.screens.product.ReviewProductState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.mongodb.kbson.ObjectId
 import javax.inject.Inject
 
 @HiltViewModel
 class ProductViewModel @Inject constructor(
     private val repository: Repository,
-    private val dataStoreManager: DataStoreManager
+    private val dataStoreManager: DataStoreManager,
+    private val mongoRepository: MongoRepository
 ) : ViewModel() {
 
     private val _state = mutableStateOf(ProductProductState())
@@ -75,5 +77,21 @@ class ProductViewModel @Inject constructor(
     suspend fun getUserId(): Int?
     {
         return dataStoreManager.getUserIdFromToken()
+    }
+
+    fun addToCart(productID: Int, name: String?, price: Float?, quantity: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val productInCart = ProductInCart()
+                productInCart.id = productID
+                productInCart.name = name.orEmpty()
+                productInCart.price = price ?: 0.0f
+                productInCart.quantity = quantity.toDouble()
+
+                mongoRepository.updateProduct(productInCart)
+            } catch (e: Exception) {
+                Log.e("addToCart", "Greska prilikom dodavanja proizvoda u korpu: ${e.message}")
+            }
+        }
     }
 }

@@ -23,6 +23,9 @@ object DatabaseModule {
                 ProductInCart::class
             )
         )
+            .schemaVersion(1)
+            //// obrisati
+            .deleteRealmIfMigrationNeeded()
             .compactOnLaunch()
 //            .initialData()
             .build()
