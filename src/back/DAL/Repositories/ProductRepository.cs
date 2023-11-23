@@ -143,8 +143,9 @@ namespace back.DAL.Repositories
             return products.Skip((page-1) * numberOfItems).Take(numberOfItems).ToList();
         }
 
-        public int ProductPages()
+        public int ProductPages(int? userId)
         {
+            if (userId != null) return (int)Math.Ceiling((double)_context.Products.Join(_context.LikedProducts.Where(x => x.UserId == userId), p => p.Id, lp => lp.ProductId, (p, lp) => p).Distinct().Count() / numberOfItems);
             return (int)Math.Ceiling((double)_context.Products.Count()/numberOfItems);
         }
 

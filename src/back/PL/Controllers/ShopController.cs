@@ -42,11 +42,11 @@ namespace back.PL.Controllers
         }
 
         [HttpGet("ShopPages")]
-        public IActionResult ShopPages() 
+        public IActionResult ShopPages(int? userId) 
         {
             try
             {
-                return Ok(new { PageCount = _service.ShopPages() });
+                return Ok(new { PageCount = _service.ShopPages(userId) });
             }
             catch (Exception ex)
             {

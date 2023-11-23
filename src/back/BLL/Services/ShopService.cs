@@ -24,9 +24,9 @@ namespace back.BLL.Services
             return shops;
         }
 
-        public int ShopPages()
+        public int ShopPages(int? userId)
         {
-            int total = _repository.ShopPages();
+            int total = _repository.ShopPages(userId);
             if (total == 0) throw new ArgumentException("No pages.");
 
             return total;
