@@ -95,33 +95,36 @@ namespace back.DAL.Repositories
                 ShippingAddress = order.ShippingAddress,
                 StatusId = (await _context.OrderStatuses.FirstOrDefaultAsync(x => x.Name == "Pending")).Id,
                 PickupTime = order.PickupTime,
-                Accepted = false
+                Accepted = false,
+                ShopId = order.ShopId
             };
 
-            _context.Orders.AddAsync(newOrder);
+            await _context.Orders.AddAsync(newOrder);
             await _context.SaveChangesAsync();
 
             foreach (var item in order.Products)
             {
-                Product product = _context.Products.FirstOrDefault(x => x.Id == item.Id);
-                float total;
-
-                int count = order.Products.Where(x => x.Id == item.Id).Sum(x => x.Quantity);
-                if (product.SalePercentage != null && product.SaleMinQuantity <= order.Products.Where(x => x.Id == item.Id).Sum(x => x.Quantity)) total = product.Price * item.Quantity * (100 - product.SalePercentage) / 100;
-                else total = product.Price * item.Quantity;
-
-                _context.OrderItems.AddAsync(new OrderItem
+                if (item != null)
                 {
-                    ProductId = item.Id,
-                    Quantity = item.Quantity,
-                    SizeId = item.SizeId,
-                    Price = total,
-                    OrderId = newOrder.Id,
-                });
+                    Product product = _context.Products.FirstOrDefault(x => x.Id == item.Id);
+                    float total;
 
-                ProductSize ps = await _context.ProductSizes.FirstOrDefaultAsync(x => x.ProductId == item.Id && x.SizeId == item.SizeId);
-                ps.Stock -= item.Quantity;
+                    int count = order.Products.Where(x => x.Id == item.Id).Sum(x => x.Quantity);
+                    if (product.SalePercentage != null && product.SaleMinQuantity <= order.Products.Where(x => x.Id == item.Id).Sum(x => x.Quantity)) total = product.Price * item.Quantity * (100 - product.SalePercentage) / 100;
+                    else total = product.Price * item.Quantity;
 
+                    await _context.OrderItems.AddAsync(new OrderItem
+                    {
+                        ProductId = item.Id,
+                        Quantity = item.Quantity,
+                        SizeId = item.SizeId,
+                        Price = total,
+                        OrderId = newOrder.Id,
+                    });
+
+                    ProductSize ps = await _context.ProductSizes.FirstOrDefaultAsync(x => x.ProductId == item.Id && x.SizeId == item.SizeId);
+                    ps.Stock -= item.Quantity;
+                }
             }
 
             return await _context.SaveChangesAsync() > 0;
