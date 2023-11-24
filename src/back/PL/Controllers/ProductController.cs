@@ -44,11 +44,11 @@ namespace back.PL.Controllers
         }
 
         [HttpGet("ProductPages")]
-        public IActionResult ProductPages(int? userId)
+        public async Task<IActionResult> ProductPages(int? userId, [FromQuery]List<int>? categories, int? rating, bool? open, int? range, string? location, string? search, int? specificShopId, bool? favorite, float? currLat, float? currLong)
         {
             try
             {
-                return Ok( new { PageCount = _service.ProductPages(userId) });
+                return Ok( new { PageCount = await _service.ProductPages(userId, categories, rating, open, range, location, search, specificShopId, favorite, currLat, currLong) });
             }
             catch (Exception ex)
             {

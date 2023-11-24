@@ -1,4 +1,6 @@
-﻿using back.BLL.Dtos;
+﻿using System.Runtime.InteropServices;
+using System;
+using back.BLL.Dtos;
 using back.BLL.Dtos.Cards;
 using back.BLL.Dtos.HelpModels;
 using back.BLL.Dtos.Infos;
@@ -65,7 +67,7 @@ namespace back.DAL.Repositories
 
         #endregion
 
-        public async Task<List<ProductCard>> GetProducts(int userId, List<int>? categories, int? rating, bool? open, int? range, string? location, int sort, string? search, int page, int? specificShopId, bool? favorite, float? currLat, float? currLong)
+        public async Task<List<ProductCard>> GetUnsortedProducts(int? userId, List<int>? categories, int? rating, bool? open, int? range, string? location, string? search, int? specificShopId, bool? favorite, float? currLat, float? currLong)
         {
             List<ProductCard> products;
             int usersShop = -1;
@@ -108,12 +110,12 @@ namespace back.DAL.Repositories
                                         Name = p.Name,
                                         Price = p.Price,
                                         Rating = pr.DefaultIfEmpty().Select(x => x.avg).FirstOrDefault(),
-                                        Image =  _context.ProductImages.FirstOrDefault(x => x.ProductId == p.Id).Image
+                                        Image = _context.ProductImages.FirstOrDefault(x => x.ProductId == p.Id).Image
                                     })
                                     .Where(x => x.Rating >= rating)
                                     .ToListAsync();
             }
-                
+
             if (favorite != null && favorite == true)
             {
                 products = products.Join(_context.LikedProducts.Where(x => x.UserId == userId), p => p.Id, lp => lp.ProductId, (p, lp) => p).ToList();
@@ -122,7 +124,7 @@ namespace back.DAL.Repositories
             if (open != null && open == true)
             {
                 products = products
-                        .Join(_context.Shop.Join(_context.WorkingHours, s => s.Id, w => w.ShopId, (s, w) => w), p => p.ShopId, w => w.ShopId, (p, w) => new {p, w})
+                        .Join(_context.Shop.Join(_context.WorkingHours, s => s.Id, w => w.ShopId, (s, w) => w), p => p.ShopId, w => w.ShopId, (p, w) => new { p, w })
                         .ToList()
                         .Where(x => x.w.Day == DateTime.Now.DayOfWeek && x.w.OpeningHours <= DateTime.Now.TimeOfDay && x.w.ClosingHours >= DateTime.Now.TimeOfDay)
                         .Select(x => x.p)
@@ -138,15 +140,20 @@ namespace back.DAL.Repositories
                 products = products.Join(_context.Shop, p => p.ShopId, s => s.Id, (p, s) => (p, s)).Where(x => CalculateDistance((float)x.s.Latitude, (float)x.s.Longitude, (float)currLat, (float)currLong) <= range).Select(x => x.p).ToList();
             }
 
+            return products;
+        }
+
+        public async Task<List<ProductCard>> GetProducts(int? userId, List<int>? categories, int? rating, bool? open, int? range, string? location, int sort, string? search, int page, int? specificShopId, bool? favorite, float? currLat, float? currLong)
+        {
+            List<ProductCard> products = await GetUnsortedProducts(userId, categories, rating, open, range, location, search, specificShopId, favorite, currLat, currLong);
             products = SortProducts(sort, products);
 
             return products.Skip((page-1) * numberOfItems).Take(numberOfItems).ToList();
         }
 
-        public int ProductPages(int? userId)
+        public async Task<int> ProductPages(int? userId, List<int>? categories, int? rating, bool? open, int? range, string? location, string? search, int? specificShopId, bool? favorite, float? currLat, float? currLong)
         {
-            if (userId != null) return (int)Math.Ceiling((double)_context.Products.Join(_context.LikedProducts.Where(x => x.UserId == userId), p => p.Id, lp => lp.ProductId, (p, lp) => p).Distinct().Count() / numberOfItems);
-            return (int)Math.Ceiling((double)_context.Products.Count()/numberOfItems);
+            return (int)Math.Ceiling((double)(await GetUnsortedProducts(userId, categories, rating, open, range, location, search, specificShopId, favorite, currLat, currLong)).Count()/ numberOfItems);
         }
 
         public async Task<ProductInfo> ProductDetails(int productId, int userId)

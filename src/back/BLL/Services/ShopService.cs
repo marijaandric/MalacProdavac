@@ -17,16 +17,16 @@ namespace back.BLL.Services
             _notificationRepository = notificationRepository;
         }
 
-        public async Task<List<ShopCard>> GetShops(int userId, List<int>? categories, int? rating, bool? open, int? range, string? location, int sort, string? search, int page, bool? favorite, float? currLat, float? currLong)
+        public async Task<List<ShopCard>> GetShops(int? userId, List<int>? categories, int? rating, bool? open, int? range, string? location, int sort, string? search, int page, bool? favorite, float? currLat, float? currLong)
         {
             List<ShopCard> shops = await _repository.GetShops(userId, categories, rating, open, range, location, sort, search, page, favorite, currLat, currLong);
             if (shops.Count == 0) throw new ArgumentException("No shops found.");
             return shops;
         }
 
-        public int ShopPages(int? userId)
+        public async Task<int> ShopPages(int? userId, List<int>? categories, int? rating, bool? open, int? range, string? location, string? search, bool? favorite, float? currLat, float? currLong)
         {
-            int total = _repository.ShopPages(userId);
+            int total = await _repository.ShopPages(userId, categories, rating, open, range, location, search, favorite, currLat, currLong);
             if (total == 0) throw new ArgumentException("No pages.");
 
             return total;

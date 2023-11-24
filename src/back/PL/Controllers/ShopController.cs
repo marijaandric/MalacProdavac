@@ -16,7 +16,7 @@ namespace back.PL.Controllers
         }
 
         [HttpGet("GetShops")]
-        public async Task<IActionResult> GetShops(int userId, [FromQuery] List<int>? categories, int? rating, bool? open, int? range, string? location, int sort, string? search, int page, bool? favorite, float? currLat, float? currLong)
+        public async Task<IActionResult> GetShops(int? userId, [FromQuery] List<int>? categories, int? rating, bool? open, int? range, string? location, int sort, string? search, int page, bool? favorite, float? currLat, float? currLong)
         {
             try
             {
@@ -42,11 +42,11 @@ namespace back.PL.Controllers
         }
 
         [HttpGet("ShopPages")]
-        public IActionResult ShopPages(int? userId) 
+        public async Task<IActionResult> ShopPages(int? userId, [FromQuery] List<int>? categories, int? rating, bool? open, int? range, string? location, string? search, bool? favorite, float? currLat, float? currLong) 
         {
             try
             {
-                return Ok(new { PageCount = _service.ShopPages(userId) });
+                return Ok(new { PageCount = await _service.ShopPages(userId, categories, rating, open, range, location, search, favorite, currLat, currLong) });
             }
             catch (Exception ex)
             {

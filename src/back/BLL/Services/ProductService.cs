@@ -22,16 +22,16 @@ namespace back.BLL.Services
 
         string imagesFolderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..\\..\\..\\images");
 
-        public async Task<List<ProductCard>> GetProducts(int userId, List<int>? categories, int? rating, bool? open, int? range, string? location, int sort, string? search, int page, int? specificShopId, bool? favorite, float? currLat, float? currLong)
+        public async Task<List<ProductCard>> GetProducts(int? userId, List<int>? categories, int? rating, bool? open, int? range, string? location, int sort, string? search, int page, int? specificShopId, bool? favorite, float? currLat, float? currLong)
         {
             List<ProductCard> products = await _repository.GetProducts(userId, categories, rating, open, range, location, sort, search, page, specificShopId, favorite, currLat, currLong);
             if (products.Count == 0) throw new ArgumentException("No products found.");
             return products;
         }
 
-        public int ProductPages(int? userId)
+        public async Task<int> ProductPages(int? userId, List<int>? categories, int? rating, bool? open, int? range, string? location, string? search, int? specificShopId, bool? favorite, float? currLat, float? currLong)
         {
-            int total = _repository.ProductPages(userId);
+            int total = await _repository.ProductPages(userId, categories, rating, open, range, location, search, specificShopId, favorite, currLat, currLong);
             if (total == 0) throw new ArgumentException("No pages.");
 
             return total;

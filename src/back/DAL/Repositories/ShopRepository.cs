@@ -59,7 +59,7 @@ namespace back.DAL.Repositories
 
         #endregion
 
-        public async Task<List<ShopCard>> GetShops(int userId, List<int>? categories, int? rating, bool? open, int? range, string? location, int sort, string? search, int page, bool? favorite, float? currLat, float? currLong)
+        public async Task<List<ShopCard>> GetUnsortedShops(int? userId, List<int>? categories, int? rating, bool? open, int? range, string? location, string? search, bool? favorite, float? currLat, float? currLong)
         {
             if (categories == null || categories.Count == 0) categories = await _context.Categories.Select(x => x.Id).ToListAsync();
             if (search == null) search = "";
@@ -110,15 +110,19 @@ namespace back.DAL.Repositories
                 shops = shops.Where(x => CalculateDistance((float)x.Latitude, (float)x.Longitude, (float)currLat, (float)currLong) <= range).ToList();
             }
 
-            shops = SortShops(sort, shops);
+            return shops;
+        }
 
+        public async Task<List<ShopCard>> GetShops(int? userId, List<int>? categories, int? rating, bool? open, int? range, string? location, int sort, string? search, int page, bool? favorite, float? currLat, float? currLong)
+        {
+            List<ShopCard> shops = await GetUnsortedShops(userId, categories, rating, open, range, location, search, favorite, currLat, currLong);
+            shops = SortShops(sort, shops);
             return shops.Skip((page - 1) * numberOfItems).Take(numberOfItems).ToList();
         }
 
-        public int ShopPages(int? userId)
+        public async Task<int> ShopPages(int? userId, List<int>? categories, int? rating, bool? open, int? range, string? location, string? search,  bool? favorite, float? currLat, float? currLong)
         {
-            if (userId != null) return (int)Math.Ceiling((double)_context.Shop.Join(_context.LikedShops.Where(x => x.UserId == userId), s => s.Id, ls => ls.ShopId, (s, ls) => s).Distinct().Count() / numberOfItems);
-            return (int)Math.Ceiling((double)_context.Shop.Count()/numberOfItems);
+            return (int)Math.Ceiling((double)(await GetUnsortedShops(userId, categories, rating, open, range, location, search, favorite, currLat, currLong)).Count()/numberOfItems);
         }
         
         public async Task<ShopInfo> ShopDetails(int shopId, int userId)
