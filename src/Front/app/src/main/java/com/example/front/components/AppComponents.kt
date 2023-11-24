@@ -753,7 +753,7 @@ fun ImageItemForProfilePic(image: String, onEditClick: () -> Unit) {
 @Composable
 fun ReviewCard(
     username: String,
-    imageRes: Int,
+    imageRes: String?,
     comment: String,
     rating: Int
 ) {
@@ -779,8 +779,11 @@ fun ReviewCard(
                         .padding(bottom = 10.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    val imageUrl = "http://softeng.pmf.kg.ac.rs:10015/images/${imageRes}"
+
+                    val painter: Painter = rememberAsyncImagePainter(model = imageUrl)
                     Image(
-                        painter = painterResource(id = imageRes),
+                        painter = painter,
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier

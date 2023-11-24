@@ -76,8 +76,8 @@ class Repository @Inject constructor(private val api: Api) {
         return res
     }
 
-    suspend fun getShopPages():Response<ShopPagesDTO>{
-        return api.getShopPages()
+    suspend fun getShopPages(userId: Int,categories:List<Int>?, rating:Int?,open:Boolean?,range:Int?, location:String?,search:String?,favorite:Boolean, currLat: Float?, currLong: Float?):Response<ShopPagesDTO>{
+        return api.getShopPages(userId,categories,rating,open,range,location,search,favorite, currLat, currLong)
     }
 
     suspend fun getShopDetails(userId: Int, shopId: Int):Response<ShopDetailsDTO>{

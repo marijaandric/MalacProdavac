@@ -111,7 +111,18 @@ interface Api {
     ): Response<Boolean>
 
     @GET("back/Shop/ShopPages")
-    suspend fun getShopPages():Response<ShopPagesDTO>
+    suspend fun getShopPages(
+        @Query("userId") userId: Int,
+        @Query("categories") categories: List<Int>?,
+        @Query("rating") rating: Int?,
+        @Query("open") open: Boolean?,
+        @Query("range") range: Int?,
+        @Query("location") location: String?,
+        @Query("search") search: String?,
+        @Query("favorite") favorite: Boolean?,
+        @Query("currLat") currLat: Float?,
+        @Query("currLong") currLong: Float?
+    ):Response<ShopPagesDTO>
 
     @GET("back/Shop/ShopDetails")
     suspend fun getShopDetails(

@@ -501,7 +501,18 @@ fun Info(isImageClicked: Boolean, shopViewModel: OneShopViewModel) {
                 }
                 if(showReviews)
                 {
-                    ReviewCard("mejo.andric",R.drawable.imageplaceholder,"Nije losa prodavnica. Saradnja je odlicna.", 4)
+//                    LazyColumn() {
+//                        items(shopViewModel.stateReview.value.reviews.size) { index ->
+//                            val review = shopViewModel.stateReview.value.reviews[index]
+//                            ReviewCard(
+//                                username = review.username,
+//                                imageRes = review.image,
+//                                comment = review.comment,
+//                                rating = review.rating
+//                            )
+//                            Spacer(modifier = Modifier.height(5.dp))
+//                        }
+//                    }
                 }
 
                 Spacer(modifier = Modifier.height(40.dp))

@@ -84,6 +84,8 @@ fun SellersScreen(navController: NavHostController, shopsViewModel: ShopsViewMod
             ?.let { shopsViewModel.getShops(it,listOf(),null,false,0,null,0,null,1,false, null, null) }
         shopsViewModel.getUserId()
             ?.let { shopsViewModel.getShops(it,listOf(),null,false,0,null,0,null,1,true, null, null) }
+        shopsViewModel.getUserId()
+            ?.let { shopsViewModel.getShopPages(it,false)}
     }
 
     val x = Osm(shopsViewModel = shopsViewModel)
@@ -152,7 +154,6 @@ fun SellersScreen(navController: NavHostController, shopsViewModel: ShopsViewMod
                 }
                 else{
                     AllSellers(navController, shopsViewModel)
-                    shopsViewModel.getShopPages()
                     totalPages = shopsViewModel.statePageCount.value
                     Paginator(
                         currentPage = currentPage,

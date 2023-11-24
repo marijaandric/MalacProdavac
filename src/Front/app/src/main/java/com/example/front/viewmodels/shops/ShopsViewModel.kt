@@ -68,7 +68,7 @@ class ShopsViewModel @Inject constructor(
                             shops = response.body()
                         )
                     }
-
+                    getShopPages(userId,false)
 
                 }
                 else{
@@ -101,11 +101,12 @@ class ShopsViewModel @Inject constructor(
         }
     }
 
-    fun getShopPages()
+    fun getShopPages(id:Int,fav:Boolean)
     {
         viewModelScope.launch {
             try {
-                val response = repository.getShopPages()
+                val response = repository.getShopPages(id,_filtersState.value.categories,_filtersState.value.rating,_filtersState.value.open,_filtersState.value.range,_filtersState.value.location,_filtersState.value.search, fav, _filtersState.value.currLat, _filtersState.value.currLon)
+                Log.d("RES PAGE", response.toString())
                 if (response.isSuccessful) {
                     val responseBody = response.body()
                     _statePageCount.value = responseBody!!.pageCount
