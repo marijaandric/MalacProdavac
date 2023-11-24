@@ -58,25 +58,32 @@ import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.example.front.R
 import com.example.front.components.ButtonWithIcon
+import com.example.front.components.FilterDialogProducts
 import com.example.front.components.SearchTextField
 import com.example.front.components.ShopProductCard
 import com.example.front.components.SmallElipseAndTitle
+import com.example.front.components.SortDialog
 import com.example.front.components.ToggleImageButton
 import com.example.front.components.ToggleImageButtonFunction
 import com.example.front.screens.categories.ClickableCard
+import com.example.front.screens.sellers.FiltersDialog
 import com.example.front.viewmodels.oneshop.OneShopViewModel
 import com.example.front.viewmodels.shops.ShopsViewModel
 import kotlinx.coroutines.delay
 
 @Composable
-fun ShopScreen(navController: NavHostController, shopViewModel: OneShopViewModel) {
+fun ShopScreen(navController: NavHostController, shopViewModel: OneShopViewModel, shopId: Int) {
     var selectedColumnIndex by remember { mutableStateOf(true) }
     var id : Int = 0
     LaunchedEffect(Unit) {
         shopViewModel.getUserId()
             ?.let {
-                shopViewModel.getShopDetails(it, 2)
+                shopViewModel.getShopDetails(it, shopId)
                 id = it
+            }
+        shopViewModel.getUserId()
+            ?.let {
+                shopViewModel.getProducts(it, listOf(),null,null,null,null,0,null,1,shopId, false,null,null )
             }
     }
 
@@ -109,7 +116,7 @@ fun ShopScreen(navController: NavHostController, shopViewModel: OneShopViewModel
                 ProfilePic(shopViewModel,id)
             }
             item{
-                ShopInfo(shopViewModel)
+                ShopInfo(shopViewModel, shopId)
             }
         }
 
@@ -118,7 +125,7 @@ fun ShopScreen(navController: NavHostController, shopViewModel: OneShopViewModel
 
 
 @Composable
-fun ShopInfo(shopViewModel: OneShopViewModel) {
+fun ShopInfo(shopViewModel: OneShopViewModel, shopId:Int) {
     var isImageClicked by remember { mutableStateOf(true) }
     var firstTime by remember { mutableStateOf(true) }
 
@@ -199,7 +206,7 @@ fun ShopInfo(shopViewModel: OneShopViewModel) {
                 }
 
                 Info(isImageClicked,shopViewModel)
-                Products(isImageClicked,)
+                Products(isImageClicked,shopViewModel, shopId)
 
             }
         }
@@ -207,8 +214,13 @@ fun ShopInfo(shopViewModel: OneShopViewModel) {
 }
 
 @Composable
-fun Products(isImageClicked: Boolean) {
+fun Products(isImageClicked: Boolean,shopViewModel: OneShopViewModel,shopId:Int) {
     var showElseText by remember { mutableStateOf(false) }
+    var showDialog by remember { mutableStateOf(false) }
+    var showSortDialog by remember {
+        mutableStateOf(false)
+    }
+
     var value by remember {
         mutableStateOf("")
     }
@@ -222,19 +234,22 @@ fun Products(isImageClicked: Boolean) {
         showElseText = true
     }
     if(showElseText && !isImageClicked) {
-        Column() {
+        Column {
             Row(
                 modifier = Modifier.padding(top=50.dp),
                 verticalAlignment = Alignment.CenterVertically
             )
             {
-                SearchTextField(valuee = value, placeh = "Search products", onValueChangee = {}, modifier = Modifier.fillMaxWidth(0.75f))
+                SearchTextField(valuee = value, placeh = "Search products", onValueChangee = {value = it; shopViewModel.Search(value, shopId)}, modifier = Modifier.fillMaxWidth(0.75f))
                 Image(
                     painter = painterResource(id = R.drawable.filters),
                     contentDescription = "Placeholder",
                     modifier = Modifier
                         .size(40.dp)
                         .padding(start = 10.dp)
+                        .clickable {
+                            showDialog = true
+                        }
                 )
                 Image(
                     painter = painterResource(id = R.drawable.sort),
@@ -242,18 +257,50 @@ fun Products(isImageClicked: Boolean) {
                     modifier = Modifier
                         .size(40.dp)
                         .padding(start = 10.dp)
+                        .clickable { showSortDialog = true }
                 )
             }
-            LazyVerticalGrid (columns = GridCells.Fixed(2),
-                modifier = Modifier
-                    .padding(start = 20.dp, end = 20.dp, top = 20.dp, bottom = 25.dp)
-                    .heightIn(400.dp, 600.dp)
-            ) {
-                items(data) { card ->
-                    ShopProductCard(R.drawable.imageplaceholder, "Card 3", "120 din/kom" ,onClick={})
+            if(shopViewModel.stateProduct.value.isLoading)
+            {
+                CircularProgressIndicator()
+            }
+            else if(shopViewModel.stateProduct.value.error.contains("NotFound"))
+            {
+                androidx.compose.material3.Text(
+                    "No shops found",
+                    style = MaterialTheme.typography.titleSmall, modifier = Modifier
+                        .padding(top = 30.dp)
+                        .align(Alignment.CenterHorizontally)
+                )
+            }
+            else{
+                LazyVerticalGrid (columns = GridCells.Fixed(2),
+                    modifier = Modifier
+                        .padding(start = 20.dp, end = 20.dp, top = 20.dp, bottom = 25.dp)
+                        .heightIn(400.dp, 600.dp)
+                ) {
+                    shopViewModel.stateProduct.value.products?.let { products ->
+                        items(products) { product ->
+                            ShopProductCard(
+                                imageRes = product.image,
+                                text = product.name,
+                                price = "${product.price} din/kom",
+                                onClick = {
+
+                                }
+                            )
+                        }
+                    }
                 }
             }
+
         }
+    }
+    if (showDialog) {
+        FilterDialogProducts(onDismiss = { showDialog = false }, shopViewModel, shopId)
+    }
+    if (showSortDialog) {
+        SortDialog(onDismiss = { showSortDialog = false }, shopViewModel, shopId)
     }
 }
 
@@ -299,6 +346,8 @@ fun Info(isImageClicked: Boolean, shopViewModel: OneShopViewModel) {
                     style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onBackground)
                 )
 
+
+                // -- SUBCATEGORIES --
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.padding(top = 16.dp)
@@ -309,21 +358,19 @@ fun Info(isImageClicked: Boolean, shopViewModel: OneShopViewModel) {
                         modifier = Modifier
                             .size(30.dp)
                     )
-
+                    Text(
+                        text = "Shop subcategories",
+                        modifier = Modifier.padding(start = 8.dp),
+                        style = MaterialTheme.typography.titleSmall.copy(color=MaterialTheme.colorScheme.onSurface)
+                    )
 
                 }
 
-                // -- SUBCATEGORIES --
-                Text(
-                    text = "Shop subcategories",
-                    modifier = Modifier.padding(start = 8.dp),
-                    style = MaterialTheme.typography.titleSmall.copy(color=MaterialTheme.colorScheme.onSurface)
-                )
                 if(state!!.subcategories!!.isEmpty())
                 {
                     Text(
                         text = "-",
-                        modifier = Modifier.padding(start = 8.dp),
+                        modifier = Modifier.padding(top = 8.dp),
                         style =MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onBackground)
                     )
                 }
@@ -505,7 +552,7 @@ fun ProfilePic(shopViewModel: OneShopViewModel,id: Int) {
         ) {
             Text(text = state.shop!!.name, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
             Text(text = state.shop!!.address, style = MaterialTheme.typography.titleSmall,color = MaterialTheme.colorScheme.primary)
-            RatingBar(rating = 3.5f)
+            RatingBar(rating = shopViewModel.state.value.shop!!.rating!!.toFloat())
         }
     }
 }

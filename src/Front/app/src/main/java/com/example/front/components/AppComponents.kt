@@ -495,7 +495,7 @@ fun ProductCard(
 }
 
 @Composable
-fun ShopProductCard(imageRes: Int, text: String, price: String, onClick: () -> Unit = {}) {
+fun ShopProductCard(imageRes: String?, text: String, price: String, onClick: () -> Unit = {}) {
     Card(
         modifier = Modifier
             .clip(MaterialTheme.shapes.medium)
@@ -513,16 +513,34 @@ fun ShopProductCard(imageRes: Int, text: String, price: String, onClick: () -> U
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Image(
-                painter = painterResource(id = imageRes),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(0.6f)
-                    .clip(RoundedCornerShape(20.dp))
-                    .padding(start = 5.dp, end = 5.dp)
-            )
+            if(imageRes != null)
+            {
+                val imageUrl = "http://softeng.pmf.kg.ac.rs:10015/images/${imageRes}"
+
+                val painter: Painter = rememberAsyncImagePainter(model = imageUrl)
+                Image(
+                    painter = painter,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(0.6f)
+                        .clip(RoundedCornerShape(20.dp))
+                        .padding(start = 5.dp, end = 5.dp)
+                )
+            }
+            else{
+                Image(
+                    painter = painterResource(id = R.drawable.imageplaceholder),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(0.6f)
+                        .clip(RoundedCornerShape(20.dp))
+                        .padding(start = 5.dp, end = 5.dp)
+                )
+            }
 
             Text(
                 text = text,
@@ -545,14 +563,16 @@ fun ShopCard(
     imageResource: String,
     navController: NavHostController,
     id:Int,
-    workingHours: String
+    workingHours: String,
 ) {
     Card(
         modifier = Modifier
             .clip(RoundedCornerShape(20.dp))
             .padding(bottom = 15.dp)
             .fillMaxWidth()
-            .clickable { },
+            .clickable {
+                navController.navigate("${Screen.Shop.route}/$id")
+            },
     ) {
         Row(
             modifier = Modifier

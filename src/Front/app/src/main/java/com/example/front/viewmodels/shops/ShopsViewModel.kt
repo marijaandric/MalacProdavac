@@ -39,7 +39,7 @@ class ShopsViewModel @Inject constructor(
     val usernameFlow: Flow<String> = _usernameFlow
 
     // defaultni filteri
-    private val _filtersState = mutableStateOf(FiltersDTO(0,null, null, null,null, null, 0, null, 1, null, null))
+    private val _filtersState = mutableStateOf(FiltersDTO(0,null, null, null,null, null, 0, null, 1, null, null, null))
     var filtersState: State<FiltersDTO> = _filtersState;
 
 

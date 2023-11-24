@@ -126,12 +126,12 @@ interface Api {
         @Query("open") open: Boolean?,
         @Query("range") range: Int?,
         @Query("location") location: String?,
-        @Query("sort") sort: Int,
+        @Query("sort") sort: Int?,
         @Query("search") search: String?,
-        @Query("page") page: Int,
-        @Query("specificShopId") specificShopId: Int,
+        @Query("page") page: Int?,
+        @Query("specificShopId") specificShopId: Int?,
         @Query("favorite") favorite: Boolean?,
         @Query("currLat") currLat: Float?,
         @Query("currLong") currLong: Float?
-    ):Response<ProductDTO>
+    ):Response<List<ProductDTO>>
 }

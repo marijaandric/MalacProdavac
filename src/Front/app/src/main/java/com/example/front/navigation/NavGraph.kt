@@ -86,11 +86,15 @@ fun SetupNavGraph(
             SellersScreen(navController = navController,shopsViewModel)
         }
         composable(
-            route = Screen.Shop.route
+            route = "${Screen.Shop.route}/{id}",
+            arguments = listOf(navArgument("id") { type= NavType.IntType})
         )
-        {
-            ShopScreen(navController = navController,oneShopViewModel)
+        {navBackStackEntry ->
+            val arguments = requireNotNull(navBackStackEntry.arguments)
+            val productId = arguments.getInt("id")
+            ShopScreen(navController = navController,oneShopViewModel, productId)
         }
+
 
         introNavGraph(navController = navController, splashViewModel)
         authNavGraph(navController = navController, loginViewModel = loginViewModel, registerViewModel = registerViewModel, categoriesViewModel)

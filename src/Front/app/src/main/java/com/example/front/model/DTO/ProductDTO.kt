@@ -7,6 +7,6 @@ data class ProductDTO (
     @SerializedName("shopId") val shopId: Int,
     @SerializedName("name") val name: String,
     @SerializedName("price") val price: Float?,
-    @SerializedName("rating") val rating : Int?,
+    @SerializedName("rating") val rating : Float?,
     @SerializedName("image") val image : String,
 )
