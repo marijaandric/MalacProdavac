@@ -12,12 +12,14 @@ namespace back.BLL.Services
         INotificationRepository _notificationRepository;
         IShopRepository _shopRepository;
         IUserRepository _userRepository;
-        public OrderService(IOrderRepository repository, INotificationRepository notificationRepository, IShopRepository shopRepository, IUserRepository userRepository)
+        IDeliveryRepository _deliveryRepository;
+        public OrderService(IOrderRepository repository, INotificationRepository notificationRepository, IShopRepository shopRepository, IUserRepository userRepository, IDeliveryRepository deliveryRepository)
         {
             _repository = repository;
             _notificationRepository = notificationRepository;
             _shopRepository = shopRepository;
             _userRepository = userRepository;
+            _deliveryRepository = deliveryRepository;
         }
 
         public async Task<List<OrderCard>> GetOrders(int userId, int? status, int page)
@@ -43,7 +45,10 @@ namespace back.BLL.Services
 
             if (o.DeliveryMethodId == 1 && o.PickupTime != null)
                 if (await _notificationRepository.InsertNotification((await _shopRepository.GetShop(order.ShopId)).OwnerId, 5, "Order pickup request", "User " + await _userRepository.GetUsername(order.UserId) + " has requested to pick up order #" + o.Id + "on " + ((DateTime)o.PickupTime).ToShortDateString() + ", at " + ((DateTime)o.PickupTime).Hour + ":" + ((DateTime)o.PickupTime).Minute + ".\nTap to respond.", o.Id)) Console.WriteLine("Notification sent!");
-            
+
+            if (o.DeliveryMethodId == 2)
+                if (!await _deliveryRepository.InsertDeliveryRequest(new DeliveryRequestDto { OrderId = o.Id, ShopId = o.ShopId })) Console.WriteLine("Request not saved!");
+
             return true;
         }
 
