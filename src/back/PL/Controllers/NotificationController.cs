@@ -15,7 +15,7 @@ namespace back.PL.Controllers
         }
 
         [HttpGet("GetNotifications")]
-        public async Task<IActionResult> GetNotifications(int userId, int type, int page)
+        public async Task<IActionResult> GetNotifications(int userId, int? type, int page)
         {
             try
             {

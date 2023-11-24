@@ -47,5 +47,31 @@ namespace back.BLL.Services
             return true;
         }
 
+        public async Task<bool> RespondToPickupRequest(int orderId, int resp, string? message)
+        {
+            if (!await _repository.UpdateResponse(orderId, resp)) throw new ArgumentException("Could not send response!");
+
+            Order o = await _repository.GetOrder(orderId);
+
+            if (resp == 1)
+            {
+                if (await _notificationRepository.InsertNotification(o.UserId, 5, "Pickup time response", "The pickup time for order #" + o.Id + " has been accepted.\nTap to view order details.", o.Id)) Console.WriteLine("Notification sent!");
+            }
+            else
+            {
+                if (message == null)
+                {
+                    if (await _notificationRepository.InsertNotification(o.UserId, 5, "Pickup time response", "The pickup time for order #" + o.Id + " has been declined.\nTap to view order details.", o.Id)) Console.WriteLine("Notification sent!");
+                }
+                else
+                {
+                    if (await _notificationRepository.InsertNotification(o.UserId, 5, "Pickup time response", "The pickup time for order #" + o.Id + " has been declined.\nThe owner said: " + message + " \nTap to view order details.", o.Id)) Console.WriteLine("Notification sent!");
+                }
+                    
+            }
+
+            return true;
+        }
+
     }
 }

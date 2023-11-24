@@ -54,5 +54,18 @@ namespace back.PL.Controllers
                 return BadRequest(new { Error = ex.Message });
             }
         }
+
+        [HttpPut("RespondToPickupRequest")]
+        public async Task<IActionResult> RespondToPickupRequest(int orderId, int resp, string? message)
+        {
+            try
+            {
+                return Ok(new { Success = await _service.RespondToPickupRequest(orderId, resp, message) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
     }
 }

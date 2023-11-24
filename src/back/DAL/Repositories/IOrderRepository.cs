@@ -10,5 +10,7 @@ namespace back.DAL.Repositories
         public Task<List<OrderCard>> GetOrders(int userId, int? status, int page);
         public Task<OrderInfo> OrderDetails(int orderId);
         public Task<Order> InsertOrder(OrderDto order);
+        public Task<bool> UpdateResponse(int orderId, int resp);
+        public Task<Order> GetOrder(int orderId);
     }
 }

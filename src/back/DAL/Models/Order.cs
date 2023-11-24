@@ -20,7 +20,7 @@ namespace back.Models
         public int StatusId { get; set; }
         public string? ShippingAddress { get; set; }
         public DateTime? PickupTime { get; set; }
-        public bool? Accepted { get; set; }
+        public int? Accepted { get; set; }
         public User User { get; set; }
         public PaymentMethod PaymentMethod { get; set; }
         public DeliveryMethod DeliveryMethod { get; set; }

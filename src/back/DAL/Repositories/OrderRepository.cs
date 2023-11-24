@@ -95,7 +95,7 @@ namespace back.DAL.Repositories
                 ShippingAddress = order.ShippingAddress,
                 StatusId = (await _context.OrderStatuses.FirstOrDefaultAsync(x => x.Name == "Pending")).Id,
                 PickupTime = order.PickupTime,
-                Accepted = false,
+                Accepted = -1,
                 ShopId = order.ShopId
             };
 
@@ -129,6 +129,19 @@ namespace back.DAL.Repositories
 
             await _context.SaveChangesAsync();
             return newOrder;
+        }
+
+        public async Task<bool> UpdateResponse(int orderId, int resp)
+        {
+            Order o = await _context.Orders.FirstOrDefaultAsync(x => x.Id == orderId);
+            o.Accepted = resp;
+
+            return await _context.SaveChangesAsync() > 0;
+        }
+
+        public async Task<Order> GetOrder(int orderId)
+        {
+            return await _context.Orders.FirstOrDefaultAsync(x => x.Id == orderId);
         }
     }
 }
