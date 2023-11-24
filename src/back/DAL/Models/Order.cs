@@ -18,7 +18,7 @@ namespace back.Models
         public int DeliveryMethodId { get; set; }
         [ForeignKey("Status")]
         public int StatusId { get; set; }
-        public string ShippingAddress { get; set; }
+        public string? ShippingAddress { get; set; }
         public DateTime? PickupTime { get; set; }
         public bool? Accepted { get; set; }
         public User User { get; set; }

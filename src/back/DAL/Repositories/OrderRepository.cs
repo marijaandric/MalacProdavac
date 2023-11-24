@@ -84,7 +84,7 @@ namespace back.DAL.Repositories
             };
         }
 
-        public async Task<bool> InsertOrder(OrderDto order)
+        public async Task<Order> InsertOrder(OrderDto order)
         {
             Order newOrder = new Order
             {
@@ -127,7 +127,8 @@ namespace back.DAL.Repositories
                 }
             }
 
-            return await _context.SaveChangesAsync() > 0;
+            await _context.SaveChangesAsync();
+            return newOrder;
         }
     }
 }
