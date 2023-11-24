@@ -30,6 +30,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.CircularProgressIndicator
@@ -58,7 +60,10 @@ import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.example.front.R
 import com.example.front.components.ButtonWithIcon
+import com.example.front.components.CardButton
+import com.example.front.components.CommentsTextBox
 import com.example.front.components.FilterDialogProducts
+import com.example.front.components.ReviewCard
 import com.example.front.components.SearchTextField
 import com.example.front.components.ShopProductCard
 import com.example.front.components.SmallElipseAndTitle
@@ -85,6 +90,7 @@ fun ShopScreen(navController: NavHostController, shopViewModel: OneShopViewModel
             ?.let {
                 shopViewModel.getProducts(it, listOf(),null,null,null,null,0,null,1,shopId, false,null,null )
             }
+        shopViewModel.getShopReview(shopId,0)
     }
 
     LazyColumn(
@@ -309,6 +315,9 @@ fun Info(isImageClicked: Boolean, shopViewModel: OneShopViewModel) {
     val state = shopViewModel.state.value.shop
     var showText by remember { mutableStateOf(false) }
     var firstTime by remember { mutableStateOf(true) }
+    var showReviews by remember { mutableStateOf(false) }
+    var leaveAReview by remember { mutableStateOf(false) }
+
     if(isImageClicked) {
         var showText by remember { mutableStateOf(false) }
 
@@ -377,7 +386,7 @@ fun Info(isImageClicked: Boolean, shopViewModel: OneShopViewModel) {
                 else{
                     Text(
                         text = state!!.subcategories!!.joinToString(", "),
-                        modifier = Modifier.padding(start = 8.dp),
+                        modifier = Modifier.padding(top = 8.dp),
                         style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onBackground)
                     )
                 }
@@ -441,16 +450,60 @@ fun Info(isImageClicked: Boolean, shopViewModel: OneShopViewModel) {
                         style = MaterialTheme.typography.titleSmall.copy(color=MaterialTheme.colorScheme.onSurface)
                     )
                 }
-                Text(
-                    text = "View all reviews",
-                    modifier = Modifier.padding(top = 8.dp),
-                    style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onBackground)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 )
-                Text(
-                    text = "Leave a review",
-                    modifier = Modifier.padding(top = 8.dp),
-                    style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onBackground)
+                {
+                    Text(
+                        text = "Leave a review",
+                        modifier = Modifier.padding(top = 8.dp),
+                        style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onBackground)
+                    )
+                    Icon(
+                        imageVector = if(leaveAReview) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                        contentDescription = null,
+                        modifier = Modifier.clickable {
+                            leaveAReview = !leaveAReview
+                        }
+                            .padding(top = 8.dp)
+                            .size(30.dp),
+                        tint = MaterialTheme.colorScheme.onBackground
+                    )
+                }
+                if(leaveAReview)
+                {
+                    CommentsTextBox()
+                    CardButton("Submit review",onClick={},0.9f, Modifier.align(Alignment.CenterHorizontally).height(50.dp), MaterialTheme.colorScheme.secondary)
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 )
+                {
+                    Text(
+                        text = "View all reviews",
+                        modifier = Modifier.padding(top = 8.dp),
+                        style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onBackground)
+                    )
+                    Icon(
+                        imageVector = if(showReviews)Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                        contentDescription = null,
+                        modifier = Modifier.clickable {
+                            showReviews = !showReviews
+                        }
+                            .padding(top = 8.dp)
+                            .size(30.dp),
+                        tint = MaterialTheme.colorScheme.onBackground
+                    )
+                }
+                if(showReviews)
+                {
+                    ReviewCard("mejo.andric",R.drawable.imageplaceholder,"Nije losa prodavnica. Saradnja je odlicna.", 4)
+                }
+
                 Spacer(modifier = Modifier.height(40.dp))
             }
         }
@@ -553,6 +606,7 @@ fun ProfilePic(shopViewModel: OneShopViewModel,id: Int) {
             Text(text = state.shop!!.name, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
             Text(text = state.shop!!.address, style = MaterialTheme.typography.titleSmall,color = MaterialTheme.colorScheme.primary)
             RatingBar(rating = shopViewModel.state.value.shop!!.rating!!.toFloat())
+            Spacer(modifier = Modifier.height(30.dp))
         }
     }
 }

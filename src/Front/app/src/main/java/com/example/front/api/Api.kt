@@ -5,6 +5,7 @@ import com.example.front.model.DTO.ChosenCategoriesDTO
 import com.example.front.model.DTO.HomeProductDTO
 import com.example.front.model.DTO.LoginDTO
 import com.example.front.model.DTO.ProductDTO
+import com.example.front.model.DTO.ReviewDTO
 import com.example.front.model.request.RegistrationRequest
 import com.example.front.model.response.LoginResponse
 import com.example.front.model.DTO.ShopDTO
@@ -134,4 +135,10 @@ interface Api {
         @Query("currLat") currLat: Float?,
         @Query("currLong") currLong: Float?
     ):Response<List<ProductDTO>>
+
+    @GET("back/Shop/ShopReviews")
+    suspend fun getShopReviews(
+        @Query("shopId") shopId: Int,
+        @Query("page") page: Int
+    ):Response<List<ReviewDTO>>
 }

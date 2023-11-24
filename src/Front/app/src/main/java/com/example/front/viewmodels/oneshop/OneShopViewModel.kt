@@ -9,6 +9,7 @@ import com.example.front.helper.DataStore.DataStoreManager
 import com.example.front.model.DTO.FiltersDTO
 import com.example.front.repository.Repository
 import com.example.front.screens.shop.state.ProductState
+import com.example.front.screens.shop.state.ReviewState
 import com.example.front.screens.shop.state.ShopState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -30,6 +31,9 @@ class OneShopViewModel @Inject constructor(
     // defaultni filteri
     private val _filtersState = mutableStateOf(FiltersDTO(0, listOf(), 0, null,0, null, 0, "", 1, null, null, null))
     var filtersState: State<FiltersDTO> = _filtersState;
+
+    private val _stateReview = mutableStateOf(ReviewState())
+    var stateReview: State<ReviewState> = _stateReview;
 
 
 
@@ -80,6 +84,30 @@ class OneShopViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 _stateProduct.value = _stateProduct.value.copy(
+                    error = e.message.toString()
+                )
+            }
+        }
+    }
+
+    fun getShopReview(shopId: Int, page: Int) {
+        viewModelScope.launch {
+            try {
+                val response = repository.getShopReviews(shopId,page)
+                Log.d("REVIEW RESPONSE", response.toString())
+                if (response.isSuccessful) {
+                    val rev = response.body()
+                    _stateReview.value = _stateReview.value.copy(
+                        isLoading = false,
+                        reviews = rev!!
+                    )
+                } else {
+                    _stateReview.value = _stateReview.value.copy(
+                        error = "NotFound"
+                    )
+                }
+            } catch (e: Exception) {
+                _stateReview.value = _stateReview.value.copy(
                     error = e.message.toString()
                 )
             }
