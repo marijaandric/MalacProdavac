@@ -6,5 +6,6 @@ namespace back.DAL.Repositories
     {
         public Task<bool> InsertDeliveryRequest(DeliveryRequestDto req);
         public Task<bool> InsertDeliveryRoute(DeliveryRouteDto route);
+        public Task<bool> AddToRoute(int requestId, int routeId);
     }
 }

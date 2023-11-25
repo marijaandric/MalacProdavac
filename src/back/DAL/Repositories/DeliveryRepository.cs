@@ -2,6 +2,7 @@
 using back.BLL.Services;
 using back.DAL.Contexts;
 using back.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace back.DAL.Repositories
 {
@@ -44,6 +45,15 @@ namespace back.DAL.Repositories
                 EndLongitude = endCoords.Item2,
                 FixedCost = route.FixedCost
             });
+
+            return await _context.SaveChangesAsync() > 0;
+        }
+
+        public async Task<bool> AddToRoute(int requestId, int routeId)
+        {
+            DeliveryRequest req = await _context.DeliveryRequests.FirstOrDefaultAsync(x => x.Id == requestId);
+            req.RouteId = routeId;
+            req.PickupDate = (await _context.DeliveryRoutes.FirstOrDefaultAsync(x => x.Id == routeId)).StartDate;
 
             return await _context.SaveChangesAsync() > 0;
         }

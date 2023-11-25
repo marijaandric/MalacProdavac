@@ -21,5 +21,10 @@ namespace back.BLL.Services
         {
             return await _repository.InsertDeliveryRoute(route);
         }
+
+        public async Task<bool> AddToRoute(int requestId, int routeId)
+        {
+            return await _repository.AddToRoute(requestId, routeId);
+        }
     }
 }
