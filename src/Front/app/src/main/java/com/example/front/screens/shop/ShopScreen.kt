@@ -1,18 +1,22 @@
 package com.example.front.screens.shop
 
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -24,7 +28,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
@@ -49,12 +55,16 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
@@ -63,6 +73,8 @@ import com.example.front.components.ButtonWithIcon
 import com.example.front.components.CardButton
 import com.example.front.components.CommentsTextBox
 import com.example.front.components.FilterDialogProducts
+import com.example.front.components.MyTextField
+import com.example.front.components.MyTextFieldWithoutIcon
 import com.example.front.components.ReviewCard
 import com.example.front.components.SearchTextField
 import com.example.front.components.ShopProductCard
@@ -75,11 +87,12 @@ import com.example.front.screens.sellers.FiltersDialog
 import com.example.front.viewmodels.oneshop.OneShopViewModel
 import com.example.front.viewmodels.shops.ShopsViewModel
 import kotlinx.coroutines.delay
+import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 
 @Composable
 fun ShopScreen(navController: NavHostController, shopViewModel: OneShopViewModel, shopId: Int) {
     var selectedColumnIndex by remember { mutableStateOf(true) }
-    var id : Int = 0
+    var id by remember { mutableStateOf(0) }
     LaunchedEffect(Unit) {
         shopViewModel.getUserId()
             ?.let {
@@ -122,7 +135,7 @@ fun ShopScreen(navController: NavHostController, shopViewModel: OneShopViewModel
                 ProfilePic(shopViewModel,id)
             }
             item{
-                ShopInfo(shopViewModel, shopId)
+                ShopInfo(shopViewModel, shopId, id)
             }
         }
 
@@ -131,9 +144,9 @@ fun ShopScreen(navController: NavHostController, shopViewModel: OneShopViewModel
 
 
 @Composable
-fun ShopInfo(shopViewModel: OneShopViewModel, shopId:Int) {
+fun ShopInfo(shopViewModel: OneShopViewModel, shopId:Int, userID:Int) {
     var isImageClicked by remember { mutableStateOf(true) }
-    var firstTime by remember { mutableStateOf(true) }
+    var shopReviewsPage by remember { mutableStateOf(0f) }
 
     val scaleImage1 by animateDpAsState(
         targetValue = if (isImageClicked) 1.1.dp else 1.dp,
@@ -211,7 +224,7 @@ fun ShopInfo(shopViewModel: OneShopViewModel, shopId:Int) {
                     )
                 }
 
-                Info(isImageClicked,shopViewModel)
+                Info(isImageClicked,shopViewModel,shopId, userID, LocalContext.current)
                 Products(isImageClicked,shopViewModel, shopId)
 
             }
@@ -223,6 +236,7 @@ fun ShopInfo(shopViewModel: OneShopViewModel, shopId:Int) {
 fun Products(isImageClicked: Boolean,shopViewModel: OneShopViewModel,shopId:Int) {
     var showElseText by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
+    var showAddProduct by remember { mutableStateOf(false) }
     var showSortDialog by remember {
         mutableStateOf(false)
     }
@@ -241,12 +255,29 @@ fun Products(isImageClicked: Boolean,shopViewModel: OneShopViewModel,shopId:Int)
     }
     if(showElseText && !isImageClicked) {
         Column {
+            if(!shopViewModel.state.value.shop!!.isOwner)
+            {
+                Column(
+                    modifier = Modifier
+                        .padding(top = 30.dp)
+                        .fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                )
+                {
+                    ButtonWithIcon(text = "Add product", onClick = { showAddProduct = true }, width = 0.6f, color = MaterialTheme.colorScheme.primary, imagePainter = painterResource(
+                        id = R.drawable.plus,
+                    ), height = 40)
+                }
+            }
             Row(
-                modifier = Modifier.padding(top=50.dp),
-                verticalAlignment = Alignment.CenterVertically
+                modifier = Modifier
+                    .padding(top = 16.dp)
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
             )
             {
-                SearchTextField(valuee = value, placeh = "Search products", onValueChangee = {value = it; shopViewModel.Search(value, shopId)}, modifier = Modifier.fillMaxWidth(0.75f))
+                SearchTextField(valuee = value, placeh = "Search products", onValueChangee = {value = it; shopViewModel.Search(value, shopId)}, modifier = Modifier.fillMaxWidth(0.65f))
                 Image(
                     painter = painterResource(id = R.drawable.filters),
                     contentDescription = "Placeholder",
@@ -273,7 +304,7 @@ fun Products(isImageClicked: Boolean,shopViewModel: OneShopViewModel,shopId:Int)
             else if(shopViewModel.stateProduct.value.error.contains("NotFound"))
             {
                 androidx.compose.material3.Text(
-                    "No shops found",
+                    "No products found",
                     style = MaterialTheme.typography.titleSmall, modifier = Modifier
                         .padding(top = 30.dp)
                         .align(Alignment.CenterHorizontally)
@@ -308,15 +339,100 @@ fun Products(isImageClicked: Boolean,shopViewModel: OneShopViewModel,shopId:Int)
     if (showSortDialog) {
         SortDialog(onDismiss = { showSortDialog = false }, shopViewModel, shopId)
     }
+    //showAddProduct
+    if(showAddProduct)
+    {
+        AddProductDialog(onDismiss = {showAddProduct = false}, shopViewModel, shopId)
+    }
 }
 
+
 @Composable
-fun Info(isImageClicked: Boolean, shopViewModel: OneShopViewModel) {
+fun AddProductDialog(onDismiss: () -> Unit, shopsViewModel: OneShopViewModel, shopId: Int?) {
+    val overlayColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)
+
+    Dialog(
+        properties = DialogProperties(usePlatformDefaultWidth = false),
+        onDismissRequest = { onDismiss() }) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(overlayColor)
+                .pointerInput(Unit) {
+                    detectTapGestures { offset ->
+                        onDismiss()
+                    }
+                }
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.8f)
+                    .fillMaxHeight(0.8f)
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(MaterialTheme.colorScheme.background)
+                    .pointerInput(Unit) {
+                        detectTapGestures { offset ->
+
+                        }
+                    }
+                    .padding(top = 5.dp)
+                    .align(Alignment.Center),
+            ) {
+                LazyColumn (
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight()
+                        .padding(16.dp)
+                        .align(Alignment.TopCenter)
+                ){
+                    item{
+                        Text(
+                            "Add new product",
+                            style = MaterialTheme.typography.titleMedium.copy(color = MaterialTheme.colorScheme.onBackground),
+                            modifier = Modifier
+                                .padding(bottom = 30.dp,start=16.dp)
+                        )
+                    }
+                    item{
+                        Box(modifier = Modifier.padding(start=16.dp,end=10.dp))
+                        {
+                            MyTextFieldWithoutIcon(labelValue = "Product name", value = "", onValueChange = {})
+                        }
+                    }
+                    item{
+                        CommentsTextBox(onReviewTextChanged = {}, "Product Description")
+                    }
+                    item{
+                        Box(modifier = Modifier.padding(start=16.dp,end=16.dp))
+                        {
+                            MyTextFieldWithoutIcon(
+                                labelValue = "Quantity in stock",
+                                value = "",
+                                onValueChange = {})
+                        }
+                    }
+
+                }
+            }
+        }
+    }
+}
+
+
+@Composable
+fun Info(isImageClicked: Boolean, shopViewModel: OneShopViewModel, shopId: Int, userID:Int, context: Context) {
     val state = shopViewModel.state.value.shop
     var showText by remember { mutableStateOf(false) }
     var firstTime by remember { mutableStateOf(true) }
     var showReviews by remember { mutableStateOf(false) }
     var leaveAReview by remember { mutableStateOf(false) }
+    var reviewPage by remember { mutableStateOf(0) }
+    var comment by remember {
+        mutableStateOf("")
+    }
+    var selectedRating by remember { mutableStateOf(0) }
+    var toast by remember { mutableStateOf(false) }
+
 
     if(isImageClicked) {
         var showText by remember { mutableStateOf(false) }
@@ -464,9 +580,10 @@ fun Info(isImageClicked: Boolean, shopViewModel: OneShopViewModel) {
                     Icon(
                         imageVector = if(leaveAReview) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                         contentDescription = null,
-                        modifier = Modifier.clickable {
-                            leaveAReview = !leaveAReview
-                        }
+                        modifier = Modifier
+                            .clickable {
+                                leaveAReview = !leaveAReview
+                            }
                             .padding(top = 8.dp)
                             .size(30.dp),
                         tint = MaterialTheme.colorScheme.onBackground
@@ -474,8 +591,29 @@ fun Info(isImageClicked: Boolean, shopViewModel: OneShopViewModel) {
                 }
                 if(leaveAReview)
                 {
-                    CommentsTextBox()
-                    CardButton("Submit review",onClick={},0.9f, Modifier.align(Alignment.CenterHorizontally).height(50.dp), MaterialTheme.colorScheme.secondary)
+                    StarRating{rating ->
+                    selectedRating = rating}
+                    CommentsTextBox(onReviewTextChanged={newText -> comment = newText}, placeholder = "Leave a review")
+                    CardButton("Submit review",onClick={
+                        shopViewModel.leaveReview(shopId,userID,selectedRating, comment)
+                        toast = true
+                    },0.9f,
+                        Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .height(50.dp), MaterialTheme.colorScheme.secondary)
+                    if(!shopViewModel.statePostReview.value.isLoading && toast)
+                    {
+                        Toast.makeText(context,"Review successfully submitted", Toast.LENGTH_LONG).show()
+                        shopViewModel.getShopReview(
+                            shopId,
+                            reviewPage
+                        )
+                        toast = false
+                    }
+                    else if(shopViewModel.statePostReview.value.error.isNotEmpty() && toast){
+                        Toast.makeText(context,"Error", Toast.LENGTH_LONG).show()
+                        toast = false
+                    }
                 }
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -491,9 +629,10 @@ fun Info(isImageClicked: Boolean, shopViewModel: OneShopViewModel) {
                     Icon(
                         imageVector = if(showReviews)Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                         contentDescription = null,
-                        modifier = Modifier.clickable {
-                            showReviews = !showReviews
-                        }
+                        modifier = Modifier
+                            .clickable {
+                                showReviews = !showReviews
+                            }
                             .padding(top = 8.dp)
                             .size(30.dp),
                         tint = MaterialTheme.colorScheme.onBackground
@@ -501,18 +640,36 @@ fun Info(isImageClicked: Boolean, shopViewModel: OneShopViewModel) {
                 }
                 if(showReviews)
                 {
-//                    LazyColumn() {
-//                        items(shopViewModel.stateReview.value.reviews.size) { index ->
-//                            val review = shopViewModel.stateReview.value.reviews[index]
-//                            ReviewCard(
-//                                username = review.username,
-//                                imageRes = review.image,
-//                                comment = review.comment,
-//                                rating = review.rating
-//                            )
-//                            Spacer(modifier = Modifier.height(5.dp))
-//                        }
-//                    }
+                    val rev= shopViewModel.stateReview.value.reviews
+                    if(rev.isEmpty())
+                    {
+                        Text("No reviews found for this store.", style= MaterialTheme.typography.titleSmall ,modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .padding(top = 20.dp))
+                    }
+                    LazyColumn(
+                        modifier = Modifier.heightIn(100.dp, 1000.dp)
+                    ) {
+                        items(rev) { review ->
+                            ReviewCard(
+                                username = review.username,
+                                imageRes = review.image,
+                                comment = review.comment,
+                                rating = review.rating
+                            )
+                        }
+                    }
+                    if(!shopViewModel.stateReview.value.error.contains("NotFound"))
+                    {
+                        Text("See more", style= MaterialTheme.typography.titleSmall ,modifier = Modifier
+                            .clickable {
+                                reviewPage++; shopViewModel.getShopReview(
+                                shopId,
+                                reviewPage
+                            )
+                            }
+                            .align(Alignment.CenterHorizontally))
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(40.dp))

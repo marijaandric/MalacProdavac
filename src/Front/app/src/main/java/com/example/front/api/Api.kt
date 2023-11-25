@@ -3,6 +3,7 @@ package com.example.front.api
 import com.example.front.model.DTO.CategoriesDTO
 import com.example.front.model.DTO.ChosenCategoriesDTO
 import com.example.front.model.DTO.HomeProductDTO
+import com.example.front.model.DTO.LeaveReviewDTO
 import com.example.front.model.DTO.LoginDTO
 import com.example.front.model.DTO.ProductDTO
 import com.example.front.model.DTO.ReviewDTO
@@ -14,8 +15,10 @@ import com.example.front.model.DTO.ShopPagesDTO
 import com.example.front.model.DTO.ToggleLikeDTO
 import com.example.front.model.product.ProductInfo
 import com.example.front.model.product.ProductReviewUserInfo
+import com.example.front.model.response.Success
 import com.example.front.model.user.MyProfileDTO
 import com.example.front.model.user.UserEditDTO
+import org.w3c.dom.Comment
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -152,4 +155,9 @@ interface Api {
         @Query("shopId") shopId: Int,
         @Query("page") page: Int
     ):Response<List<ReviewDTO>>
+
+    @POST("back/Shop/Review")
+    suspend fun postShopReview(
+        @Body data: LeaveReviewDTO,
+    ): Response<Success>
 }

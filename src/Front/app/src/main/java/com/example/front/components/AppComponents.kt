@@ -106,7 +106,7 @@ fun TitleTextComponent(value: String) {
 @Composable
 fun MyTextField(
     labelValue: String,
-    painterResource: Painter,
+    painterResource: Painter?,
     value: String,
     onValueChange: (String) -> Unit,
     isPassword: Boolean = false,
@@ -125,12 +125,46 @@ fun MyTextField(
         value = value,
         onValueChange = onValueChange,
         leadingIcon = {
-            Icon(
-                painter = painterResource,
-                contentDescription = "",
-                modifier = Modifier.size(25.dp)
-            )
+            if(painterResource != null)
+            {
+                Icon(
+                    painter = painterResource,
+                    contentDescription = "",
+                    modifier = Modifier.size(25.dp)
+                )
+            }
         },
+        visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
+        keyboardOptions = KeyboardOptions.Default.copy(
+            keyboardType = if (isPassword) KeyboardType.Password else KeyboardType.Text,
+            imeAction = if (isLast) ImeAction.Done else ImeAction.Next
+        ),
+        shape = RoundedCornerShape(20.dp)
+    )
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MyTextFieldWithoutIcon(
+    labelValue: String,
+    value: String,
+    onValueChange: (String) -> Unit,
+    isPassword: Boolean = false,
+    isLast: Boolean = false
+) {
+    OutlinedTextField(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(5.dp)),
+        label = { Text(text = labelValue) },
+        colors = TextFieldDefaults.outlinedTextFieldColors(
+            focusedBorderColor = LightBlue,
+            focusedLabelColor = LightBlue,
+            cursorColor = LightBlue
+        ),
+        value = value,
+        onValueChange = onValueChange,
         visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
         keyboardOptions = KeyboardOptions.Default.copy(
             keyboardType = if (isPassword) KeyboardType.Password else KeyboardType.Text,
@@ -142,7 +176,7 @@ fun MyTextField(
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
-fun CommentsTextBox() {
+fun CommentsTextBox(onReviewTextChanged: (String) -> Unit, placeholder: String) {
     var reviewText by remember { mutableStateOf("") }
     var isButtonEnabled by remember { mutableStateOf(false) }
 
@@ -156,13 +190,12 @@ fun CommentsTextBox() {
             onValueChange = {
                 reviewText = it
                 isButtonEnabled = it.isNotBlank()
+                onReviewTextChanged(it)
             },
             textStyle = TextStyle.Default.copy(
                 fontSize = 18.sp
             ),
-            placeholder = {
-                Text("Write your review here!")
-            },
+            label = { Text(text = placeholder) },
             shape = RoundedCornerShape(20.dp),
             modifier = Modifier
                 .fillMaxWidth()
@@ -358,12 +391,18 @@ fun ButtonWithIcon(
     modifier: Modifier = Modifier,
     color: Color,
     imagePainter: Painter? = null,
-    imageModifier: Modifier = Modifier
+    imageModifier: Modifier = Modifier,
+    height: Int?
 ) {
+    var h = 32
+    if(height != null)
+    {
+        h = height
+    }
     Row(
         modifier = Modifier
             .fillMaxWidth(width)
-            .height(32.dp)
+            .height(h.dp)
             .clip(RoundedCornerShape(30))
             .background(color)
             .then(modifier)
@@ -538,7 +577,8 @@ fun ProductCard(
                     width = 0.8f,
                     modifier = Modifier,
                     color = MaterialTheme.colorScheme.secondary,
-                    imagePainter = painterResource(id = R.drawable.cart)
+                    imagePainter = painterResource(id = R.drawable.cart),
+                    height = 32
                 )
             }
         }
@@ -794,28 +834,31 @@ fun ReviewCard(
                     Text(text = username, style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onBackground))
                 }
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    LazyRow(
-                        state = rememberLazyListState(),
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                if(rating>0)
+                {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        items(5) { index ->
-                            val starIcon = if (index < rating) {
-                                R.drawable.fullstar
-                            } else {
-                                R.drawable.emptystar
+                        LazyRow(
+                            state = rememberLazyListState(),
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        ) {
+                            items(5) { index ->
+                                val starIcon = if (index < rating) {
+                                    R.drawable.fullstar
+                                } else {
+                                    R.drawable.emptystar
+                                }
+                                Image(
+                                    painter = painterResource(id = starIcon),
+                                    contentDescription = null,
+                                )
                             }
-                            Image(
-                                painter = painterResource(id = starIcon),
-                                contentDescription = null,
-                            )
                         }
+                        Spacer(modifier = Modifier.width(4.dp))
                     }
-                    Spacer(modifier = Modifier.width(4.dp))
                 }
 
                 Text(text = comment, style = MaterialTheme.typography.displaySmall, modifier = Modifier.padding(top=10.dp))

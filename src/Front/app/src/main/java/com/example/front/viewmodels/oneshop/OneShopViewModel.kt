@@ -2,18 +2,22 @@ package com.example.front.viewmodels.oneshop
 
 import android.util.Log
 import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.front.helper.DataStore.DataStoreManager
 import com.example.front.model.DTO.FiltersDTO
 import com.example.front.repository.Repository
 import com.example.front.screens.shop.state.ProductState
-import com.example.front.screens.shop.state.ReviewState
+import com.example.front.screens.shop.state.ShopReviewState
+import com.example.front.screens.shop.state.PostReviewState
 import com.example.front.screens.shop.state.ShopState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import org.osmdroid.util.GeoPoint
+import org.w3c.dom.Comment
 import javax.inject.Inject
 
 @HiltViewModel
@@ -32,10 +36,12 @@ class OneShopViewModel @Inject constructor(
     private val _filtersState = mutableStateOf(FiltersDTO(0, listOf(), 0, null,0, null, 0, "", 1, null, null, null))
     var filtersState: State<FiltersDTO> = _filtersState;
 
-    private val _stateReview = mutableStateOf(ReviewState())
-    var stateReview: State<ReviewState> = _stateReview;
+    private val _stateReview = mutableStateOf(ShopReviewState())
+    var stateReview: State<ShopReviewState> = _stateReview;
 
-
+    //ShopReviewState
+    private val _statePostReview = mutableStateOf(PostReviewState())
+    var statePostReview: State<PostReviewState> = _statePostReview;
 
     suspend fun getShopDetails(userId: Int, shopId: Int) {
         viewModelScope.launch {
@@ -94,12 +100,12 @@ class OneShopViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val response = repository.getShopReviews(shopId,page)
-                Log.d("REVIEW RESPONSE", response.toString())
                 if (response.isSuccessful) {
                     val rev = response.body()
                     _stateReview.value = _stateReview.value.copy(
                         isLoading = false,
-                        reviews = rev!!
+                        reviews = rev!!,
+                        error = ""
                     )
                 } else {
                     _stateReview.value = _stateReview.value.copy(
@@ -108,6 +114,31 @@ class OneShopViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 _stateReview.value = _stateReview.value.copy(
+                    error = e.message.toString()
+                )
+            }
+        }
+    }
+
+    fun leaveReview(shopId: Int, userId: Int, rating: Int?, comment: String) {
+        viewModelScope.launch {
+            try {
+                val response = repository.postShopReview(shopId,userId,rating,comment)
+                Log.d("REVIEW RESPONSE", response.toString())
+                if (response.isSuccessful) {
+                    val rev = response.body()
+                    _statePostReview.value = _statePostReview.value.copy(
+                        isLoading = false,
+                        review = response.body(),
+                        error = ""
+                    )
+                } else {
+                    _statePostReview.value = _statePostReview.value.copy(
+                        error = "NotFound"
+                    )
+                }
+            } catch (e: Exception) {
+                _statePostReview.value = _statePostReview.value.copy(
                     error = e.message.toString()
                 )
             }

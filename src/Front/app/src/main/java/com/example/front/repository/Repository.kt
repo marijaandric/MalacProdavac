@@ -5,6 +5,7 @@ import com.example.front.api.Api
 import com.example.front.model.DTO.CategoriesDTO
 import com.example.front.model.DTO.ChosenCategoriesDTO
 import com.example.front.model.DTO.HomeProductDTO
+import com.example.front.model.DTO.LeaveReviewDTO
 import com.example.front.model.DTO.LoginDTO
 import com.example.front.model.DTO.ProductDTO
 import com.example.front.model.DTO.ReviewDTO
@@ -16,6 +17,7 @@ import com.example.front.model.DTO.ShopPagesDTO
 import com.example.front.model.DTO.ToggleLikeDTO
 import com.example.front.model.product.ProductInfo
 import com.example.front.model.product.ProductReviewUserInfo
+import com.example.front.model.response.Success
 import com.example.front.model.user.MyProfileDTO
 import com.example.front.model.user.UserEditDTO
 import retrofit2.Response
@@ -92,5 +94,10 @@ class Repository @Inject constructor(private val api: Api) {
     suspend fun getShopReviews(shopId: Int, page:Int): Response<List<ReviewDTO>>
     {
         return api.getShopReviews(shopId,page)
+    }
+
+    suspend fun postShopReview(id:Int, userId: Int, rating: Int?, comment: String): Response<Success>
+    {
+        return api.postShopReview(LeaveReviewDTO(id, userId,rating, comment))
     }
 }
