@@ -6,6 +6,8 @@ import com.example.front.model.DTO.CategoriesDTO
 import com.example.front.model.DTO.ChosenCategoriesDTO
 import com.example.front.model.DTO.HomeProductDTO
 import com.example.front.model.DTO.LoginDTO
+import com.example.front.model.DTO.ProductDTO
+import com.example.front.model.DTO.ReviewDTO
 import com.example.front.model.request.RegistrationRequest
 import com.example.front.model.response.LoginResponse
 import com.example.front.model.DTO.ShopDTO
@@ -74,11 +76,21 @@ class Repository @Inject constructor(private val api: Api) {
         return res
     }
 
-    suspend fun getShopPages():Response<ShopPagesDTO>{
-        return api.getShopPages()
+    suspend fun getShopPages(userId: Int,categories:List<Int>?, rating:Int?,open:Boolean?,range:Int?, location:String?,search:String?,favorite:Boolean, currLat: Float?, currLong: Float?):Response<ShopPagesDTO>{
+        return api.getShopPages(userId,categories,rating,open,range,location,search,favorite, currLat, currLong)
     }
 
     suspend fun getShopDetails(userId: Int, shopId: Int):Response<ShopDetailsDTO>{
         return api.getShopDetails(shopId,userId)
+    }
+
+    suspend fun getProducts(userId: Int,categories:List<Int>?, rating:Int?,open:Boolean?,range:Int?, location:String?,sort:Int?,search:String?,page:Int?,specificShopId:Int?,favorite:Boolean?, currLat: Float?, currLong: Float?):Response<List<ProductDTO>>
+    {
+        return api.getProducts(userId,categories,rating,open,range,location,sort,search,page,specificShopId,favorite,currLat,currLong)
+    }
+
+    suspend fun getShopReviews(shopId: Int, page:Int): Response<List<ReviewDTO>>
+    {
+        return api.getShopReviews(shopId,page)
     }
 }

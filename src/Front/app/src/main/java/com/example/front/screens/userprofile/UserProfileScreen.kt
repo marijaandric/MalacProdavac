@@ -697,6 +697,7 @@ fun EditDialog(onDismiss: () -> Unit,myProfileViewModel: MyProfileViewModel) {
                     if(editState!!.isLoading == false)
                     {
                         myProfileViewModel.getMyProfileInfo(state!!.id)
+                        myProfileViewModel.inicijalnoStanje()
                         onDismiss()
                     }
 

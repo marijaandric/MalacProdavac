@@ -138,5 +138,9 @@ namespace back.DAL.Repositories
                         .Skip((page - 1) * numberOfItems).Take(numberOfItems).ToListAsync();
         }
 
+        public async Task<string> GetUsername(int userId)
+        {
+            return (await _context.Users.FirstOrDefaultAsync(x => x.Id == userId)).Username;
+        }
     }
 }

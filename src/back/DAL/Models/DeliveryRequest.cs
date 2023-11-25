@@ -16,7 +16,7 @@ namespace back.Models
         public DateTime? PickupDate { get; set; }
         public DateTime CreatedOn { get; set; }
 
-        public DeliveryRoute Route { get; set; }
+        public DeliveryRoute? Route { get; set; }
         public Shop Shop { get; set; }
         public Order Order { get; set; }
     }

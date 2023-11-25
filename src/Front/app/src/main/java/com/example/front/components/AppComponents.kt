@@ -25,8 +25,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
@@ -34,6 +36,7 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -51,6 +54,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
@@ -59,6 +63,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -70,6 +75,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.front.R
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
@@ -132,6 +138,50 @@ fun MyTextField(
         ),
         shape = RoundedCornerShape(20.dp)
     )
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
+@Composable
+fun CommentsTextBox() {
+    var reviewText by remember { mutableStateOf("") }
+    var isButtonEnabled by remember { mutableStateOf(false) }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 16.dp)
+    ) {
+        OutlinedTextField(
+            value = reviewText,
+            onValueChange = {
+                reviewText = it
+                isButtonEnabled = it.isNotBlank()
+            },
+            textStyle = TextStyle.Default.copy(
+                fontSize = 18.sp
+            ),
+            placeholder = {
+                Text("Write your review here!")
+            },
+            shape = RoundedCornerShape(20.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(150.dp)
+                .background(MaterialTheme.colorScheme.background)
+                .padding(16.dp),//
+            keyboardOptions = KeyboardOptions.Default.copy(
+                imeAction = ImeAction.Done
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    //LocalSoftwareKeyboardController.current?.hide()
+                }
+            ),
+            singleLine = false
+        )
+
+        Spacer(modifier = Modifier.height(5.dp))
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -216,6 +266,27 @@ fun ToggleImageButton(modifier: Modifier) {
     )
 }
 
+@Composable
+fun ToggleImageButtonFunction(modifier: Modifier, onClick: () -> Unit) {
+    var isToggled by remember { mutableStateOf(false) }
+
+    val currentImage = if (isToggled) painterResource(id = R.drawable.srcefull)
+    else painterResource(id = R.drawable.srce)
+
+    Image(
+        painter = currentImage,
+        contentDescription = "",
+        modifier = Modifier
+            .size(50.dp)
+            .padding(5.dp)
+            .then(modifier)
+            .clickable {
+                isToggled = !isToggled
+                onClick()
+            }
+    )
+}
+
 
 @Composable
 fun LogoImage(painterResource: Painter, modifier: Modifier = Modifier) {
@@ -268,7 +339,6 @@ fun CardButton(text: String, onClick: () -> Unit, width: Float, modifier: Modifi
         onClick = onClick,
         modifier = Modifier
             .fillMaxWidth(width)
-            .height(32.dp)
             .then(modifier),
         colors = ButtonDefaults.buttonColors(containerColor = color),
         shape = RoundedCornerShape(30)
@@ -399,14 +469,16 @@ fun SellerCard(title: String, author: String, imageResource: String,isLiked: Boo
                         text = "More info",
                         onClick = { /*TODO*/ },
                         width = 0.52f,
-                        modifier = Modifier.padding(end = 8.dp),
+                        modifier = Modifier
+                            .padding(end = 8.dp)
+                            .height(32.dp),
                         color = MaterialTheme.colorScheme.secondary
                     )
                     CardButton(
                         text = "Products",
                         onClick = { /*TODO*/ },
                         width = 1f,
-                        modifier = Modifier,
+                        modifier = Modifier.height(32.dp),
                         color = MaterialTheme.colorScheme.primary
                     )
                 }
@@ -474,7 +546,7 @@ fun ProductCard(
 }
 
 @Composable
-fun ShopProductCard(imageRes: Int, text: String, price: String, onClick: () -> Unit = {}) {
+fun ShopProductCard(imageRes: String?, text: String, price: String, onClick: () -> Unit = {}) {
     Card(
         modifier = Modifier
             .clip(MaterialTheme.shapes.medium)
@@ -492,16 +564,34 @@ fun ShopProductCard(imageRes: Int, text: String, price: String, onClick: () -> U
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Image(
-                painter = painterResource(id = imageRes),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(0.6f)
-                    .clip(RoundedCornerShape(20.dp))
-                    .padding(start = 5.dp, end = 5.dp)
-            )
+            if(imageRes != null)
+            {
+                val imageUrl = "http://softeng.pmf.kg.ac.rs:10015/images/${imageRes}"
+
+                val painter: Painter = rememberAsyncImagePainter(model = imageUrl)
+                Image(
+                    painter = painter,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(0.6f)
+                        .clip(RoundedCornerShape(20.dp))
+                        .padding(start = 5.dp, end = 5.dp)
+                )
+            }
+            else{
+                Image(
+                    painter = painterResource(id = R.drawable.imageplaceholder),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(0.6f)
+                        .clip(RoundedCornerShape(20.dp))
+                        .padding(start = 5.dp, end = 5.dp)
+                )
+            }
 
             Text(
                 text = text,
@@ -524,14 +614,16 @@ fun ShopCard(
     imageResource: String,
     navController: NavHostController,
     id:Int,
-    workingHours: String
+    workingHours: String,
 ) {
     Card(
         modifier = Modifier
             .clip(RoundedCornerShape(20.dp))
             .padding(bottom = 15.dp)
             .fillMaxWidth()
-            .clickable { },
+            .clickable {
+                navController.navigate("${Screen.Shop.route}/$id")
+            },
     ) {
         Row(
             modifier = Modifier
@@ -656,6 +748,82 @@ fun ImageItemForProfilePic(image: String, onEditClick: () -> Unit) {
         }
     }
 }
+
+
+@Composable
+fun ReviewCard(
+    username: String,
+    imageRes: String?,
+    comment: String,
+    rating: Int
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+            .clip(RoundedCornerShape(20.dp))
+
+    ) {
+        Box(
+            modifier = Modifier.background(MaterialTheme.colorScheme.surface)
+        )
+        {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    val imageUrl = "http://softeng.pmf.kg.ac.rs:10015/images/${imageRes}"
+
+                    val painter: Painter = rememberAsyncImagePainter(model = imageUrl)
+                    Image(
+                        painter = painter,
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(40.dp)
+                            .clip(CircleShape)
+                    )
+                    Spacer(modifier = Modifier.width(5.dp))
+                    Text(text = username, style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onBackground))
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    LazyRow(
+                        state = rememberLazyListState(),
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    ) {
+                        items(5) { index ->
+                            val starIcon = if (index < rating) {
+                                R.drawable.fullstar
+                            } else {
+                                R.drawable.emptystar
+                            }
+                            Image(
+                                painter = painterResource(id = starIcon),
+                                contentDescription = null,
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.width(4.dp))
+                }
+
+                Text(text = comment, style = MaterialTheme.typography.displaySmall, modifier = Modifier.padding(top=10.dp))
+            }
+        }
+    }
+}
+
 
 @Composable
 fun SmallElipseAndTitle(title:String) {

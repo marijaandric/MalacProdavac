@@ -90,4 +90,12 @@ class MyProfileViewModel @Inject constructor(
         return dataStoreManager.getUserIdFromToken()
     }
 
+    fun inicijalnoStanje(){
+        _stateEdit.value = _stateEdit.value!!.copy(
+            isLoading = false,
+            info = null,
+            error = ""
+        )
+    }
+
 }

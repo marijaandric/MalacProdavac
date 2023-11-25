@@ -187,7 +187,7 @@ namespace back.BLL.Services
         public async Task<string> EditUser(EditUserDto values)
         {
             User newUser = await _authRepository.GetUser(values.Id);
-
+            if (values.Address != null && values.Name != null && values.Username != null && values.RoleId != null && values.Address == newUser.Address && values.Name == newUser.Name && values.Username == newUser.Username && values.RoleId == newUser.RoleId) return await CreateToken(newUser);
             if (values.Username.Length > 0)
             {
                 if (_authRepository.CountUsers(values.Username) == 0) newUser.Username = values.Username;

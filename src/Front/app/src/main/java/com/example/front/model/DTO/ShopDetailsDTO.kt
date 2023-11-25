@@ -3,7 +3,7 @@ package com.example.front.model.DTO
 import com.google.gson.annotations.SerializedName
 
 data class ShopDetailsDTO (
-    @SerializedName("rating") val rating: Int?,
+    @SerializedName("rating") val rating: Float?,
     @SerializedName("liked") val liked: Boolean,
     @SerializedName("boughtFrom") val boughtFrom: Boolean?,
     @SerializedName("rated") val rated: Boolean,

@@ -10,7 +10,14 @@ namespace back.Models
         [ForeignKey("DeliveryPerson")]
         public int DeliveryPersonId { get; set; }
         public DateTime StartDate { get; set; }
-        public DateTime StartTime { get; set; }
+        public TimeSpan StartTime { get; set; }
+        public string StartLocation { get; set; }
+        public string EndLocation { get; set; }
+        public double StartLatitude { get; set; }
+        public double StartLongitude { get; set; }
+        public double EndLatitude { get; set; }
+        public double EndLongitude { get; set; }
+        public float FixedCost { get; set; }
 
         public User DeliveryPerson { get; set; }
     }

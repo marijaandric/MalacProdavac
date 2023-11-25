@@ -16,9 +16,9 @@ namespace back.DAL.Repositories
 
         int numberOfItems = 10;
 
-        public async Task<List<NotificationCard>> GetNotifications(int userId, int type, int page)
+        public async Task<List<NotificationCard>> GetNotifications(int userId, int? type, int page)
         {
-            if (type == -1)
+            if (type == null)
             {
                 return await _context.Notifications.Where(x => x.UserId == userId).Skip(page - 1 * numberOfItems).Take(numberOfItems).Select(x => new NotificationCard
                 {
@@ -26,7 +26,7 @@ namespace back.DAL.Repositories
                     Title = x.Title,
                     Text = x.Text,
                     CreatedOn = x.CreatedOn,
-                    TypeId = type,
+                    TypeId = x.TypeId,
                     ReferenceId = x.ReferenceId,
                     Read = x.Read
                 }).ToListAsync();
@@ -38,7 +38,7 @@ namespace back.DAL.Repositories
                 Title = x.Title,
                 Text = x.Text,
                 CreatedOn = x.CreatedOn,
-                TypeId = type,
+                TypeId = (int)type,
                 ReferenceId = x.ReferenceId,
                 Read = x.Read
             }).ToListAsync();

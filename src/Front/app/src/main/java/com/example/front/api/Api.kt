@@ -4,6 +4,8 @@ import com.example.front.model.DTO.CategoriesDTO
 import com.example.front.model.DTO.ChosenCategoriesDTO
 import com.example.front.model.DTO.HomeProductDTO
 import com.example.front.model.DTO.LoginDTO
+import com.example.front.model.DTO.ProductDTO
+import com.example.front.model.DTO.ReviewDTO
 import com.example.front.model.request.RegistrationRequest
 import com.example.front.model.response.LoginResponse
 import com.example.front.model.DTO.ShopDTO
@@ -109,11 +111,45 @@ interface Api {
     ): Response<Boolean>
 
     @GET("back/Shop/ShopPages")
-    suspend fun getShopPages():Response<ShopPagesDTO>
+    suspend fun getShopPages(
+        @Query("userId") userId: Int,
+        @Query("categories") categories: List<Int>?,
+        @Query("rating") rating: Int?,
+        @Query("open") open: Boolean?,
+        @Query("range") range: Int?,
+        @Query("location") location: String?,
+        @Query("search") search: String?,
+        @Query("favorite") favorite: Boolean?,
+        @Query("currLat") currLat: Float?,
+        @Query("currLong") currLong: Float?
+    ):Response<ShopPagesDTO>
 
     @GET("back/Shop/ShopDetails")
     suspend fun getShopDetails(
         @Query("shopId") shopId: Int,
         @Query("userId") userId: Int
     ):Response<ShopDetailsDTO>
+
+    @GET("back/Product/GetProducts")
+    suspend fun getProducts(
+        @Query("userId") userId: Int,
+        @Query("categories") categories: List<Int>?,
+        @Query("rating") rating: Int?,
+        @Query("open") open: Boolean?,
+        @Query("range") range: Int?,
+        @Query("location") location: String?,
+        @Query("sort") sort: Int?,
+        @Query("search") search: String?,
+        @Query("page") page: Int?,
+        @Query("specificShopId") specificShopId: Int?,
+        @Query("favorite") favorite: Boolean?,
+        @Query("currLat") currLat: Float?,
+        @Query("currLong") currLong: Float?
+    ):Response<List<ProductDTO>>
+
+    @GET("back/Shop/ShopReviews")
+    suspend fun getShopReviews(
+        @Query("shopId") shopId: Int,
+        @Query("page") page: Int
+    ):Response<List<ReviewDTO>>
 }

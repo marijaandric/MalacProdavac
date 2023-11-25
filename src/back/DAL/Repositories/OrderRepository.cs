@@ -18,9 +18,9 @@ namespace back.DAL.Repositories
 
         int numberOfItems = 10;
 
-        public async Task<List<OrderCard>> GetOrders(int userId, int status, int page)
+        public async Task<List<OrderCard>> GetOrders(int userId, int? status, int page)
         {
-            if (status == -1)
+            if (status == null)
             {
                 return await _context.Orders.Where(x => x.UserId == userId).Skip(page - 1 * numberOfItems).Take(numberOfItems).Select(x => new OrderCard
                 {
@@ -28,18 +28,18 @@ namespace back.DAL.Repositories
                     Quantity = _context.OrderItems.Where(i => i.OrderId == x.Id).Count(),
                     Amount = _context.OrderItems.Where(i => i.OrderId == x.Id).Sum(i => i.Price),
                     CreatedOn = x.CreatedOn,
-                    Status = _context.OrderStatuses.FirstOrDefault(s => s.Id == x.Status).Name
+                    Status = _context.OrderStatuses.FirstOrDefault(s => s.Id == x.StatusId).Name
                     
                 }).ToListAsync();
             }
 
-            return await _context.Orders.Where(x => x.UserId == userId && x.Status == status).Skip(page - 1 * numberOfItems).Take(numberOfItems).Select(x => new OrderCard
+            return await _context.Orders.Where(x => x.UserId == userId && x.StatusId == status).Skip(page - 1 * numberOfItems).Take(numberOfItems).Select(x => new OrderCard
             {
                 Id = x.Id,
                 Quantity = _context.OrderItems.Where(i => i.OrderId == x.Id).Count(),
                 Amount = _context.OrderItems.Where(i => i.OrderId == x.Id).Sum(i => i.Price),
                 CreatedOn = x.CreatedOn,
-                Status = _context.OrderStatuses.FirstOrDefault(s => s.Id == x.Status).Name
+                Status = _context.OrderStatuses.FirstOrDefault(s => s.Id == x.StatusId).Name
 
             }).ToListAsync();
         }
@@ -52,9 +52,9 @@ namespace back.DAL.Repositories
                 Quantity = _context.OrderItems.Where(i => i.OrderId == x.Id).Count(),
                 Amount = _context.OrderItems.Where(i => i.OrderId == x.Id).Sum(i => i.Price),
                 CreatedOn = x.CreatedOn,
-                Status = _context.OrderStatuses.FirstOrDefault(s => s.Id == x.Status).Name,
-                DeliveryMethod = _context.DeliveryMethods.FirstOrDefault(dm => dm.Id == x.DeliveryMethod).Name,
-                PaymentMethod = _context.PaymentMethods.FirstOrDefault(pm => pm.Id == x.PaymentMethod).Name,
+                Status = _context.OrderStatuses.FirstOrDefault(s => s.Id == x.StatusId).Name,
+                DeliveryMethod = _context.DeliveryMethods.FirstOrDefault(dm => dm.Id == x.DeliveryMethodId).Name,
+                PaymentMethod = _context.PaymentMethods.FirstOrDefault(pm => pm.Id == x.PaymentMethodId).Name,
                 ShippingAddress = x.ShippingAddress
 
             }).FirstOrDefaultAsync(x => x.Id == orderId);
@@ -84,45 +84,64 @@ namespace back.DAL.Repositories
             };
         }
 
-        public async Task<bool> InsertOrder(OrderDto order)
+        public async Task<Order> InsertOrder(OrderDto order)
         {
             Order newOrder = new Order
             {
                 UserId = order.UserId,
                 CreatedOn = DateTime.Now,
-                DeliveryMethod = order.DeliveryMethod,
-                PaymentMethod = order.PaymentMethod,
+                DeliveryMethodId = order.DeliveryMethod,
+                PaymentMethodId = order.PaymentMethod,
                 ShippingAddress = order.ShippingAddress,
-                Status = (await _context.OrderStatuses.FirstOrDefaultAsync(x => x.Name == "Pending")).Id
+                StatusId = (await _context.OrderStatuses.FirstOrDefaultAsync(x => x.Name == "Pending")).Id,
+                PickupTime = order.PickupTime,
+                Accepted = -1,
+                ShopId = order.ShopId
             };
 
-            _context.Orders.AddAsync(newOrder);
+            await _context.Orders.AddAsync(newOrder);
             await _context.SaveChangesAsync();
 
             foreach (var item in order.Products)
             {
-                Product product = _context.Products.FirstOrDefault(x => x.Id == item.Id);
-                float total;
-
-                int count = order.Products.Where(x => x.Id == item.Id).Sum(x => x.Quantity);
-                if (product.SalePercentage != null && product.SaleMinQuantity <= order.Products.Where(x => x.Id == item.Id).Sum(x => x.Quantity)) total = product.Price * item.Quantity * (100 - product.SalePercentage) / 100;
-                else total = product.Price * item.Quantity;
-
-                _context.OrderItems.AddAsync(new OrderItem
+                if (item != null)
                 {
-                    ProductId = item.Id,
-                    Quantity = item.Quantity,
-                    SizeId = item.SizeId,
-                    Price = total,
-                    OrderId = newOrder.Id,
-                });
+                    Product product = _context.Products.FirstOrDefault(x => x.Id == item.Id);
+                    float total;
 
-                ProductSize ps = await _context.ProductSizes.FirstOrDefaultAsync(x => x.ProductId == item.Id && x.SizeId == item.SizeId);
-                ps.Stock -= item.Quantity;
+                    int count = order.Products.Where(x => x.Id == item.Id).Sum(x => x.Quantity);
+                    if (product.SalePercentage != null && product.SaleMinQuantity <= order.Products.Where(x => x.Id == item.Id).Sum(x => x.Quantity)) total = product.Price * item.Quantity * (100 - product.SalePercentage) / 100;
+                    else total = product.Price * item.Quantity;
 
+                    await _context.OrderItems.AddAsync(new OrderItem
+                    {
+                        ProductId = item.Id,
+                        Quantity = item.Quantity,
+                        SizeId = item.SizeId,
+                        Price = total,
+                        OrderId = newOrder.Id,
+                    });
+
+                    ProductSize ps = await _context.ProductSizes.FirstOrDefaultAsync(x => x.ProductId == item.Id && x.SizeId == item.SizeId);
+                    ps.Stock -= item.Quantity;
+                }
             }
 
+            await _context.SaveChangesAsync();
+            return newOrder;
+        }
+
+        public async Task<bool> UpdateResponse(int orderId, int resp)
+        {
+            Order o = await _context.Orders.FirstOrDefaultAsync(x => x.Id == orderId);
+            o.Accepted = resp;
+
             return await _context.SaveChangesAsync() > 0;
+        }
+
+        public async Task<Order> GetOrder(int orderId)
+        {
+            return await _context.Orders.FirstOrDefaultAsync(x => x.Id == orderId);
         }
     }
 }

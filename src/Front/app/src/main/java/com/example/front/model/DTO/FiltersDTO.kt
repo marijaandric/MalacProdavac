@@ -11,5 +11,6 @@ data class FiltersDTO(
     val search: String? = null,
     val page: Int,
     val currLat: Float?,
-    val currLon: Float?
+    val currLon: Float?,
+    val favorite: Boolean?
 )

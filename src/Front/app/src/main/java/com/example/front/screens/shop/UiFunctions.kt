@@ -13,42 +13,45 @@ import com.example.front.R
 
 @Composable
 fun RatingBar(rating: Float) {
-    val filledStars = rating.toInt()
-    val remainingStar = 4 - filledStars
-    val isHalfStar = rating - filledStars >= 0.5
+    if(rating != 0f)
+    {
+        val filledStars = rating.toInt()
+        val remainingStar = 4 - filledStars
+        val isHalfStar = rating - filledStars >= 0.5
 
-    Row(
-        modifier = Modifier
-            .heightIn(min = 48.dp)
-    ) {
-        repeat(filledStars) {
-            Image(
-                painter = painterResource(id = R.drawable.fullstar),
-                contentDescription = null,
-                modifier = Modifier
-                    .size(30.dp)
-                    .padding(end = 4.dp, top=8.dp)
-            )
-        }
+        Row(
+            modifier = Modifier
+                .heightIn(min = 48.dp)
+        ) {
+            repeat(filledStars) {
+                Image(
+                    painter = painterResource(id = R.drawable.fullstar),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(30.dp)
+                        .padding(end = 4.dp, top=8.dp)
+                )
+            }
 
-        if (isHalfStar) {
-            Image(
-                painter = painterResource(id = R.drawable.halfstar),
-                contentDescription = null,
-                modifier = Modifier
-                    .size(30.dp)
-                    .padding(end = 4.dp, top=8.dp)
-            )
-        }
+            if (isHalfStar) {
+                Image(
+                    painter = painterResource(id = R.drawable.halfstar),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(30.dp)
+                        .padding(end = 4.dp, top=8.dp)
+                )
+            }
 
-        repeat(remainingStar) {
-            Image(
-                painter = painterResource(id = R.drawable.emptystar),
-                contentDescription = null,
-                modifier = Modifier
-                    .size(28.dp)
-                    .padding(end = 4.dp, top=8.dp)
-            )
+            repeat(remainingStar) {
+                Image(
+                    painter = painterResource(id = R.drawable.emptystar),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(28.dp)
+                        .padding(end = 4.dp, top=8.dp)
+                )
+            }
         }
     }
 }
