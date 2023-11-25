@@ -135,9 +135,9 @@ namespace back.BLL.Services
                 }
             }
 
-            output = output.Substring(0, output.LastIndexOf(".")) + ".pdf";
+            string pdfOutput = output.Substring(0, output.LastIndexOf(".")) + ".pdf";
 
-            using (var pdfWriter = new PdfWriter(Path.Combine(folderPath, output)))
+            using (var pdfWriter = new PdfWriter(Path.Combine(folderPath, pdfOutput)))
             {
                 using (var pdfDocument = new PdfDocument(pdfWriter))
                 {
@@ -149,7 +149,9 @@ namespace back.BLL.Services
                 }
             }
 
-            return output;
+            File.Delete(outputPath);
+
+            return pdfOutput;
         }
 
     }
