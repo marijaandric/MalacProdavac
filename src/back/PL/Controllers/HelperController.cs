@@ -26,5 +26,18 @@ namespace back.PL.Controllers
                 return BadRequest(new { Error = ex.Message });
             }
         }
+
+        [HttpGet("GeneratePaymentSlip")]
+        public async Task<IActionResult> GeneratePaymentSlip(int userId, int shopId, float amount, string? address)
+        {
+            try
+            {
+                return Ok(new { Success = await _service.GeneratePaymentSlip(userId, shopId, amount, address) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+    }
     }
 }

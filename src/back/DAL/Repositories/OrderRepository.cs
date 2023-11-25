@@ -143,5 +143,22 @@ namespace back.DAL.Repositories
         {
             return await _context.Orders.FirstOrDefaultAsync(x => x.Id == orderId);
         }
+
+        public async Task<PaymentSlipInfo> GetPaymentSlipInfo(int userId, int shopId)
+        {
+            User u = await _context.Users.FirstOrDefaultAsync(x => x.Id == userId);
+            int rcvId = (await _context.Shop.FirstOrDefaultAsync(x => x.Id == shopId)).OwnerId;
+            User rcv = await _context.Users.FirstOrDefaultAsync(x => x.Id == rcvId);
+            return new PaymentSlipInfo
+            {
+                Name = u.Name,
+                Lastname = u.Lastname,
+                Address = u.Address,
+                NameRcv = rcv.Name,
+                LastnameRcv = rcv.Lastname,
+                AddressRcv = rcv.Address,
+                AccountNumberRcv = rcv.AccountNumber,
+            };
+        }
     }
 }
