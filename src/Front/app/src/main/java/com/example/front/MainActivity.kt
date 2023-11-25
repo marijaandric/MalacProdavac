@@ -48,6 +48,9 @@ import com.example.front.components.DrawerItems
 import com.example.front.helper.DataStore.DataStoreManager
 import com.example.front.navigation.SetupNavGraph
 import com.example.front.ui.theme.FrontTheme
+import com.google.firebase.Firebase
+import com.google.firebase.FirebaseApp
+import com.google.firebase.messaging.messaging
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -77,6 +80,7 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var dataStoreManager: DataStoreManager
 
+
     private fun askNotificationPermission() {
         // This is only necessary for API Level > 33 (TIRAMISU)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -101,6 +105,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            // Create channel to show notifications.
             val channelId = getString(R.string.default_notification_channel_id)
             val channelName = getString(R.string.default_notification_channel_name)
             val notificationManager = getSystemService(NotificationManager::class.java)
@@ -112,6 +117,7 @@ class MainActivity : ComponentActivity() {
                 ),
             )
         }
+
         intent.extras?.let {
             for (key in it.keySet()) {
                 val value = intent.extras?.getString(key)
@@ -119,7 +125,6 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        Toast.makeText(this, "See README for setup instructions", Toast.LENGTH_SHORT).show()
         askNotificationPermission()
 
         setContent {
