@@ -184,14 +184,14 @@ fun HeaderImage(painterResource: Painter) {
 
 @OptIn(ExperimentalEncodingApi::class)
 @Composable
-fun ProductImage(image: String) {
+fun ProductImage(image: String, modifier: Modifier) {
     val imageUrl = "http://softeng.pmf.kg.ac.rs:10015/images/${image}"
 
     val painter: Painter = rememberAsyncImagePainter(model = imageUrl)
     Image(
         painter = painter,
         contentDescription = null,
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().fillMaxHeight().then(modifier),
         contentScale = ContentScale.FillWidth
     )
 }

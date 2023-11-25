@@ -1,6 +1,8 @@
 package com.example.front.screens.product
 
 import android.annotation.SuppressLint
+import android.graphics.Path
+import android.graphics.RectF
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -17,32 +19,33 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.GenericShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
@@ -50,18 +53,16 @@ import com.example.front.R
 import com.example.front.components.GalleryComponent
 import com.example.front.components.ProductImage
 import com.example.front.components.ToggleImageButton
-import com.example.front.helper.DataStore.DataStoreManager
 import com.example.front.model.DTO.WorkingHoursDTO
 import com.example.front.model.product.ProductReviewUserInfo
 import com.example.front.navigation.Screen
-import com.example.front.ui.theme.Black
 import com.example.front.ui.theme.DarkBlue
 import com.example.front.ui.theme.Orange
 import com.example.front.ui.theme.Typography
 import com.example.front.viewmodels.product.ProductViewModel
-import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import java.lang.Integer.max
 
 @SuppressLint("SuspiciousIndentation")
 @Composable
@@ -107,9 +108,10 @@ fun ProductPage(
                     .fillMaxWidth()
                     .weight(1.5f)
                     .align(Alignment.CenterHorizontally)
+                    .background(Color.Transparent)
             ) {
                 if (productInfo != null) {
-                    productInfo.images?.get(0)?.let { ProductImage(it.image) }
+                    productInfo.images?.get(0)?.let { ProductImage(it.image, modifier = Modifier) }
                 }
 
                 ToggleImageButton(modifier = Modifier.align(Alignment.TopEnd))
@@ -124,179 +126,132 @@ fun ProductPage(
                         .clickable { navHostController.navigate(Screen.Home.route) }
                 )
             }
-
-            Column(
+            Card(
                 modifier = Modifier
-                    .padding(20.dp)
                     .fillMaxWidth()
-                    .weight(2f)
-                    .verticalScroll(rememberScrollState())
+                    .weight(3f)
+                    .clip(RoundedCornerShape(20.dp))
+                    .border(1.dp, Color.Black, shape = RoundedCornerShape(20.dp))
+                    .background(Color.Transparent)
+                    .clip(RoundedCornerShape(20.dp))
             ) {
-                productInfo?.images?.let {
-                    GalleryComponent(images = it, modifier = Modifier.padding(20.dp))
-                }
-
-                productInfo?.name?.let {
-                    Text(
-                        text = it,
-                        modifier = Modifier
-                            .padding(5.dp)
-                            .fillMaxWidth(),
-                        style = Typography.titleMedium,
-                        color = DarkBlue
-                    )
-                }
-
-                Row(
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalArrangement = Arrangement.Center
+                        .fillMaxSize()
+                        .background(Color.White)
+                        .padding(20.dp)
+                        .verticalScroll(rememberScrollState())
                 ) {
-                    productInfo?.shopName?.let {
+                    productInfo?.images?.let {
+                        GalleryComponent(images = it, modifier = Modifier.padding(20.dp))
+                    }
+
+                    productInfo?.name?.let {
                         Text(
                             text = it,
                             modifier = Modifier
-                                .padding(5.dp),
-                            style = Typography.titleSmall,
-                            textAlign = TextAlign.Center
+                                .padding(5.dp)
+                                .fillMaxWidth(),
+                            style = Typography.titleMedium,
+                            color = DarkBlue
                         )
                     }
 
-                    Image(
-                        painter = painterResource(R.drawable.strelica),
-                        contentDescription = "",
-                        modifier = Modifier
-                            .size(29.dp)
-                    )
-                }
-
-                Text(
-                    text = "${productInfo?.price} rsd",
-                    modifier = Modifier
-                        .padding(20.dp)
-                        .fillMaxWidth(),
-                    style = Typography.titleLarge,
-                    color = DarkBlue,
-                    textAlign = TextAlign.Center
-                )
-
-                productInfo?.saleMessage?.let {
-                    Text(
-                        text = it,
-                        modifier = Modifier.fillMaxWidth(),
-                        style = Typography.titleMedium,
-                        textAlign = TextAlign.Center,
-                        color = Orange
-                    )
-                }
-
-                productInfo?.description?.let {
-                    Text(
-                        text = it,
-                        modifier = Modifier
-                            .padding(10.dp)
-                            .fillMaxWidth(),
-                        style = Typography.bodySmall,
-                        textAlign = TextAlign.Center,
-                        color = Color.Black
-                    )
-                }
-
-                Divider(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(1.dp)
-                        .padding(horizontal = 16.dp),
-                    color = Color.Gray
-                )
-
-                productInfo?.workingHours?.let { ExpandableRow(it) }
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(10.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Quantity",
-                        style = Typography.titleSmall,
-                        color = Color.Black
-                    )
-
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Button(
-                            onClick = {},
-                            modifier = Modifier
-                                .height(40.dp)
-                                .border(1.dp, Color.Black),
-                            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-                        ) {
-                            Text(text = "-")
-                        }
-
-                        Text(
-                            text = "1",
-                            modifier = Modifier.padding(20.dp),
-                            textAlign = TextAlign.Justify
-                        )
-
-                        Button(
-                            onClick = {},
-                            modifier = Modifier
-                                .height(40.dp)
-                                .border(1.dp, Color.Black),
-                            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-                        ) {
-                            Text(text = "+")
-                        }
-                    }
-                }
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Button(
-                        onClick = {},
-                        modifier = Modifier
-                            .height(80.dp)
-                            .width(300.dp)
-                            .padding(20.dp),
-                    ) {
-                        Text(text = "Add To Cart", style = Typography.titleSmall)
-                    }
-                }
-                Divider(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(1.dp)
-                        .padding(horizontal = 16.dp),
-                    color = Color.Gray
-                )
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(30.dp), horizontalArrangement = Arrangement.SpaceBetween
+                            .padding(16.dp),
+                        horizontalArrangement = Arrangement.Center
                     ) {
-                        Text(text = "Product reviews", style = Typography.bodyLarge)
-                        Row {
-                            if (productInfo != null) {
-                                Text(text = "${productInfo.rating}", style = Typography.bodyLarge)
-                            }
-                            Icon(
-                                imageVector = Icons.Default.Star,
-                                contentDescription = "Star icon"
+                        productInfo?.shopName?.let {
+                            Text(
+                                text = it,
+                                modifier = Modifier
+                                    .padding(5.dp),
+                                style = Typography.titleSmall,
+                                textAlign = TextAlign.Center
                             )
                         }
+
+                        Image(
+                            painter = painterResource(R.drawable.strelica),
+                            contentDescription = "",
+                            modifier = Modifier
+                                .size(29.dp)
+                        )
+                    }
+
+                    Text(
+                        text = "${productInfo?.price} rsd",
+                        modifier = Modifier
+                            .padding(20.dp)
+                            .fillMaxWidth(),
+                        style = Typography.titleLarge,
+                        color = DarkBlue,
+                        textAlign = TextAlign.Center
+                    )
+
+                    productInfo?.saleMessage?.let {
+                        Text(
+                            text = it,
+                            modifier = Modifier.fillMaxWidth(),
+                            style = Typography.titleMedium,
+                            textAlign = TextAlign.Center,
+                            color = Orange
+                        )
+                    }
+
+                    productInfo?.description?.let {
+                        Text(
+                            text = it,
+                            modifier = Modifier
+                                .padding(10.dp)
+                                .fillMaxWidth(),
+                            style = Typography.bodySmall,
+                            textAlign = TextAlign.Center,
+                            color = Color.Black
+                        )
+                    }
+
+                    Divider(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(1.dp)
+                            .padding(horizontal = 16.dp),
+                        color = Color.Gray
+                    )
+
+                    productInfo?.workingHours?.let { ExpandableRow(it) }
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(10.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Quantity",
+                            style = Typography.titleSmall,
+                            color = Color.Black
+                        )
+
+                        NumberPicker()
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Button(
+                            onClick = {},
+                            modifier = Modifier
+                                .height(80.dp)
+                                .width(300.dp)
+                                .padding(20.dp),
+                        ) {
+                            Text(text = "Add To Cart", style = Typography.titleSmall)
+                        }
                     }
                     Divider(
                         modifier = Modifier
@@ -305,80 +260,153 @@ fun ProductPage(
                             .padding(horizontal = 16.dp),
                         color = Color.Gray
                     )
-                    Row(modifier = Modifier.padding(10.dp)) {
-                        val reviews = productViewModel.stateReview.value.reviews
-
-                        if (reviews.isNullOrEmpty()) {
-                            Text("No reviews available", style = Typography.bodySmall)
-                        } else {
-                            Column {
-                                // Display the first review
-                                ReviewCard(productReviewUserInfo = reviews[0])
-
-                                var reviewCounter by remember { mutableStateOf(1) }
-                                var showAllReviews by remember { mutableStateOf(false) }
-
-                                // Display reviews
-                                if (showAllReviews) {
-                                    for (i in 1..reviewCounter) {
-                                        ReviewCard(productReviewUserInfo = reviews[i - 1])
-                                    }
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(30.dp), horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(text = "Product reviews", style = Typography.bodyLarge)
+                            Row {
+                                if (productInfo != null) {
+                                    Text(
+                                        text = "${productInfo.rating}",
+                                        style = Typography.bodyLarge
+                                    )
                                 }
-                                Row(modifier = Modifier.fillMaxWidth(),Arrangement.Center) {
+                                Icon(
+                                    imageVector = Icons.Default.Star,
+                                    contentDescription = "Star icon"
+                                )
+                            }
+                        }
+                        Divider(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(1.dp)
+                                .padding(horizontal = 16.dp),
+                            color = Color.Gray
+                        )
+                        Row(modifier = Modifier.padding(10.dp)) {
+                            val reviews = productViewModel.stateReview.value.reviews
 
-                                    // Button to toggle between showing all reviews and showing only a few
-                                    Button(
-                                        onClick = {
-                                            // Toggle the value
-                                            showAllReviews = !showAllReviews
+                            if (reviews.isNullOrEmpty()) {
+                                Text("No reviews available", style = Typography.bodySmall)
+                            } else {
+                                Column {
+                                    ReviewCard(productReviewUserInfo = reviews[0])
 
-                                            // If showing all reviews, fetch all reviews
-                                            if (showAllReviews) {
-                                                GlobalScope.launch {
-                                                    productViewModel.getReviewsForProduct(
-                                                        productID,
-                                                        reviews.size
-                                                    )
+                                    var reviewCounter by remember { mutableStateOf(1) }
+                                    var showAllReviews by remember { mutableStateOf(false) }
+
+                                    if (showAllReviews) {
+                                        for (i in 1..reviewCounter) {
+                                            ReviewCard(productReviewUserInfo = reviews[i - 1])
+                                        }
+                                    }
+                                    Row(modifier = Modifier.fillMaxWidth(), Arrangement.Center) {
+
+                                        Button(
+                                            onClick = {
+                                                showAllReviews = !showAllReviews
+
+                                                if (showAllReviews) {
+                                                    GlobalScope.launch {
+                                                        productViewModel.getReviewsForProduct(
+                                                            productID,
+                                                            reviews.size
+                                                        )
+                                                    }
                                                 }
                                             }
+                                        ) {
+                                            Text(if (showAllReviews) "Show less reviews" else "Show all reviews")
                                         }
-                                    ) {
-                                        Text(if (showAllReviews) "Show less reviews" else "Show all reviews")
                                     }
-                                }
 
-                                // DisposableEffect to fetch more reviews when reviewCounter changes
-                                DisposableEffect(reviewCounter) {
-                                    if (showAllReviews) {
-                                        GlobalScope.launch {
-                                            productViewModel.getReviewsForProduct(productID, reviews.size)
+                                    DisposableEffect(reviewCounter) {
+                                        if (showAllReviews) {
+                                            GlobalScope.launch {
+                                                productViewModel.getReviewsForProduct(
+                                                    productID,
+                                                    reviews.size
+                                                )
+                                            }
                                         }
-                                    }
-                                    onDispose {
-                                        // Cleanup if needed
+                                        onDispose {
+                                        }
                                     }
                                 }
                             }
                         }
+                        Divider(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(1.dp)
+                                .padding(horizontal = 16.dp),
+                            color = Color.Gray
+                        )
                     }
-
-
-
-
-
-
-
-                    Divider(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(1.dp)
-                            .padding(horizontal = 16.dp),
-                        color = Color.Gray
-                    )
                 }
             }
         }
 
+    }
+}
+
+@Preview
+@Composable
+fun NumberPicker() {
+    var value by remember { mutableStateOf(1) }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+    ) {
+        Button(
+            onClick = {
+                value = max(value - 1, 1)
+            },
+            modifier = Modifier
+                .height(30.dp)
+                .weight(0.7f)
+                .border(1.dp, Color.Black),
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+        ) {
+            Text(text = "-", color = MaterialTheme.colorScheme.onSurface)
+        }
+
+        BasicTextField(
+            value = value.toString(),
+            onValueChange = {
+                // Ensure the input is a valid integer and update the value accordingly
+                value = it.toIntOrNull() ?: value
+            },
+            keyboardOptions = KeyboardOptions.Default.copy(
+                keyboardType = KeyboardType.Number
+            ),
+            textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center), // Center the text horizontally
+            modifier = Modifier
+                .padding(8.dp)
+                .weight(1f)
+        )
+
+        Button(
+            onClick = {
+                value += 1
+            },
+            modifier = Modifier
+                .height(30.dp)
+                .weight(0.7f)
+                .border(1.dp, Color.Black),
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+        ) {
+            Text(text = "+", color = MaterialTheme.colorScheme.onSurface)
+        }
     }
 }
 
