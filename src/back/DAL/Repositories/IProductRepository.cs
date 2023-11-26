@@ -33,6 +33,7 @@ namespace back.DAL.Repositories
         public Task<List<int>> GetShopFollowers(int shopId);
         public Task<Product> GetProduct(int id);
         public Task<string> GetMetric(int metricId);
-
+        public Task<List<Metric>> GetMetrics();
+        public Task<List<Size>> GetSizes();
     }
 }

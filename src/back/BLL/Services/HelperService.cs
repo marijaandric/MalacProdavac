@@ -6,6 +6,7 @@ using System.Drawing.Imaging;
 using iText.Kernel.Pdf;
 using iText.Layout;
 using iText.IO.Image;
+using back.Models;
 
 namespace back.BLL.Services
 {
@@ -239,6 +240,16 @@ namespace back.BLL.Services
 
             throw new ArgumentException("Error finding route!");
 
+        }
+
+        public async Task<List<Metric>> GetMetrics()
+        {
+            return await _productRepository.GetMetrics();
+        }
+
+        public async Task<List<DAL.Models.Size>> GetSizes()
+        {
+            return await _productRepository.GetSizes();
         }
     }
 }

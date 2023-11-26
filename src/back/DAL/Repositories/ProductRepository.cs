@@ -470,5 +470,15 @@ namespace back.DAL.Repositories
         {
             return (await _context.Metrics.FirstOrDefaultAsync(x => x.Id == metricId)).Name;
         }
+
+        public async Task<List<Metric>> GetMetrics()
+        {
+            return await _context.Metrics.ToListAsync();
+        }
+
+        public async Task<List<Size>> GetSizes()
+        {
+            return await _context.Sizes.ToListAsync();
+        }
     }
 }

@@ -53,5 +53,31 @@ namespace back.PL.Controllers
                 return BadRequest(ex.Message); 
             }
         }
+
+        [HttpGet("Metrics")]
+        public async Task<IActionResult> Metrics()
+        {
+            try
+            {
+                return Ok(await _service.GetMetrics());
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
+
+        [HttpGet("Sizes")]
+        public async Task<IActionResult> Sizes()
+        {
+            try
+            {
+                return Ok(await _service.GetSizes());
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
     }
 }
