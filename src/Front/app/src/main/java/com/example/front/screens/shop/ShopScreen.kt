@@ -547,13 +547,13 @@ fun contentOfAddNewProduct(shopViewModel: OneShopViewModel) {
                             MyTextFieldWithoutIcon(
                                 labelValue = "Discount",
                                 value = salePercentage.toString(),
-                            onValueChange = {
-                                // Update the state variable when the value changes
-                                salePercentage = it.toInt()
-                            },
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(end = 2.dp) // Add padding to the end of the first TextField
+                                onValueChange = {
+                                    // Update the state variable when the value changes
+                                    salePercentage = it.toInt()
+                                },
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(end = 2.dp) // Add padding to the end of the first TextField
                             )
                             MyTextFieldWithoutIcon(
                                 labelValue = "If quantity over ...",
@@ -969,55 +969,55 @@ fun ProfilePic(shopViewModel: OneShopViewModel, id: Int) {
         )
 
         if (shopViewModel.state.value.shop!!.image == null) {
-        if(shopViewModel.state.value.shop!!.image == null)
-        {
-            Image(
-                painter = painterResource(id = R.drawable.imageplaceholder),
-                contentDescription = "Placeholder",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(140.dp)
-                    .clip(CircleShape)
-                    .border(4.dp, Color.White, CircleShape)
-            )
-        } else {
-            val image = shopViewModel.state.value.shop!!.image
-            val imageUrl = "http://softeng.pmf.kg.ac.rs:10015/images/${image}"
+            if (shopViewModel.state.value.shop!!.image == null) {
+                Image(
+                    painter = painterResource(id = R.drawable.imageplaceholder),
+                    contentDescription = "Placeholder",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(140.dp)
+                        .clip(CircleShape)
+                        .border(4.dp, Color.White, CircleShape)
+                )
+            } else {
+                val image = shopViewModel.state.value.shop!!.image
+                val imageUrl = "http://softeng.pmf.kg.ac.rs:10015/images/${image}"
 
-            val painter: Painter = rememberAsyncImagePainter(model = imageUrl)
-            Image(
-                painter = painter,
-                contentDescription = "Placeholder",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(140.dp)
-                    .clip(CircleShape)
-                    .border(4.dp, Color.White, CircleShape)
-            )
+                val painter: Painter = rememberAsyncImagePainter(model = imageUrl)
+                Image(
+                    painter = painter,
+                    contentDescription = "Placeholder",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(140.dp)
+                        .clip(CircleShape)
+                        .border(4.dp, Color.White, CircleShape)
+                )
+            }
         }
-    }
-    Box(
-        modifier = Modifier
-            .padding(top = 20.dp)
-            .fillMaxWidth(),
-        contentAlignment = Alignment.Center
-    )
-    {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = state.shop!!.name,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                text = state.shop!!.address,
-                style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.primary
-            )
-            RatingBar(rating = shopViewModel.state.value.shop!!.rating!!.toFloat())
-            Spacer(modifier = Modifier.height(30.dp))
+        Box(
+            modifier = Modifier
+                .padding(top = 20.dp)
+                .fillMaxWidth(),
+            contentAlignment = Alignment.Center
+        )
+        {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = state.shop!!.name,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = state.shop!!.address,
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                RatingBar(rating = shopViewModel.state.value.shop!!.rating!!.toFloat())
+                Spacer(modifier = Modifier.height(30.dp))
+            }
         }
     }
 }
