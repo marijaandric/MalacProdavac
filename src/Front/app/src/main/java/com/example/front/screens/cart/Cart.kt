@@ -16,11 +16,18 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Surface
+import androidx.compose.material3.Button
+import androidx.compose.material3.Surface
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,6 +35,8 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -37,6 +46,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.front.R
 import com.example.front.components.ProductCard
 import com.example.front.components.TitleTextComponent
+import com.example.front.model.product.ProductInCart
 import com.example.front.screens.home.CardData
 import com.example.front.ui.theme.Typography
 import com.example.front.viewmodels.cart.CartViewModel
@@ -51,7 +61,15 @@ fun Cart(
         viewModel.getCartProducts()
     }
     val cartState = viewModel.state.value
+    val isButtonVisible by remember { mutableStateOf(false) }
+    var sum by remember { mutableDoubleStateOf(0.0) }
 
+
+    LaunchedEffect(cartState.isLoading) {
+        if (!cartState.isLoading) {
+            sum = calculateTotal(cartState.products)
+        }
+    }
     Surface(
         modifier = Modifier
             .fillMaxSize(),
@@ -60,6 +78,7 @@ fun Cart(
         Column (
             modifier = Modifier
                 .fillMaxSize()
+
         ) {
             Box(
                 modifier = Modifier
@@ -81,7 +100,7 @@ fun Cart(
                     modifier = Modifier
                         .fillMaxWidth()
                         .heightIn(min = 80.dp)
-                        .offset(y=40.dp),
+                        .offset(y = 40.dp),
                     style = Typography.titleLarge,
                     color = Color.White
                 )
@@ -101,6 +120,7 @@ fun Cart(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(horizontal = 16.dp, vertical = 0.dp)
+                    .weight(1f)
             ) {
                 // Grupisanje proizvoda po prodavnicama
                 val groupedProducts = cartState.products.groupBy { it.shopName }
@@ -153,19 +173,83 @@ fun Cart(
                                 Text(DecimalFormat("#.00").format(product.price * product.quantity).toString() + " rsd")
 //                                Text("Slika: " + product.image)
                             }
-                        } // Implementacija ProductCard-a zavisi od vašeg dizajna
+                        }
+//                        sum += product.price * product.quantity
                     }
 
-                    // Spacer između grupa proizvoda
                     item {
                         Spacer(modifier = Modifier.height(16.dp))
                     }
                 }
             }
+
+            Surface(
+                color= Color.White,
+                modifier = Modifier
+            ) {
+
+                Column(
+                    Modifier
+                        .fillMaxWidth()
+                    ,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text("Total: ${DecimalFormat("#.00").format(sum)} rsd",
+                        modifier = Modifier
+                            .padding(vertical = 14.dp)
+                        ,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Button(
+                        onClick = { /*TODO*/ },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF457FA8)),
+                        modifier = Modifier
+                            .padding(vertical = 14.dp)
+                    ) {
+                        Text(text = "Checkout", fontSize = 20.sp, modifier = Modifier,color = Color.White,
+
+                            fontFamily = FontFamily(Font(R.font.lexend)),
+                            fontWeight = FontWeight(300))
+                    }
+                }
+            }
+
         }
+
+//        Box(
+//                modifier = Modifier
+////            .fillMaxSize()
+//                    .fillMaxWidth()
+////                    .align(Alignment.BottomCenter)
+////            .offset(y = if (isButtonVisible) (-20).dp else 0.dp)
+//        ,
+//
+////        color = Color.White
+//        ) {
+//            //za donji deo sa CHECKOUT DUGMETOM
+//            Button(onClick = { /*TOD    O*/ }) {
+//                Text(text = "DUGME")
+//            }
+//        }
     }
 
-    Surface() {
-        //za donji deo sa CHECKOUT DUGMETOM
-    }
+//    Surface(
+//        modifier = Modifier
+////            .fillMaxSize()
+//            .fillMaxWidth()
+////            .offset(y = if (isButtonVisible) (-20).dp else 0.dp)
+//        ,
+//
+////        color = Color.White
+//    ) {
+//        //za donji deo sa CHECKOUT DUGMETOM
+//        Button(onClick = { /*TOD    O*/ }) {
+//            Text(text = "DUGME")
+//        }
+//    }
+}
+
+private fun calculateTotal(products: List<ProductInCart>): Double {
+    return products.sumOf { it.price * it.quantity }
 }
