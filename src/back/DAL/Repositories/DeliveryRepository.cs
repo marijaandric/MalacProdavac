@@ -79,9 +79,9 @@ namespace back.DAL.Repositories
 
         public async Task<List<DeliveryRequestCard>> GetRequestsForShop(int userId)
         {
-            int shopId = (await _context.Shop.FirstOrDefaultAsync(x => x.Id == userId)).Id;
+            int shopId = (await _context.Shop.FirstOrDefaultAsync(x => x.OwnerId == userId)).Id;
 
-            return await _context.DeliveryRequests.Where(x => x.ShopId == shopId && x.RouteId == null).Join(_context.Shop, dr => dr.ShopId, s => s.Id, (dr, s) => new { dr, s }).Join(_context.Orders, x => x.dr.OrderId, o => o.Id, (x, o) => new DeliveryRequestCard
+            return await _context.DeliveryRequests.Where(x => x.ShopId == shopId && x.RouteId == null && x.ChosenPersonId == null).Join(_context.Shop, dr => dr.ShopId, s => s.Id, (dr, s) => new { dr, s }).Join(_context.Orders, x => x.dr.OrderId, o => o.Id, (x, o) => new DeliveryRequestCard
             {
                 Id = x.dr.Id,
                 Locations = x.s.Address

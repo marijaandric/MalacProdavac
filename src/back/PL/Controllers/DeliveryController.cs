@@ -54,6 +54,19 @@ namespace back.PL.Controllers
             }
         }
 
+        [HttpGet("GetRequestsForShop")]
+        public async Task<IActionResult> GetRequestsForShop(int userId)
+        {
+            try
+            {
+                return Ok(await _service.GetRequestsForShop(userId));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
+
 
         [HttpGet("GetRoutesForRequest")]
         public async Task<IActionResult> GetRoutesForRequest(int userId, int requestId)

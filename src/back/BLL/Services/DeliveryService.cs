@@ -36,6 +36,13 @@ namespace back.BLL.Services
             return requests;
         }
 
+        public async Task<List<DeliveryRequestCard>> GetRequestsForShop(int userId)
+        {
+            List<DeliveryRequestCard> requests = await _repository.GetRequestsForShop(userId);
+            if (requests == null || requests.Count == 0) throw new ArgumentException("No requests!");
+            return requests;
+        }
+
         public async Task<List<DeliveryRequestCard>> GetRoutesForRequest(int userId, int requestId)
         {
             var routes = await _repository.GetRoutesForDeliveryPerson(userId);
