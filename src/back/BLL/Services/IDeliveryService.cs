@@ -1,4 +1,5 @@
 ﻿using back.BLL.Dtos;
+using back.BLL.Dtos.Cards;
 
 namespace back.BLL.Services
 {
@@ -9,6 +10,7 @@ namespace back.BLL.Services
         public Task<bool> AddToRoute(int requestId, int routeId);
         public Task<List<DeliveryRequestCard>> GetRequestsForDeliveryPerson(int deliveryPerson);
         public Task<List<DeliveryRequestCard>> GetRequestsForShop(int userId);
-        public Task<List<DeliveryRequestCard>> GetRoutesForRequest(int userId, int requestId);
+        public Task<List<DeliveryRouteCard>> GetRoutesForRequest(int userId, int requestId);
+        public Task<List<DeliveryPersonCard>> GetDeliveryPeopleForRequest(int requestId);
     }
 }

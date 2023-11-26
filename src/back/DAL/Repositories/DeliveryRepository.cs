@@ -1,4 +1,5 @@
 ﻿using back.BLL.Dtos;
+using back.BLL.Dtos.Cards;
 using back.BLL.Services;
 using back.DAL.Contexts;
 using back.Models;
@@ -98,9 +99,26 @@ namespace back.DAL.Repositories
             }).ToListAsync();
         }
 
-        public async Task<List<DeliveryRoute>> GetRoutesForDeliveryPerson(int userId)
+        public async Task<List<DeliveryRouteCard>> GetRoutesForDeliveryPerson(int userId)
         {
-            return await _context.DeliveryRoutes.Where(x => x.DeliveryPersonId == userId).ToListAsync();
+            return await _context.DeliveryRoutes.Where(x => x.DeliveryPersonId == userId).Select(x => new DeliveryRouteCard
+            {
+                EndAddress = x.EndLocation,
+                StartAddress = x.StartLocation,
+                Locations = x.StartLocation
+                .Substring(x.StartLocation.IndexOf(',') + 1)
+                .Substring(0, x.StartLocation.Substring(x.StartLocation.IndexOf(',') + 1).IndexOf(','))
+                .Trim()
+                + " - " +
+                x.EndLocation
+                .Substring(x.EndLocation.IndexOf(',') + 1)
+                .Substring(0, x.EndLocation.Substring(x.EndLocation.IndexOf(',') + 1).IndexOf(','))
+                .Trim(),
+                Id = x.Id,
+                StartTime = x.StartTime,
+                Cost = x.FixedCost,
+                CreatedOn = x.StartDate
+            }).ToListAsync();
         }
 
         public async Task<DeliveryRequestCard> GetRequest(int requestId)

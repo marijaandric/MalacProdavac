@@ -80,5 +80,18 @@ namespace back.PL.Controllers
                 return BadRequest(new { Error = ex.Message });
             }
         }
+
+        [HttpGet("GetDeliveryPeopleForRequest")]
+        public async Task<IActionResult> GetDeliveryPeopleForRequest(int requestId)
+        {
+            try
+            {
+                return Ok(await _service.GetDeliveryPeopleForRequest(requestId));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
     }
 }

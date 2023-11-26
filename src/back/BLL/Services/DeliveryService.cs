@@ -1,5 +1,7 @@
 ﻿using back.BLL.Dtos;
+using back.BLL.Dtos.Cards;
 using back.DAL.Repositories;
+using back.Models;
 
 namespace back.BLL.Services
 {
@@ -7,11 +9,13 @@ namespace back.BLL.Services
     {
         IDeliveryRepository _repository;
         IHelperService _helperService;
+        IUserRepository _userRepository;
 
-        public DeliveryService(IDeliveryRepository repository, IHelperService helperService)
+        public DeliveryService(IDeliveryRepository repository, IHelperService helperService, IUserRepository userRepository)
         {
             _repository = repository;
             _helperService = helperService;
+            _userRepository = userRepository;
         }
 
         public async Task<bool> InsertDeliveryRequest(DeliveryRequestDto req)
@@ -43,7 +47,7 @@ namespace back.BLL.Services
             return requests;
         }
 
-        public async Task<List<DeliveryRequestCard>> GetRoutesForRequest(int userId, int requestId)
+        public async Task<List<DeliveryRouteCard>> GetRoutesForRequest(int userId, int requestId)
         {
             var routes = await _repository.GetRoutesForDeliveryPerson(userId);
             var request = await _repository.GetRequest(requestId);
@@ -52,22 +56,46 @@ namespace back.BLL.Services
             .Select(routeItem => new
             {
                 Route = routeItem,
-                RouteDivergence = _helperService.Route(routeItem.StartLocation, routeItem.EndLocation, request.StartAddress, request.EndAddress)
+                RouteDivergence = _helperService.Route(routeItem.StartAddress, routeItem.EndAddress, request.StartAddress, request.EndAddress)
             })
             .OrderBy(x => x.RouteDivergence.Result)
             .Take(10)
-            .Select(x => new DeliveryRequestCard
+            .Select(x => new DeliveryRouteCard
             {
-                CreatedOn = request.CreatedOn,
+                CreatedOn = x.Route.CreatedOn,
                 EndAddress = request.EndAddress,
                 Locations = request.Locations,
                 StartAddress = request.StartAddress,
-                RouteDivergence = x.RouteDivergence.Result
+                RouteDivergence = x.RouteDivergence.Result,
+                Cost = x.Route.Cost,
+                Id = x.Route.Id,
+                StartTime = x.Route.StartTime
             })
             .ToList();
 
             return result;
 
+        }
+
+        public async Task<List<DeliveryPersonCard>> GetDeliveryPeopleForRequest(int requestId)
+        {
+            List<User> deliveryPeople = await _userRepository.GetDeliveryPeople();
+            List<DeliveryPersonCard> deliveryPeopleList = new List<DeliveryPersonCard>();
+
+            foreach (var deliveryPerson in deliveryPeople)
+            {
+                var min = (await GetRoutesForRequest(deliveryPerson.Id, requestId)).First();
+                deliveryPeopleList.Add(new DeliveryPersonCard
+                {
+                    DeliveryPerson = deliveryPerson.Username,
+                    ClosestRouteDivergence = min.RouteDivergence,
+                    Date = (DateTime)min.CreatedOn,
+                    DeliveryPersonId = deliveryPerson.Id,
+                    Price = min.Cost
+                });
+            }
+
+            return deliveryPeopleList;
         }
     }
 }

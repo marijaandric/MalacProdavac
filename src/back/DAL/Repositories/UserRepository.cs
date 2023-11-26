@@ -1,5 +1,4 @@
-﻿using System.Formats.Tar;
-using back.BLL.Dtos.Cards;
+﻿using back.BLL.Dtos.Cards;
 using back.BLL.Dtos.HelpModels;
 using back.BLL.Dtos.Infos;
 using back.DAL.Contexts;
@@ -141,6 +140,11 @@ namespace back.DAL.Repositories
         public async Task<string> GetUsername(int userId)
         {
             return (await _context.Users.FirstOrDefaultAsync(x => x.Id == userId)).Username;
+        }
+
+        public async Task<List<User>> GetDeliveryPeople()
+        {
+            return await _context.Users.Where(x => x.RoleId == 3).ToListAsync();
         }
     }
 }
