@@ -35,6 +35,7 @@ import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -67,7 +68,8 @@ import com.example.front.components.ButtonWithIcon
 import com.example.front.components.CardButton
 import com.example.front.components.CommentsTextBox
 import com.example.front.components.FilterDialogProducts
-import com.example.front.components.MyDropdown
+import com.example.front.components.MyDropdownCategories
+import com.example.front.components.MyDropdownMetrics
 import com.example.front.components.MyTextFieldWithoutIcon
 import com.example.front.components.ReviewCard
 import com.example.front.components.SearchTextField
@@ -76,6 +78,8 @@ import com.example.front.components.SmallElipseAndTitle
 import com.example.front.components.SortDialog
 import com.example.front.components.ToggleImageButtonFunction
 import com.example.front.model.DTO.CategoriesDTO
+import com.example.front.model.DTO.MetricsDTO
+import com.example.front.model.DTO.NewProductDTO
 import com.example.front.viewmodels.oneshop.OneShopViewModel
 import kotlinx.coroutines.delay
 
@@ -91,9 +95,25 @@ fun ShopScreen(navController: NavHostController, shopViewModel: OneShopViewModel
             }
         shopViewModel.getUserId()
             ?.let {
-                shopViewModel.getProducts(it, listOf(),null,null,null,null,0,null,1,shopId, false,null,null )
+                shopViewModel.getProducts(
+                    it,
+                    listOf(),
+                    null,
+                    null,
+                    null,
+                    null,
+                    0,
+                    null,
+                    1,
+                    shopId,
+                    false,
+                    null,
+                    null
+                )
             }
-        shopViewModel.getShopReview(shopId,0)
+        shopViewModel.getShopReview(shopId, 0)
+        shopViewModel.getCategories()
+        shopViewModel.getMetrics()
     }
 
     LazyColumn(
@@ -102,12 +122,11 @@ fun ShopScreen(navController: NavHostController, shopViewModel: OneShopViewModel
             .background(color = MaterialTheme.colorScheme.background)
     )
     {
-        item{
+        item {
             SmallElipseAndTitle(title = "Shop")
         }
-        if(shopViewModel.state.value.isLoading)
-        {
-            item{
+        if (shopViewModel.state.value.isLoading) {
+            item {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -118,13 +137,12 @@ fun ShopScreen(navController: NavHostController, shopViewModel: OneShopViewModel
                     CircularProgressIndicator()
                 }
             }
-        }
-        else{
-            item{
+        } else {
+            item {
                 //shop for user
-                ProfilePic(shopViewModel,id)
+                ProfilePic(shopViewModel, id)
             }
-            item{
+            item {
                 ShopInfo(shopViewModel, shopId, id)
             }
         }
@@ -134,7 +152,7 @@ fun ShopScreen(navController: NavHostController, shopViewModel: OneShopViewModel
 
 
 @Composable
-fun ShopInfo(shopViewModel: OneShopViewModel, shopId:Int, userID:Int) {
+fun ShopInfo(shopViewModel: OneShopViewModel, shopId: Int, userID: Int) {
     var isImageClicked by remember { mutableStateOf(true) }
     var shopReviewsPage by remember { mutableStateOf(0f) }
 
@@ -200,22 +218,30 @@ fun ShopInfo(shopViewModel: OneShopViewModel, shopId:Int, userID:Int) {
                 ) {
                     Text(
                         "Info",
-                        style = MaterialTheme.typography.titleLarge.copy(fontSize = if(isImageClicked) 25.sp else 20.sp, fontWeight = FontWeight.Medium,color=MaterialTheme.colorScheme.onBackground),
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            fontSize = if (isImageClicked) 25.sp else 20.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = MaterialTheme.colorScheme.onBackground
+                        ),
                         modifier = Modifier.clickable {
                             isImageClicked = true
                         }
                     )
                     Text(
                         "Products",
-                        style = MaterialTheme.typography.titleLarge.copy(fontSize = if(!isImageClicked) 25.sp else 20.sp, fontWeight = FontWeight.Medium,color=MaterialTheme.colorScheme.onBackground),
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            fontSize = if (!isImageClicked) 25.sp else 20.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = MaterialTheme.colorScheme.onBackground
+                        ),
                         modifier = Modifier.clickable {
                             isImageClicked = false
                         }
                     )
                 }
 
-                Info(isImageClicked,shopViewModel,shopId, userID, LocalContext.current)
-                Products(isImageClicked,shopViewModel, shopId)
+                Info(isImageClicked, shopViewModel, shopId, userID, LocalContext.current)
+                Products(isImageClicked, shopViewModel, shopId)
 
             }
         }
@@ -223,7 +249,7 @@ fun ShopInfo(shopViewModel: OneShopViewModel, shopId:Int, userID:Int) {
 }
 
 @Composable
-fun Products(isImageClicked: Boolean,shopViewModel: OneShopViewModel,shopId:Int) {
+fun Products(isImageClicked: Boolean, shopViewModel: OneShopViewModel, shopId: Int) {
     var showElseText by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
     var showAddProduct by remember { mutableStateOf(false) }
@@ -236,17 +262,16 @@ fun Products(isImageClicked: Boolean,shopViewModel: OneShopViewModel,shopId:Int)
     }
 
     val data = listOf(
-        1,2,3,4
+        1, 2, 3, 4
     )
 
     LaunchedEffect(!isImageClicked) {
         delay(200)
         showElseText = true
     }
-    if(showElseText && !isImageClicked) {
+    if (showElseText && !isImageClicked) {
         Column {
-            if(!shopViewModel.state.value.shop!!.isOwner)
-            {
+            if (!shopViewModel.state.value.shop!!.isOwner) {
                 Column(
                     modifier = Modifier
                         .padding(top = 30.dp)
@@ -254,9 +279,16 @@ fun Products(isImageClicked: Boolean,shopViewModel: OneShopViewModel,shopId:Int)
                     horizontalAlignment = Alignment.CenterHorizontally
                 )
                 {
-                    ButtonWithIcon(text = "Add product", onClick = { showAddProduct = true }, width = 0.6f, color = MaterialTheme.colorScheme.primary, imagePainter = painterResource(
-                        id = R.drawable.plus,
-                    ), height = 40)
+                    ButtonWithIcon(
+                        text = "Add product",
+                        onClick = { showAddProduct = true },
+                        width = 0.6f,
+                        color = MaterialTheme.colorScheme.primary,
+                        imagePainter = painterResource(
+                            id = R.drawable.plus,
+                        ),
+                        height = 40
+                    )
                 }
             }
             Row(
@@ -267,7 +299,12 @@ fun Products(isImageClicked: Boolean,shopViewModel: OneShopViewModel,shopId:Int)
                 horizontalArrangement = Arrangement.Center
             )
             {
-                SearchTextField(valuee = value, placeh = "Search products", onValueChangee = {value = it; shopViewModel.Search(value, shopId)}, modifier = Modifier.fillMaxWidth(0.65f))
+                SearchTextField(
+                    valuee = value,
+                    placeh = "Search products",
+                    onValueChangee = { value = it; shopViewModel.Search(value, shopId) },
+                    modifier = Modifier.fillMaxWidth(0.65f)
+                )
                 Image(
                     painter = painterResource(id = R.drawable.filters),
                     contentDescription = "Placeholder",
@@ -287,21 +324,18 @@ fun Products(isImageClicked: Boolean,shopViewModel: OneShopViewModel,shopId:Int)
                         .clickable { showSortDialog = true }
                 )
             }
-            if(shopViewModel.stateProduct.value.isLoading)
-            {
+            if (shopViewModel.stateProduct.value.isLoading) {
                 CircularProgressIndicator()
-            }
-            else if(shopViewModel.stateProduct.value.error.contains("NotFound"))
-            {
+            } else if (shopViewModel.stateProduct.value.error.contains("NotFound")) {
                 androidx.compose.material3.Text(
                     "No products found",
                     style = MaterialTheme.typography.titleSmall, modifier = Modifier
                         .padding(top = 30.dp)
                         .align(Alignment.CenterHorizontally)
                 )
-            }
-            else{
-                LazyVerticalGrid (columns = GridCells.Fixed(2),
+            } else {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
                     modifier = Modifier
                         .padding(start = 20.dp, end = 20.dp, top = 20.dp, bottom = 25.dp)
                         .heightIn(400.dp, 600.dp)
@@ -330,9 +364,8 @@ fun Products(isImageClicked: Boolean,shopViewModel: OneShopViewModel,shopId:Int)
         SortDialog(onDismiss = { showSortDialog = false }, shopViewModel, shopId)
     }
     //showAddProduct
-    if(showAddProduct)
-    {
-        AddProductDialog(onDismiss = {showAddProduct = false}, shopViewModel, shopId)
+    if (showAddProduct) {
+        AddProductDialog(onDismiss = { showAddProduct = false }, shopViewModel, shopId)
     }
 }
 
@@ -375,102 +408,250 @@ fun AddProductDialog(onDismiss: () -> Unit, shopViewModel: OneShopViewModel, sho
 }
 
 @Composable
-fun contentOfAddNewProduct(shopViewModel: OneShopViewModel){
-    var allCategories by remember { mutableStateOf(emptyList<CategoriesDTO>()) }
+fun contentOfAddNewProduct(shopViewModel: OneShopViewModel) {
+    var productName by remember { mutableStateOf("") }
+    var quantity by remember { mutableStateOf(0) }
+    var productDescription by remember { mutableStateOf("") }
+    var selectedMetric by remember { mutableStateOf(MetricsDTO(1, "Piece")) }
+    var selectedCategory by remember { mutableStateOf(CategoriesDTO(1, "Food")) }
+    var price by remember { mutableStateOf(0) }
+    var salePercentage by remember { mutableStateOf(0) }
+    var saleMinQuantity by remember { mutableStateOf(0) }
+    var saleMessage by remember { mutableStateOf("") }
+    var shopId by remember { mutableStateOf(0) }
+    var weight by remember { mutableStateOf(0f) }
 
-    LaunchedEffect(Unit) {
-        allCategories = shopViewModel.getCategories()!!
-    }
 
-    Column(
-    ){
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-            Image(
-                painter = painterResource(id = R.drawable.upload_image),
-                contentDescription = "Placeholder",
+    Column {
+        if (shopViewModel.stateGetCategories.value.isLoading && shopViewModel.stateGetMetrics.value.isLoading) {
+            CircularProgressIndicator()
+        } else {
+            LazyColumn(
                 modifier = Modifier
-                    .size(150.dp)
-                    .padding(20.dp),
-                contentScale = ContentScale.FillWidth,
-                alignment = Alignment.Center
-            )
-        }
-        LazyColumn (
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight()
-                .padding(16.dp)
-        ){
-            item{
-                Row(modifier = Modifier
                     .fillMaxWidth()
-                    .padding(10.dp), horizontalArrangement = Arrangement.Center) {
-                    Text(
-                        "Add new product",
-                        style = MaterialTheme.typography.titleMedium.copy(color = MaterialTheme.colorScheme.onBackground),
+                    .padding(16.dp)
+            ) {
+                item {
+                    Row(
                         modifier = Modifier
-                    )
+                            .fillMaxWidth()
+                            .padding(10.dp),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            "Add new product",
+                            style = MaterialTheme.typography.titleMedium.copy(color = MaterialTheme.colorScheme.onBackground),
+                            modifier = Modifier
+                        )
+                    }
                 }
-            }
-            item{
-                Box(modifier = Modifier.padding(start=16.dp,end=10.dp))
-                {
-                    MyTextFieldWithoutIcon(labelValue = "Product name", value = "", onValueChange = {}, modifier = Modifier)
-                }
-            }
-            item{
-                CommentsTextBox(onReviewTextChanged = {}, "Product Description")
-            }
-            item{
-                Box(modifier = Modifier.padding(start=16.dp,end=16.dp))
-                {
-                    MyTextFieldWithoutIcon(
-                        labelValue = "Quantity in stock",
-                        value = "",
-                        onValueChange = {},
-                        modifier = Modifier.fillMaxWidth())
-                }
-            }
-
-            item{
-                Row(
-                    modifier = Modifier
-                        .padding(start = 16.dp, end = 16.dp)
-                ) {
-                    MyTextFieldWithoutIcon(
-                        labelValue = "Unity price",
-                        value = "",
-                        onValueChange = {},
+                item {
+                    Row(
                         modifier = Modifier
-                            .weight(1f)
-                            .padding(end = 2.dp) // Add padding to the end of the first TextField
-                    )
-
-                    MyTextFieldWithoutIcon(
-                        labelValue = "Unity of quantity",
-                        value = "",
-                        onValueChange = {},
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(start = 2.dp) // Add padding to the start of the second TextField
-                    )
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.upload_image),
+                            contentDescription = "Placeholder",
+                            modifier = Modifier
+                                .size(150.dp)
+                                .padding(20.dp),
+                            contentScale = ContentScale.FillWidth,
+                            alignment = Alignment.Center
+                        )
+                    }
                 }
-
-            }
-            item{
-                MyDropdown(
-                    categoriesList = allCategories,
-                    onCategorySelected = {
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                )
+                item {
+                    Box(modifier = Modifier.padding(start = 16.dp, end = 10.dp)) {
+                        MyTextFieldWithoutIcon(
+                            labelValue = "Product name",
+                            value = productName,
+                            onValueChange = {
+                                // Update the state variable when the value changes
+                                productName = it
+                            },
+                            modifier = Modifier
+                        )
+                    }
+                }
+                item {
+                    CommentsTextBox(onReviewTextChanged = {}, "Product Description")
+                }
+                item {
+                    Row(modifier = Modifier.padding(start = 16.dp, end = 16.dp)) {
+                        MyTextFieldWithoutIcon(
+                            labelValue = "Quantity in stock",
+                            value = quantity.toString(),
+                            onValueChange = {
+                                // Update the state variable when the value changes
+                                quantity = it.toInt()
+                            },
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(end = 2.dp) // Add padding to the end of the first TextField
+                        )
+                    }
+                }
+                item {
+                    Row(
+                        modifier = Modifier
+                            .padding(start = 16.dp, end = 16.dp)
+                    ) {
+                        MyTextFieldWithoutIcon(
+                            labelValue = "Unity price",
+                            value = price.toString(),
+                            onValueChange = {
+                                // Update the state variable when the value changes
+                                price = it.toInt()
+                            },
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(end = 2.dp) // Add padding to the end of the first TextField
+                        )
+                        shopViewModel.stateGetMetrics.value.metrics?.let {
+                            MyDropdownMetrics(
+                                labelValue = "Metric",
+                                selectedMetric = selectedMetric,
+                                metricsList = it,
+                                onMetricSelected = { newMetric ->
+                                    selectedMetric = newMetric
+                                },
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(end = 2.dp)
+                            )
+                        }
+                    }
+                }
+                item {
+                    Row(
+                        modifier = Modifier
+                            .padding(start = 16.dp, end = 16.dp)
+                    ) {
+                        MyTextFieldWithoutIcon(
+                            labelValue = "Weight of single piece",
+                            value = weight.toString(),
+                            onValueChange = {
+                                // Update the state variable when the value changes
+                                weight = it.toFloat()
+                            },
+                            modifier = Modifier
+                                .weight(1f)
+                        )
+                    }
+                }
+                item {
+                    Column(modifier = Modifier.padding(start = 16.dp, end = 16.dp)) {
+                        Row() {
+                            MyTextFieldWithoutIcon(
+                                labelValue = "Discount",
+                                value = salePercentage.toString(),
+                            onValueChange = {
+                                // Update the state variable when the value changes
+                                salePercentage = it.toInt()
+                            },
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(end = 2.dp) // Add padding to the end of the first TextField
+                            )
+                            MyTextFieldWithoutIcon(
+                                labelValue = "If quantity over ...",
+                                value = saleMinQuantity.toString(),
+                                onValueChange = {
+                                    // Update the state variable when the value changes
+                                    saleMinQuantity = it.toInt()
+                                },
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(end = 2.dp) // Add padding to the end of the first TextField
+                            )
+                        }
+                        Row() {
+                            MyTextFieldWithoutIcon(
+                                labelValue = "Discount message",
+                                value = saleMessage,
+                                onValueChange = {
+                                    // Update the state variable when the value changes
+                                    saleMessage = it
+                                },
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(end = 2.dp) // Add padding to the end of the first TextField
+                            )
+                        }
+                    }
+                }
+                item {
+                    Row(modifier = Modifier.padding(start = 16.dp, end = 10.dp)) {
+                        shopViewModel.stateGetCategories.value.categories?.let {
+                            MyDropdownCategories(
+                                labelValue = "Category",
+                                selectedCategory = selectedCategory,
+                                categoriesList = it,
+                                onCategorySelected = { newCat ->
+                                    selectedCategory = newCat
+                                },
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                    }
+                }
+                item {
+                    Row(
+                        modifier = Modifier
+                            .padding(start = 16.dp, end = 16.dp)
+                    ) {
+                        MyTextFieldWithoutIcon(
+                            labelValue = "Price",
+                            value = price.toString(),
+                            onValueChange = {
+                                // Update the state variable when the value changes
+                                price = it.toInt()
+                            },
+                            modifier = Modifier
+                                .weight(1f)
+                        )
+                    }
+                }
+                item {
+                    Button(
+                        onClick = {
+                            val newProductDTO = NewProductDTO(
+                                name = productName,
+                                description = productDescription,
+                                metricId = selectedMetric.id,
+                                price = price,
+                                salePercentage = salePercentage,
+                                saleMinQuantity = saleMinQuantity,
+                                saleMessage = saleMessage,
+                                categoryId = selectedCategory.id,
+                                shopId = shopId,
+                                weight = weight
+                            )
+                            shopViewModel.postNewProduct(newProductDTO)
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                    ) {
+                        Text("Proceed")
+                    }
+                }
             }
         }
     }
 }
 
+
 @Composable
-fun Info(isImageClicked: Boolean, shopViewModel: OneShopViewModel, shopId: Int, userID:Int, context: Context) {
+fun Info(
+    isImageClicked: Boolean,
+    shopViewModel: OneShopViewModel,
+    shopId: Int,
+    userID: Int,
+    context: Context
+) {
     val state = shopViewModel.state.value.shop
     var showText by remember { mutableStateOf(false) }
     var firstTime by remember { mutableStateOf(true) }
@@ -484,7 +665,7 @@ fun Info(isImageClicked: Boolean, shopViewModel: OneShopViewModel, shopId: Int, 
     var toast by remember { mutableStateOf(false) }
 
 
-    if(isImageClicked) {
+    if (isImageClicked) {
         var showText by remember { mutableStateOf(false) }
 
         LaunchedEffect(isImageClicked) {
@@ -492,7 +673,7 @@ fun Info(isImageClicked: Boolean, shopViewModel: OneShopViewModel, shopId: Int, 
             showText = true
             firstTime = false
         }
-        if(showText || firstTime) {
+        if (showText || firstTime) {
 
             Column(
                 modifier = Modifier
@@ -512,7 +693,7 @@ fun Info(isImageClicked: Boolean, shopViewModel: OneShopViewModel, shopId: Int, 
                     Text(
                         text = "Shop categories",
                         modifier = Modifier.padding(start = 8.dp),
-                        style = MaterialTheme.typography.titleSmall.copy(color=MaterialTheme.colorScheme.onSurface)
+                        style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onSurface)
                     )
                 }
                 Text(
@@ -536,20 +717,18 @@ fun Info(isImageClicked: Boolean, shopViewModel: OneShopViewModel, shopId: Int, 
                     Text(
                         text = "Shop subcategories",
                         modifier = Modifier.padding(start = 8.dp),
-                        style = MaterialTheme.typography.titleSmall.copy(color=MaterialTheme.colorScheme.onSurface)
+                        style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onSurface)
                     )
 
                 }
 
-                if(state!!.subcategories!!.isEmpty())
-                {
+                if (state!!.subcategories!!.isEmpty()) {
                     Text(
                         text = "-",
                         modifier = Modifier.padding(top = 8.dp),
-                        style =MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onBackground)
+                        style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onBackground)
                     )
-                }
-                else{
+                } else {
                     Text(
                         text = state!!.subcategories!!.joinToString(", "),
                         modifier = Modifier.padding(top = 8.dp),
@@ -572,7 +751,7 @@ fun Info(isImageClicked: Boolean, shopViewModel: OneShopViewModel, shopId: Int, 
                     Text(
                         text = "Pick up time",
                         modifier = Modifier.padding(start = 8.dp),
-                        style = MaterialTheme.typography.titleSmall.copy(color=MaterialTheme.colorScheme.onSurface)
+                        style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onSurface)
                     )
                 }
 
@@ -588,14 +767,16 @@ fun Info(isImageClicked: Boolean, shopViewModel: OneShopViewModel, shopId: Int, 
                             5 -> "Fri"
                             6 -> "Sut"
                             7 -> "Sun"
-                            else -> {"-"}
+                            else -> {
+                                "-"
+                            }
                         }
                         val openingHours = workingHour.openingHours
                         val closingHours = workingHour.closingHours
                         Text(
-                        text = "$dayOfWeek: $openingHours - $closingHours",
-                        modifier = Modifier.padding(top = 8.dp),
-                        style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onBackground)
+                            text = "$dayOfWeek: $openingHours - $closingHours",
+                            modifier = Modifier.padding(top = 8.dp),
+                            style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onBackground)
                         )
                     }
                 }
@@ -613,7 +794,7 @@ fun Info(isImageClicked: Boolean, shopViewModel: OneShopViewModel, shopId: Int, 
                     Text(
                         text = "Reviews",
                         modifier = Modifier.padding(start = 8.dp),
-                        style = MaterialTheme.typography.titleSmall.copy(color=MaterialTheme.colorScheme.onSurface)
+                        style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onSurface)
                     )
                 }
                 Row(
@@ -628,7 +809,7 @@ fun Info(isImageClicked: Boolean, shopViewModel: OneShopViewModel, shopId: Int, 
                         style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onBackground)
                     )
                     Icon(
-                        imageVector = if(leaveAReview) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                        imageVector = if (leaveAReview) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                         contentDescription = null,
                         modifier = Modifier
                             .clickable {
@@ -639,29 +820,33 @@ fun Info(isImageClicked: Boolean, shopViewModel: OneShopViewModel, shopId: Int, 
                         tint = MaterialTheme.colorScheme.onBackground
                     )
                 }
-                if(leaveAReview)
-                {
-                    StarRating{rating ->
-                    selectedRating = rating}
-                    CommentsTextBox(onReviewTextChanged={newText -> comment = newText}, placeholder = "Leave a review")
-                    CardButton("Submit review",onClick={
-                        shopViewModel.leaveReview(shopId,userID,selectedRating, comment)
-                        toast = true
-                    },0.9f,
+                if (leaveAReview) {
+                    StarRating { rating ->
+                        selectedRating = rating
+                    }
+                    CommentsTextBox(
+                        onReviewTextChanged = { newText -> comment = newText },
+                        placeholder = "Leave a review"
+                    )
+                    CardButton(
+                        "Submit review", onClick = {
+                            shopViewModel.leaveReview(shopId, userID, selectedRating, comment)
+                            toast = true
+                        }, 0.9f,
                         Modifier
                             .align(Alignment.CenterHorizontally)
-                            .height(50.dp), MaterialTheme.colorScheme.secondary)
-                    if(!shopViewModel.statePostReview.value.isLoading && toast)
-                    {
-                        Toast.makeText(context,"Review successfully submitted", Toast.LENGTH_LONG).show()
+                            .height(50.dp), MaterialTheme.colorScheme.secondary
+                    )
+                    if (!shopViewModel.statePostReview.value.isLoading && toast) {
+                        Toast.makeText(context, "Review successfully submitted", Toast.LENGTH_LONG)
+                            .show()
                         shopViewModel.getShopReview(
                             shopId,
                             reviewPage
                         )
                         toast = false
-                    }
-                    else if(shopViewModel.statePostReview.value.error.isNotEmpty() && toast){
-                        Toast.makeText(context,"Error", Toast.LENGTH_LONG).show()
+                    } else if (shopViewModel.statePostReview.value.error.isNotEmpty() && toast) {
+                        Toast.makeText(context, "Error", Toast.LENGTH_LONG).show()
                         toast = false
                     }
                 }
@@ -677,7 +862,7 @@ fun Info(isImageClicked: Boolean, shopViewModel: OneShopViewModel, shopId: Int, 
                         style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onBackground)
                     )
                     Icon(
-                        imageVector = if(showReviews)Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                        imageVector = if (showReviews) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                         contentDescription = null,
                         modifier = Modifier
                             .clickable {
@@ -688,14 +873,16 @@ fun Info(isImageClicked: Boolean, shopViewModel: OneShopViewModel, shopId: Int, 
                         tint = MaterialTheme.colorScheme.onBackground
                     )
                 }
-                if(showReviews)
-                {
-                    val rev= shopViewModel.stateReview.value.reviews
-                    if(rev.isEmpty())
-                    {
-                        Text("No reviews found for this store.", style= MaterialTheme.typography.titleSmall ,modifier = Modifier
-                            .align(Alignment.CenterHorizontally)
-                            .padding(top = 20.dp))
+                if (showReviews) {
+                    val rev = shopViewModel.stateReview.value.reviews
+                    if (rev.isEmpty()) {
+                        Text(
+                            "No reviews found for this store.",
+                            style = MaterialTheme.typography.titleSmall,
+                            modifier = Modifier
+                                .align(Alignment.CenterHorizontally)
+                                .padding(top = 20.dp)
+                        )
                     }
                     LazyColumn(
                         modifier = Modifier.heightIn(100.dp, 1000.dp)
@@ -709,16 +896,17 @@ fun Info(isImageClicked: Boolean, shopViewModel: OneShopViewModel, shopId: Int, 
                             )
                         }
                     }
-                    if(!shopViewModel.stateReview.value.error.contains("NotFound"))
-                    {
-                        Text("See more", style= MaterialTheme.typography.titleSmall ,modifier = Modifier
-                            .clickable {
-                                reviewPage++; shopViewModel.getShopReview(
-                                shopId,
-                                reviewPage
-                            )
-                            }
-                            .align(Alignment.CenterHorizontally))
+                    if (!shopViewModel.stateReview.value.error.contains("NotFound")) {
+                        Text("See more",
+                            style = MaterialTheme.typography.titleSmall,
+                            modifier = Modifier
+                                .clickable {
+                                    reviewPage++; shopViewModel.getShopReview(
+                                    shopId,
+                                    reviewPage
+                                )
+                                }
+                                .align(Alignment.CenterHorizontally))
                     }
                 }
 
@@ -729,7 +917,7 @@ fun Info(isImageClicked: Boolean, shopViewModel: OneShopViewModel, shopId: Int, 
 }
 
 @Composable
-fun ProfilePic(shopViewModel: OneShopViewModel,id: Int) {
+fun ProfilePic(shopViewModel: OneShopViewModel, id: Int) {
     val state = shopViewModel.state.value
     Box(
         modifier = Modifier
@@ -738,13 +926,11 @@ fun ProfilePic(shopViewModel: OneShopViewModel,id: Int) {
         contentAlignment = Alignment.Center
     )
     {
-        if(!shopViewModel.state.value.shop!!.isOwner)
-        {
-            ToggleImageButtonFunction(modifier = Modifier.align(Alignment.TopEnd), onClick={
+        if (!shopViewModel.state.value.shop!!.isOwner) {
+            ToggleImageButtonFunction(modifier = Modifier.align(Alignment.TopEnd), onClick = {
                 shopViewModel.changeToggleLike(id, shopViewModel.state.value.shop!!.id)
             })
-        }
-        else{
+        } else {
             Icon(
                 imageVector = Icons.Default.Edit,
                 contentDescription = "Search icon",
@@ -760,7 +946,7 @@ fun ProfilePic(shopViewModel: OneShopViewModel,id: Int) {
 
 
         Image(
-            painter = painterResource(id = if(shopViewModel.state.value.shop!!.isOwner) R.drawable.addshop else R.drawable.navbar_message),
+            painter = painterResource(id = if (shopViewModel.state.value.shop!!.isOwner) R.drawable.addshop else R.drawable.navbar_message),
             contentDescription = "Search icon",
             modifier = Modifier
                 .size(40.dp)
@@ -782,8 +968,7 @@ fun ProfilePic(shopViewModel: OneShopViewModel,id: Int) {
             tint = MaterialTheme.colorScheme.primary
         )
 
-        if(shopViewModel.state.value.shop!!.image == null)
-        {
+        if (shopViewModel.state.value.shop!!.image == null) {
             Image(
                 painter = painterResource(id = R.drawable.imageplaceholder),
                 contentDescription = "Placeholder",
@@ -793,9 +978,7 @@ fun ProfilePic(shopViewModel: OneShopViewModel,id: Int) {
                     .clip(CircleShape)
                     .border(4.dp, Color.White, CircleShape)
             )
-        }
-        else
-        {
+        } else {
             val image = shopViewModel.state.value.shop!!.image
             val imageUrl = "http://softeng.pmf.kg.ac.rs:10015/images/${image}"
 
@@ -821,8 +1004,16 @@ fun ProfilePic(shopViewModel: OneShopViewModel,id: Int) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = state.shop!!.name, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-            Text(text = state.shop!!.address, style = MaterialTheme.typography.titleSmall,color = MaterialTheme.colorScheme.primary)
+            Text(
+                text = state.shop!!.name,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = state.shop!!.address,
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.primary
+            )
             RatingBar(rating = shopViewModel.state.value.shop!!.rating!!.toFloat())
             Spacer(modifier = Modifier.height(30.dp))
         }

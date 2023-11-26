@@ -7,6 +7,8 @@ import com.example.front.model.DTO.ChosenCategoriesDTO
 import com.example.front.model.DTO.HomeProductDTO
 import com.example.front.model.DTO.LeaveReviewDTO
 import com.example.front.model.DTO.LoginDTO
+import com.example.front.model.DTO.MetricsDTO
+import com.example.front.model.DTO.NewProductDTO
 import com.example.front.model.DTO.ProductDTO
 import com.example.front.model.DTO.ReviewDTO
 import com.example.front.model.request.RegistrationRequest
@@ -99,5 +101,11 @@ class Repository @Inject constructor(private val api: Api) {
     suspend fun postShopReview(id:Int, userId: Int, rating: Int?, comment: String): Response<Success>
     {
         return api.postShopReview(LeaveReviewDTO(id, userId,rating, comment))
+    }
+    suspend fun getMetrics(): Response<List<MetricsDTO>> {
+        return api.getMetrics()
+    }
+    suspend fun postNewProduct(product: NewProductDTO): Response<Success> {
+        return api.postNewProduct(product)
     }
 }

@@ -5,6 +5,8 @@ import com.example.front.model.DTO.ChosenCategoriesDTO
 import com.example.front.model.DTO.HomeProductDTO
 import com.example.front.model.DTO.LeaveReviewDTO
 import com.example.front.model.DTO.LoginDTO
+import com.example.front.model.DTO.MetricsDTO
+import com.example.front.model.DTO.NewProductDTO
 import com.example.front.model.DTO.ProductDTO
 import com.example.front.model.DTO.ReviewDTO
 import com.example.front.model.request.RegistrationRequest
@@ -159,5 +161,14 @@ interface Api {
     @POST("back/Shop/Review")
     suspend fun postShopReview(
         @Body data: LeaveReviewDTO,
+    ): Response<Success>
+
+    @GET("/back/Helper/Metrics")
+    suspend fun getMetrics(
+    ):Response<List<MetricsDTO>>
+
+    @POST("/back/Product/AddProduct")
+    suspend fun postNewProduct(
+        @Body data: NewProductDTO,
     ): Response<Success>
 }

@@ -2,24 +2,24 @@ package com.example.front.viewmodels.oneshop
 
 import android.util.Log
 import androidx.compose.runtime.State
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.front.helper.DataStore.DataStoreManager
 import com.example.front.model.DTO.CategoriesDTO
 import com.example.front.model.DTO.FiltersDTO
+import com.example.front.model.DTO.MetricsDTO
+import com.example.front.model.DTO.NewProductDTO
 import com.example.front.repository.Repository
+import com.example.front.screens.shop.state.GetCategoriesState
+import com.example.front.screens.shop.state.GetMetricsState
+import com.example.front.screens.shop.state.PostReviewState
 import com.example.front.screens.shop.state.ProductState
 import com.example.front.screens.shop.state.ShopReviewState
-import com.example.front.screens.shop.state.PostReviewState
 import com.example.front.screens.shop.state.ShopState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import org.osmdroid.util.GeoPoint
-import org.w3c.dom.Comment
-import retrofit2.Response
 import javax.inject.Inject
 
 @HiltViewModel
@@ -35,7 +35,8 @@ class OneShopViewModel @Inject constructor(
     var stateProduct: State<ProductState> = _stateProduct;
 
     // defaultni filteri
-    private val _filtersState = mutableStateOf(FiltersDTO(0, listOf(), 0, null,0, null, 0, "", 1, null, null, null))
+    private val _filtersState =
+        mutableStateOf(FiltersDTO(0, listOf(), 0, null, 0, null, 0, "", 1, null, null, null))
     var filtersState: State<FiltersDTO> = _filtersState;
 
     private val _stateReview = mutableStateOf(ShopReviewState())
@@ -44,6 +45,14 @@ class OneShopViewModel @Inject constructor(
     //ShopReviewState
     private val _statePostReview = mutableStateOf(PostReviewState())
     var statePostReview: State<PostReviewState> = _statePostReview;
+
+    //CategoriesGetState
+    private val _stateGetMetrics = mutableStateOf(GetMetricsState())
+    var stateGetMetrics: State<GetMetricsState> = _stateGetMetrics;
+
+    //CategoriesGetState
+    private val _stateGetCategories = mutableStateOf(GetCategoriesState())
+    var stateGetCategories: State<GetCategoriesState> = _stateGetCategories;
 
     suspend fun getShopDetails(userId: Int, shopId: Int) {
         viewModelScope.launch {
@@ -68,14 +77,53 @@ class OneShopViewModel @Inject constructor(
         }
     }
 
-    fun getProducts(userId: Int, categories:List<Int>?,rating:Int?, open:Boolean?, range:Int?, location:String?, sort:Int, search:String?, page: Int,specificShop:Int?, favorite: Boolean?, currLat:Float?, currLong:Float?) {
+    fun getProducts(
+        userId: Int,
+        categories: List<Int>?,
+        rating: Int?,
+        open: Boolean?,
+        range: Int?,
+        location: String?,
+        sort: Int,
+        search: String?,
+        page: Int,
+        specificShop: Int?,
+        favorite: Boolean?,
+        currLat: Float?,
+        currLong: Float?
+    ) {
         inicijalnoStanje()
         viewModelScope.launch {
             try {
                 Log.d("SALJEM", categories.toString())
-                val response = repository.getProducts(userId,categories,rating,open,range,location,sort,search,page,specificShop,favorite,currLat,currLong)
+                val response = repository.getProducts(
+                    userId,
+                    categories,
+                    rating,
+                    open,
+                    range,
+                    location,
+                    sort,
+                    search,
+                    page,
+                    specificShop,
+                    favorite,
+                    currLat,
+                    currLong
+                )
                 _filtersState.value = _filtersState.value.copy(
-                    userId = userId, categories = categories, rating = rating, open = open, range = range, location = location, sort = sort, search =search, page = page, favorite=favorite ,currLat = currLat, currLon = currLong
+                    userId = userId,
+                    categories = categories,
+                    rating = rating,
+                    open = open,
+                    range = range,
+                    location = location,
+                    sort = sort,
+                    search = search,
+                    page = page,
+                    favorite = favorite,
+                    currLat = currLat,
+                    currLon = currLong
                 )
                 Log.d("KONACAN RESPONSE", response.toString())
                 if (response.isSuccessful) {
@@ -101,7 +149,7 @@ class OneShopViewModel @Inject constructor(
     fun getShopReview(shopId: Int, page: Int) {
         viewModelScope.launch {
             try {
-                val response = repository.getShopReviews(shopId,page)
+                val response = repository.getShopReviews(shopId, page)
                 if (response.isSuccessful) {
                     val rev = response.body()
                     _stateReview.value = _stateReview.value.copy(
@@ -125,7 +173,7 @@ class OneShopViewModel @Inject constructor(
     fun leaveReview(shopId: Int, userId: Int, rating: Int?, comment: String) {
         viewModelScope.launch {
             try {
-                val response = repository.postShopReview(shopId,userId,rating,comment)
+                val response = repository.postShopReview(shopId, userId, rating, comment)
                 Log.d("REVIEW RESPONSE", response.toString())
                 if (response.isSuccessful) {
                     val rev = response.body()
@@ -147,12 +195,11 @@ class OneShopViewModel @Inject constructor(
         }
     }
 
-    suspend fun getUserId(): Int?
-    {
+    suspend fun getUserId(): Int? {
         return dataStoreManager.getUserIdFromToken()
     }
 
-    fun changeToggleLike(userId:Int, shopId: Int){
+    fun changeToggleLike(userId: Int, shopId: Int) {
         viewModelScope.launch {
             try {
                 val response = repository.toggleLike(userId, shopId)
@@ -162,8 +209,7 @@ class OneShopViewModel @Inject constructor(
         }
     }
 
-    fun inicijalnoStanje()
-    {
+    fun inicijalnoStanje() {
         _stateProduct.value = _stateProduct.value.copy(
             isLoading = true,
             products = emptyList(),
@@ -171,46 +217,43 @@ class OneShopViewModel @Inject constructor(
         )
     }
 
-    fun withoutFilters()
-    {
+    fun withoutFilters() {
         _filtersState.value = _filtersState.value.copy(
-            1, listOf(), null, null,0, null, 0, null, 1
+            1, listOf(), null, null, 0, null, 0, null, 1
         )
     }
 
-    fun changeCategories(categories: List<Int>?)
-    {
+    fun changeCategories(categories: List<Int>?) {
         _filtersState.value = _filtersState.value.copy(
             categories = categories
         )
     }
-    fun changeRating(rating: Int?)
-    {
+
+    fun changeRating(rating: Int?) {
         _filtersState.value = _filtersState.value.copy(
             rating = rating
         )
     }
-    fun changeOpen(open: Boolean?)
-    {
+
+    fun changeOpen(open: Boolean?) {
         _filtersState.value = _filtersState.value.copy(
             open = open
         )
     }
-    fun changeRange(range: Int?)
-    {
+
+    fun changeRange(range: Int?) {
         _filtersState.value = _filtersState.value.copy(
             range = range
         )
     }
-    fun changeLocation(location: String?)
-    {
+
+    fun changeLocation(location: String?) {
         _filtersState.value = _filtersState.value.copy(
             location = location
         )
     }
 
-    fun changeCoordinates(geoPoint: GeoPoint?)
-    {
+    fun changeCoordinates(geoPoint: GeoPoint?) {
         _filtersState.value = _filtersState.value.copy(
             currLat = geoPoint!!.latitude.toFloat(),
             currLon = geoPoint!!.longitude.toFloat(),
@@ -218,32 +261,63 @@ class OneShopViewModel @Inject constructor(
     }
 
 
-    fun Sort(s:Int, specificShopId:Int?)
-    {
+    fun Sort(s: Int, specificShopId: Int?) {
         _filtersState.value = _filtersState.value.copy(
             sort = s
         )
-        getProducts(_filtersState.value.userId,_filtersState.value.categories,_filtersState.value.rating,_filtersState.value.open,_filtersState.value.range,_filtersState.value.location,_filtersState.value.sort,_filtersState.value.search,_filtersState.value.page, specificShopId,_filtersState.value.favorite, _filtersState.value.currLat, _filtersState.value.currLon)
+        getProducts(
+            _filtersState.value.userId,
+            _filtersState.value.categories,
+            _filtersState.value.rating,
+            _filtersState.value.open,
+            _filtersState.value.range,
+            _filtersState.value.location,
+            _filtersState.value.sort,
+            _filtersState.value.search,
+            _filtersState.value.page,
+            specificShopId,
+            _filtersState.value.favorite,
+            _filtersState.value.currLat,
+            _filtersState.value.currLon
+        )
     }
 
-    fun ChangePage(s:Int)
-    {
+    fun ChangePage(s: Int) {
         _filtersState.value = _filtersState.value.copy(
             page = s
         )
         //getShops(_filtersState.value.userId,_filtersState.value.categories,_filtersState.value.rating,_filtersState.value.open,_filtersState.value.range,_filtersState.value.location,_filtersState.value.sort,_filtersState.value.search,_filtersState.value.page, true, _filtersState.value.currLat, _filtersState.value.currLon)
     }
 
-    fun Search(s:String, specificShopId:Int?)
-    {
+    fun Search(s: String, specificShopId: Int?) {
         _filtersState.value = _filtersState.value.copy(
             search = s
         )
-        getProducts(_filtersState.value.userId,_filtersState.value.categories,_filtersState.value.rating,_filtersState.value.open,_filtersState.value.range,_filtersState.value.location,_filtersState.value.sort,_filtersState.value.search,_filtersState.value.page, specificShopId,_filtersState.value.favorite, _filtersState.value.currLat, _filtersState.value.currLon)
+        getProducts(
+            _filtersState.value.userId,
+            _filtersState.value.categories,
+            _filtersState.value.rating,
+            _filtersState.value.open,
+            _filtersState.value.range,
+            _filtersState.value.location,
+            _filtersState.value.sort,
+            _filtersState.value.search,
+            _filtersState.value.page,
+            specificShopId,
+            _filtersState.value.favorite,
+            _filtersState.value.currLat,
+            _filtersState.value.currLon
+        )
     }
 
-    fun DialogFilters(categories: List<Int>?, rating: Int?, open: Boolean?, location: String?, range: Int?, specificShopId:Int?)
-    {
+    fun DialogFilters(
+        categories: List<Int>?,
+        rating: Int?,
+        open: Boolean?,
+        location: String?,
+        range: Int?,
+        specificShopId: Int?
+    ) {
         _filtersState.value = _filtersState.value.copy(
             categories = categories,
             rating = rating,
@@ -252,9 +326,72 @@ class OneShopViewModel @Inject constructor(
             range = range
         )
         Log.d("STA SALJEM", filtersState.toString())
-        getProducts(_filtersState.value.userId,_filtersState.value.categories,_filtersState.value.rating,_filtersState.value.open,_filtersState.value.range,_filtersState.value.location,_filtersState.value.sort,_filtersState.value.search,_filtersState.value.page, specificShopId,_filtersState.value.favorite, _filtersState.value.currLat, _filtersState.value.currLon)
+        getProducts(
+            _filtersState.value.userId,
+            _filtersState.value.categories,
+            _filtersState.value.rating,
+            _filtersState.value.open,
+            _filtersState.value.range,
+            _filtersState.value.location,
+            _filtersState.value.sort,
+            _filtersState.value.search,
+            _filtersState.value.page,
+            specificShopId,
+            _filtersState.value.favorite,
+            _filtersState.value.currLat,
+            _filtersState.value.currLon
+        )
     }
-    suspend fun getCategories(): List<CategoriesDTO>? {
-        return repository.getCategories().body()
+
+    fun getCategories() {
+        viewModelScope.launch {
+            try {
+                val response = repository.getCategories()
+                if (response.isSuccessful) {
+                    val rev = response.body()
+                    _stateGetCategories.value = _stateGetCategories.value.copy(
+                        isLoading = false,
+                        categories = response.body(),
+                        error = ""
+                    )
+                } else {
+                    _stateGetCategories.value = _stateGetCategories.value.copy(
+                        error = "No categories"
+                    )
+                }
+            } catch (e: Exception) {
+                _stateReview.value = _stateReview.value.copy(
+                    error = e.message.toString()
+                )
+            }
+        }
+    }
+
+    fun getMetrics() {
+        viewModelScope.launch {
+            try {
+                val response = repository.getMetrics()
+                if (response.isSuccessful) {
+                    _stateGetMetrics.value = _stateGetMetrics.value.copy(
+                        isLoading = false,
+                        metrics = response.body(),
+                        error = ""
+                    )
+                } else {
+                    _stateGetCategories.value = _stateGetCategories.value.copy(
+                        error = "No metrics"
+                    )
+                }
+            } catch (e: Exception) {
+                _stateReview.value = _stateReview.value.copy(
+                    error = e.message.toString()
+                )
+            }
+        }
+    }
+    fun postNewProduct(newProd: NewProductDTO){
+        viewModelScope.launch {
+            repository.postNewProduct(newProd)
+        }
     }
 }

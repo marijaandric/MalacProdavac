@@ -172,25 +172,26 @@ fun ProductPage(
                             .padding(16.dp),
                         horizontalArrangement = Arrangement.Center
                     ) {
-                        productInfo?.shopName?.let {
-                            Text(
-                                text = it,
+                        Row(modifier = Modifier.clickable {
+                            navHostController.navigate("${Screen.Shop.route}/${productInfo?.shopId}")
+                        }) {
+                            productInfo?.shopName?.let {
+                                Text(
+                                    text = it,
+                                    modifier = Modifier
+                                        .padding(5.dp),
+                                    style = Typography.titleSmall,
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+
+                            Image(
+                                painter = painterResource(R.drawable.strelica),
+                                contentDescription = "",
                                 modifier = Modifier
-                                    .padding(5.dp),
-                                style = Typography.titleSmall,
-                                textAlign = TextAlign.Center
+                                    .size(29.dp)
                             )
                         }
-
-                        Image(
-                            painter = painterResource(R.drawable.strelica),
-                            contentDescription = "",
-                            modifier = Modifier
-                                .size(29.dp)
-                                .clickable {
-                                    navHostController.navigate("${Screen.Shop.route}/${productInfo?.shopId}")
-                                }
-                        )
                     }
 
                     Text(
