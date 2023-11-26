@@ -196,5 +196,18 @@ namespace back.PL.Controllers
                 return BadRequest(new { Error = ex.Message });
             }
         }
+
+        [HttpGet("GetShopid")]
+        public async Task<IActionResult> GetShopid(int userId)
+        {
+            try
+            {
+                return Ok(new { Id = await _service.GetShopId(userId) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
     }
 }

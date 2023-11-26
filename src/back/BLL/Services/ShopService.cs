@@ -203,5 +203,12 @@ namespace back.BLL.Services
 
             return pd;
         }
+
+        public async Task<int> GetShopId(int userId)
+        {
+            Shop s = await _repository.GetShopByUserId(userId);
+            if (s == null) return 0;
+            return s.Id;
+        }
     }
 }

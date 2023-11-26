@@ -344,5 +344,10 @@ namespace back.DAL.Repositories
 
             return await _context.SaveChangesAsync() > 0;
         }
+
+        public async Task<Shop> GetShopByUserId(int userId)
+        {
+            return await _context.Shop.FirstOrDefaultAsync(x => x.OwnerId == userId);
+        }
     }
 }
