@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.map
 import org.mongodb.kbson.ObjectId
 
 class MongoRepositoryImpl(val realm: Realm) : MongoRepository {
-    override fun getData(): Flow<List<ProductInCart>> {
+    override fun getCartProducts(): Flow<List<ProductInCart>> {
         return realm.query<ProductInCart>().asFlow().map { it.list }
     }
 

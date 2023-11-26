@@ -79,7 +79,7 @@ class ProductViewModel @Inject constructor(
         return dataStoreManager.getUserIdFromToken()
     }
 
-    fun addToCart(productID: Int, name: String?, price: Float?, quantity: Int) {
+    fun addToCart(productID: Int, name: String?, price: Float?, quantity: Int, shopName: String?) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val productInCart = ProductInCart()
@@ -87,6 +87,7 @@ class ProductViewModel @Inject constructor(
                 productInCart.name = name.orEmpty()
                 productInCart.price = price ?: 0.0f
                 productInCart.quantity = quantity.toDouble()
+                productInCart.shopName = shopName.orEmpty()
 
                 mongoRepository.updateProduct(productInCart)
             } catch (e: Exception) {

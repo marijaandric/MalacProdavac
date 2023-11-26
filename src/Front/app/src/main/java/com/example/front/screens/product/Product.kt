@@ -265,7 +265,12 @@ fun ProductPage(
                     Button(
                         onClick = {
                             // zove funkciju i salje podatke sa stranice
-                            productViewModel.addToCart(productID, productInfo?.name, productInfo?.price, 1)
+                            if (productInfo != null)
+                            {
+                                productViewModel.addToCart(productID, productInfo.name, productInfo.price, 1, productInfo.shopName)//, productInfo.images[0])
+                            } else {
+
+                            }
                             //// ispisuje obavestenje
                         },
                         modifier = Modifier
