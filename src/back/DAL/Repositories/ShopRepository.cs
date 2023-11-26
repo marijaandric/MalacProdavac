@@ -309,7 +309,7 @@ namespace back.DAL.Repositories
 
         public async Task<List<int>> GetNearbyUsers(float latitude, float longitude, int ownerId)
         {
-            int range = 15;
+            int range = 10;
             return (await _context.Users.Select(x => new {id = x.Id, lat = x.LatestLatitude, lon = x.LatestLongitude }).ToListAsync()).Where(x => x.id != ownerId && CalculateDistance(x.lat, x.lon, latitude, longitude) <= range).Select(x => x.id).ToList();
         }
 

@@ -40,5 +40,32 @@ namespace back.PL.Controllers
                 return BadRequest(new { Error = ex.Message });
             }
         }
+
+        [HttpGet("GetRequestsForDeliveryPerson")]
+        public async Task<IActionResult> GetRequestsForDeliveryPerson(int deliveryPerson)
+        {
+            try
+            {
+                return Ok(await _service.GetRequestsForDeliveryPerson(deliveryPerson));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
+
+
+        [HttpGet("GetRoutesForRequest")]
+        public async Task<IActionResult> GetRoutesForRequest(int userId, int requestId)
+        {
+            try
+            {
+                return Ok(await _service.GetRoutesForRequest(userId, requestId));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
     }
 }

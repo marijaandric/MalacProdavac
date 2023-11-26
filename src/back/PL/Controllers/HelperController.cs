@@ -38,6 +38,20 @@ namespace back.PL.Controllers
             {
                 return BadRequest(ex.Message);
             }
-    }
+        }
+
+        [HttpGet("Route")]
+        public async Task<IActionResult> Route(string start, string end, string shop, string shipping)
+        {
+            try
+            {
+                
+                return Ok(new { TotalDistance = await _service.Route(start, end, shop, shipping) });
+            }
+            catch (Exception ex)
+            {  
+                return BadRequest(ex.Message); 
+            }
+        }
     }
 }

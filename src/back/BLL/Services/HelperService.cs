@@ -5,7 +5,6 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using iText.Kernel.Pdf;
 using iText.Layout;
-using iText.Layout.Element;
 using iText.IO.Image;
 
 namespace back.BLL.Services
@@ -99,6 +98,25 @@ namespace back.BLL.Services
             return (latitude, longitude);
         }
 
+        public static double CalculateDistance(double lat1, double lon1, double lat2, double lon2)
+        {
+            const double radiusOfEarth = 6371;
+
+            // degrees -> radians
+            double dLat = Math.PI / 180.0 * (lat2 - lat1);
+            double dLon = Math.PI / 180.0 * (lon2 - lon1);
+
+            // Haversine formula
+            double a = Math.Sin(dLat / 2) * Math.Sin(dLat / 2) +
+                Math.Cos(Math.PI / 180.0 * lat1) * Math.Cos(Math.PI / 180.0 * lat2) *
+                Math.Sin(dLon / 2) * Math.Sin(dLon / 2);
+            double c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+
+            double distance = radiusOfEarth * c;
+
+            return distance;
+        }
+
         public async Task<string> GeneratePaymentSlip(int userId, int shopId, float amount, string? address)
         {
 
@@ -154,5 +172,73 @@ namespace back.BLL.Services
             return pdfOutput;
         }
 
+        public async Task<double> Route(string start, string end, string shop, string shipping)
+        {
+            double shopLat, shopLong, shippingLat, shippingLong;
+            (double, double) shopcoords = await GetCoordinates(shop);
+            shopLat = shopcoords.Item1;
+            shopLong = shopcoords.Item2;
+
+            (double, double) shippingCoords = await GetCoordinates(shipping);
+            shippingLat = shippingCoords.Item1;
+            shippingLong = shippingCoords.Item2;
+
+            using (var client = new HttpClient())
+            {
+                string apiKey = "Aj_nYJhXf_C_QoPf7gOQch6KOhTJo2iX2VIyvOlwb7hDpGCtS8rOhyQYp5kAbR54";
+
+                string apiUrl = $"https://dev.virtualearth.net/REST/v1/Routes/Driving?wp.0={start}&wp.1={end}&key={apiKey}";
+
+                HttpResponseMessage response = await client.GetAsync(apiUrl);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string result = await response.Content.ReadAsStringAsync();
+                    JObject json = JObject.Parse(result);
+
+                    double minShopDistance = 100000;
+                    double minShippingDistance = 100000;
+
+                    double minShopLat = 0, minShopLong = 0;
+                    bool ind = false;
+
+                    foreach (var item in json["resourceSets"][0]["resources"][0]["routeLegs"][0]["itineraryItems"])
+                    {
+                        double xLat = (double)item["maneuverPoint"]["coordinates"][0];
+                        double xLong = (double)item["maneuverPoint"]["coordinates"][1];
+
+                        double distance = CalculateDistance(xLat, xLong, shopLat, shopLong);
+                        if (distance < minShopDistance)
+                        {
+                            minShopDistance = distance;
+                            minShopLat = xLat;
+                            minShopLong = xLong;
+                        }
+                        Console.WriteLine("SHOP: " + distance);
+                        
+                    }
+
+                    foreach (var item in json["resourceSets"][0]["resources"][0]["routeLegs"][0]["itineraryItems"])
+                    {
+                        double xLat = (double)item["maneuverPoint"]["coordinates"][0];
+                        double xLong = (double)item["maneuverPoint"]["coordinates"][1];
+
+                        if (xLat == minShopLat && xLong == minShopLong) ind = true;
+
+                        double distance = CalculateDistance(xLat, xLong, shippingLat, shippingLong);
+                        if (ind && distance < minShippingDistance)
+                        {
+                            minShippingDistance = distance;
+                        }
+                        Console.WriteLine("ADDRESS: " + distance);
+                    }
+
+                    return Math.Round(minShippingDistance + minShopDistance, 1);
+                }
+            }
+
+            throw new ArgumentException("Error finding route!");
+
+        }
     }
 }
