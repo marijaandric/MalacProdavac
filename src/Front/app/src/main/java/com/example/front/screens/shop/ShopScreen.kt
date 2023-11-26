@@ -245,7 +245,7 @@ fun Products(isImageClicked: Boolean,shopViewModel: OneShopViewModel,shopId:Int)
     }
     if(showElseText && !isImageClicked) {
         Column {
-            if(!shopViewModel.state.value.shop!!.isOwner)
+            if(shopViewModel.state.value.shop!!.isOwner)
             {
                 Column(
                     modifier = Modifier
@@ -750,7 +750,7 @@ fun ProfilePic(shopViewModel: OneShopViewModel,id: Int) {
                 contentDescription = "Search icon",
                 modifier = Modifier
                     .size(40.dp)
-                    .align(Alignment.TopStart)
+                    .align(Alignment.TopEnd)
                     .clickable {
 
                     },
@@ -768,18 +768,6 @@ fun ProfilePic(shopViewModel: OneShopViewModel,id: Int) {
                 .clickable {
 
                 },
-        )
-
-        Icon(
-            imageVector = Icons.Default.Email,
-            contentDescription = "Search icon",
-            modifier = Modifier
-                .size(40.dp)
-                .align(Alignment.TopStart)
-                .clickable {
-
-                },
-            tint = MaterialTheme.colorScheme.primary
         )
 
         if(shopViewModel.state.value.shop!!.image == null)

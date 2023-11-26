@@ -15,6 +15,7 @@ import com.example.front.model.DTO.ShopPagesDTO
 import com.example.front.model.DTO.ToggleLikeDTO
 import com.example.front.model.product.ProductInfo
 import com.example.front.model.product.ProductReviewUserInfo
+import com.example.front.model.response.Id
 import com.example.front.model.response.Success
 import com.example.front.model.user.MyProfileDTO
 import com.example.front.model.user.UserEditDTO
@@ -160,4 +161,10 @@ interface Api {
     suspend fun postShopReview(
         @Body data: LeaveReviewDTO,
     ): Response<Success>
+
+    @GET("back/Shop/GetShopid")
+    suspend fun getShopId(
+        @Query("userId") userId: Int,
+    ):Response<Id>
+
 }

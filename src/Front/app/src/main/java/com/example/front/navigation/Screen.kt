@@ -15,4 +15,6 @@ sealed class Screen(val route:String){
     object AllProduct:Screen(route="products")
     object AllSellers:Screen(route="sellers")
     object Shop:Screen(route="shop")
+    object MyShop:Screen(route="my_shop")
+    object SetUpShop:Screen(route="setup_shop")
 }

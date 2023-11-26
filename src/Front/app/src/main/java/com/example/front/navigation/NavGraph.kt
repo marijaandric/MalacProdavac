@@ -11,6 +11,8 @@ import androidx.navigation.navArgument
 import com.example.front.screens.products.AllProducts
 import com.example.front.screens.home.HomePage
 import com.example.front.screens.categories.RegistrationCategories
+import com.example.front.screens.myshop.MyShopScreen
+import com.example.front.screens.myshop.SetUpShopScreen
 import com.example.front.screens.product.ProductPage
 import com.example.front.screens.sellers.SellersScreen
 import com.example.front.screens.shop.ShopScreen
@@ -24,6 +26,7 @@ import com.example.front.viewmodels.oneshop.OneShopViewModel
 import com.example.front.viewmodels.product.ProductViewModel
 import com.example.front.viewmodels.register.RegisterViewModel
 import com.example.front.viewmodels.shops.ShopsViewModel
+import com.example.front.viewmodels.myshop.MyShopViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -40,11 +43,12 @@ fun SetupNavGraph(
     val myProfileViewModel : MyProfileViewModel = hiltViewModel()
     val shopsViewModel: ShopsViewModel = hiltViewModel()
     val oneShopViewModel : OneShopViewModel = hiltViewModel()
+    val myShopViewModel : MyShopViewModel = hiltViewModel()
 
     NavHost(
         navController = navController,
         startDestination = "intro"
-        //startDestination = "sellers"
+        //startDestination = "my_shop"
         ){
         composable(
             route = Screen.Home.route
@@ -93,6 +97,18 @@ fun SetupNavGraph(
             val arguments = requireNotNull(navBackStackEntry.arguments)
             val productId = arguments.getInt("id")
             ShopScreen(navController = navController,oneShopViewModel, productId)
+        }
+        composable(
+            route = Screen.MyShop.route
+        )
+        {
+            MyShopScreen(navController = navController, myShopViewModel = myShopViewModel)
+        }
+        composable(
+            route = Screen.SetUpShop.route
+        )
+        {
+            SetUpShopScreen(navController = navController)
         }
 
 

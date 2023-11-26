@@ -22,6 +22,7 @@ class HomeViewModel @Inject constructor(
     private val dataStoreManager: DataStoreManager
 ) : ViewModel() {
 
+
     private val _state = mutableStateOf(HomeProductsState())
     var state : State<HomeProductsState> = _state;
 
@@ -46,8 +47,6 @@ class HomeViewModel @Inject constructor(
                     val response = repository.getHomeProducts(i)
 
                     if (response.isSuccessful) {
-                        val responseBody = response.body()
-
                         _state.value = _state.value.copy(
                             isLoading = false,
                             products = response.body()
