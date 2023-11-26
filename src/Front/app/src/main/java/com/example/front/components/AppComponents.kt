@@ -1,15 +1,11 @@
 package com.example.front.components
 
-import android.graphics.BitmapFactory
-import android.net.Uri
-import android.util.Log
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.PickVisualMediaRequest
-import androidx.activity.result.contract.ActivityResultContracts
+import android.view.MotionEvent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,9 +21,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Menu
@@ -36,9 +35,9 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -49,12 +48,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -62,23 +64,19 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.front.R
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
-import coil.compose.rememberImagePainter
+import com.example.front.R
+import com.example.front.model.DTO.CategoriesDTO
 import com.example.front.model.DTO.ImageDataDTO
+import com.example.front.model.DTO.MetricsDTO
 import com.example.front.navigation.Screen
-import com.example.front.ui.theme.DarkBlue
 import com.example.front.ui.theme.LightBlue
 import com.example.front.ui.theme.MainBlue
 import com.example.front.ui.theme.Typography
-import java.io.File
-import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
 @Composable
@@ -96,7 +94,7 @@ fun TitleTextComponent(value: String) {
 @Composable
 fun MyTextField(
     labelValue: String,
-    painterResource: Painter,
+    painterResource: Painter?,
     value: String,
     onValueChange: (String) -> Unit,
     isPassword: Boolean = false,
@@ -115,11 +113,13 @@ fun MyTextField(
         value = value,
         onValueChange = onValueChange,
         leadingIcon = {
-            Icon(
-                painter = painterResource,
-                contentDescription = "",
-                modifier = Modifier.size(25.dp)
-            )
+            if (painterResource != null) {
+                Icon(
+                    painter = painterResource,
+                    contentDescription = "",
+                    modifier = Modifier.size(25.dp)
+                )
+            }
         },
         visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
         keyboardOptions = KeyboardOptions.Default.copy(
@@ -128,6 +128,184 @@ fun MyTextField(
         ),
         shape = RoundedCornerShape(20.dp)
     )
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
+@Composable
+fun MyDropdownCategories(
+    labelValue: String,
+    selectedCategory: CategoriesDTO?,
+    categoriesList: List<CategoriesDTO>,
+    onCategorySelected: (CategoriesDTO) -> Unit,
+    modifier: Modifier
+) {
+    var currentSelectedCategory by remember { mutableStateOf<CategoriesDTO?>(selectedCategory) }
+    var isPressed by remember { mutableStateOf(false) }
+
+    OutlinedTextField(
+        modifier = modifier
+            .pointerInteropFilter { event ->
+                isPressed = event.action == MotionEvent.ACTION_DOWN
+                false
+            },
+        readOnly = true,
+        value = currentSelectedCategory?.name ?: "",
+        onValueChange = {},
+        label = { Text(text = labelValue) },
+        colors = TextFieldDefaults.outlinedTextFieldColors(
+            focusedBorderColor = Color.Blue,
+            focusedLabelColor = Color.Blue,
+            cursorColor = Color.Blue
+        ),
+        keyboardOptions = KeyboardOptions.Default.copy(
+            keyboardType = KeyboardType.Text,
+            imeAction = ImeAction.Done
+        ),
+        shape = RoundedCornerShape(20.dp)
+    )
+
+    DropdownMenu(
+        expanded = isPressed,
+        onDismissRequest = { isPressed = false },
+        modifier = Modifier.background(MaterialTheme.colorScheme.surface)
+    ) {
+        categoriesList.forEach { category ->
+            DropdownMenuItem(onClick = {
+                currentSelectedCategory = category
+                onCategorySelected(category)
+                isPressed = false
+            }) {
+                Text(text = category.name)
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
+@Composable
+fun MyDropdownMetrics(
+    labelValue: String,
+    selectedMetric: MetricsDTO?,
+    metricsList: List<MetricsDTO>,
+    onMetricSelected: (MetricsDTO) -> Unit,
+    modifier: Modifier
+) {
+    var currentSelectedCategory by remember { mutableStateOf<MetricsDTO?>(selectedMetric) }
+    var isPressed by remember { mutableStateOf(false) }
+
+    OutlinedTextField(
+        modifier = modifier
+            .pointerInteropFilter { event ->
+                isPressed = event.action == MotionEvent.ACTION_DOWN
+                false
+            },
+        readOnly = true,
+        value = currentSelectedCategory?.name ?: "",
+        onValueChange = {},
+        label = { Text(text = labelValue) },
+        colors = TextFieldDefaults.outlinedTextFieldColors(
+            focusedBorderColor = Color.Blue,
+            focusedLabelColor = Color.Blue,
+            cursorColor = Color.Blue
+        ),
+        keyboardOptions = KeyboardOptions.Default.copy(
+            keyboardType = KeyboardType.Text,
+            imeAction = ImeAction.Done
+        ),
+        shape = RoundedCornerShape(20.dp)
+    )
+
+    DropdownMenu(
+        expanded = isPressed,
+        onDismissRequest = { isPressed = false },
+        modifier = Modifier.background(MaterialTheme.colorScheme.surface)
+    ) {
+        metricsList.forEach { metric ->
+            DropdownMenuItem(onClick = {
+                currentSelectedCategory = metric
+                onMetricSelected(metric)
+                isPressed = false
+            }) {
+                Text(text = metric.name)
+            }
+        }
+    }
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MyTextFieldWithoutIcon(
+    labelValue: String,
+    value: String,
+    onValueChange: (String) -> Unit,
+    isPassword: Boolean = false,
+    isLast: Boolean = false,
+    modifier: Modifier
+) {
+    OutlinedTextField(
+        modifier = Modifier
+            .clip(RoundedCornerShape(5.dp))
+            .then(modifier),
+        label = { Text(text = labelValue) },
+        colors = TextFieldDefaults.outlinedTextFieldColors(
+            focusedBorderColor = LightBlue,
+            focusedLabelColor = LightBlue,
+            cursorColor = LightBlue
+        ),
+        value = value,
+        onValueChange = onValueChange,
+        visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
+        keyboardOptions = KeyboardOptions.Default.copy(
+            keyboardType = if (isPassword) KeyboardType.Password else KeyboardType.Text,
+            imeAction = if (isLast) ImeAction.Done else ImeAction.Next
+        ),
+        shape = RoundedCornerShape(20.dp)
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
+@Composable
+fun CommentsTextBox(onReviewTextChanged: (String) -> Unit, placeholder: String) {
+    var reviewText by remember { mutableStateOf("") }
+    var isButtonEnabled by remember { mutableStateOf(false) }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 16.dp)
+    ) {
+        OutlinedTextField(
+            value = reviewText,
+            onValueChange = {
+                reviewText = it
+                isButtonEnabled = it.isNotBlank()
+                onReviewTextChanged(it)
+            },
+            textStyle = TextStyle.Default.copy(
+                fontSize = 18.sp
+            ),
+            label = { Text(text = placeholder) },
+            shape = RoundedCornerShape(20.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(150.dp)
+                .background(MaterialTheme.colorScheme.background)
+                .padding(16.dp),//
+            keyboardOptions = KeyboardOptions.Default.copy(
+                imeAction = ImeAction.Done
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    //LocalSoftwareKeyboardController.current?.hide()
+                }
+            ),
+            singleLine = false
+        )
+
+        Spacer(modifier = Modifier.height(5.dp))
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -180,14 +358,17 @@ fun HeaderImage(painterResource: Painter) {
 
 @OptIn(ExperimentalEncodingApi::class)
 @Composable
-fun ProductImage(image: String) {
+fun ProductImage(image: String, modifier: Modifier) {
     val imageUrl = "http://softeng.pmf.kg.ac.rs:10015/images/${image}"
 
     val painter: Painter = rememberAsyncImagePainter(model = imageUrl)
     Image(
         painter = painter,
         contentDescription = null,
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight()
+            .then(modifier),
         contentScale = ContentScale.FillWidth
     )
 }
@@ -208,6 +389,27 @@ fun ToggleImageButton(modifier: Modifier) {
             .then(modifier)
             .clickable {
                 isToggled = !isToggled
+            }
+    )
+}
+
+@Composable
+fun ToggleImageButtonFunction(modifier: Modifier, onClick: () -> Unit) {
+    var isToggled by remember { mutableStateOf(false) }
+
+    val currentImage = if (isToggled) painterResource(id = R.drawable.srcefull)
+    else painterResource(id = R.drawable.srce)
+
+    Image(
+        painter = currentImage,
+        contentDescription = "",
+        modifier = Modifier
+            .size(50.dp)
+            .padding(5.dp)
+            .then(modifier)
+            .clickable {
+                isToggled = !isToggled
+                onClick()
             }
     )
 }
@@ -260,23 +462,63 @@ fun MediumBlueButton(text: String, onClick: () -> Unit, width: Float, modifier: 
 
 @Composable
 fun CardButton(text: String, onClick: () -> Unit, width: Float, modifier: Modifier, color: Color) {
-    val primaryColor = MainBlue
     Button(
         onClick = onClick,
         modifier = Modifier
             .fillMaxWidth(width)
-            .height(38.dp)
             .then(modifier),
         colors = ButtonDefaults.buttonColors(containerColor = color),
-        shape = RoundedCornerShape(20)
+        shape = RoundedCornerShape(30)
     ) {
         Text(
             text = text,
-            style = Typography.bodyLarge
+            style = Typography.labelSmall.copy(color = MaterialTheme.colorScheme.background)
         )
     }
 }
 
+@Composable
+fun ButtonWithIcon(
+    text: String,
+    onClick: () -> Unit,
+    width: Float,
+    modifier: Modifier = Modifier,
+    color: Color,
+    imagePainter: Painter? = null,
+    imageModifier: Modifier = Modifier,
+    height: Int?
+) {
+    var h = 32
+    if (height != null) {
+        h = height
+    }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth(width)
+            .height(h.dp)
+            .clip(RoundedCornerShape(30))
+            .background(color)
+            .then(modifier)
+            .clickable(onClick = onClick),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
+        if (imagePainter != null) {
+            Image(
+                painter = imagePainter,
+                contentDescription = null,
+                modifier = Modifier
+                    .size(23.dp)
+                    .then(imageModifier)
+                    .padding(end = 4.dp)
+            )
+        }
+        Text(
+            text = text,
+            style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.background)
+        )
+    }
+}
 
 @Composable
 fun BigBlueButton(text: String, onClick: () -> Unit, width: Float, modifier: Modifier) {
@@ -299,33 +541,44 @@ fun BigBlueButton(text: String, onClick: () -> Unit, width: Float, modifier: Mod
 }
 
 @Composable
-fun SellerCard(title: String, author: String, imageResource: Int,isLiked: Boolean,onClick: () -> Unit ) {
+fun SellerCard(
+    title: String,
+    author: String,
+    imageResource: String,
+    isLiked: Boolean,
+    onClick: () -> Unit
+) {
     Card(
         modifier = Modifier
-            .width(320.dp)
+            .width(280.dp)
             .clip(RoundedCornerShape(20.dp))
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(color = MaterialTheme.colorScheme.surface)
         ) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(150.dp)
+                    .height(120.dp)
             ) {
+                val imageUrl = "http://softeng.pmf.kg.ac.rs:10015/images/${imageResource}"
+
+                val painter: Painter = rememberAsyncImagePainter(model = imageUrl)
                 Image(
-                    painter = painterResource(id = imageResource),
+                    painter = painter,
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(150.dp)
+                        .height(120.dp)
                         .padding(13.dp)
                         .clip(RoundedCornerShape(10.dp))
                 )
 
                 Image(
-                    painter = painterResource(if(isLiked) R.drawable.srcefull else R.drawable.srce),
+                    painter = painterResource(if (isLiked) R.drawable.srcefull else R.drawable.srce),
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
@@ -344,8 +597,8 @@ fun SellerCard(title: String, author: String, imageResource: Int,isLiked: Boolea
                     .fillMaxWidth()
                     .padding(start = 16.dp, bottom = 16.dp, end = 16.dp)
             ) {
-                Text(text = title, fontWeight = FontWeight.Bold, fontSize = 15.sp)
-                Text(text = author, fontSize = 13.sp)
+                Text(text = title, fontWeight = FontWeight.Bold, fontSize = 17.sp)
+                Text(text = author, fontSize = 14.sp)
                 Row(
                     modifier = Modifier.padding(top = 10.dp)
                 )
@@ -354,14 +607,16 @@ fun SellerCard(title: String, author: String, imageResource: Int,isLiked: Boolea
                         text = "More info",
                         onClick = { /*TODO*/ },
                         width = 0.52f,
-                        modifier = Modifier.padding(end = 8.dp),
+                        modifier = Modifier
+                            .padding(end = 8.dp)
+                            .height(32.dp),
                         color = MaterialTheme.colorScheme.secondary
                     )
                     CardButton(
                         text = "Products",
                         onClick = { /*TODO*/ },
                         width = 1f,
-                        modifier = Modifier,
+                        modifier = Modifier.height(32.dp),
                         color = MaterialTheme.colorScheme.primary
                     )
                 }
@@ -375,32 +630,42 @@ fun SellerCard(title: String, author: String, imageResource: Int,isLiked: Boolea
 fun ProductCard(
     title: String,
     price: String,
-    imageResource: Int,
+    imageResource: String,
     navController: NavHostController,
-    id:Int
+    id: Int
 ) {
+    val onClick: () -> Unit = remember {
+        {
+            navController.navigate("${Screen.Product.route}/$id")
+        }
+    }
     Card(
         modifier = Modifier
-            .width(350.dp)
             .clip(RoundedCornerShape(20.dp))
-            .padding(bottom = 15.dp)
-            .clickable { navController.navigate("${Screen.Product.route}/$id") }
+            .fillMaxWidth(0.9f)
+            .padding(bottom = 15.dp, end = 16.dp)
+            .clickable(onClick = onClick)
     ) {
+        val imageUrl = "http://softeng.pmf.kg.ac.rs:10015/images/${imageResource}"
+
+        val painter: Painter = rememberAsyncImagePainter(model = imageUrl)
         Row(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(color = MaterialTheme.colorScheme.surface)
         ) {
             Image(
-                painter = painterResource(id = imageResource),
+                painter = painter,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(120.dp)
-                    .padding(10.dp)
+                    .padding(13.dp)
                     .clip(RoundedCornerShape(10.dp))
             )
 
             Column(
-                modifier = Modifier.padding(8.dp)
+                modifier = Modifier.padding(10.dp)
             ) {
                 Text(text = title, fontWeight = FontWeight.Bold, fontSize = 17.sp)
                 Text(
@@ -410,15 +675,80 @@ fun ProductCard(
                     modifier = Modifier.padding(bottom = 25.dp, top = 5.dp),
                     color = MaterialTheme.colorScheme.secondary
                 )
-                CardButton(
+                ButtonWithIcon(
                     text = "Add to cart",
                     onClick = { /*TODO*/ },
-                    width = 0.9f,
+                    width = 0.8f,
                     modifier = Modifier,
-                    color = MaterialTheme.colorScheme.secondary
+                    color = MaterialTheme.colorScheme.secondary,
+                    imagePainter = painterResource(id = R.drawable.cart),
+                    height = 32
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun ShopProductCard(imageRes: String?, text: String, price: String, onClick: () -> Unit = {}) {
+    Card(
+        modifier = Modifier
+            .clip(MaterialTheme.shapes.medium)
+            .clickable(onClick = onClick)
+            .height(200.dp)
+            .width(100.dp)
+            .padding(8.dp)
+    )
+    {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.primary)
+                .padding(5.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            if (imageRes != null) {
+                val imageUrl = "http://softeng.pmf.kg.ac.rs:10015/images/${imageRes}"
+
+                val painter: Painter = rememberAsyncImagePainter(model = imageUrl)
+                Image(
+                    painter = painter,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(0.6f)
+                        .clip(RoundedCornerShape(20.dp))
+                        .padding(start = 5.dp, end = 5.dp)
+                )
+            } else {
+                Image(
+                    painter = painterResource(id = R.drawable.imageplaceholder),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(0.6f)
+                        .clip(RoundedCornerShape(20.dp))
+                        .padding(start = 5.dp, end = 5.dp)
                 )
             }
 
+            Text(
+                text = text,
+                style = MaterialTheme.typography.titleSmall.copy(color = Color.White),
+                modifier = Modifier.padding(top = 8.dp),
+            )
+            Text(
+                text = price,
+                style = MaterialTheme.typography.titleSmall.copy(
+                    fontWeight = FontWeight.Light,
+                    fontSize = 12.sp,
+                    color = Color.White
+                ),
+                modifier = Modifier.padding(top = 8.dp),
+            )
         }
     }
 }
@@ -427,23 +757,30 @@ fun ProductCard(
 fun ShopCard(
     title: String,
     price: String,
-    imageResource: Int,
+    imageResource: String,
     navController: NavHostController,
-    id:Int,
-    workingHours: String
+    id: Int,
+    workingHours: String,
 ) {
     Card(
         modifier = Modifier
             .clip(RoundedCornerShape(20.dp))
             .padding(bottom = 15.dp)
             .fillMaxWidth()
-            .clickable { },
+            .clickable {
+                navController.navigate("${Screen.Shop.route}/$id")
+            },
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(color = MaterialTheme.colorScheme.surface),
         ) {
+            val imageUrl = "http://softeng.pmf.kg.ac.rs:10015/images/${imageResource}"
+
+            val painter: Painter = rememberAsyncImagePainter(model = imageUrl)
             Image(
-                painter = painterResource(id = imageResource),
+                painter = painter,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
@@ -465,7 +802,7 @@ fun ShopCard(
                 )
 
                 Row(
-                    modifier = Modifier.padding(top = 20.dp)
+                    modifier = Modifier.padding(top = 25.dp)
                 )
                 {
                     Icon(
@@ -478,7 +815,7 @@ fun ShopCard(
                     Text(
                         text = workingHours,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 13.sp,
+                        fontSize = 15.sp,
                         modifier = Modifier.padding(start = 5.dp),
                         color = MaterialTheme.colorScheme.secondary
                     )
@@ -491,7 +828,12 @@ fun ShopCard(
 
 
 @Composable
-fun GalleryComponent(images: List<ImageDataDTO>, modifier: Modifier) {
+fun GalleryComponent(
+    modifier: Modifier,
+    images: List<ImageDataDTO>,
+    selectedImage: ImageDataDTO?,
+    onImageClick: (ImageDataDTO) -> Unit
+) {
     LazyRow(
         modifier = Modifier
             .fillMaxWidth()
@@ -499,26 +841,32 @@ fun GalleryComponent(images: List<ImageDataDTO>, modifier: Modifier) {
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(images) { image ->
-            ImageItem(image = image)
+            ImageItem(image = image, isSelected = image == selectedImage) {
+                onImageClick(image)
+            }
         }
     }
 }
 
-@OptIn(ExperimentalEncodingApi::class)
 @Composable
-fun ImageItem(image: ImageDataDTO) {
-    val imageUrl = "http://softeng.pmf.kg.ac.rs:10015/images/${image.image}"
-
-    val painter: Painter = rememberAsyncImagePainter(model = imageUrl)
-    Image(
-        painter = painter,
-        contentDescription = null,
+fun ImageItem(image: ImageDataDTO, isSelected: Boolean, onImageClick: () -> Unit) {
+    Box(
         modifier = Modifier
-            .size(100.dp)
-            .clip(RoundedCornerShape(10.dp))
-    )
-}
+            .border(1.dp, if (isSelected) Color.Gray else Color.Transparent)
+            .clickable { onImageClick() }
+    ) {
+        val imageUrl = "http://softeng.pmf.kg.ac.rs:10015/images/${image.image}"
 
+        val painter: Painter = rememberAsyncImagePainter(model = imageUrl)
+        Image(
+            painter = painter,
+            contentDescription = null,
+            modifier = Modifier
+                .size(100.dp)
+                .clip(RoundedCornerShape(10.dp))
+        )
+    }
+}
 
 @OptIn(ExperimentalEncodingApi::class)
 @Composable
@@ -558,8 +906,93 @@ fun ImageItemForProfilePic(image: String, onEditClick: () -> Unit) {
     }
 }
 
+
 @Composable
-fun SmallElipseAndTitle(title:String) {
+fun ReviewCard(
+    username: String,
+    imageRes: String?,
+    comment: String,
+    rating: Int
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+            .clip(RoundedCornerShape(20.dp))
+
+    ) {
+        Box(
+            modifier = Modifier.background(MaterialTheme.colorScheme.surface)
+        )
+        {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    val imageUrl = "http://softeng.pmf.kg.ac.rs:10015/images/${imageRes}"
+
+                    val painter: Painter = rememberAsyncImagePainter(model = imageUrl)
+                    Image(
+                        painter = painter,
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(40.dp)
+                            .clip(CircleShape)
+                    )
+                    Spacer(modifier = Modifier.width(5.dp))
+                    Text(
+                        text = username,
+                        style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onBackground)
+                    )
+                }
+
+                if (rating > 0) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        LazyRow(
+                            state = rememberLazyListState(),
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        ) {
+                            items(5) { index ->
+                                val starIcon = if (index < rating) {
+                                    R.drawable.fullstar
+                                } else {
+                                    R.drawable.emptystar
+                                }
+                                Image(
+                                    painter = painterResource(id = starIcon),
+                                    contentDescription = null,
+                                )
+                            }
+                        }
+                        Spacer(modifier = Modifier.width(4.dp))
+                    }
+                }
+
+                Text(
+                    text = comment,
+                    style = MaterialTheme.typography.displaySmall,
+                    modifier = Modifier.padding(top = 10.dp)
+                )
+            }
+        }
+    }
+}
+
+
+@Composable
+fun SmallElipseAndTitle(title: String) {
     Box(
         contentAlignment = Alignment.CenterStart,
         modifier = Modifier.fillMaxWidth()
@@ -603,7 +1036,7 @@ fun Tabs(
     selectedColumnIndex: Boolean,
     firstTab: String,
     secondTab: String,
-    isFilters: Boolean
+    isFilters: Boolean,
 ) {
     Row {
         Column(
@@ -615,7 +1048,7 @@ fun Tabs(
                 text = firstTab,
                 style = MaterialTheme.typography.titleLarge.copy(
                     color = MaterialTheme.colorScheme.onTertiary,
-                    fontSize = if(!isFilters) 20.sp else 16.sp
+                    fontSize = if (!isFilters) 20.sp else 16.sp
                 ),
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
@@ -626,7 +1059,7 @@ fun Tabs(
                     contentDescription = "Crtica",
                     contentScale = ContentScale.FillWidth,
                     modifier = Modifier
-                        .width(if(!isFilters) 30.dp else 20.dp)
+                        .width(if (!isFilters) 30.dp else 20.dp)
                         .align(Alignment.CenterHorizontally)
                         .padding(top = 10.dp)
                 )
@@ -642,7 +1075,7 @@ fun Tabs(
                 text = secondTab,
                 style = MaterialTheme.typography.titleLarge.copy(
                     color = MaterialTheme.colorScheme.onTertiary,
-                    if(!isFilters) 20.sp else 16.sp
+                    if (!isFilters) 20.sp else 16.sp
                 ),
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
@@ -653,7 +1086,7 @@ fun Tabs(
                     contentDescription = "Crtica",
                     contentScale = ContentScale.FillWidth,
                     modifier = Modifier
-                        .width(if(!isFilters) 30.dp else 20.dp)
+                        .width(if (!isFilters) 30.dp else 20.dp)
                         .align(Alignment.CenterHorizontally)
                         .padding(top = 10.dp)
                 )

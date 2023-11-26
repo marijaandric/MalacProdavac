@@ -17,7 +17,7 @@ namespace back.PL.Controllers
         }
 
         [HttpGet("GetOrders")]
-        public async Task<IActionResult> GetOrders(int userId, int status, int page)
+        public async Task<IActionResult> GetOrders(int userId, int? status, int page)
         {
             try
             {
@@ -48,6 +48,19 @@ namespace back.PL.Controllers
             try
             {
                 return Ok(new { Success = await _service.InsertOrder(order) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
+
+        [HttpPut("RespondToPickupRequest")]
+        public async Task<IActionResult> RespondToPickupRequest(int orderId, int resp, string? message)
+        {
+            try
+            {
+                return Ok(new { Success = await _service.RespondToPickupRequest(orderId, resp, message) });
             }
             catch (Exception ex)
             {

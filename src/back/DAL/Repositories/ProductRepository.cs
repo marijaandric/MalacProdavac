@@ -1,8 +1,11 @@
-﻿using back.BLL.Dtos;
+﻿using System.Runtime.InteropServices;
+using System;
+using back.BLL.Dtos;
 using back.BLL.Dtos.Cards;
 using back.BLL.Dtos.HelpModels;
 using back.BLL.Dtos.Infos;
 using back.DAL.Contexts;
+using back.DAL.Models;
 using back.Models;
 using FirebaseAdmin.Messaging;
 using Microsoft.EntityFrameworkCore;
@@ -64,17 +67,17 @@ namespace back.DAL.Repositories
 
         #endregion
 
-        public async Task<List<ProductCard>> GetProducts(int userId, List<int> categories, int rating, bool open, int range, string location, int sort, string search, int page, int specificShopId, bool favorite)
+        public async Task<List<ProductCard>> GetUnsortedProducts(int? userId, List<int>? categories, int? rating, bool? open, int? range, string? location, string? search, int? specificShopId, bool? favorite, float? currLat, float? currLong)
         {
             List<ProductCard> products;
-            User currentUser = _context.Users.FirstOrDefault(x => x.Id == userId);
-            float currLat = currentUser.Latitude;
-            float currLong = currentUser.Longitude;
             int usersShop = -1;
             if (_context.Shop.Any(x => x.OwnerId == userId)) usersShop = (await _context.Shop.FirstOrDefaultAsync(x => x.OwnerId == userId)).Id;
 
-            if (categories.Count == 0) categories = await _context.Categories.Select(x => x.Id).ToListAsync();
-            if (specificShopId == -1)
+            if (categories == null || categories.Count == 0) categories = await _context.Categories.Select(x => x.Id).ToListAsync();
+            if (search == null) search = "";
+            if (rating == null) rating = 0;
+
+            if (specificShopId == null)
             {
                 products = await _context.Products.Where(x => categories.Contains(x.CategoryId) && x.Name.ToLower().Contains(search.Trim().ToLower()) && x.ShopId != usersShop)
                                     .GroupJoin(_context.ProductReviews.GroupBy(x => x.ProductId).Select(group => new
@@ -107,49 +110,57 @@ namespace back.DAL.Repositories
                                         Name = p.Name,
                                         Price = p.Price,
                                         Rating = pr.DefaultIfEmpty().Select(x => x.avg).FirstOrDefault(),
-                                        Image =  _context.ProductImages.FirstOrDefault(x => x.ProductId == p.Id).Image
+                                        Image = _context.ProductImages.FirstOrDefault(x => x.ProductId == p.Id).Image
                                     })
                                     .Where(x => x.Rating >= rating)
                                     .ToListAsync();
             }
-                
-            if (favorite)
+
+            if (favorite != null && favorite == true)
             {
                 products = products.Join(_context.LikedProducts.Where(x => x.UserId == userId), p => p.Id, lp => lp.ProductId, (p, lp) => p).ToList();
             }
 
-            if (open)
+            if (open != null && open == true)
             {
                 products = products
-                        .Join(_context.Shop.Join(_context.WorkingHours, s => s.Id, w => w.ShopId, (s, w) => w), p => p.ShopId, w => w.ShopId, (p, w) => new {p, w})
+                        .Join(_context.Shop.Join(_context.WorkingHours, s => s.Id, w => w.ShopId, (s, w) => w), p => p.ShopId, w => w.ShopId, (p, w) => new { p, w })
                         .ToList()
                         .Where(x => x.w.Day == DateTime.Now.DayOfWeek && x.w.OpeningHours <= DateTime.Now.TimeOfDay && x.w.ClosingHours >= DateTime.Now.TimeOfDay)
                         .Select(x => x.p)
                         .ToList();
             }
 
-            if (location.Trim().Length > 0 && location != "none")
+            if (location != null && location.Trim().Length > 0)
             {
                 products = products.Join(_context.Shop.Where(x => x.Address.Trim().ToLower().Contains(location.Trim().ToLower())), p => p.ShopId, s => s.Id, (p, s) => p).ToList();
             }
-            else if (range > 0)
+            else if (range != null && range > 0)
             {
-                products = products.Join(_context.Shop, p => p.ShopId, s => s.Id, (p, s) => (p, s)).Where(x => CalculateDistance((float)x.s.Latitude, (float)x.s.Longitude, currLat, currLong) <= range).Select(x => x.p).ToList();
+                products = products.Join(_context.Shop, p => p.ShopId, s => s.Id, (p, s) => (p, s)).Where(x => CalculateDistance((float)x.s.Latitude, (float)x.s.Longitude, (float)currLat, (float)currLong) <= range).Select(x => x.p).ToList();
             }
 
+            return products;
+        }
+
+        public async Task<List<ProductCard>> GetProducts(int? userId, List<int>? categories, int? rating, bool? open, int? range, string? location, int sort, string? search, int page, int? specificShopId, bool? favorite, float? currLat, float? currLong)
+        {
+            List<ProductCard> products = await GetUnsortedProducts(userId, categories, rating, open, range, location, search, specificShopId, favorite, currLat, currLong);
             products = SortProducts(sort, products);
 
             return products.Skip((page-1) * numberOfItems).Take(numberOfItems).ToList();
         }
 
-        public int ProductPages()
+        public async Task<int> ProductPages(int? userId, List<int>? categories, int? rating, bool? open, int? range, string? location, string? search, int? specificShopId, bool? favorite, float? currLat, float? currLong)
         {
-            return (int)Math.Ceiling((double)_context.Products.Count()/numberOfItems);
+            return (int)Math.Ceiling((double)(await GetUnsortedProducts(userId, categories, rating, open, range, location, search, specificShopId, favorite, currLat, currLong)).Count()/ numberOfItems);
         }
 
         public async Task<ProductInfo> ProductDetails(int productId, int userId)
         {
             Product product = await _context.Products.FirstOrDefaultAsync(x => x.Id == productId);
+            if (product == null) return null;
+
             List<WorkingHours> workingHours = await _context.WorkingHours.Where(x => x.ShopId == product.ShopId).Select(wh => new WorkingHours
                                                 {
                                                     Day = wh.Day,
@@ -197,7 +208,6 @@ namespace back.DAL.Repositories
                 Price = product.Price,
                 Metric = _context.Metrics.FirstOrDefault(x => x.Id == product.MetricId).Name,
                 Category = _context.Categories.FirstOrDefault(x => x.Id == product.CategoryId).Name,
-                Subcategory = _context.Subcategories.FirstOrDefault(x => x.Id == product.SubcategoryId).Name,
                 SalePercentage = product.SalePercentage,
                 SaleMinQuantity = product.SaleMinQuantity,
                 SaleMessage = product.SaleMessage,
@@ -312,7 +322,9 @@ namespace back.DAL.Repositories
                 await _context.ProductReviews.AddAsync(newReview);
                 await _context.SaveChangesAsync();
 
-                await SendNotificationAsync("New Review", "You have a new review to review!");
+                int ownerID = 5;
+
+                await SendNotificationAsync("New Review", "You have a new review to review!",ownerID);
 
                 return true;
             }
@@ -322,29 +334,52 @@ namespace back.DAL.Repositories
             }
         }
 
-        private async Task SendNotificationAsync(string title, string body)
+        private async Task SendNotificationAsync(string title, string body, int userID)
         {
             try
             {
-                var fcmToken = "user_or_topic_fcm_token";
+                var user = _context.Users.FirstOrDefault(u => u.Id == userID);
 
-                var message = new Message
+                if (user == null)
                 {
+                    Console.WriteLine("User not found.");
+                    return;
+                }
+
+                var fcmToken = user.FCMToken;
+
+                if (string.IsNullOrEmpty(fcmToken))
+                {
+                    Console.WriteLine("FCM token not available for the user.");
+                    return;
+                }
+
+                var message = new Message()
+                {
+                    Token = fcmToken,
                     Notification = new FirebaseAdmin.Messaging.Notification
                     {
                         Title = title,
-                        Body = body
+                        Body = body,
                     },
-                    Token = fcmToken
                 };
 
-                var result = await FirebaseMessaging.DefaultInstance.SendAsync(message, CancellationToken.None);
+                try
+                {
+                    var result = await FirebaseMessaging.DefaultInstance.SendAsync(message);
+                    Console.WriteLine($"Notification sent successfully: {result}");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error sending notification: {ex.Message}");
+                }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                
+                Console.WriteLine($"Error: {ex.Message}");
             }
         }
+
 
 
         public async Task<bool> LeaveQuestion(QnADto question)
@@ -373,6 +408,78 @@ namespace back.DAL.Repositories
             _context.ProductImages.Remove(pi);
             await _context.SaveChangesAsync();
             return name;
+        }
+
+        public async Task<bool> AddProduct(Product product)
+        {
+            await _context.Products.AddAsync(product);
+            return await _context.SaveChangesAsync() > 0;
+        }
+
+        public async Task<bool> AddProductSize(int id, int sizeId, int quantity)
+        {
+            await _context.ProductSizes.AddAsync(new ProductSize { ProductId = id, SizeId = sizeId, Stock = quantity });
+            return await _context.SaveChangesAsync() > 0;
+        }
+
+        public async Task<List<ProductSize>> GetProductSizes(int productId)
+        {
+            return await _context.ProductSizes.Where(x => x.ProductId == productId).ToListAsync();
+        }
+
+        public async Task<bool> DeleteProduct(int productId)
+        {
+            Product p = await _context.Products.FirstOrDefaultAsync(x => x.Id == productId);
+            _context.Products.Remove(p);
+
+            return await _context.SaveChangesAsync() > 0;
+        }
+
+        public async Task<bool> EditProduct(EditProductDto product)
+        {
+            if (product.Name == null && product.Description == null && product.SaleMinQuantity == null && product.SalePercentage == null && product.SaleMessage == null) return true; 
+
+            Product p = await _context.Products.FirstOrDefaultAsync(x => x.Id == product.Id);
+
+            if (product.Name != null) p.Name = product.Name;
+            if (product.Description != null) p.Description = product.Description;
+            if (product.SaleMinQuantity != null) p.SaleMinQuantity = (int)product.SaleMinQuantity;
+            if (product.SalePercentage != null) p.SalePercentage = (float)product.SalePercentage;
+            if (product.SaleMessage != null) p.SaleMessage = product.SaleMessage;
+
+            return await _context.SaveChangesAsync() > 0;
+        }
+
+        public async Task<bool> EditProductSize(int id, int sizeId, int quantity)
+        {
+            ProductSize ps = await _context.ProductSizes.FirstOrDefaultAsync(x => x.ProductId == id && x.SizeId == sizeId);
+            ps.Stock = quantity;
+            return await _context.SaveChangesAsync() > 0;
+        }
+
+        public async Task<List<int>> GetShopFollowers(int shopId)
+        {
+            return await _context.LikedShops.Where(x => x.ShopId == shopId).Select(x => x.UserId).ToListAsync();
+        }
+
+        public async Task<Product> GetProduct(int id)
+        {
+            return await _context.Products.FirstOrDefaultAsync(x => x.Id == id);
+        }
+
+        public async Task<string> GetMetric(int metricId)
+        {
+            return (await _context.Metrics.FirstOrDefaultAsync(x => x.Id == metricId)).Name;
+        }
+
+        public async Task<List<Metric>> GetMetrics()
+        {
+            return await _context.Metrics.ToListAsync();
+        }
+
+        public async Task<List<Size>> GetSizes()
+        {
+            return await _context.Sizes.ToListAsync();
         }
     }
 }

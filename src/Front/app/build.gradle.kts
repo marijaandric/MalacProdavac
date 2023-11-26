@@ -11,12 +11,13 @@ plugins {
 
 android {
     namespace = "com.example.front"
-    compileSdk = 33
+    compileSdk = 34
+
 
     defaultConfig {
         applicationId = "com.example.front"
         minSdk = 26
-        targetSdk = 33
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
@@ -68,6 +69,7 @@ dependencies {
     implementation("com.google.firebase:firebase-messaging-ktx:23.3.1")
     implementation("com.google.firebase:firebase-messaging:23.3.1")
     implementation("com.google.firebase:firebase-common-ktx:20.4.2")
+    implementation("androidx.work:work-runtime-ktx:2.8.1")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
@@ -139,14 +141,34 @@ dependencies {
 
     // osm
     implementation ("org.osmdroid:osmdroid-android:6.1.10")
+    implementation ("com.google.android.gms:play-services-location:17.1.0")
+
 
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1")
 
+    // Required when asking for permission to post notifications (starting in Android 13)
+    implementation("androidx.activity:activity-ktx:1.8.1")
+    implementation("androidx.fragment:fragment-ktx:1.6.2")
 
-    //Firebase
-    implementation(platform("com.google.firebase:firebase-bom:32.5.0"))
+    implementation("com.google.android.material:material:1.9.0")
+
+    // Import the Firebase BoM (see: https://firebase.google.com/docs/android/learn-more#bom)
+    implementation(platform("com.google.firebase:firebase-bom:32.6.0"))
+
+    // Firebase Cloud Messaging
+    implementation("com.google.firebase:firebase-messaging")
+
+    // For an optimal experience using FCM, add the Firebase SDK
+    // for Google Analytics. This is recommended, but not required.
     implementation("com.google.firebase:firebase-analytics")
 
+    
+    implementation("com.google.firebase:firebase-installations:17.2.0")
+
+    implementation("androidx.work:work-runtime:2.8.1")
+
+    implementation("androidx.compose.material3:material3")
+    
     //Realm
     implementation("io.realm.kotlin:library-base:1.11.0")
 }

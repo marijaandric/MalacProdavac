@@ -3,15 +3,25 @@ package com.example.front.api
 import com.example.front.model.DTO.CategoriesDTO
 import com.example.front.model.DTO.ChosenCategoriesDTO
 import com.example.front.model.DTO.HomeProductDTO
+import com.example.front.model.DTO.LeaveReviewDTO
 import com.example.front.model.DTO.LoginDTO
+import com.example.front.model.DTO.MetricsDTO
+import com.example.front.model.DTO.NewProductDTO
+import com.example.front.model.DTO.ProductDTO
+import com.example.front.model.DTO.ReviewDTO
 import com.example.front.model.request.RegistrationRequest
 import com.example.front.model.response.LoginResponse
 import com.example.front.model.DTO.ShopDTO
+import com.example.front.model.DTO.ShopDetailsDTO
+import com.example.front.model.DTO.ShopPagesDTO
 import com.example.front.model.DTO.ToggleLikeDTO
 import com.example.front.model.product.ProductInfo
 import com.example.front.model.product.ProductReviewUserInfo
+import com.example.front.model.response.Id
+import com.example.front.model.response.Success
 import com.example.front.model.user.MyProfileDTO
 import com.example.front.model.user.UserEditDTO
+import org.w3c.dom.Comment
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -96,6 +106,76 @@ interface Api {
         @Query("search") search: String?,
         @Query("page") page: Int,
         @Query("favorite") favorite: Boolean?,
+        @Query("currLat") currLat: Float?,
+        @Query("currLong") currLong: Float?
     ):Response<List<ShopDTO>>
+
+    @PUT("/back/Auth/FCMTokenSave")
+    suspend fun saveFCMToken(
+        @Query("userId") userID: Int,
+        @Query("token") token: String
+    ): Response<Boolean>
+
+    @GET("back/Shop/ShopPages")
+    suspend fun getShopPages(
+        @Query("userId") userId: Int,
+        @Query("categories") categories: List<Int>?,
+        @Query("rating") rating: Int?,
+        @Query("open") open: Boolean?,
+        @Query("range") range: Int?,
+        @Query("location") location: String?,
+        @Query("search") search: String?,
+        @Query("favorite") favorite: Boolean?,
+        @Query("currLat") currLat: Float?,
+        @Query("currLong") currLong: Float?
+    ):Response<ShopPagesDTO>
+
+    @GET("back/Shop/ShopDetails")
+    suspend fun getShopDetails(
+        @Query("shopId") shopId: Int,
+        @Query("userId") userId: Int
+    ):Response<ShopDetailsDTO>
+
+    @GET("back/Product/GetProducts")
+    suspend fun getProducts(
+        @Query("userId") userId: Int,
+        @Query("categories") categories: List<Int>?,
+        @Query("rating") rating: Int?,
+        @Query("open") open: Boolean?,
+        @Query("range") range: Int?,
+        @Query("location") location: String?,
+        @Query("sort") sort: Int?,
+        @Query("search") search: String?,
+        @Query("page") page: Int?,
+        @Query("specificShopId") specificShopId: Int?,
+        @Query("favorite") favorite: Boolean?,
+        @Query("currLat") currLat: Float?,
+        @Query("currLong") currLong: Float?
+    ):Response<List<ProductDTO>>
+
+    @GET("back/Shop/ShopReviews")
+    suspend fun getShopReviews(
+        @Query("shopId") shopId: Int,
+        @Query("page") page: Int
+    ):Response<List<ReviewDTO>>
+
+    @POST("back/Shop/Review")
+    suspend fun postShopReview(
+        @Body data: LeaveReviewDTO,
+    ): Response<Success>
+
+    @GET("/back/Helper/Metrics")
+    suspend fun getMetrics(
+    ):Response<List<MetricsDTO>>
+
+    @POST("/back/Product/AddProduct")
+    suspend fun postNewProduct(
+        @Body data: NewProductDTO,
+    ): Response<Success>
+
+    @GET("back/Shop/GetShopid")
+    suspend fun getShopId(
+        @Query("userId") userId: Int,
+    ):Response<Id>
 
 }

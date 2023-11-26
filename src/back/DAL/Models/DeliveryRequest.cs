@@ -15,9 +15,13 @@ namespace back.Models
         public int OrderId { get; set; }
         public DateTime? PickupDate { get; set; }
         public DateTime CreatedOn { get; set; }
+        [ForeignKey("User")]
+        public int? ChosenPersonId { get; set; }
+        public bool? Accepted {  get; set; } 
 
-        public DeliveryRoute Route { get; set; }
+        public DeliveryRoute? Route { get; set; }
         public Shop Shop { get; set; }
         public Order Order { get; set; }
+        public User? User { get; set; }
     }
 }

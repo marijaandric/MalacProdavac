@@ -1,5 +1,4 @@
-﻿using back.BLL.Dtos;
-using back.DAL.Contexts;
+﻿using back.DAL.Contexts;
 using back.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -73,6 +72,26 @@ namespace back.DAL.Repositories
             user.Image = "default.png";
             await _context.SaveChangesAsync();
             return name;
+        }
+
+        public async Task<bool> SaveFcmToken(int id, string token)
+        {
+            User user = await _context.Users.FirstOrDefaultAsync(x => x.Id == id);
+
+            user.FCMToken = token;
+            
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> SaveLatestCoordinates(int userId, float lat, float lon)
+        {
+            User user = await _context.Users.FirstOrDefaultAsync(x => x.Id == userId);
+
+            user.LatestLatitude = lat;
+            user.LatestLongitude = lon;
+
+            return await _context.SaveChangesAsync() > 0;
         }
     }
 }

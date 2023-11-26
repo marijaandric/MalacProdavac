@@ -1,5 +1,6 @@
 ﻿using back.BLL.Dtos;
 using back.BLL.Services;
+using back.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace back.PL.Controllers
@@ -15,11 +16,11 @@ namespace back.PL.Controllers
         }
 
         [HttpGet("GetShops")]
-        public async Task<IActionResult> GetShops(int userId, [FromQuery] List<int> categories, int rating, bool open, int range, string location, int sort, string search, int page, bool favorite)
+        public async Task<IActionResult> GetShops(int? userId, [FromQuery] List<int>? categories, int? rating, bool? open, int? range, string? location, int sort, string? search, int page, bool? favorite, float? currLat, float? currLong)
         {
             try
             {
-                return Ok(await _service.GetShops(userId, categories, rating, open, range, location, sort, search, page, favorite));
+                return Ok(await _service.GetShops(userId, categories, rating, open, range, location, sort, search, page, favorite, currLat, currLong));
             }
             catch (Exception ex)
             {
@@ -41,11 +42,11 @@ namespace back.PL.Controllers
         }
 
         [HttpGet("ShopPages")]
-        public IActionResult ShopPages() 
+        public async Task<IActionResult> ShopPages(int? userId, [FromQuery] List<int>? categories, int? rating, bool? open, int? range, string? location, string? search, bool? favorite, float? currLat, float? currLong) 
         {
             try
             {
-                return Ok(new { PageCount = _service.ShopPages() });
+                return Ok(new { PageCount = await _service.ShopPages(userId, categories, rating, open, range, location, search, favorite, currLat, currLong) });
             }
             catch (Exception ex)
             {
@@ -98,6 +99,110 @@ namespace back.PL.Controllers
             try
             {
                 return Ok(new { success = await _service.LeaveReview(review) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
+
+        [HttpPost("NewShop")]
+        public async Task<IActionResult> NewShop(ShopDto shop)
+        {
+            try
+            {
+                return Ok(new { Success = await _service.InsertShop(shop) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
+
+        [HttpPut("EditShop")]
+        public async Task<IActionResult> EditShop(EditShopDto shop)
+        {
+            try
+            {
+                return Ok(new { Success = await _service.EditShop(shop) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
+
+        [HttpDelete("DeleteShop")]
+        public async Task<IActionResult> DeleteShop(int shopId)
+        {
+            try
+            {
+                return Ok(new { Success = await _service.DeleteShop(shopId) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
+
+        [HttpPost("NewProductDisplay")]
+        public async Task<IActionResult> NewProductDisplay(ProductDisplayDto productDisplay)
+        {
+            try
+            {
+                return Ok(new { Success = await _service.InsertProductDisplay(productDisplay) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new {Error =  ex.Message});
+            }
+        }
+
+        [HttpPut("EditProductDisplay")]
+        public async Task<IActionResult> EditProductDisplay(EditProductDisplayDto productDisplay)
+        {
+            try
+            {
+                return Ok(new { Success = await _service.EditProductDisplay(productDisplay) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
+
+        [HttpDelete("DeleteProductDisplay")]
+        public async Task<IActionResult> DeleteProductDisplay(int id)
+        {
+            try
+            {
+                return Ok(new { Success = await _service.DeleteProductDisplay(id) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
+
+        [HttpGet("GetProductDisplay")]
+        public async Task<IActionResult> GetProductDisplay(int id)
+        {
+            try
+            {
+                return Ok(new { Success = await _service.GetProductDisplay(id) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
+
+        [HttpGet("GetShopid")]
+        public async Task<IActionResult> GetShopid(int userId)
+        {
+            try
+            {
+                return Ok(new { Id = await _service.GetShopId(userId) });
             }
             catch (Exception ex)
             {

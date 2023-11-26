@@ -1,5 +1,6 @@
 ﻿using back.BLL.Dtos.Cards;
 using back.DAL.Contexts;
+using back.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace back.DAL.Repositories
@@ -15,9 +16,9 @@ namespace back.DAL.Repositories
 
         int numberOfItems = 10;
 
-        public async Task<List<NotificationCard>> GetNotifications(int userId, int type, int page)
+        public async Task<List<NotificationCard>> GetNotifications(int userId, int? type, int page)
         {
-            if (type == -1)
+            if (type == null)
             {
                 return await _context.Notifications.Where(x => x.UserId == userId).Skip(page - 1 * numberOfItems).Take(numberOfItems).Select(x => new NotificationCard
                 {
@@ -25,7 +26,7 @@ namespace back.DAL.Repositories
                     Title = x.Title,
                     Text = x.Text,
                     CreatedOn = x.CreatedOn,
-                    TypeId = type,
+                    TypeId = x.TypeId,
                     ReferenceId = x.ReferenceId,
                     Read = x.Read
                 }).ToListAsync();
@@ -37,10 +38,28 @@ namespace back.DAL.Repositories
                 Title = x.Title,
                 Text = x.Text,
                 CreatedOn = x.CreatedOn,
-                TypeId = type,
+                TypeId = (int)type,
                 ReferenceId = x.ReferenceId,
                 Read = x.Read
             }).ToListAsync();
+        }
+
+        public async Task<bool> InsertNotification(int userId, int type, string title, string description, int referenceId)
+        {
+            Notification notification = new Notification
+            {
+                UserId = userId,
+                CreatedOn = DateTime.Now,
+                Read = false,
+                TypeId = type,
+                ReferenceId = referenceId,
+                Text = description,
+                Title = title
+            };
+
+            await _context.Notifications.AddAsync(notification);
+
+            return await _context.SaveChangesAsync() > 0;
         }
     }
 }

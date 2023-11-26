@@ -1,4 +1,5 @@
-﻿using back.BLL.Dtos;
+﻿using System.Runtime.InteropServices;
+using back.BLL.Dtos;
 using back.BLL.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,11 +16,11 @@ namespace back.PL.Controllers
         }
 
         [HttpGet("GetProducts")]
-        public async Task<IActionResult> GetProducts(int userId, [FromQuery] List<int> categories, int rating, bool open, int range, string location, int sort, string search, int page, bool favorite)
+        public async Task<IActionResult> GetProducts(int userId, [FromQuery]List<int>? categories, int? rating, bool? open, int? range, string? location, int sort, string? search, int page, int? specificShopId, bool? favorite, float? currLat, float? currLong)
         {
             try
             {
-                return Ok(await _service.GetProducts(userId, categories, rating, open, range, location, sort, search, page, -1, favorite));
+                return Ok(await _service.GetProducts(userId, categories, rating, open, range, location, sort, search, page, specificShopId, favorite, currLat, currLong));
             }
             catch (Exception ex)
             {
@@ -43,11 +44,11 @@ namespace back.PL.Controllers
         }
 
         [HttpGet("ProductPages")]
-        public IActionResult ProductPages()
+        public async Task<IActionResult> ProductPages(int? userId, [FromQuery]List<int>? categories, int? rating, bool? open, int? range, string? location, string? search, int? specificShopId, bool? favorite, float? currLat, float? currLong)
         {
             try
             {
-                return Ok( new { PageCount = _service.ProductPages() });
+                return Ok( new { PageCount = await _service.ProductPages(userId, categories, rating, open, range, location, search, specificShopId, favorite, currLat, currLong) });
             }
             catch (Exception ex)
             {
@@ -152,6 +153,45 @@ namespace back.PL.Controllers
             try
             {
                 return Ok(new { Success = await _service.DeleteProductPhoto(imageId) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
+
+        [HttpPost("AddProduct")]
+        public async Task<IActionResult> AddProduct(ProductDto product)
+        {
+            try
+            {
+                return Ok(new { Success = await _service.AddProduct(product) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
+
+        [HttpPut("EditProduct")]
+        public async Task<IActionResult> EditProduct(EditProductDto product)
+        {
+            try
+            {
+                return Ok(new { Success = await _service.EditProduct(product) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
+
+        [HttpDelete("DeleteProduct")]
+        public async Task<IActionResult> DeleteProduct(int productId)
+        {
+            try
+            {
+                return Ok(new { Success = await _service.DeleteProduct(productId) });
             }
             catch (Exception ex)
             {

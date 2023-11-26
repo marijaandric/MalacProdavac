@@ -1,16 +1,26 @@
 package com.example.front.repository
 
+import android.util.Log
 import com.example.front.api.Api
 import com.example.front.model.DTO.CategoriesDTO
 import com.example.front.model.DTO.ChosenCategoriesDTO
 import com.example.front.model.DTO.HomeProductDTO
+import com.example.front.model.DTO.LeaveReviewDTO
 import com.example.front.model.DTO.LoginDTO
+import com.example.front.model.DTO.MetricsDTO
+import com.example.front.model.DTO.NewProductDTO
+import com.example.front.model.DTO.ProductDTO
+import com.example.front.model.DTO.ReviewDTO
 import com.example.front.model.request.RegistrationRequest
 import com.example.front.model.response.LoginResponse
 import com.example.front.model.DTO.ShopDTO
+import com.example.front.model.DTO.ShopDetailsDTO
+import com.example.front.model.DTO.ShopPagesDTO
 import com.example.front.model.DTO.ToggleLikeDTO
 import com.example.front.model.product.ProductInfo
 import com.example.front.model.product.ProductReviewUserInfo
+import com.example.front.model.response.Id
+import com.example.front.model.response.Success
 import com.example.front.model.user.MyProfileDTO
 import com.example.front.model.user.UserEditDTO
 import retrofit2.Response
@@ -61,7 +71,47 @@ class Repository @Inject constructor(private val api: Api) {
         return api.getReviewsForProduct(productId,page)
     }
 
-    suspend fun getShops(userId: Int,categories:List<Int>?, rating:Int?,open:Boolean?,range:Int?, location:String?,sort:Int,search:String?,page:Int,favorite:Boolean): Response<List<ShopDTO>>{
-        return api.getShops(userId,categories,rating,open,range,location,sort,search,page,favorite)
+    suspend fun getShops(userId: Int,categories:List<Int>?, rating:Int?,open:Boolean?,range:Int?, location:String?,sort:Int,search:String?,page:Int,favorite:Boolean, currLat: Float?, currLong: Float?): Response<List<ShopDTO>>{
+        return api.getShops(userId,categories,rating,open,range,location,sort,search,page,favorite, currLat, currLong)
+    }
+    suspend fun saveFCMToken(userID:Int, token: String) : Response<Boolean>{
+        Log.d("Repository", "USAO")
+        val res = api.saveFCMToken(userID,token)
+        Log.d("Odgovor", res.toString())
+        return res
+    }
+
+    suspend fun getShopPages(userId: Int,categories:List<Int>?, rating:Int?,open:Boolean?,range:Int?, location:String?,search:String?,favorite:Boolean, currLat: Float?, currLong: Float?):Response<ShopPagesDTO>{
+        return api.getShopPages(userId,categories,rating,open,range,location,search,favorite, currLat, currLong)
+    }
+
+    suspend fun getShopDetails(userId: Int, shopId: Int):Response<ShopDetailsDTO>{
+        return api.getShopDetails(shopId,userId)
+    }
+
+    suspend fun getProducts(userId: Int,categories:List<Int>?, rating:Int?,open:Boolean?,range:Int?, location:String?,sort:Int?,search:String?,page:Int?,specificShopId:Int?,favorite:Boolean?, currLat: Float?, currLong: Float?):Response<List<ProductDTO>>
+    {
+        return api.getProducts(userId,categories,rating,open,range,location,sort,search,page,specificShopId,favorite,currLat,currLong)
+    }
+
+    suspend fun getShopReviews(shopId: Int, page:Int): Response<List<ReviewDTO>>
+    {
+        return api.getShopReviews(shopId,page)
+    }
+
+    suspend fun postShopReview(id:Int, userId: Int, rating: Int?, comment: String): Response<Success>
+    {
+        return api.postShopReview(LeaveReviewDTO(id, userId,rating, comment))
+    }
+
+    suspend fun getShopId(userId: Int):Response<Id>
+    {
+        return api.getShopId(userId)
+    }
+    suspend fun getMetrics(): Response<List<MetricsDTO>> {
+        return api.getMetrics()
+    }
+    suspend fun postNewProduct(product: NewProductDTO): Response<Success> {
+        return api.postNewProduct(product)
     }
 }

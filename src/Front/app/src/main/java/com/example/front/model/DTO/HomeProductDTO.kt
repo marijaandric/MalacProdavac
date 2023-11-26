@@ -18,4 +18,5 @@ data class HomeProductDTO (
     @SerializedName("metric") val metric: MetricDTO,
     @SerializedName("category") val category: CategoriesDTO,
     @SerializedName("subcategory") val subcategory: Int,
+    @SerializedName("image") val image: String,
 )

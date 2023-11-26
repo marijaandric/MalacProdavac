@@ -98,10 +98,16 @@ fun RegisterScreen(navController: NavHostController, registerViewModel: Register
             Box {
                 HeaderImage(painterResource(id = R.drawable.loginheaderimage))
 
-                LogoImage(
-                    painterResource(id = R.drawable.logowithwhitebackground),
-                    modifier = Modifier.offset(y = (-16).dp)
+                Box(
+                    modifier = Modifier.align(Alignment.BottomCenter)
+                        .padding(top=50.dp)
                 )
+                {
+                    LogoImage(
+                        painterResource(id = R.drawable.logowithwhitebackground),
+                        modifier = Modifier.offset(y = (-16).dp)
+                    )
+                }
             }
 
             Column(

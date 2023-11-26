@@ -17,14 +17,13 @@ namespace back.Models
         [ForeignKey("Category")]
         public int CategoryId { get; set; }
         [ForeignKey("Subcategory")]
-        public int SubcategoryId { get; set; }
         public float SalePercentage { get; set; }
         public int SaleMinQuantity { get; set; }
         public string? SaleMessage { get; set; }
+        public double? Mass { get; set; }
 
         public Shop Shop { get; set; }
         public Metric Metric { get; set; }
         public Category Category { get; set; }
-        public Subcategory Subcategory { get; set; }
     }
 }

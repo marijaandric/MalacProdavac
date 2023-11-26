@@ -19,6 +19,6 @@ namespace back.Models
 
         public Order Order { get; set; }
         public Product Product { get; set; }
-        public Size Size { get; set; }
+       // public Size Size { get; set; }
     }
 }

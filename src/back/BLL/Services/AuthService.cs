@@ -187,7 +187,7 @@ namespace back.BLL.Services
         public async Task<string> EditUser(EditUserDto values)
         {
             User newUser = await _authRepository.GetUser(values.Id);
-
+            if (values.Address != null && values.Name != null && values.Username != null && values.RoleId != null && values.Address == newUser.Address && values.Name == newUser.Name && values.Username == newUser.Username && values.RoleId == newUser.RoleId) return await CreateToken(newUser);
             if (values.Username.Length > 0)
             {
                 if (_authRepository.CountUsers(values.Username) == 0) newUser.Username = values.Username;
@@ -205,7 +205,7 @@ namespace back.BLL.Services
                 }
                 else throw new ArgumentException("Invalid address!");
             }
-            
+
 
             if (values.RoleId != null) newUser.RoleId = (int)values.RoleId;
             if (values.Name.Length > 0) newUser.Name = values.Name;
@@ -243,6 +243,17 @@ namespace back.BLL.Services
             }
 
             return false;
+        }
+
+        public async Task<bool> SaveFcmToken(int id, string token)
+        {
+            return await _authRepository.SaveFcmToken(id, token);
+        }
+
+        public async Task<bool> SaveLatestCoordinates(int userId, float lat, float lon)
+        {
+            if (!await _authRepository.SaveLatestCoordinates(userId, lat, lon)) throw new ArgumentException("Coordinates could not be saved!");
+            return true;
         }
     }
 }

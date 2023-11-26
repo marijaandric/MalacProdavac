@@ -14,5 +14,9 @@ namespace back.DAL.Repositories
         public Task<bool> EditUser(User newUser);
         public Task<bool> ChangeProfilePhoto(int id, string path);
         public Task<string> DeleteProfilePhoto(int userId);
+
+        public Task<bool> SaveFcmToken(int id,String token);
+        public Task<bool> SaveLatestCoordinates(int userId, float lat, float lon);
+
     }
 }

@@ -49,8 +49,8 @@ fun LoginScreen(
     navController: NavHostController,
     viewModel: LoginViewModel
 ) {
-    var userInput by remember { mutableStateOf("milovan") }
-    var passwordInput by remember { mutableStateOf("MilovanSmrdi123!") }
+    var userInput by remember { mutableStateOf("marija.andric") }
+    var passwordInput by remember { mutableStateOf("MejoSmrdi123!") }
 
     var scaffoldState: ScaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
@@ -67,14 +67,26 @@ fun LoginScreen(
             Box(
                 modifier = Modifier.fillMaxSize()
             ) {
-                HeaderImage(
-                    painterResource(id = R.drawable.loginheaderimage),
-                )
+                Box(
 
-                // Logo Image
-                LogoImage(
-                    painterResource(id = R.drawable.logowithwhitebackground),
                 )
+                {
+                    HeaderImage(
+                        painterResource(id = R.drawable.loginheaderimage),
+                    )
+
+                    // Logo Image
+                    Box(
+                        modifier = Modifier.align(Alignment.BottomCenter)
+                            .padding(top=30.dp)
+                    )
+                    {
+                        LogoImage(
+                            painterResource(id = R.drawable.logowithwhitebackground),
+                        )
+                    }
+
+                }
 
                 Column(
                     modifier = Modifier

@@ -1,5 +1,6 @@
 package com.example.front.screens.home
 
+import android.icu.util.Calendar
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -33,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.front.R
@@ -70,7 +72,7 @@ data class CardData(
     val id: Int,
     val title: String,
     val description: String,
-    val imageResource: Int,
+    val imageResource: String,
     var isLiked: Boolean
 )
 
@@ -83,7 +85,7 @@ fun Products(viewModel: HomeViewModel, navController: NavHostController) {
             id = productsState.id,
             title = productsState.name,
             description = productsState.price.toString()+" din",
-            imageResource = R.drawable.imageplaceholder,
+            imageResource = productsState.image,
             isLiked = false
         )
     }?.toList() ?: emptyList()
@@ -91,10 +93,17 @@ fun Products(viewModel: HomeViewModel, navController: NavHostController) {
     Column(
         modifier = Modifier
             .padding(16.dp, end = 0.dp, top = 20.dp)
+            .fillMaxWidth()
     ) {
-        Text(text = "Recommended products", modifier = Modifier.padding(bottom = 10.dp))
+        Text(text = "Recommended products",  style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),modifier = Modifier.padding(bottom = 10.dp))
         if (viewModel.state.value.isLoading) {
-            CircularProgressIndicator()
+            Box(
+                modifier=Modifier.padding(top=50.dp).fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            )
+            {
+                CircularProgressIndicator()
+            }
         } else {
             LazyColumn(
                 modifier = Modifier.heightIn(100.dp, 600.dp)
@@ -123,7 +132,7 @@ fun Sellers(viewModel: HomeViewModel) {
             id = shopState.id,
             title = shopState.name,
             description = shopState.address,
-            imageResource = R.drawable.imageplaceholder,
+            imageResource = shopState.image.toString(),
             isLiked = shopState.liked
         )
     }?.toList() ?: emptyList()
@@ -133,14 +142,22 @@ fun Sellers(viewModel: HomeViewModel) {
         modifier = Modifier
             .padding(16.dp, end = 0.dp)
     ) {
-        Text(text = "Recommended sellers", modifier = Modifier.padding(bottom = 10.dp))
-        LazyRow(
-            modifier = Modifier.heightIn(100.dp, 600.dp)
-        ) {
-            if (viewModel.stateShop.value.isLoading) {
-
+        Text(text = "Recommended sellers", style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold), modifier = Modifier.padding(bottom = 10.dp),)
+        if(viewModel.stateShop.value.isLoading)
+        {
+            Box(
+                modifier=Modifier.padding(top=20.dp)
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            )
+            {
+                CircularProgressIndicator()
             }
-            else{
+        }
+        else{
+            LazyRow(
+                modifier = Modifier.heightIn(100.dp, 600.dp)
+            ) {
                 itemsIndexed(sellers) { index, cardData ->
                     SellerCard(
                         title = cardData.title,
@@ -156,6 +173,7 @@ fun Sellers(viewModel: HomeViewModel) {
                 }
             }
         }
+
     }
 }
 
@@ -165,7 +183,7 @@ fun Search() {
     var value by remember { mutableStateOf("") }
     val context = LocalContext.current
     Box(
-        contentAlignment = Alignment.TopCenter
+        contentAlignment = Alignment.TopCenter,
     ) {
         Image(
             painter = painterResource(id = R.drawable.elipse),
@@ -177,7 +195,8 @@ fun Search() {
         Column()
         {
             Row(
-                modifier = Modifier.padding(top = 35.dp)
+                modifier = Modifier.padding(top = 35.dp, end = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
             )
             {
                 Icon(
@@ -189,12 +208,7 @@ fun Search() {
                         .align(Alignment.CenterVertically),
                     tint = MaterialTheme.colorScheme.background
                 )
-                SearchTextField(
-                    valuee = value,
-                    placeh = "Search products and sellers",
-                    onValueChangee = { value = it },
-                    modifier = Modifier
-                )
+                Text(getGreetingMessage(),style=MaterialTheme.typography.titleLarge.copy(color = MaterialTheme.colorScheme.background))
             }
             Image(
                 painter = painterResource(id = R.drawable.homepage),
@@ -210,6 +224,17 @@ fun Search() {
     }
 }
 
+fun getGreetingMessage(): String {
+    val calendar = Calendar.getInstance()
+    val hour = calendar.get(Calendar.HOUR_OF_DAY)
+
+    return when {
+        hour in 6..11 -> "Good morning!"
+        hour in 12..16 -> "Good afternoon!"
+        hour in 17..20 -> "Good evening!"
+        else -> "Good night!"
+    }
+}
 
 
 

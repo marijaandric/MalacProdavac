@@ -59,5 +59,5 @@ val Typography = Typography(
                 fontSize = 17.sp,
                 letterSpacing = 0.5.sp,
                 color = LightBlue
-        )
+        ),
 )
