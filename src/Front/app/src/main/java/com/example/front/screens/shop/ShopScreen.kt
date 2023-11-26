@@ -1,7 +1,6 @@
 package com.example.front.screens.shop
 
 import android.content.Context
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
@@ -13,7 +12,6 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -23,7 +21,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -35,10 +32,8 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -60,8 +55,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -74,21 +67,17 @@ import com.example.front.components.ButtonWithIcon
 import com.example.front.components.CardButton
 import com.example.front.components.CommentsTextBox
 import com.example.front.components.FilterDialogProducts
-import com.example.front.components.MyTextField
+import com.example.front.components.MyDropdown
 import com.example.front.components.MyTextFieldWithoutIcon
 import com.example.front.components.ReviewCard
 import com.example.front.components.SearchTextField
 import com.example.front.components.ShopProductCard
 import com.example.front.components.SmallElipseAndTitle
 import com.example.front.components.SortDialog
-import com.example.front.components.ToggleImageButton
 import com.example.front.components.ToggleImageButtonFunction
-import com.example.front.screens.categories.ClickableCard
-import com.example.front.screens.sellers.FiltersDialog
+import com.example.front.model.DTO.CategoriesDTO
 import com.example.front.viewmodels.oneshop.OneShopViewModel
-import com.example.front.viewmodels.shops.ShopsViewModel
 import kotlinx.coroutines.delay
-import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 
 @Composable
 fun ShopScreen(navController: NavHostController, shopViewModel: OneShopViewModel, shopId: Int) {
@@ -349,7 +338,7 @@ fun Products(isImageClicked: Boolean,shopViewModel: OneShopViewModel,shopId:Int)
 
 
 @Composable
-fun AddProductDialog(onDismiss: () -> Unit, shopsViewModel: OneShopViewModel, shopId: Int?) {
+fun AddProductDialog(onDismiss: () -> Unit, shopViewModel: OneShopViewModel, shopId: Int?) {
     val overlayColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)
 
     Dialog(
@@ -379,14 +368,20 @@ fun AddProductDialog(onDismiss: () -> Unit, shopsViewModel: OneShopViewModel, sh
                     .padding(top = 5.dp)
                     .align(Alignment.Center),
             ) {
+                contentOfAddNewProduct(shopViewModel)
             }
         }
     }
 }
 
 @Composable
-@Preview
-fun contentOfAddNewProduct(){
+fun contentOfAddNewProduct(shopViewModel: OneShopViewModel){
+    var allCategories by remember { mutableStateOf(emptyList<CategoriesDTO>()) }
+
+    LaunchedEffect(Unit) {
+        allCategories = shopViewModel.getCategories()!!
+    }
+
     Column(
     ){
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
@@ -407,7 +402,9 @@ fun contentOfAddNewProduct(){
                 .padding(16.dp)
         ){
             item{
-                Row(modifier = Modifier.fillMaxWidth().padding(10.dp), horizontalArrangement = Arrangement.Center) {
+                Row(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp), horizontalArrangement = Arrangement.Center) {
                     Text(
                         "Add new product",
                         style = MaterialTheme.typography.titleMedium.copy(color = MaterialTheme.colorScheme.onBackground),
@@ -460,7 +457,14 @@ fun contentOfAddNewProduct(){
                 }
 
             }
-
+            item{
+                MyDropdown(
+                    categoriesList = allCategories,
+                    onCategorySelected = {
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
         }
     }
 }

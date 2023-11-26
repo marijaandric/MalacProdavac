@@ -30,6 +30,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Menu
@@ -41,6 +42,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -83,6 +85,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
+import com.example.front.model.DTO.CategoriesDTO
 import com.example.front.model.DTO.ImageDataDTO
 import com.example.front.navigation.Screen
 import com.example.front.ui.theme.DarkBlue
@@ -144,6 +147,33 @@ fun MyTextField(
         shape = RoundedCornerShape(20.dp)
     )
 }
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MyDropdown(
+    categoriesList: List<CategoriesDTO>,
+    onCategorySelected: (CategoriesDTO) -> Unit,
+    modifier: Modifier
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    DropdownMenu(
+        expanded = expanded,
+        onDismissRequest = { expanded = false },
+        modifier = Modifier.background(MaterialTheme.colorScheme.surface)
+    ) {
+        categoriesList.forEach { category ->
+            DropdownMenuItem(onClick = {
+                expanded = false
+                onCategorySelected(category)
+            }) {
+                Text(text = category.name)
+            }
+        }
+    }
+}
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)

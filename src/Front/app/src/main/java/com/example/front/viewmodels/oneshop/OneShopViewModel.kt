@@ -8,6 +8,7 @@ import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.front.helper.DataStore.DataStoreManager
+import com.example.front.model.DTO.CategoriesDTO
 import com.example.front.model.DTO.FiltersDTO
 import com.example.front.repository.Repository
 import com.example.front.screens.shop.state.ProductState
@@ -18,6 +19,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import org.osmdroid.util.GeoPoint
 import org.w3c.dom.Comment
+import retrofit2.Response
 import javax.inject.Inject
 
 @HiltViewModel
@@ -251,5 +253,8 @@ class OneShopViewModel @Inject constructor(
         )
         Log.d("STA SALJEM", filtersState.toString())
         getProducts(_filtersState.value.userId,_filtersState.value.categories,_filtersState.value.rating,_filtersState.value.open,_filtersState.value.range,_filtersState.value.location,_filtersState.value.sort,_filtersState.value.search,_filtersState.value.page, specificShopId,_filtersState.value.favorite, _filtersState.value.currLat, _filtersState.value.currLon)
+    }
+    suspend fun getCategories(): List<CategoriesDTO>? {
+        return repository.getCategories().body()
     }
 }
