@@ -3,6 +3,8 @@ package com.example.front.screens.product
 import android.annotation.SuppressLint
 import android.graphics.Path
 import android.graphics.RectF
+import android.util.Log
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -84,7 +86,6 @@ fun ProductPage(
     }
 
     val productInfo = productViewModel.state.value.product
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -103,6 +104,7 @@ fun ProductPage(
                 CircularProgressIndicator()
             }
         } else {
+            var selectedImage by remember { mutableStateOf(productInfo?.images?.get(0)) }
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -111,7 +113,11 @@ fun ProductPage(
                     .background(Color.Transparent)
             ) {
                 if (productInfo != null) {
-                    productInfo.images?.get(0)?.let { ProductImage(it.image, modifier = Modifier) }
+                    selectedImage?.let { image ->
+                        if (image.image.isNotEmpty()) {
+                            ProductImage(image.image, modifier = Modifier)
+                        }
+                    }
                 }
 
                 ToggleImageButton(modifier = Modifier.align(Alignment.TopEnd))
@@ -130,20 +136,23 @@ fun ProductPage(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(3f)
-                    .clip(RoundedCornerShape(20.dp))
-                    .border(1.dp, Color.Black, shape = RoundedCornerShape(20.dp))
+                    .border(1.dp, Color.Black, shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp, bottomStart = 0.dp, bottomEnd = 0.dp))
                     .background(Color.Transparent)
-                    .clip(RoundedCornerShape(20.dp))
-            ) {
+            ){
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
                         .background(Color.White)
-                        .padding(20.dp)
+                        .padding(
+                            top = 20.dp,
+                            start = 20.dp,
+                            end = 20.dp,
+                            bottom = 0.dp
+                        )
                         .verticalScroll(rememberScrollState())
                 ) {
-                    productInfo?.images?.let {
-                        GalleryComponent(images = it, modifier = Modifier.padding(20.dp))
+                    productInfo?.images?.let { images ->
+                        GalleryComponent(modifier = Modifier.padding(20.dp),images = images, selectedImage = selectedImage) { selectedImage = it }
                     }
 
                     productInfo?.name?.let {
@@ -178,6 +187,9 @@ fun ProductPage(
                             contentDescription = "",
                             modifier = Modifier
                                 .size(29.dp)
+                                .clickable {
+                                    navHostController.navigate("${Screen.Shop.route}/${productInfo?.shopId}")
+                                }
                         )
                     }
 

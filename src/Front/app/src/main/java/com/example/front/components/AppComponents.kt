@@ -49,9 +49,11 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -151,12 +153,13 @@ fun MyTextFieldWithoutIcon(
     value: String,
     onValueChange: (String) -> Unit,
     isPassword: Boolean = false,
-    isLast: Boolean = false
+    isLast: Boolean = false,
+    modifier: Modifier
 ) {
     OutlinedTextField(
         modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(5.dp)),
+            .clip(RoundedCornerShape(5.dp))
+            .then(modifier),
         label = { Text(text = labelValue) },
         colors = TextFieldDefaults.outlinedTextFieldColors(
             focusedBorderColor = LightBlue,
@@ -535,13 +538,18 @@ fun ProductCard(
     navController: NavHostController,
     id:Int
 ) {
+    val onClick: () -> Unit = remember {
+        {
+            navController.navigate("${Screen.Product.route}/$id")
+        }
+    }
     Card(
         modifier = Modifier
             .clip(RoundedCornerShape(20.dp))
             .fillMaxWidth(0.9f)
             .padding(bottom = 15.dp, end = 16.dp)
-            .clickable { navController.navigate("${Screen.Product.route}/$id") }
-    ) {
+            .clickable(onClick = onClick)
+    ){
         val imageUrl = "http://softeng.pmf.kg.ac.rs:10015/images/${imageResource}"
 
         val painter: Painter = rememberAsyncImagePainter(model = imageUrl)
@@ -722,7 +730,7 @@ fun ShopCard(
 
 
 @Composable
-fun GalleryComponent(images: List<ImageDataDTO>, modifier: Modifier) {
+fun GalleryComponent(modifier: Modifier,images: List<ImageDataDTO>, selectedImage: ImageDataDTO?, onImageClick: (ImageDataDTO) -> Unit) {
     LazyRow(
         modifier = Modifier
             .fillMaxWidth()
@@ -730,26 +738,32 @@ fun GalleryComponent(images: List<ImageDataDTO>, modifier: Modifier) {
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(images) { image ->
-            ImageItem(image = image)
+            ImageItem(image = image, isSelected = image == selectedImage) {
+                onImageClick(image)
+            }
         }
     }
 }
 
-@OptIn(ExperimentalEncodingApi::class)
 @Composable
-fun ImageItem(image: ImageDataDTO) {
-    val imageUrl = "http://softeng.pmf.kg.ac.rs:10015/images/${image.image}"
-
-    val painter: Painter = rememberAsyncImagePainter(model = imageUrl)
-    Image(
-        painter = painter,
-        contentDescription = null,
+fun ImageItem(image: ImageDataDTO, isSelected: Boolean, onImageClick: () -> Unit) {
+    Box(
         modifier = Modifier
-            .size(100.dp)
-            .clip(RoundedCornerShape(10.dp))
-    )
-}
+            .border(1.dp, if (isSelected) Color.Gray else Color.Transparent)
+            .clickable { onImageClick() }
+    ) {
+        val imageUrl = "http://softeng.pmf.kg.ac.rs:10015/images/${image.image}"
 
+        val painter: Painter = rememberAsyncImagePainter(model = imageUrl)
+        Image(
+            painter = painter,
+            contentDescription = null,
+            modifier = Modifier
+                .size(100.dp)
+                .clip(RoundedCornerShape(10.dp))
+        )
+    }
+}
 
 @OptIn(ExperimentalEncodingApi::class)
 @Composable

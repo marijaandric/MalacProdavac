@@ -60,6 +60,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -378,46 +379,91 @@ fun AddProductDialog(onDismiss: () -> Unit, shopsViewModel: OneShopViewModel, sh
                     .padding(top = 5.dp)
                     .align(Alignment.Center),
             ) {
-                LazyColumn (
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight()
-                        .padding(16.dp)
-                        .align(Alignment.TopCenter)
-                ){
-                    item{
-                        Text(
-                            "Add new product",
-                            style = MaterialTheme.typography.titleMedium.copy(color = MaterialTheme.colorScheme.onBackground),
-                            modifier = Modifier
-                                .padding(bottom = 30.dp,start=16.dp)
-                        )
-                    }
-                    item{
-                        Box(modifier = Modifier.padding(start=16.dp,end=10.dp))
-                        {
-                            MyTextFieldWithoutIcon(labelValue = "Product name", value = "", onValueChange = {})
-                        }
-                    }
-                    item{
-                        CommentsTextBox(onReviewTextChanged = {}, "Product Description")
-                    }
-                    item{
-                        Box(modifier = Modifier.padding(start=16.dp,end=16.dp))
-                        {
-                            MyTextFieldWithoutIcon(
-                                labelValue = "Quantity in stock",
-                                value = "",
-                                onValueChange = {})
-                        }
-                    }
-
-                }
             }
         }
     }
 }
 
+@Composable
+@Preview
+fun contentOfAddNewProduct(){
+    Column(
+    ){
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+            Image(
+                painter = painterResource(id = R.drawable.upload_image),
+                contentDescription = "Placeholder",
+                modifier = Modifier
+                    .size(150.dp)
+                    .padding(20.dp),
+                contentScale = ContentScale.FillWidth,
+                alignment = Alignment.Center
+            )
+        }
+        LazyColumn (
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight()
+                .padding(16.dp)
+        ){
+            item{
+                Row(modifier = Modifier.fillMaxWidth().padding(10.dp), horizontalArrangement = Arrangement.Center) {
+                    Text(
+                        "Add new product",
+                        style = MaterialTheme.typography.titleMedium.copy(color = MaterialTheme.colorScheme.onBackground),
+                        modifier = Modifier
+                    )
+                }
+            }
+            item{
+                Box(modifier = Modifier.padding(start=16.dp,end=10.dp))
+                {
+                    MyTextFieldWithoutIcon(labelValue = "Product name", value = "", onValueChange = {}, modifier = Modifier)
+                }
+            }
+            item{
+                CommentsTextBox(onReviewTextChanged = {}, "Product Description")
+            }
+            item{
+                Box(modifier = Modifier.padding(start=16.dp,end=16.dp))
+                {
+                    MyTextFieldWithoutIcon(
+                        labelValue = "Quantity in stock",
+                        value = "",
+                        onValueChange = {},
+                        modifier = Modifier.fillMaxWidth())
+                }
+            }
+
+            item{
+                Row(
+                    modifier = Modifier
+                        .padding(start = 16.dp, end = 16.dp)
+                ) {
+                    MyTextFieldWithoutIcon(
+                        labelValue = "Unity price",
+                        value = "",
+                        onValueChange = {},
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(end = 2.dp) // Add padding to the end of the first TextField
+                    )
+
+                    MyTextFieldWithoutIcon(
+                        labelValue = "Unity of quantity",
+                        value = "",
+                        onValueChange = {},
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(start = 2.dp) // Add padding to the start of the second TextField
+                    )
+                }
+
+            }
+
+        }
+    }
+}
 
 @Composable
 fun Info(isImageClicked: Boolean, shopViewModel: OneShopViewModel, shopId: Int, userID:Int, context: Context) {
