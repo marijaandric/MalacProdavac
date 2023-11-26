@@ -95,7 +95,7 @@ namespace back.BLL.Services
                 });
             }
 
-            return deliveryPeopleList;
+            return deliveryPeopleList.OrderBy(x => x.ClosestRouteDivergence).Take(10).ToList();
         }
     }
 }
