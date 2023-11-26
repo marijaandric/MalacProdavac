@@ -1,5 +1,6 @@
 package com.example.front.screens.home
 
+import android.icu.util.Calendar
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -194,24 +195,20 @@ fun Search() {
         Column()
         {
             Row(
-                modifier = Modifier.padding(top = 35.dp, end = 16.dp)
+                modifier = Modifier.padding(top = 35.dp, end = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
             )
             {
                 Icon(
                     imageVector = Icons.Default.Menu,
                     contentDescription = "Search icon",
                     modifier = Modifier
-                        .padding(end = 10.dp,start = 16.dp)
+                        .padding(end = 10.dp)
                         .size(50.dp)
                         .align(Alignment.CenterVertically),
                     tint = MaterialTheme.colorScheme.background
                 )
-                SearchTextField(
-                    valuee = value,
-                    placeh = "Search products and sellers",
-                    onValueChangee = { value = it },
-                    modifier = Modifier
-                )
+                Text(getGreetingMessage(),style=MaterialTheme.typography.titleLarge.copy(color = MaterialTheme.colorScheme.background))
             }
             Image(
                 painter = painterResource(id = R.drawable.homepage),
@@ -227,6 +224,17 @@ fun Search() {
     }
 }
 
+fun getGreetingMessage(): String {
+    val calendar = Calendar.getInstance()
+    val hour = calendar.get(Calendar.HOUR_OF_DAY)
+
+    return when {
+        hour in 6..11 -> "Good morning!"
+        hour in 12..16 -> "Good afternoon!"
+        hour in 17..20 -> "Good evening!"
+        else -> "Good night!"
+    }
+}
 
 
 
