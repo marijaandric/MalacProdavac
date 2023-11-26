@@ -14,6 +14,6 @@ namespace back.DAL.Models
         public int Stock {  get; set; }
 
         public Product Product { get; set; }
-        public Size Size { get; set; }
+        //public Size Size { get; set; }
     }
 }

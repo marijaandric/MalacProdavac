@@ -936,7 +936,7 @@ fun ProfilePic(shopViewModel: OneShopViewModel, id: Int) {
                 contentDescription = "Search icon",
                 modifier = Modifier
                     .size(40.dp)
-                    .align(Alignment.TopStart)
+                    .align(Alignment.TopEnd)
                     .clickable {
 
                     },
@@ -969,6 +969,8 @@ fun ProfilePic(shopViewModel: OneShopViewModel, id: Int) {
         )
 
         if (shopViewModel.state.value.shop!!.image == null) {
+        if(shopViewModel.state.value.shop!!.image == null)
+        {
             Image(
                 painter = painterResource(id = R.drawable.imageplaceholder),
                 contentDescription = "Placeholder",
