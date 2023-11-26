@@ -25,6 +25,9 @@ class MongoRepositoryImpl(val realm: Realm) : MongoRepository {
                 existingProduct.name = product.name
                 existingProduct.price = product.price
                 existingProduct.quantity = product.quantity
+                existingProduct.shopName = product.shopName
+                existingProduct.image = product.image
+                existingProduct.metric = product.metric
             } else {
                 copyToRealm(product)
             }

@@ -265,13 +265,17 @@ fun ProductPage(
                     Button(
                         onClick = {
                             // zove funkciju i salje podatke sa stranice
-                            if (productInfo != null)
+                            if (productInfo?.name != null &&
+                                productInfo?.price != null &&
+                                productInfo?.shopName != null &&
+                                productInfo.images?.isNotEmpty() == true &&
+                                productInfo.metric != null)
                             {
-                                productViewModel.addToCart(productID, productInfo.name, productInfo.price, 1, productInfo.shopName)//, productInfo.images[0])
+                                productViewModel.addToCart(productID, productInfo.name, productInfo.price, 1, productInfo.shopName, productInfo.images[0].image, productInfo.metric)
+                                //// ispisuje obavestenje
                             } else {
 
                             }
-                            //// ispisuje obavestenje
                         },
                         modifier = Modifier
                             .height(80.dp)
