@@ -13,7 +13,7 @@ namespace back.BLL.Dtos
         public string? SaleMessage { get; set; }
         public int CategoryId { get; set; }
         public int ShopId { get; set; }
-        public int SubcategoryId { get; set; }
+        public double? Mass { get; set; }
         public List<StockDto> Sizes { get; set; }
     }
 }

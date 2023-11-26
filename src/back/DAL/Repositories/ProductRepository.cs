@@ -159,6 +159,8 @@ namespace back.DAL.Repositories
         public async Task<ProductInfo> ProductDetails(int productId, int userId)
         {
             Product product = await _context.Products.FirstOrDefaultAsync(x => x.Id == productId);
+            if (product == null) return null;
+
             List<WorkingHours> workingHours = await _context.WorkingHours.Where(x => x.ShopId == product.ShopId).Select(wh => new WorkingHours
                                                 {
                                                     Day = wh.Day,
@@ -206,7 +208,6 @@ namespace back.DAL.Repositories
                 Price = product.Price,
                 Metric = _context.Metrics.FirstOrDefault(x => x.Id == product.MetricId).Name,
                 Category = _context.Categories.FirstOrDefault(x => x.Id == product.CategoryId).Name,
-                Subcategory = _context.Subcategories.FirstOrDefault(x => x.Id == product.SubcategoryId).Name,
                 SalePercentage = product.SalePercentage,
                 SaleMinQuantity = product.SaleMinQuantity,
                 SaleMessage = product.SaleMessage,

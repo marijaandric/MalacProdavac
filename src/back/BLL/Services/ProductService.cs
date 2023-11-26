@@ -125,7 +125,6 @@ namespace back.BLL.Services
                 SaleMinQuantity = product.SaleMinQuantity,
                 SalePercentage = product.SalePercentage,
                 ShopId = product.ShopId,
-                SubcategoryId = product.SubcategoryId
             };
 
             if (!await _repository.AddProduct(newProduct)) throw new ArgumentException("The product could not be added!");

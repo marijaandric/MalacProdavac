@@ -128,6 +128,7 @@ namespace back.DAL.Repositories
         public async Task<ShopInfo> ShopDetails(int shopId, int userId)
         {
             Shop shop = await _context.Shop.FirstOrDefaultAsync(x => x.Id == shopId);
+            if (shop == null) return null;
             
             List<string> categories = await _context.ShopCategories.Where(x => x.ShopId == shopId).Join(_context.Categories, sc => sc.CategoryId, c => c.Id, (sc, c) => c).Select(x => x.Name).ToListAsync();
             List<string> subcategories = await _context.ShopSubcategories.Where(x => x.ShopId == shopId).Join(_context.Subcategories, sc => sc.SubcategoryId, c => c.Id, (sc, c) => c).Select(x => x.Name).ToListAsync();

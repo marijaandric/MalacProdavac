@@ -7,5 +7,6 @@
         public string StartTime {  get; set; }
         public string StartLocation { get; set; }
         public string EndLocation { get; set; }
+        public double FixedCost { get; set; }
     }
 }
