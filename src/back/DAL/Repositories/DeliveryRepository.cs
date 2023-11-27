@@ -10,7 +10,7 @@ namespace back.DAL.Repositories
     public class DeliveryRepository : IDeliveryRepository
     {
         Context _context;
-
+        public static double priceMax = 350;
         public DeliveryRepository(Context context)
         {
             _context = context;
@@ -28,8 +28,10 @@ namespace back.DAL.Repositories
             return await _context.SaveChangesAsync() > 0;
         }
 
-        public async Task<bool> InsertDeliveryRoute(DeliveryRouteDto route)
+        public async Task<bool?> InsertDeliveryRoute(DeliveryRouteDto route)
         {
+            if (route.FixedCost > priceMax) return null;
+
             (double, double) startCoords = await HelperService.GetCoordinates(route.StartLocation);
             (double, double) endCoords = await HelperService.GetCoordinates(route.EndLocation);
 
@@ -44,7 +46,7 @@ namespace back.DAL.Repositories
                 StartLongitude = startCoords.Item2,
                 EndLatitude = endCoords.Item1,
                 EndLongitude = endCoords.Item2,
-                FixedCost = 0
+                FixedCost = (float)route.FixedCost
             });
 
             return await _context.SaveChangesAsync() > 0;
