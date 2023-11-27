@@ -78,8 +78,6 @@ fun ProductPage(
         }
     }
 
-    val productInfo = productViewModel.state.value.product
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -93,12 +91,17 @@ fun ProductPage(
                     .background(MaterialTheme.colorScheme.background),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
-            )
-            {
+            ) {
                 CircularProgressIndicator()
             }
         } else {
+            val productInfo = productViewModel.state.value.product
             var selectedImage by remember { mutableStateOf(productInfo?.images?.get(0)) }
+
+            LaunchedEffect(productInfo) {
+                selectedImage = productInfo?.images?.get(0)
+            }
+
             Box(
                 modifier = Modifier
                     .fillMaxWidth()

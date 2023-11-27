@@ -1,7 +1,11 @@
 package com.example.front.screens.shop
 
 import android.content.Context
+import android.net.Uri
+import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
@@ -372,6 +376,8 @@ fun Products(isImageClicked: Boolean, shopViewModel: OneShopViewModel, shopId: I
 
 @Composable
 fun AddProductDialog(onDismiss: () -> Unit, shopViewModel: OneShopViewModel, shopId: Int?) {
+    var currentStep by remember { mutableStateOf(0) }
+
     val overlayColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)
 
     Dialog(
@@ -401,14 +407,94 @@ fun AddProductDialog(onDismiss: () -> Unit, shopViewModel: OneShopViewModel, sho
                     .padding(top = 5.dp)
                     .align(Alignment.Center),
             ) {
-                contentOfAddNewProduct(shopViewModel)
+                when (currentStep) {
+                    0 -> {
+                        contentOfAddNewProduct(shopViewModel, onNextClicked = { currentStep = 1 })
+                    }
+                    1 -> {
+                        contentOfAddNewImage(shopViewModel, onNextClicked = { currentStep = 0 })
+                    }
+                }
             }
         }
     }
 }
 
+
 @Composable
-fun contentOfAddNewProduct(shopViewModel: OneShopViewModel) {
+fun contentOfAddNewImage(shopViewModel: OneShopViewModel, onNextClicked: () -> Unit) {
+
+    var selectedImageUris by remember { mutableStateOf(emptyList<Uri>()) }
+    val imagePickerLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        uri?.let {
+            selectedImageUris = selectedImageUris + it
+            Log.d("ImagePicker", "New image added: $it")
+        }
+    }
+
+    Column {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    "Add images for product",
+                    style = MaterialTheme.typography.titleMedium.copy(color = MaterialTheme.colorScheme.onBackground),
+                    modifier = Modifier
+                )
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.upload_image),
+                    contentDescription = "Placeholder",
+                    modifier = Modifier
+                        .size(150.dp)
+                        .padding(20.dp)
+                        .clickable {
+                            imagePickerLauncher.launch("image/*")
+                        },
+                    contentScale = ContentScale.FillWidth,
+                    alignment = Alignment.Center
+                )
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Button(
+                    onClick = {
+                        selectedImageUris.forEach { uri ->
+                            shopViewModel.uploadImage(1, 17, uri)
+                            Log.d("ImagePicker", "New image added: $uri")
+                        }
+                    }
+                ) {
+                    Text("Upload Images")
+                }
+            }
+        }
+    }
+}
+
+
+
+@Composable
+fun contentOfAddNewProduct(shopViewModel: OneShopViewModel, onNextClicked: () -> Unit) {
+
     var productName by remember { mutableStateOf("") }
     var quantity by remember { mutableStateOf(0) }
     var productDescription by remember { mutableStateOf("") }
@@ -442,23 +528,6 @@ fun contentOfAddNewProduct(shopViewModel: OneShopViewModel) {
                             "Add new product",
                             style = MaterialTheme.typography.titleMedium.copy(color = MaterialTheme.colorScheme.onBackground),
                             modifier = Modifier
-                        )
-                    }
-                }
-                item {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.upload_image),
-                            contentDescription = "Placeholder",
-                            modifier = Modifier
-                                .size(150.dp)
-                                .padding(20.dp),
-                            contentScale = ContentScale.FillWidth,
-                            alignment = Alignment.Center
                         )
                     }
                 }
@@ -629,7 +698,8 @@ fun contentOfAddNewProduct(shopViewModel: OneShopViewModel) {
                                 shopId = shopId,
                                 weight = weight
                             )
-                            shopViewModel.postNewProduct(newProductDTO)
+                            //shopViewModel.postNewProduct(newProductDTO)
+                            onNextClicked()
                         },
                         modifier = Modifier
                             .fillMaxWidth()

@@ -49,7 +49,7 @@ fun LoginScreen(
     navController: NavHostController,
     viewModel: LoginViewModel
 ) {
-    var userInput by remember { mutableStateOf("marija.andric") }
+    var userInput by remember { mutableStateOf("milovan") }
     var passwordInput by remember { mutableStateOf("MejoSmrdi123!") }
 
     var scaffoldState: ScaffoldState = rememberScaffoldState()

@@ -39,7 +39,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.front.R
 import com.example.front.components.ProductCard
-import com.example.front.components.SearchTextField
 import com.example.front.components.SellerCard
 import com.example.front.viewmodels.home.HomeViewModel
 
@@ -49,8 +48,8 @@ fun HomePage(
     homeViewModel: HomeViewModel
 ) {
     LaunchedEffect(Unit) {
-        homeViewModel.getUserId()?.let { homeViewModel.getHomeProducts(it) }
-        homeViewModel.getUserId()?.let { homeViewModel.getHomeShops(it) }
+        homeViewModel.getHomeProducts(homeViewModel.getUserId())
+        homeViewModel.getHomeShops(homeViewModel.getUserId())
     }
 
     LazyColumn(
@@ -72,7 +71,7 @@ data class CardData(
     val id: Int,
     val title: String,
     val description: String,
-    val imageResource: String,
+    val imageResource: String?,
     var isLiked: Boolean
 )
 
@@ -84,11 +83,12 @@ fun Products(viewModel: HomeViewModel, navController: NavHostController) {
         CardData(
             id = productsState.id,
             title = productsState.name,
-            description = productsState.price.toString()+" din",
+            description = String.format("%.2f", productsState.price)+ " din",
             imageResource = productsState.image,
             isLiked = false
         )
     }?.toList() ?: emptyList()
+
 
     Column(
         modifier = Modifier
@@ -109,13 +109,24 @@ fun Products(viewModel: HomeViewModel, navController: NavHostController) {
                 modifier = Modifier.heightIn(100.dp, 600.dp)
             ) {
                 items(products) { cardData ->
-                    ProductCard(
-                        title = cardData.title,
-                        price = cardData.description,
-                        imageResource = cardData.imageResource,
-                        navController,
-                        cardData.id
-                    )
+                    cardData.imageResource?.let { imageResource ->
+                        ProductCard(
+                            title = cardData.title,
+                            price = cardData.description,
+                            imageResource = imageResource,
+                            navController,
+                            cardData.id
+                        )
+                    } ?: run {
+                        // Use a default image placeholder when cardData.imageResource is null
+                        ProductCard(
+                            title = cardData.title,
+                            price = cardData.description,
+                            imageResource = "imageplaceholder.jpg", // Replace with your default image placeholder
+                            navController,
+                            cardData.id
+                        )
+                    }
                 }
             }
         }
@@ -159,16 +170,30 @@ fun Sellers(viewModel: HomeViewModel) {
                 modifier = Modifier.heightIn(100.dp, 600.dp)
             ) {
                 itemsIndexed(sellers) { index, cardData ->
-                    SellerCard(
-                        title = cardData.title,
-                        author = cardData.description,
-                        imageResource = cardData.imageResource,
-                        isLiked = cardData.isLiked,
-                        onClick = {
-                            viewModel.updateLikeStatus(index, !cardData.isLiked)
-                            viewModel.changeLikedState(cardData.id)
-                        }
-                    )
+                    cardData.imageResource?.let { imageResource ->
+                        SellerCard(
+                            title = cardData.title,
+                            author = cardData.description,
+                            imageResource = imageResource,
+                            isLiked = cardData.isLiked,
+                            onClick = {
+                                viewModel.updateLikeStatus(index, !cardData.isLiked)
+                                viewModel.changeLikedState(cardData.id)
+                            }
+                        )
+                    } ?: run {
+                        // Use a default image placeholder when cardData.imageResource is null
+                        SellerCard(
+                            title = cardData.title,
+                            author = cardData.description,
+                            imageResource = "imageplaceholder.jpg", // Replace with your default image placeholder
+                            isLiked = cardData.isLiked,
+                            onClick = {
+                                viewModel.updateLikeStatus(index, !cardData.isLiked)
+                                viewModel.changeLikedState(cardData.id)
+                            }
+                        )
+                    }
                     Spacer(modifier = Modifier.width(16.dp))
                 }
             }

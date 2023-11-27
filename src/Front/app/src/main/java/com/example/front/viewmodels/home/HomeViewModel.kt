@@ -11,8 +11,6 @@ import com.example.front.screens.home.states.HomeProductsState
 import com.example.front.screens.home.states.HomeShopState
 import com.example.front.screens.home.states.ToggleLikeState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -32,25 +30,24 @@ class HomeViewModel @Inject constructor(
     private val _stateLike = mutableStateOf(ToggleLikeState())
     var stateLike : State<ToggleLikeState> = _stateLike;
 
-    private val _usernameFlow = MutableStateFlow("")
-    val usernameFlow: Flow<String> = _usernameFlow
 
 
-
-    fun getHomeProducts(i: Int)
+    fun getHomeProducts(userId: Int?)
     {
         viewModelScope.launch {
             try{
                 val id = dataStoreManager.getUserIdFromToken()
                 if(id != null)
                 {
-                    val response = repository.getHomeProducts(i)
+                    val response = userId?.let { repository.getHomeProducts(5) }
 
-                    if (response.isSuccessful) {
-                        _state.value = _state.value.copy(
-                            isLoading = false,
-                            products = response.body()
-                        )
+                    if (response != null) {
+                        if (response.isSuccessful) {
+                            _state.value = _state.value.copy(
+                                isLoading = false,
+                                products = response.body()
+                            )
+                        }
                     }
                 }
             }
@@ -61,21 +58,21 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun getHomeShops(i: Int)
+    fun getHomeShops(userId: Int?)
     {
         viewModelScope.launch {
             val id = dataStoreManager.getUserIdFromToken()
             if(id != null) {
                 try{
-                    val response = repository.getHomeShops(i)
+                    val response = userId?.let { repository.getHomeShops(5) }
 
-                    if (response.isSuccessful) {
-                        val responseBody = response.body()
-
-                        _stateShop.value = _stateShop.value.copy(
-                            isLoading = false,
-                            shops = response.body()
-                        )
+                    if (response != null) {
+                        if (response.isSuccessful) {
+                            _stateShop.value = _stateShop.value.copy(
+                                isLoading = false,
+                                shops = response.body()
+                            )
+                        }
                     }
                 }
                 catch (e:Exception)

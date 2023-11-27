@@ -21,13 +21,16 @@ import com.example.front.model.response.Id
 import com.example.front.model.response.Success
 import com.example.front.model.user.MyProfileDTO
 import com.example.front.model.user.UserEditDTO
+import okhttp3.MultipartBody
 import org.w3c.dom.Comment
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Headers
+import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.PUT
+import retrofit2.http.Part
 import retrofit2.http.Query
 import javax.inject.Singleton
 
@@ -177,5 +180,13 @@ interface Api {
     suspend fun getShopId(
         @Query("userId") userId: Int,
     ):Response<Id>
+
+    @POST("/back/Helper/UploadImage")
+    @Multipart
+    suspend fun uploadImage(
+        @Query("type") shopId: Int,
+        @Query("id") page: Int,
+        @Part image: MultipartBody.Part
+    ): Response<Success>
 
 }

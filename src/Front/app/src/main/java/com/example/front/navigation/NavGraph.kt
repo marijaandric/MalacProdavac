@@ -84,7 +84,7 @@ fun SetupNavGraph(
             route = Screen.AllProduct.route
         )
         {
-            AllProducts(navController = navController, homeViewModel)
+            AllProducts(navController = navController, homeViewModel,shopsViewModel)
         }
         composable(
             route = Screen.AllSellers.route

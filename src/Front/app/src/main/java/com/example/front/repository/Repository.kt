@@ -23,6 +23,7 @@ import com.example.front.model.response.Id
 import com.example.front.model.response.Success
 import com.example.front.model.user.MyProfileDTO
 import com.example.front.model.user.UserEditDTO
+import okhttp3.MultipartBody
 import retrofit2.Response
 import javax.inject.Inject
 
@@ -113,5 +114,8 @@ class Repository @Inject constructor(private val api: Api) {
     }
     suspend fun postNewProduct(product: NewProductDTO): Response<Success> {
         return api.postNewProduct(product)
+    }
+    suspend fun uploadImage(type: Int, id: Int, imagePart: MultipartBody.Part): Response<Success> {
+        return api.uploadImage(type, id, imagePart)
     }
 }

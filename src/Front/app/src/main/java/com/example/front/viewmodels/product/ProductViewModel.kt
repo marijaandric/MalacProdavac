@@ -14,7 +14,6 @@ import com.example.front.screens.product.ReviewProductState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.mongodb.kbson.ObjectId
 import javax.inject.Inject
 
 @HiltViewModel
@@ -58,7 +57,8 @@ class ProductViewModel @Inject constructor(
                     val reviewsResponse = response.body()
                     _stateReview.value = _stateReview.value.copy(
                         isLoading = false,
-                        reviews = _stateReview.value.reviews.orEmpty() + (reviewsResponse ?: emptyList())
+                        reviews = _stateReview.value.reviews.orEmpty() + (reviewsResponse
+                            ?: emptyList())
                     )
                 } else {
                     // Handle error if needed
@@ -74,12 +74,19 @@ class ProductViewModel @Inject constructor(
     }
 
 
-    suspend fun getUserId(): Int?
-    {
+    suspend fun getUserId(): Int? {
         return dataStoreManager.getUserIdFromToken()
     }
 
-    fun addToCart(productID: Int, name: String, price: Float, quantity: Int, shopName: String, image: String, metric: String) {
+    fun addToCart(
+        productID: Int,
+        name: String,
+        price: Float,
+        quantity: Int,
+        shopName: String,
+        image: String,
+        metric: String
+    ) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val productInCart = ProductInCart()

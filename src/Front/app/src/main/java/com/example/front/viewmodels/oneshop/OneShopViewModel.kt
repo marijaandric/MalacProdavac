@@ -1,14 +1,13 @@
 package com.example.front.viewmodels.oneshop
 
+import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.front.helper.DataStore.DataStoreManager
-import com.example.front.model.DTO.CategoriesDTO
 import com.example.front.model.DTO.FiltersDTO
-import com.example.front.model.DTO.MetricsDTO
 import com.example.front.model.DTO.NewProductDTO
 import com.example.front.repository.Repository
 import com.example.front.screens.shop.state.GetCategoriesState
@@ -18,15 +17,33 @@ import com.example.front.screens.shop.state.ProductState
 import com.example.front.screens.shop.state.ShopReviewState
 import com.example.front.screens.shop.state.ShopState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
 import org.osmdroid.util.GeoPoint
+import java.io.File
 import javax.inject.Inject
+
+
 
 @HiltViewModel
 class OneShopViewModel @Inject constructor(
     private val repository: Repository,
     private val dataStoreManager: DataStoreManager
 ) : ViewModel() {
+
+    sealed class UploadStatus {
+        object Idle : UploadStatus()
+        object InProgress : UploadStatus()
+        data class Success(val response: com.example.front.model.response.Success) : UploadStatus()
+        data class Error(val message: String) : UploadStatus()
+    }
+
+    private val _uploadStatus = MutableStateFlow<UploadStatus>(UploadStatus.Idle)
+    val uploadStatus: StateFlow<UploadStatus> = _uploadStatus
 
     private val _state = mutableStateOf(ShopState())
     var state: State<ShopState> = _state;
@@ -392,6 +409,31 @@ class OneShopViewModel @Inject constructor(
     fun postNewProduct(newProd: NewProductDTO){
         viewModelScope.launch {
             repository.postNewProduct(newProd)
+        }
+    }
+
+    fun uploadImage(type: Int, id: Int, imageUri: Uri) {
+        viewModelScope.launch {
+            try {
+                _uploadStatus.value = UploadStatus.InProgress
+
+                // Convert imageUri to MultipartBody.Part
+                val file = File(imageUri.path!!)
+                val requestFile = file.asRequestBody("multipart/form-data".toMediaTypeOrNull())
+                val imagePart = MultipartBody.Part.createFormData("file", file.name, requestFile)
+
+                // Call the repository method
+                val response = repository.uploadImage(type, id, imagePart)
+
+                // Update the status based on the response
+                if (response.isSuccessful) {
+                    _uploadStatus.value = UploadStatus.Success(response.body()!!)
+                } else {
+                    _uploadStatus.value = UploadStatus.Error("Upload failed")
+                }
+            } catch (e: Exception) {
+                _uploadStatus.value = UploadStatus.Error("Upload failed: ${e.message}")
+            }
         }
     }
 }
