@@ -1,10 +1,6 @@
 package com.example.front.screens.product
 
 import android.annotation.SuppressLint
-import android.graphics.Path
-import android.graphics.RectF
-import android.util.Log
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -21,7 +17,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.GenericShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
@@ -41,13 +36,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
@@ -86,6 +79,7 @@ fun ProductPage(
     }
 
     val productInfo = productViewModel.state.value.product
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -166,139 +160,6 @@ fun ProductPage(
                         )
                     }
 
-                    Image(
-                        painter = painterResource(R.drawable.strelica),
-                        contentDescription = "",
-                        modifier = Modifier
-                            .size(29.dp)
-                    )
-                }
-
-                Text(
-                    text = "${productInfo?.price} rsd",
-                    modifier = Modifier
-                        .padding(20.dp)
-                        .fillMaxWidth(),
-                    style = Typography.titleLarge,
-                    color = DarkBlue,
-                    textAlign = TextAlign.Center
-                )
-
-                productInfo?.saleMessage?.let {
-                    Text(
-                        text = it,
-                        modifier = Modifier.fillMaxWidth(),
-                        style = Typography.titleMedium,
-                        textAlign = TextAlign.Center,
-                        color = Orange
-                    )
-                }
-
-                productInfo?.description?.let {
-                    Text(
-                        text = it,
-                        modifier = Modifier
-                            .padding(10.dp)
-                            .fillMaxWidth(),
-                        style = Typography.bodySmall,
-                        textAlign = TextAlign.Center,
-                        color = Color.Black
-                    )
-                }
-
-                Divider(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(1.dp)
-                        .padding(horizontal = 16.dp),
-                    color = Color.Gray
-                )
-
-                productInfo?.workingHours?.let { ExpandableRow(it) }
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(10.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Quantity",
-                        style = Typography.titleSmall,
-                        color = Color.Black
-                    )
-
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Button(
-                            onClick = {},
-                            modifier = Modifier
-                                .height(40.dp)
-                                .border(1.dp, Color.Black),
-                            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-                        ) {
-                            Text(text = "-")
-                        }
-
-                        Text(
-                            //// da se cuva kolicina
-                            text = "1",
-                            modifier = Modifier.padding(20.dp),
-                            textAlign = TextAlign.Justify
-                        )
-
-                        Button(
-                            onClick = {},
-                            modifier = Modifier
-                                .height(40.dp)
-                                .border(1.dp, Color.Black),
-                            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-                        ) {
-                            Text(text = "+")
-                        }
-                    }
-                }
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Button(
-                        onClick = {
-                            // zove funkciju i salje podatke sa stranice
-                            if (productInfo?.name != null &&
-                                productInfo?.price != null &&
-                                productInfo?.shopName != null &&
-                                productInfo.images?.isNotEmpty() == true &&
-                                productInfo.metric != null)
-                            {
-                                productViewModel.addToCart(productID, productInfo.name, productInfo.price, 1, productInfo.shopName, productInfo.images[0].image, productInfo.metric)
-                                //// ispisuje obavestenje
-                            } else {
-
-                            }
-                        },
-                        modifier = Modifier
-                            .height(80.dp)
-                            .width(300.dp)
-                            .padding(20.dp),
-                    ) {
-                        Text(text = "Add To Cart", style = Typography.titleSmall)
-                    }
-                }
-                Divider(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(1.dp)
-                        .padding(horizontal = 16.dp),
-                    color = Color.Gray
-                )
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -390,7 +251,20 @@ fun ProductPage(
                         horizontalArrangement = Arrangement.Center
                     ) {
                         Button(
-                            onClick = {},
+                            onClick = {
+                                // zove funkciju i salje podatke sa stranice
+                                if (productInfo?.name != null &&
+                                    productInfo?.price != null &&
+                                    productInfo?.shopName != null &&
+                                    productInfo.images?.isNotEmpty() == true &&
+                                    productInfo.metric != null)
+                                {
+                                    productViewModel.addToCart(productID, productInfo.name, productInfo.price, 1, productInfo.shopName, productInfo.images[0].image, productInfo.metric)
+                                    //// ispisuje obavestenje
+                                } else {
+
+                                }
+                            },
                             modifier = Modifier
                                 .height(80.dp)
                                 .width(300.dp)
