@@ -25,7 +25,10 @@ namespace back.BLL.Services
 
         public async Task<bool> InsertDeliveryRoute(DeliveryRouteDto route)
         {
-            return await _repository.InsertDeliveryRoute(route);
+            bool? ind = await _repository.InsertDeliveryRoute(route);
+            if (ind == null) throw new ArgumentException("Price is too high! The highest value is 350.");
+
+            return (bool)ind;
         }
 
         public async Task<bool> AddToRoute(int requestId, int routeId)
@@ -63,9 +66,9 @@ namespace back.BLL.Services
             .Select(x => new DeliveryRouteCard
             {
                 CreatedOn = x.Route.CreatedOn,
-                EndAddress = request.EndAddress,
-                Locations = request.Locations,
-                StartAddress = request.StartAddress,
+                EndAddress = x.Route.EndAddress,
+                Locations = x.Route.Locations,
+                StartAddress = x.Route.StartAddress,
                 RouteDivergence = x.RouteDivergence.Result,
                 Cost = x.Route.Cost,
                 Id = x.Route.Id,
