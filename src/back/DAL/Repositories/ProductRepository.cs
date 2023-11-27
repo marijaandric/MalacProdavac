@@ -410,10 +410,12 @@ namespace back.DAL.Repositories
             return name;
         }
 
-        public async Task<bool> AddProduct(Product product)
+        public async Task<int> AddProduct(Product product)
         {
-            await _context.Products.AddAsync(product);
-            return await _context.SaveChangesAsync() > 0;
+            _context.Products.AddAsync(product);
+            await _context.SaveChangesAsync();
+            int id = product.Id;
+            return  id;
         }
 
         public async Task<bool> AddProductSize(int id, int sizeId, int quantity)

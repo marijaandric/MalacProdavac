@@ -112,7 +112,7 @@ namespace back.BLL.Services
             return false;
         }
 
-        public async Task<bool> AddProduct(ProductDto product)
+        public async Task<int> AddProduct(ProductDto product)
         {
             Product newProduct = new Product
             {
@@ -127,7 +127,7 @@ namespace back.BLL.Services
                 ShopId = product.ShopId,
             };
 
-            if (!await _repository.AddProduct(newProduct)) throw new ArgumentException("The product could not be added!");
+            if (await _repository.AddProduct(newProduct) == 0) throw new ArgumentException("The product could not be added!");
 
             foreach (StockDto size in product.Sizes)
             {
@@ -147,7 +147,7 @@ namespace back.BLL.Services
             }
             
 
-            return true;
+            return newProduct.Id;
         }
 
         public async Task<bool> EditProduct(EditProductDto productDto)

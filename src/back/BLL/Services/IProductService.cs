@@ -17,7 +17,7 @@ namespace back.BLL.Services
         public Task<bool> LeaveReview(ReviewDto review);
         public Task<bool> LeaveQuestion(QnADto question);
         public Task<bool> DeleteProductPhoto(int photoId);
-        public Task<bool> AddProduct(ProductDto product);
+        public Task<int> AddProduct(ProductDto product);
         public Task<bool> EditProduct(EditProductDto productDto);
         public Task<bool> DeleteProduct(int productId);
 

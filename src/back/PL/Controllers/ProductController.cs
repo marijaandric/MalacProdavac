@@ -165,7 +165,7 @@ namespace back.PL.Controllers
         {
             try
             {
-                return Ok(new { Success = await _service.AddProduct(product) });
+                return Ok(new { Id = await _service.AddProduct(product) });
             }
             catch (Exception ex)
             {
