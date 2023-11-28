@@ -112,7 +112,7 @@ class Repository @Inject constructor(private val api: Api) {
     suspend fun getMetrics(): Response<List<MetricsDTO>> {
         return api.getMetrics()
     }
-    suspend fun postNewProduct(product: NewProductDTO): Response<Success> {
+    suspend fun postNewProduct(product: NewProductDTO): Response<Int> {
         return api.postNewProduct(product)
     }
     suspend fun uploadImage(type: Int, id: Int, imagePart: MultipartBody.Part): Response<Success> {

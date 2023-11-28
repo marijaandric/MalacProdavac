@@ -698,7 +698,7 @@ fun contentOfAddNewProduct(shopViewModel: OneShopViewModel, onNextClicked: () ->
                                 shopId = shopId,
                                 weight = weight
                             )
-                            //shopViewModel.postNewProduct(newProductDTO)
+                            shopViewModel.postNewProduct(newProductDTO)
                             onNextClicked()
                         },
                         modifier = Modifier

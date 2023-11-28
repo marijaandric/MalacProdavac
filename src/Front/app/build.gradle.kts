@@ -70,6 +70,8 @@ dependencies {
     implementation("com.google.firebase:firebase-messaging:23.3.1")
     implementation("com.google.firebase:firebase-common-ktx:20.4.2")
     implementation("androidx.work:work-runtime-ktx:2.8.1")
+    implementation("com.google.firebase:firebase-auth-ktx:22.3.0")
+    implementation("com.google.firebase:firebase-appdistribution-gradle:4.0.1")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
@@ -171,6 +173,9 @@ dependencies {
     
     //Realm
     implementation("io.realm.kotlin:library-base:1.11.0")
+
+    implementation("com.google.auth:google-auth-library-oauth2-http:0.29.0")
+
 }
 
 kapt {

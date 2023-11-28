@@ -322,7 +322,7 @@ namespace back.DAL.Repositories
                 await _context.ProductReviews.AddAsync(newReview);
                 await _context.SaveChangesAsync();
 
-                int ownerID = 5;
+                int ownerID = 1;
 
                 await SendNotificationAsync("New Review", "You have a new review to review!",ownerID);
 
@@ -356,12 +356,12 @@ namespace back.DAL.Repositories
 
                 var message = new Message()
                 {
-                    Token = fcmToken,
-                    Notification = new FirebaseAdmin.Messaging.Notification
+                    Data = new Dictionary<string, string>()
                     {
-                        Title = title,
-                        Body = body,
+                    { "score", "850" },
+                    { "time", "2:45" },
                     },
+                    Token = "dNfa7FR1Rne-30sShKnHRQ:APA91bFa_Mc6KQMDzSVt1tXvfea7M986PDwq3Tp0SKbK-ITWn5928p1PSDxUxwdTdah4XB4-2NhaflYifX6gJByopXPj61n6uCZeYD9v7nvyx5O5mgiGwdW9GHqzURH7DVxPGsgvRcx8",
                 };
 
                 try

@@ -14,8 +14,16 @@ import androidx.work.WorkManager
 import com.example.front.MainActivity
 import com.example.front.R
 import com.example.front.helper.MyWorker
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.appdistribution.gradle.models.ServiceAccountCredentials
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import java.io.FileInputStream
+import java.util.Collections
+//import com.google.auth.oauth2.GoogleCredentials
 
 class MyFirebaseMessagingService : FirebaseMessagingService() {
 
@@ -76,9 +84,27 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     override fun onNewToken(token: String) {
         Log.d(TAG, "Refreshed token: $token")
 
-        // If you want to send messages to this application instance or
-        // manage this apps subscriptions on the server side, send the
-        // FCM registration token to your app server.
+//        val mUser: FirebaseUser? = FirebaseAuth.getInstance().currentUser
+//
+//        if (mUser != null) {
+//            mUser.getIdToken(true)
+//                .addOnCompleteListener { task ->
+//                    if (task.isSuccessful) {
+//                        val idToken: String? = task.result?.token
+//                        if (idToken != null) {
+//                            Log.d(TAG, "ID Token: $idToken")
+//                        } else {
+//                            Log.w(TAG, "ID Token is null")
+//                        }
+//                    } else {
+//                        Log.w(TAG, "Failed to get ID Token", task.exception)
+//                    }
+//                }
+//        } else {
+//            // Handle the case where the user is not signed in
+//            Log.w(TAG, "User is not signed in")
+//        }
+
         sendRegistrationToServer(token)
     }
     // [END on_new_token]
@@ -154,6 +180,17 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         val notificationId = 0
         notificationManager.notify(notificationId, notificationBuilder.build())
     }
+
+
+//    fun getAccessToken(): String {
+//        val credentialsStream = FileInputStream("/path/to/your/keyfile.json")
+//
+//        val credentials = GoogleCredentials.fromStream(credentialsStream)
+//        val accessToken = credentials.refreshAccessToken()
+//
+//        return accessToken.tokenValue
+//    }
+
 
     companion object {
 
