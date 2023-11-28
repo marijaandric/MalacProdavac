@@ -10,12 +10,16 @@ namespace back.BLL.Services
         IDeliveryRepository _repository;
         IHelperService _helperService;
         IUserRepository _userRepository;
+        IShopRepository _shopRepository;
+        INotificationRepository _notificationRepository;
 
-        public DeliveryService(IDeliveryRepository repository, IHelperService helperService, IUserRepository userRepository)
+        public DeliveryService(IDeliveryRepository repository, IHelperService helperService, IUserRepository userRepository, IShopRepository shopRepository, INotificationRepository notificationRepository)
         {
             _repository = repository;
             _helperService = helperService;
             _userRepository = userRepository;
+            _shopRepository = shopRepository;
+            _notificationRepository = notificationRepository;
         }
 
         public async Task<bool> InsertDeliveryRequest(DeliveryRequestDto req)
@@ -23,11 +27,23 @@ namespace back.BLL.Services
             return await _repository.InsertDeliveryRequest(req);
         }
 
+        public async Task<List<int>> GetNearbySellers(string routeStart, string routeEnd, double range)
+        {
+            var shops = await _shopRepository.GetAllShops();
+            return shops.Where(x => _helperService.NearRoute(routeStart, routeEnd, (double)x.Latitude, (double)x.Longitude, range).Result).Select(x => x.OwnerId).ToList();
+        }
+
         public async Task<bool> InsertDeliveryRoute(DeliveryRouteDto route)
         {
             bool? ind = await _repository.InsertDeliveryRoute(route);
             if (ind == null) throw new ArgumentException("Price is too high! The highest value is 350.");
-
+            
+            List<int> ownerIds = await GetNearbySellers(route.StartLocation, route.EndLocation, 10);
+            
+            foreach (int ownerId in ownerIds)
+            {
+                if (await _notificationRepository.InsertNotification(ownerId, 0, "Delivery person available!", " just made a route close to your shop!\nThe route starts in " + route.StartLocation + " on " + route.StartDate.ToShortDateString() + " at " + route.StartTime + " and ends in " + route.EndLocation, -1)) Console.WriteLine("Notification sent!");
+            }
             return (bool)ind;
         }
 

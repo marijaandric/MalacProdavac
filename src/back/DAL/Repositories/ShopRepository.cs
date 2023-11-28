@@ -350,5 +350,10 @@ namespace back.DAL.Repositories
         {
             return await _context.Shop.FirstOrDefaultAsync(x => x.OwnerId == userId);
         }
+
+        public async Task<List<Shop>> GetAllShops()
+        {
+            return await _context.Shop.ToListAsync();
+        }
     }
 }

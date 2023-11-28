@@ -251,5 +251,35 @@ namespace back.BLL.Services
         {
             return await _productRepository.GetSizes();
         }
+
+        public async Task<bool> NearRoute(string routeStart, string routeEnd, double shopLat, double shopLong, double range)
+        {
+            using (var client = new HttpClient())
+            {
+                string apiKey = "Aj_nYJhXf_C_QoPf7gOQch6KOhTJo2iX2VIyvOlwb7hDpGCtS8rOhyQYp5kAbR54";
+
+                string apiUrl = $"https://dev.virtualearth.net/REST/v1/Routes/Driving?wp.0={routeStart}&wp.1={routeEnd}&key={apiKey}";
+
+                HttpResponseMessage response = await client.GetAsync(apiUrl);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string result = await response.Content.ReadAsStringAsync();
+                    JObject json = JObject.Parse(result);
+
+                    foreach (var item in json["resourceSets"][0]["resources"][0]["routeLegs"][0]["itineraryItems"])
+                    {
+                        double xLat = (double)item["maneuverPoint"]["coordinates"][0];
+                        double xLong = (double)item["maneuverPoint"]["coordinates"][1];
+
+                        double distance = CalculateDistance(xLat, xLong, shopLat, shopLong);
+                        
+                        if (distance <= range) return true;
+                    }
+                }
+            }
+
+            return false;
+        }
     }
 }
