@@ -1,3 +1,5 @@
+import com.android.build.api.dsl.Packaging
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -48,11 +50,13 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = "1.4.3"
     }
+
     packaging {
         resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes.add("META-INF/*")
         }
     }
+
 }
 
 dependencies {
@@ -134,8 +138,6 @@ dependencies {
     // photo picker
     implementation("io.coil-kt:coil-compose:2.3.0")
 
-    //Coil
-    implementation("io.coil-kt:coil-compose:1.4.0")
 
     // google mape
     implementation("com.google.maps.android:maps-compose:2.15.0")
@@ -174,7 +176,6 @@ dependencies {
     //Realm
     implementation("io.realm.kotlin:library-base:1.11.0")
 
-    implementation("com.google.auth:google-auth-library-oauth2-http:0.29.0")
 
 }
 
