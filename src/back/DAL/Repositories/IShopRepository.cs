@@ -33,5 +33,6 @@ namespace back.DAL.Repositories
         public Task<bool> DeleteProductDisplay(int id);
         public Task<Shop> GetShopByUserId(int userId);
         public Task<List<Shop>> GetAllShops();
+        public Task<List<LikedShops>> GetFollowerIds(int shopId);
     }
 }

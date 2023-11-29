@@ -29,20 +29,40 @@ namespace back.BLL.Services
 
         public async Task<List<int>> GetNearbySellers(string routeStart, string routeEnd, double range)
         {
+            List<(double, double)> waypoints = await _helperService.GetWaypoints(routeStart, routeEnd);
             var shops = await _shopRepository.GetAllShops();
-            return shops.Where(x => _helperService.NearRoute(routeStart, routeEnd, (double)x.Latitude, (double)x.Longitude, range).Result).Select(x => x.OwnerId).ToList();
+            return shops.Where(x => _helperService.NearRoute(waypoints, (double)x.Latitude, (double)x.Longitude, range).Result).Select(x => x.OwnerId).ToList();
+        }
+        
+        public async Task<List<LikedShops>> GetFollowersForNearbySellers(List<int> sellerIds)
+        {
+            List<LikedShops> followers = new List<LikedShops>();
+            foreach (int id in sellerIds) followers.AddRange(await _shopRepository.GetFollowerIds(id));
+
+            return followers.Distinct().ToList();
         }
 
         public async Task<bool> InsertDeliveryRoute(DeliveryRouteDto route)
         {
+            string username = await _userRepository.GetUsername(route.UserId);
             bool? ind = await _repository.InsertDeliveryRoute(route);
             if (ind == null) throw new ArgumentException("Price is too high! The highest value is 350.");
             
             List<int> ownerIds = await GetNearbySellers(route.StartLocation, route.EndLocation, 10);
-            
+
+            if (ind == false) return false;
+
             foreach (int ownerId in ownerIds)
             {
-                if (await _notificationRepository.InsertNotification(ownerId, 0, "Delivery person available!", " just made a route close to your shop!\nThe route starts in " + route.StartLocation + " on " + route.StartDate.ToShortDateString() + " at " + route.StartTime + " and ends in " + route.EndLocation, -1)) Console.WriteLine("Notification sent!");
+                if (await _notificationRepository.InsertNotification(ownerId, 0, "Delivery person available!", "Delivery person " + username + " just made a route close to your shop!\nThe route starts in " + route.StartLocation + " on " + route.StartDate.ToShortDateString() + " at " + route.StartTime + " and ends in " + route.EndLocation + ".", -1)) Console.WriteLine("Notification sent!");
+            }
+
+            List<LikedShops> followerIds = await GetFollowersForNearbySellers(ownerIds);
+
+            foreach (LikedShops followerId in followerIds)
+            {
+                Shop s = await _shopRepository.GetShop(followerId.ShopId);
+                if (followerId.UserId != route.UserId && await _notificationRepository.InsertNotification(followerId.UserId, 0, "Delivery person near "+ s.Name +"!", "Delivery person " + username + " just made a route close to your favorite shop "+ s.Name+"!\nThe route starts in " + route.StartLocation + " on " + route.StartDate.ToShortDateString() + " at " + route.StartTime + " and ends in " + route.EndLocation + ".", -1)) Console.WriteLine("Notification sent!");
             }
             return (bool)ind;
         }

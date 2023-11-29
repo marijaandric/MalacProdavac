@@ -252,8 +252,10 @@ namespace back.BLL.Services
             return await _productRepository.GetSizes();
         }
 
-        public async Task<bool> NearRoute(string routeStart, string routeEnd, double shopLat, double shopLong, double range)
+        public async Task<List<(double, double)>> GetWaypoints(string routeStart, string routeEnd)
         {
+            List<(double, double)> waypoints = new List<(double, double)>();
+
             using (var client = new HttpClient())
             {
                 string apiKey = "Aj_nYJhXf_C_QoPf7gOQch6KOhTJo2iX2VIyvOlwb7hDpGCtS8rOhyQYp5kAbR54";
@@ -272,11 +274,21 @@ namespace back.BLL.Services
                         double xLat = (double)item["maneuverPoint"]["coordinates"][0];
                         double xLong = (double)item["maneuverPoint"]["coordinates"][1];
 
-                        double distance = CalculateDistance(xLat, xLong, shopLat, shopLong);
-                        
-                        if (distance <= range) return true;
+                        waypoints.Add((xLat, xLong));
                     }
                 }
+            }
+
+            return waypoints;
+        }
+
+        public async Task<bool> NearRoute(List<(double, double)> routeWaypoints, double shopLat, double shopLong, double range)
+        {
+            foreach (var item in routeWaypoints)
+            {
+                double distance = CalculateDistance(item.Item1, item.Item2, shopLat, shopLong);
+                        
+                if (distance <= range) return true;
             }
 
             return false;

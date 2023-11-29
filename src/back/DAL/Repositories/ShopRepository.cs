@@ -355,5 +355,10 @@ namespace back.DAL.Repositories
         {
             return await _context.Shop.ToListAsync();
         }
+
+        public async Task<List<LikedShops>> GetFollowerIds(int shopId)
+        {
+            return await _context.LikedShops.Where(x => x.ShopId == shopId).ToListAsync();
+        }
     }
 }
