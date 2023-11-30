@@ -6,18 +6,22 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.front.helper.DataStore.DataStoreManager
+import com.example.front.model.product.ProductInCart
+import com.example.front.repository.MongoRepository
 import com.example.front.repository.Repository
 import com.example.front.screens.home.states.HomeProductsState
 import com.example.front.screens.home.states.HomeShopState
 import com.example.front.screens.home.states.ToggleLikeState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val repository: Repository,
-    private val dataStoreManager: DataStoreManager
+    private val dataStoreManager: DataStoreManager,
+    private val mongoRepository: MongoRepository
 ) : ViewModel() {
 
 
@@ -124,6 +128,30 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    fun addToCart(
+        productID: Int,
+        name: String,
+        price: Float,
+        quantity: Int,
+        shopName: String,
+        image: String,
+        metric: String
+    ) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val productInCart = ProductInCart()
+                productInCart.id = productID
+                productInCart.name = name
+                productInCart.price = price
+                productInCart.quantity = quantity.toDouble()
+                productInCart.shopName = shopName
+                productInCart.metric = metric
 
+                mongoRepository.updateProduct(productInCart)
+            } catch (e: Exception) {
+                Log.e("addToCart", "Greska prilikom dodavanja proizvoda u korpu: ${e.message}")
+            }
+        }
+    }
 
 }

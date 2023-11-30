@@ -1,6 +1,7 @@
 package com.example.front.screens.product
 
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -37,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -68,6 +70,7 @@ fun ProductPage(
 ) {
 
     var quantity by remember { mutableStateOf(1) }
+    val context = LocalContext.current
     LaunchedEffect(Unit) {
         productViewModel.getUserId()?.let { productViewModel.getProductInfo(productID, it) }
         productViewModel.getReviewsForProduct(productID, 0)
@@ -256,7 +259,6 @@ fun ProductPage(
                     ) {
                         Button(
                             onClick = {
-                                // zove funkciju i salje podatke sa stranice
                                 if (productInfo?.name != null &&
                                     productInfo?.price != null &&
                                     productInfo?.shopName != null &&
@@ -264,9 +266,8 @@ fun ProductPage(
                                     productInfo.metric != null)
                                 {
                                     productViewModel.addToCart(productID, productInfo.name, productInfo.price, quantity, productInfo.shopName, productInfo.images[0].image, productInfo.metric)
-                                    //// ispisuje obavestenje
-                                } else {
 
+                                    Toast.makeText(context, "Product added to cart", Toast.LENGTH_SHORT).show()
                                 }
                             },
                             modifier = Modifier

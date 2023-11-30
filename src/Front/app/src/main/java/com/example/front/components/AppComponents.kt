@@ -632,7 +632,8 @@ fun ProductCard(
     price: String,
     imageResource: String,
     navController: NavHostController,
-    id: Int
+    id: Int,
+    onClick: () -> Unit = {}
 ) {
     val onClick: () -> Unit = remember {
         {
@@ -677,7 +678,7 @@ fun ProductCard(
                 )
                 ButtonWithIcon(
                     text = "Add to cart",
-                    onClick = { /*TODO*/ },
+                    onClick = onClick,
                     width = 0.8f,
                     modifier = Modifier,
                     color = MaterialTheme.colorScheme.secondary,
