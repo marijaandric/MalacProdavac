@@ -67,6 +67,7 @@ fun ProductPage(
     productID: Int
 ) {
 
+    var quantity by remember { mutableStateOf(1) }
     LaunchedEffect(Unit) {
         productViewModel.getUserId()?.let { productViewModel.getProductInfo(productID, it) }
         productViewModel.getReviewsForProduct(productID, 0)
@@ -246,7 +247,7 @@ fun ProductPage(
                             color = Color.Black
                         )
 
-                        NumberPicker()
+                        NumberPicker(value = quantity, onValueChange = { newValue -> quantity = newValue })
                     }
 
                     Row(
@@ -262,7 +263,7 @@ fun ProductPage(
                                     productInfo.images?.isNotEmpty() == true &&
                                     productInfo.metric != null)
                                 {
-                                    productViewModel.addToCart(productID, productInfo.name, productInfo.price, 1, productInfo.shopName, productInfo.images[0].image, productInfo.metric)
+                                    productViewModel.addToCart(productID, productInfo.name, productInfo.price, quantity, productInfo.shopName, productInfo.images[0].image, productInfo.metric)
                                     //// ispisuje obavestenje
                                 } else {
 
@@ -380,10 +381,8 @@ fun ProductPage(
     }
 }
 
-@Preview
 @Composable
-fun NumberPicker() {
-    var value by remember { mutableStateOf(1) }
+fun NumberPicker(value: Int, onValueChange: (Int) -> Unit) {
 
     Row(
         modifier = Modifier
@@ -392,7 +391,8 @@ fun NumberPicker() {
     ) {
         Button(
             onClick = {
-                value = max(value - 1, 1)
+                val newValue = max(value - 1, 1)
+                onValueChange(newValue)
             },
             modifier = Modifier
                 .height(30.dp)
@@ -407,7 +407,8 @@ fun NumberPicker() {
             value = value.toString(),
             onValueChange = {
                 // Ensure the input is a valid integer and update the value accordingly
-                value = it.toIntOrNull() ?: value
+                val newValue = it.toIntOrNull() ?: value
+                onValueChange(newValue)
             },
             keyboardOptions = KeyboardOptions.Default.copy(
                 keyboardType = KeyboardType.Number
@@ -420,7 +421,8 @@ fun NumberPicker() {
 
         Button(
             onClick = {
-                value += 1
+                val newValue = value + 1
+                onValueChange(newValue)
             },
             modifier = Modifier
                 .height(30.dp)
