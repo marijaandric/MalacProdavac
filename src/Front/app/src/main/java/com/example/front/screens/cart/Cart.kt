@@ -3,11 +3,13 @@ package com.example.front.screens.cart
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -22,17 +24,21 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Surface
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
@@ -53,6 +59,7 @@ import com.example.front.model.product.ProductInCart
 import com.example.front.screens.home.CardData
 import com.example.front.ui.theme.Typography
 import com.example.front.viewmodels.cart.CartViewModel
+import kotlinx.coroutines.launch
 import java.text.DecimalFormat
 
 @Composable
@@ -66,7 +73,7 @@ fun Cart(
     val cartState = viewModel.state.value
     val isButtonVisible by remember { mutableStateOf(false) }
     var sum by remember { mutableDoubleStateOf(0.0) }
-
+    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(cartState.isLoading) {
         if (!cartState.isLoading) {
@@ -173,13 +180,15 @@ fun Cart(
                                         clip = true,
                                         shape = RoundedCornerShape(16.dp)
                                     )
+//                                    .border(1.dp, Color.Green, RectangleShape)
 
                             )
                             Column (
                                 modifier = Modifier
-                                    .fillMaxSize()
+                                    .fillMaxHeight()
+                                    .weight(1f)
                                     .padding(horizontal = 16.dp, vertical = 8.dp)
-//                                    .border(1.dp, Color.Red, RectangleShape)
+//                                    .border(1.dp, Color.Green, RectangleShape)
                                 ,
                                 verticalArrangement = Arrangement.SpaceBetween
                             ) {
@@ -197,6 +206,38 @@ fun Cart(
                                 Text(DecimalFormat("#.00").format(product.quantity) + " " + product.metric, Modifier, Color(0xFFE15F26))
                                 Text(DecimalFormat("#.00").format(product.price * product.quantity).toString() + " rsd")
 //                                Text("Slika: " + product.image)
+                            }
+
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxHeight()
+                                    .width(24.dp)
+//                                    .border(1.dp, Color.Red, RectangleShape)
+//                                    .align(Alignment.TopEnd)
+                            ) {
+//                                Icon(
+//                                    painterResource(id = R.drawable.navbar_cart1),
+//                                    contentDescription = "",
+//                                    tint = Color(0xFFA80303),
+//                                    modifier = Modifier
+//                                        .height(24.dp)
+//                                )
+                                Image(
+                                    painter = painterResource(id = R.drawable.bin),
+                                    contentDescription = "",
+                                    colorFilter = ColorFilter.tint(Color(0xFFAC1D1D)),
+                                    modifier = Modifier
+                                        .padding(vertical = 8.dp)
+                                        .height(16.dp)
+                                        .clickable {
+
+                                            coroutineScope.launch {
+                                                viewModel.removeProductFromCart(product.id)
+                                                sum -= calculateTotal(cartState.products)
+                                            }
+
+                                        }
+                                )
                             }
                         }
 //                        sum += product.price * product.quantity

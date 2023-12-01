@@ -44,6 +44,11 @@ class CartViewModel @Inject constructor(
         }
     }
 
+    suspend fun removeProductFromCart(id: Int) {
+        mongoRepository.deleteProduct(id)
+        getCartProducts()
+    }
+
 }
 
 data class CartState(
