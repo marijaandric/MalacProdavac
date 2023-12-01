@@ -32,6 +32,8 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Checkbox
+import androidx.compose.material.CheckboxDefaults
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
@@ -41,11 +43,13 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -74,6 +78,8 @@ import com.example.front.components.CommentsTextBox
 import com.example.front.components.FilterDialogProducts
 import com.example.front.components.MyDropdownCategories
 import com.example.front.components.MyDropdownMetrics
+import com.example.front.components.MyDropdown
+import com.example.front.components.MyTextField
 import com.example.front.components.MyTextFieldWithoutIcon
 import com.example.front.components.ReviewCard
 import com.example.front.components.SearchTextField
@@ -84,6 +90,9 @@ import com.example.front.components.ToggleImageButtonFunction
 import com.example.front.model.DTO.CategoriesDTO
 import com.example.front.model.DTO.MetricsDTO
 import com.example.front.model.DTO.NewProductDTO
+import com.example.front.model.DTO.WorkingHoursDTO
+import com.example.front.model.user.UserEditDTO
+import com.example.front.viewmodels.myprofile.MyProfileViewModel
 import com.example.front.viewmodels.oneshop.OneShopViewModel
 import kotlinx.coroutines.delay
 
@@ -989,6 +998,9 @@ fun Info(
 @Composable
 fun ProfilePic(shopViewModel: OneShopViewModel, id: Int) {
     val state = shopViewModel.state.value
+    var showDialog by remember{
+        mutableStateOf(false)
+    }
     Box(
         modifier = Modifier
             .padding(top = 50.dp, end = 16.dp, start = 16.dp)
@@ -1008,7 +1020,7 @@ fun ProfilePic(shopViewModel: OneShopViewModel, id: Int) {
                     .size(40.dp)
                     .align(Alignment.TopEnd)
                     .clickable {
-
+                        showDialog = true
                     },
                 tint = MaterialTheme.colorScheme.primary
             )
@@ -1090,5 +1102,98 @@ fun ProfilePic(shopViewModel: OneShopViewModel, id: Int) {
             }
         }
     }
+
+    if(showDialog)
+    {
+        EditSellersDialog(onDismiss = { showDialog = false })
+    }
 }
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun EditSellersDialog(onDismiss: () -> Unit) {
+    val overlayColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)
+
+
+    var name by remember {
+        mutableStateOf("")
+    }
+    var address by remember {
+        mutableStateOf("")
+    }
+    var pib by remember {
+        mutableStateOf(0)
+    }
+    var categories = mutableListOf<Int>()
+//    var workingHoursDTO by remember {
+//        mutableListOf<WorkingHoursDTO>()
+//    }
+
+
+    Dialog(
+        properties = DialogProperties(usePlatformDefaultWidth = false),
+        onDismissRequest = { onDismiss() }) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(overlayColor)
+                .pointerInput(Unit) {
+                    detectTapGestures { offset ->
+                        onDismiss()
+                    }
+                }
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.8f)
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(MaterialTheme.colorScheme.background)
+                    .pointerInput(Unit) {
+                        detectTapGestures { offset ->
+
+                        }
+                    }
+                    .padding(16.dp)
+                    .align(Alignment.Center)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                        .align(Alignment.Center)
+                ) {
+                    Text("Edit shop", style = MaterialTheme.typography.titleMedium, modifier = Modifier
+                        .padding(bottom = 25.dp)
+                        .align(Alignment.CenterHorizontally))
+
+                    MyTextField(
+                        labelValue = "Name",
+                        painterResource = painterResource(id = R.drawable.user),
+                        value = name,
+                        onValueChange = { name = it }
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    MyTextField(
+                        labelValue = "Address",
+                        painterResource = painterResource(id = R.drawable.user),
+                        value = name,
+                        onValueChange = { name = it }
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    CardButton(text = "Edit", onClick = { onDismiss() }, width = 1f, modifier = Modifier, color = MaterialTheme.colorScheme.primary)
+
+                }
+
+            }
+        }
+    }
+}
+
+
+
 
