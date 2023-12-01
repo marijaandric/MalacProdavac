@@ -2,7 +2,6 @@ package com.example.front.screens.cart
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,11 +22,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Surface
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
@@ -39,24 +35,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.example.front.R
-import com.example.front.components.ProductCard
-import com.example.front.components.TitleTextComponent
 import com.example.front.model.product.ProductInCart
-import com.example.front.screens.home.CardData
 import com.example.front.ui.theme.Typography
 import com.example.front.viewmodels.cart.CartViewModel
 import kotlinx.coroutines.launch
@@ -115,16 +105,6 @@ fun Cart(
                     color = Color.White
                 )
             }
-//            Spacer(Modifier.height(200.dp))
-
-//            if (cartState.isLoading) {
-//                // Prikazati indikator ucitavanja ako podaci jos nisu usitani
-//                CircularProgressIndicator(
-//                    modifier = Modifier
-//                        .padding(16.dp)
-//                        .align(Alignment.CenterHorizontally)
-//                )
-//            }
 
             LazyColumn (
                 modifier = Modifier
@@ -132,11 +112,11 @@ fun Cart(
                     .padding(horizontal = 16.dp, vertical = 0.dp)
                     .weight(1f)
             ) {
-                // Grupisanje proizvoda po prodavnicama
+
                 val groupedProducts = cartState.products.groupBy { it.shopName }
 
                 groupedProducts.forEach { (shopName, products) ->
-                    // Header red za prikaz imena prodavnice
+
                     item {
                         Text(
                             text = shopName,
@@ -150,7 +130,6 @@ fun Cart(
                     }
 
                     item {
-                        //Spacer(modifier = Modifier.height(8.dp))
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -180,7 +159,6 @@ fun Cart(
                                         clip = true,
                                         shape = RoundedCornerShape(16.dp)
                                     )
-//                                    .border(1.dp, Color.Green, RectangleShape)
 
                             )
                             Column (
@@ -188,7 +166,6 @@ fun Cart(
                                     .fillMaxHeight()
                                     .weight(1f)
                                     .padding(horizontal = 16.dp, vertical = 8.dp)
-//                                    .border(1.dp, Color.Green, RectangleShape)
                                 ,
                                 verticalArrangement = Arrangement.SpaceBetween
                             ) {
@@ -197,12 +174,6 @@ fun Cart(
                                     fontSize = 16.sp,
                                     fontWeight = FontWeight.SemiBold
                                 )
-//                                Text(product.shopName)
-//                                var txt = "%2.f".format(product.quantity)
-//                                txt += " " + product.metric
-//                                Text(text = "%2.f %s".format(product.quantity ?: 0.0, product.metric), Modifier, Color(0xFFE15F26))
-//                                Text(text = txt, Modifier, Color(0xFFE15F26))
-//                                Text(text = product.quantity.toString())
                                 Text(DecimalFormat("#.00").format(product.quantity) + " " + product.metric, Modifier, Color(0xFFE15F26))
                                 Text(DecimalFormat("#.00").format(product.price * product.quantity).toString() + " rsd")
 //                                Text("Slika: " + product.image)
@@ -212,16 +183,7 @@ fun Cart(
                                 modifier = Modifier
                                     .fillMaxHeight()
                                     .width(24.dp)
-//                                    .border(1.dp, Color.Red, RectangleShape)
-//                                    .align(Alignment.TopEnd)
                             ) {
-//                                Icon(
-//                                    painterResource(id = R.drawable.navbar_cart1),
-//                                    contentDescription = "",
-//                                    tint = Color(0xFFA80303),
-//                                    modifier = Modifier
-//                                        .height(24.dp)
-//                                )
                                 Image(
                                     painter = painterResource(id = R.drawable.bin),
                                     contentDescription = "",
@@ -240,7 +202,6 @@ fun Cart(
                                 )
                             }
                         }
-//                        sum += product.price * product.quantity
                     }
 
                     item {
@@ -283,38 +244,7 @@ fun Cart(
             }
 
         }
-
-//        Box(
-//                modifier = Modifier
-////            .fillMaxSize()
-//                    .fillMaxWidth()
-////                    .align(Alignment.BottomCenter)
-////            .offset(y = if (isButtonVisible) (-20).dp else 0.dp)
-//        ,
-//
-////        color = Color.White
-//        ) {
-//            //za donji deo sa CHECKOUT DUGMETOM
-//            Button(onClick = { /*TOD    O*/ }) {
-//                Text(text = "DUGME")
-//            }
-//        }
     }
-
-//    Surface(
-//        modifier = Modifier
-////            .fillMaxSize()
-//            .fillMaxWidth()
-////            .offset(y = if (isButtonVisible) (-20).dp else 0.dp)
-//        ,
-//
-////        color = Color.White
-//    ) {
-//        //za donji deo sa CHECKOUT DUGMETOM
-//        Button(onClick = { /*TOD    O*/ }) {
-//            Text(text = "DUGME")
-//        }
-//    }
 }
 
 private fun calculateTotal(products: List<ProductInCart>): Double {
