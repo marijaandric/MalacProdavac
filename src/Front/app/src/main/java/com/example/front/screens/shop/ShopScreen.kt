@@ -78,7 +78,6 @@ import com.example.front.components.CommentsTextBox
 import com.example.front.components.FilterDialogProducts
 import com.example.front.components.MyDropdownCategories
 import com.example.front.components.MyDropdownMetrics
-import com.example.front.components.MyDropdown
 import com.example.front.components.MyTextField
 import com.example.front.components.MyTextFieldWithoutIcon
 import com.example.front.components.ReviewCard
