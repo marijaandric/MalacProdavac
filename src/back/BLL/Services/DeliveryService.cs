@@ -69,7 +69,14 @@ namespace back.BLL.Services
 
         public async Task<bool> AddToRoute(int requestId, int routeId)
         {
-            return await _repository.AddToRoute(requestId, routeId);
+            DeliveryRoute route = await _repository.GetRoute(routeId);
+            int userId = await _repository.GetCustomerIdForDelivery(requestId);
+            string username = await _userRepository.GetUsername(route.DeliveryPersonId);
+
+            if (!await _repository.AddToRoute(requestId, routeId)) return false;
+            if (await _notificationRepository.InsertNotification(userId, 0, "Delivery accepted!", "Delivery person " + username + " just added your delivery request to their route!\nYou can expect your order to arrive on " + route.StartDate.ToShortDateString() + ".", -1)) Console.WriteLine("Notification sent!");
+
+            return true;
         }
 
         public async Task<List<DeliveryRequestCard>> GetRequestsForDeliveryPerson(int deliveryPerson)
