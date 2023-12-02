@@ -47,6 +47,7 @@ import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.example.front.R
 import com.example.front.model.product.ProductInCart
+import com.example.front.navigation.Screen
 import com.example.front.ui.theme.Typography
 import com.example.front.viewmodels.cart.CartViewModel
 import kotlinx.coroutines.launch
@@ -230,7 +231,9 @@ fun Cart(
                         fontWeight = FontWeight.Bold
                     )
                     Button(
-                        onClick = { /*TODO*/ },
+                        onClick = {
+                                  navController.navigate(route = Screen.Checkout.route)
+                        },
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF457FA8)),
                         modifier = Modifier
                             .padding(vertical = 14.dp)

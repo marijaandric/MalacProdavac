@@ -8,11 +8,9 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.example.front.screens.cart.Cart
 import com.example.front.screens.products.AllProducts
 import com.example.front.screens.home.HomePage
 import com.example.front.screens.categories.RegistrationCategories
-import com.example.front.screens.checkout.CheckoutScreen
 import com.example.front.screens.myshop.MyShopScreen
 import com.example.front.screens.myshop.SetUpShopScreen
 import com.example.front.screens.product.ProductPage
@@ -96,12 +94,6 @@ fun SetupNavGraph(
             SellersScreen(navController = navController,shopsViewModel)
         }
         composable(
-            route = Screen.Cart.route
-        )
-        {
-            Cart(cartViewModel, navController)
-        }
-        composable(
             route = "${Screen.Shop.route}/{id}",
             arguments = listOf(navArgument("id") { type= NavType.IntType})
         )
@@ -122,14 +114,9 @@ fun SetupNavGraph(
         {
             SetUpShopScreen(navController = navController)
         }
-        composable(
-            route = Screen.Checkout.route
-        )
-        {
-            CheckoutScreen(viewModel = checkoutViewModel, navController = navController)
-        }
 
         introNavGraph(navController = navController, splashViewModel)
         authNavGraph(navController = navController, loginViewModel = loginViewModel, registerViewModel = registerViewModel, categoriesViewModel)
+        orderingNavGraph(navController, cartViewModel, checkoutViewModel)
     }
 }

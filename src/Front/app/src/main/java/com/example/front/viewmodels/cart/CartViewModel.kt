@@ -23,7 +23,6 @@ class CartViewModel @Inject constructor(
     suspend fun getCartProducts() {
         try {
             mongoRepository.getCartProducts().collect() {cartProducts ->
-                // Pretpostavljeni naziv metode
                 _state.value = _state.value.copy(
                     isLoading = false,
                     products = cartProducts
