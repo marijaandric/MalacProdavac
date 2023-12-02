@@ -12,14 +12,16 @@ namespace back.BLL.Services
         IUserRepository _userRepository;
         IShopRepository _shopRepository;
         INotificationRepository _notificationRepository;
+        IOrderRepository _orderRepository;
 
-        public DeliveryService(IDeliveryRepository repository, IHelperService helperService, IUserRepository userRepository, IShopRepository shopRepository, INotificationRepository notificationRepository)
+        public DeliveryService(IDeliveryRepository repository, IHelperService helperService, IUserRepository userRepository, IShopRepository shopRepository, INotificationRepository notificationRepository, IOrderRepository orderRepository)
         {
             _repository = repository;
             _helperService = helperService;
             _userRepository = userRepository;
             _shopRepository = shopRepository;
             _notificationRepository = notificationRepository;
+            _orderRepository = orderRepository;
         }
 
         public async Task<bool> InsertDeliveryRequest(DeliveryRequestDto req)
@@ -75,6 +77,19 @@ namespace back.BLL.Services
 
             if (!await _repository.AddToRoute(requestId, routeId)) return false;
             if (await _notificationRepository.InsertNotification(userId, 0, "Delivery accepted!", "Delivery person " + username + " just added your delivery request to their route!\nYou can expect your order to arrive on " + route.StartDate.ToShortDateString() + ".", -1)) Console.WriteLine("Notification sent!");
+
+            return true;
+        }
+
+        public async Task<bool> DeclineRequest(int requestId)
+        {
+            DeliveryRequest req = await _repository.GetBaseRequest(requestId);
+            Order order = await _orderRepository.GetOrder(req.OrderId);
+            int userId = await _shopRepository.GetOwnerId(order.ShopId);
+            string username = await _userRepository.GetUsername((int)req.ChosenPersonId);
+
+            if (!await _repository.DeclineRequest(requestId)) return false;
+            if (await _notificationRepository.InsertNotification(userId, 0, "Delivery declined!", "Delivery person " + username + " declined the delivery request for order #!"+ order.Id +" \nPlease choose another delivery person.", -1)) Console.WriteLine("Notification sent!");
 
             return true;
         }

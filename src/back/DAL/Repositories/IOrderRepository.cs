@@ -13,5 +13,6 @@ namespace back.DAL.Repositories
         public Task<bool> UpdateResponse(int orderId, int resp);
         public Task<Order> GetOrder(int orderId);
         public Task<PaymentSlipInfo> GetPaymentSlipInfo(int userId, int shopId);
+        public Task<bool> DeleteOrder(Order order);
     }
 }
