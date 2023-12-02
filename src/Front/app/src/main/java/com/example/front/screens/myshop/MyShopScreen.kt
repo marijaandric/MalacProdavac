@@ -14,6 +14,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
@@ -35,18 +36,35 @@ import com.example.front.viewmodels.myshop.MyShopViewModel
 
 @Composable
 fun MyShopScreen(navController : NavHostController, myShopViewModel: MyShopViewModel) {
-    var shopId by remember {
+    var userId by remember {
         mutableStateOf(0)
     }
+//    LaunchedEffect(Unit) {
+//            myShopViewModel.getUserId()?.let { myShopViewModel.getShopId(it); userId = it}
+//    }
     LaunchedEffect(Unit) {
-            myShopViewModel.getUserId()?.let { myShopViewModel.getShopId(it) ; shopId=it}
+        val fetchedUserId = myShopViewModel.getUserId()
+        if (fetchedUserId != null) {
+            userId = fetchedUserId
+            myShopViewModel.getShopId(userId)
+        }
+    }
+
+    DisposableEffect(myShopViewModel.state.value.shopId) {
+        if (!myShopViewModel.state.value.isLoading) {
+            val shopId = myShopViewModel.state.value.shopId?.id
+            if (shopId != null && shopId != 0) {
+                navController.navigate("${Screen.Shop.route}/$shopId")
+            }
+        }
+        onDispose { /* Cleanup, if needed */ }
     }
     if(myShopViewModel.state.value.isLoading)
     {
         CircularProgressIndicator()
     }
     else{
-        if(true)//myShopViewModel.state.value.shopId!!.id == 0
+        if(myShopViewModel.state.value.shopId!!.id == 0)//true
         {
             Column(
                 modifier = Modifier
@@ -79,10 +97,13 @@ fun MyShopScreen(navController : NavHostController, myShopViewModel: MyShopViewM
             }
 
         }
-        else{
-            navController.navigate("${Screen.Shop.route}/$shopId")
-        }
+//        else{
+//            if(myShopViewModel.state.value.shopId != null)
+//            {
+//                val shopId = myShopViewModel.state.value.shopId!!.id
+//                Log.d("IDDDDDDDDDDD", shopId.toString())
+//                navController.navigate("${Screen.Shop.route}/$shopId")
+//            }
+//        }
     }
-
-
 }

@@ -51,7 +51,7 @@ fun SetupNavGraph(
     NavHost(
         navController = navController,
         //startDestination = "intro"
-        startDestination = "setup_shop"//"my_shop"
+        startDestination = "my_shop"//"my_shop"
         ){
         composable(
             route = Screen.Home.route
@@ -105,7 +105,7 @@ fun SetupNavGraph(
         {navBackStackEntry ->
             val arguments = requireNotNull(navBackStackEntry.arguments)
             val productId = arguments.getInt("id")
-            ShopScreen(navController = navController,oneShopViewModel, productId)
+            ShopScreen(navController = navController,shopViewModel = oneShopViewModel, shopId = productId)
         }
         composable(
             route = Screen.MyShop.route
