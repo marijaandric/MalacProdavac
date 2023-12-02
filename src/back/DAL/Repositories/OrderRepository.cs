@@ -160,5 +160,11 @@ namespace back.DAL.Repositories
                 AccountNumberRcv = rcv.AccountNumber,
             };
         }
+
+        public async Task<bool> DeleteOrder(Order order)
+        {
+            _context.Orders.Remove(order);
+            return await _context.SaveChangesAsync() > 0;
+        }
     }
 }

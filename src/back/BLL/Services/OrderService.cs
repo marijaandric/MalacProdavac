@@ -47,7 +47,18 @@ namespace back.BLL.Services
                 if (await _notificationRepository.InsertNotification((await _shopRepository.GetShop(order.ShopId)).OwnerId, 5, "Order pickup request", "User " + await _userRepository.GetUsername(order.UserId) + " has requested to pick up order #" + o.Id + "on " + ((DateTime)o.PickupTime).ToShortDateString() + ", at " + ((DateTime)o.PickupTime).Hour + ":" + ((DateTime)o.PickupTime).Minute + ".\nTap to respond.", o.Id)) Console.WriteLine("Notification sent!");
 
             if (o.DeliveryMethodId == 2)
-                if (!await _deliveryRepository.InsertDeliveryRequest(new DeliveryRequestDto { OrderId = o.Id, ShopId = o.ShopId })) Console.WriteLine("Request not saved!");
+            {
+                if (await _deliveryRepository.InsertDeliveryRequest(new DeliveryRequestDto { OrderId = o.Id, ShopId = o.ShopId }))
+                {
+                    if (await _notificationRepository.InsertNotification((await _shopRepository.GetShop(order.ShopId)).OwnerId, 5, "Order delivery request", "User " + await _userRepository.GetUsername(order.UserId) + " has placed a new order. Please choose a delivery person to deliver order#" + o.Id + ".\nTap here to view the order.", 5)) Console.WriteLine("Notification sent!");
+                }
+                else
+                {
+                    await _repository.DeleteOrder(o);
+                    return false;
+                }
+            }
+                
 
             return true;
         }
