@@ -24,6 +24,7 @@ class MongoRepositoryImpl(val realm: Realm) : MongoRepository {
                 existingProduct.name = product.name
                 existingProduct.price = product.price
                 existingProduct.quantity = product.quantity
+                existingProduct.shopId = product.id
                 existingProduct.shopName = product.shopName
                 existingProduct.image = product.image
                 existingProduct.metric = product.metric
@@ -44,11 +45,12 @@ class MongoRepositoryImpl(val realm: Realm) : MongoRepository {
         }
     }
 
-    override fun getUniqueShops(): List<String> {
-        val distinctShopNames = realm.query<ProductInCart>()
-            .distinct("shopName")
-            .find()
-
-        return distinctShopNames.map { it.shopName ?: "" }
+    override fun getUniqueShops(): Flow<List<Int>> {
+        return realm.query<ProductInCart>()
+            .asFlow()
+            .map { it.list }
+            .map { products ->
+                products.map { it.shopId }.distinct()
+            }
     }
 }

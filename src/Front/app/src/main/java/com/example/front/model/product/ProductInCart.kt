@@ -9,6 +9,7 @@ class ProductInCart : RealmObject {
     var name: String = ""
     var price: Float = 0.0f
     var quantity: Double = 0.0
+    var shopId: Int = 0
     var shopName: String = ""
     var image: String = ""
     var metric: String = ""

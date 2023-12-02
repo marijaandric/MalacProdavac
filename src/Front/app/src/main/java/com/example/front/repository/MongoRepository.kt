@@ -9,5 +9,5 @@ interface MongoRepository {
     suspend fun insertProduct(product: ProductInCart)
     suspend fun updateProduct(product: ProductInCart)
     suspend fun deleteProduct(id: Int)
-    fun getUniqueShops(): List<String>
+    fun getUniqueShops(): Flow<List<Int>>
 }

@@ -261,11 +261,12 @@ fun ProductPage(
                             onClick = {
                                 if (productInfo?.name != null &&
                                     productInfo?.price != null &&
+                                    productInfo.shopId != null &&
                                     productInfo?.shopName != null &&
                                     productInfo.images?.isNotEmpty() == true &&
                                     productInfo.metric != null)
                                 {
-                                    productViewModel.addToCart(productID, productInfo.name, productInfo.price, quantity, productInfo.shopName, productInfo.images[0].image, productInfo.metric)
+                                    productViewModel.addToCart(productID, productInfo.name, productInfo.price, quantity, productInfo.shopId, productInfo.shopName, productInfo.images[0].image, productInfo.metric)
 
                                     Toast.makeText(context, "Product added to cart", Toast.LENGTH_SHORT).show()
                                 }

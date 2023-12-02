@@ -21,7 +21,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.front.R
 import com.example.front.ui.theme.Typography
-import com.example.front.viewmodels.cart.CartViewModel
 import com.example.front.viewmodels.checkout.CheckoutViewModel
 
 @Composable
@@ -35,7 +34,7 @@ fun CheckoutScreen(
         viewModel.getCheckoutData()
     }
 
-    val checkoutState by viewModel.state.collectAsState()
+    val checkoutState = viewModel.state.value
 
     Surface(
         modifier = Modifier
@@ -80,18 +79,11 @@ fun CheckoutScreen(
                     .padding(horizontal = 16.dp, vertical = 0.dp)
                     .weight(1f)
             ) {
-                checkoutState.shops.forEach { shop ->
-                    // Item za svaku prodavnicu
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
-                    ) {
+                checkoutState.forEach { shop ->
+                    item {
                         Text(
-                            text = shop.name
+                            text = shop.toString()
                         )
-
-
                     }
                 }
             }

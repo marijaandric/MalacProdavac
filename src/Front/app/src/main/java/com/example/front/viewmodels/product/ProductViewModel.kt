@@ -83,6 +83,7 @@ class ProductViewModel @Inject constructor(
         name: String,
         price: Float,
         quantity: Int,
+        shopId: Int,
         shopName: String,
         image: String,
         metric: String
@@ -94,7 +95,9 @@ class ProductViewModel @Inject constructor(
                 productInCart.name = name
                 productInCart.price = price
                 productInCart.quantity = quantity.toDouble()
+                productInCart.shopId = shopId
                 productInCart.shopName = shopName
+                productInCart.image = image
                 productInCart.metric = metric
 
                 mongoRepository.updateProduct(productInCart)
