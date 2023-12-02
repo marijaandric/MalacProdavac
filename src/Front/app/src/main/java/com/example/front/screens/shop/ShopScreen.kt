@@ -3,6 +3,7 @@ package com.example.front.screens.shop
 import android.content.Context
 import android.net.Uri
 import android.util.Log
+import android.widget.TimePicker
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -25,6 +26,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -36,6 +38,7 @@ import androidx.compose.material.Checkbox
 import androidx.compose.material.CheckboxDefaults
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -43,9 +46,13 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.TimeInput
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -91,6 +98,7 @@ import com.example.front.model.DTO.MetricsDTO
 import com.example.front.model.DTO.NewProductDTO
 import com.example.front.model.DTO.WorkingHoursDTO
 import com.example.front.model.user.UserEditDTO
+import com.example.front.screens.myshop.DayOfWeekItem
 import com.example.front.viewmodels.myprofile.MyProfileViewModel
 import com.example.front.viewmodels.oneshop.OneShopViewModel
 import kotlinx.coroutines.delay
@@ -151,7 +159,6 @@ fun ShopScreen(navController: NavHostController, shopViewModel: OneShopViewModel
             }
         } else {
             item {
-                //shop for user
                 ProfilePic(shopViewModel, id)
             }
             item {
@@ -1113,7 +1120,7 @@ fun ProfilePic(shopViewModel: OneShopViewModel, id: Int) {
 @Composable
 fun EditSellersDialog(onDismiss: () -> Unit) {
     val overlayColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)
-
+    val state = rememberTimePickerState()
 
     var name by remember {
         mutableStateOf("")
@@ -1125,9 +1132,9 @@ fun EditSellersDialog(onDismiss: () -> Unit) {
         mutableStateOf(0)
     }
     var categories = mutableListOf<Int>()
-//    var workingHoursDTO by remember {
-//        mutableListOf<WorkingHoursDTO>()
-//    }
+    var workingHour by remember {
+        mutableStateOf(WorkingHoursDTO(0,0,"00","00", "Shop"))
+    }
 
 
     Dialog(
@@ -1184,6 +1191,23 @@ fun EditSellersDialog(onDismiss: () -> Unit) {
 
                     Spacer(modifier = Modifier.height(16.dp))
 
+                    Text("Working hours", style = MaterialTheme.typography.titleSmall, modifier = Modifier)
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 16.dp,bottom=16.dp),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        val daysOfWeek = listOf("Mon","Tue","Wed","Thu","Fri","Sat","Sun")
+                        for (day in daysOfWeek) {
+                            DayOfWeek(day = day, onClick={})
+                        }
+                    }
+                    TimeInput(state = state)
+                    TimeInput(state = state)
+
+
+
                     CardButton(text = "Edit", onClick = { onDismiss() }, width = 1f, modifier = Modifier, color = MaterialTheme.colorScheme.primary)
 
                 }
@@ -1194,5 +1218,21 @@ fun EditSellersDialog(onDismiss: () -> Unit) {
 }
 
 
-
+@Composable
+fun DayOfWeek(day: String, onClick: () -> Unit ) {
+    Box(
+        modifier = Modifier
+            .background(color = MaterialTheme.colorScheme.primary, RoundedCornerShape(10.dp))
+            .height(35.dp)
+            .width(35.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = day,
+            color = Color.White,
+            fontWeight = FontWeight.Bold,
+            fontSize = 10.sp
+        )
+    }
+}
 

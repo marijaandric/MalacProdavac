@@ -28,7 +28,7 @@ class MyShopViewModel @Inject constructor(
     val usernameFlow: Flow<String> = _usernameFlow
 
 
-    fun getHomeProducts(i: Int) {
+    fun getShopId(i: Int) {
         viewModelScope.launch {
             try {
                 val response = repository.getShopId(i)

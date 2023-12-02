@@ -1,5 +1,6 @@
 package com.example.front.screens.myshop
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -38,14 +39,14 @@ fun MyShopScreen(navController : NavHostController, myShopViewModel: MyShopViewM
         mutableStateOf(0)
     }
     LaunchedEffect(Unit) {
-            myShopViewModel.getUserId()?.let { myShopViewModel.getHomeProducts(it) ; shopId=it}
+            myShopViewModel.getUserId()?.let { myShopViewModel.getShopId(it) ; shopId=it}
     }
     if(myShopViewModel.state.value.isLoading)
     {
         CircularProgressIndicator()
     }
     else{
-        if(myShopViewModel.state.value.shopId!!.id == 0)
+        if(true)//myShopViewModel.state.value.shopId!!.id == 0
         {
             Column(
                 modifier = Modifier
