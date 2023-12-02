@@ -145,5 +145,20 @@ namespace back.DAL.Repositories
                 EndAddress = end
             };
         }
+
+        public async Task<DeliveryRoute> GetRoute(int routeId)
+        {
+            return await _context.DeliveryRoutes.FirstOrDefaultAsync(x => x.Id == routeId);
+        }
+        public async Task<DeliveryRequest> GetBaseRequest(int requestId)
+        {
+            return await _context.DeliveryRequests.FirstOrDefaultAsync(x => x.Id == requestId);
+        }
+
+        public async Task<int> GetCustomerIdForDelivery(int requestId)
+        {
+            int orderId  = (await _context.DeliveryRequests.FirstOrDefaultAsync(x => x.Id == requestId)).OrderId;
+            return (await _context.Orders.FirstOrDefaultAsync(x => x.Id == orderId)).UserId;
+        }
     }
 }

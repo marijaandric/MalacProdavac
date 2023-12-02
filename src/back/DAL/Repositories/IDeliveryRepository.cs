@@ -13,5 +13,8 @@ namespace back.DAL.Repositories
         public Task<List<DeliveryRequestCard>> GetRequestsForDeliveryPerson(int deliveryPerson);
         public Task<List<DeliveryRouteCard>> GetRoutesForDeliveryPerson(int userId);
         public Task<DeliveryRequestCard> GetRequest(int requestId);
+        public Task<DeliveryRequest> GetBaseRequest(int requestId);
+        public Task<DeliveryRoute> GetRoute(int routeId);
+        public Task<int> GetCustomerIdForDelivery(int requestId);
     }
 }
