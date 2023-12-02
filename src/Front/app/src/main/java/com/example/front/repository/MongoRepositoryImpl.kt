@@ -6,7 +6,6 @@ import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.query
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import org.mongodb.kbson.ObjectId
 
 class MongoRepositoryImpl(val realm: Realm) : MongoRepository {
     override fun getCartProducts(): Flow<List<ProductInCart>> {
@@ -43,5 +42,13 @@ class MongoRepositoryImpl(val realm: Realm) : MongoRepository {
                 Log.d("MongoRepositoryImpl", "${e.message}")
             }
         }
+    }
+
+    override fun getUniqueShops(): List<String> {
+        val distinctShopNames = realm.query<ProductInCart>()
+            .distinct("shopName")
+            .find()
+
+        return distinctShopNames.map { it.shopName ?: "" }
     }
 }

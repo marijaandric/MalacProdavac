@@ -21,12 +21,6 @@ class CartViewModel @Inject constructor(
     val state: State<CartState> = _state
 
     suspend fun getCartProducts() {
-        // Implementirajte logiku za dohvat proizvoda iz korpe iz repository-ja
-        // Na primer, možete koristiti repository metodu poput getCartProducts()
-        // koja vraća listu proizvoda u korpi.
-        // Ažurirajte _state kada podaci budu dostupni.
-
-        // Primer:
         try {
             mongoRepository.getCartProducts().collect() {cartProducts ->
                 // Pretpostavljeni naziv metode
@@ -36,10 +30,8 @@ class CartViewModel @Inject constructor(
                 )
             }
         } catch (e: Exception) {
-            // Handle error if needed
             _state.value = _state.value.copy(
                 isLoading = false,
-                // Možete dodati dodatna polja u CartState za rukovanje greškama
             )
         }
     }

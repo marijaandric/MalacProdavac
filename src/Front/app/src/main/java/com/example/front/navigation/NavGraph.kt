@@ -12,6 +12,7 @@ import com.example.front.screens.cart.Cart
 import com.example.front.screens.products.AllProducts
 import com.example.front.screens.home.HomePage
 import com.example.front.screens.categories.RegistrationCategories
+import com.example.front.screens.checkout.CheckoutScreen
 import com.example.front.screens.myshop.MyShopScreen
 import com.example.front.screens.myshop.SetUpShopScreen
 import com.example.front.screens.product.ProductPage
@@ -21,6 +22,7 @@ import com.example.front.screens.userprofile.UserProfileScreen
 import com.example.front.viewmodels.cart.CartViewModel
 import com.example.front.viewmodels.splasintro.SplashAndIntroViewModel
 import com.example.front.viewmodels.categories.CategoriesViewModel
+import com.example.front.viewmodels.checkout.CheckoutViewModel
 import com.example.front.viewmodels.home.HomeViewModel
 import com.example.front.viewmodels.login.LoginViewModel
 import com.example.front.viewmodels.myprofile.MyProfileViewModel
@@ -47,6 +49,7 @@ fun SetupNavGraph(
     val cartViewModel: CartViewModel = hiltViewModel()
     val oneShopViewModel : OneShopViewModel = hiltViewModel()
     val myShopViewModel : MyShopViewModel = hiltViewModel()
+    val checkoutViewModel: CheckoutViewModel = hiltViewModel()
 
     NavHost(
         navController = navController,
@@ -119,7 +122,12 @@ fun SetupNavGraph(
         {
             SetUpShopScreen(navController = navController)
         }
-
+        composable(
+            route = Screen.Checkout.route
+        )
+        {
+            CheckoutScreen(viewModel = checkoutViewModel, navController = navController)
+        }
 
         introNavGraph(navController = navController, splashViewModel)
         authNavGraph(navController = navController, loginViewModel = loginViewModel, registerViewModel = registerViewModel, categoriesViewModel)
