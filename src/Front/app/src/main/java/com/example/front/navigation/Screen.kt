@@ -18,4 +18,5 @@ sealed class Screen(val route:String){
     object Shop:Screen(route="shop")
     object MyShop:Screen(route="my_shop")
     object SetUpShop:Screen(route="setup_shop")
+    object NewCreditCard: Screen(route="new_credit_card")
 }
