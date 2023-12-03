@@ -209,5 +209,18 @@ namespace back.PL.Controllers
                 return BadRequest(new { Error = ex.Message });
             }
         }
+
+        [HttpGet("GetShopsForCheckout")]
+        public async Task<IActionResult> GetShopsForCheckout([FromQuery] List<int> shopIds)
+        {
+            try
+            {
+                return Ok(await _service.GetShopsForCheckout(shopIds));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
     }
 }
