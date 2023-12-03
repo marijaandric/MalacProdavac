@@ -210,5 +210,12 @@ namespace back.BLL.Services
             if (s == null) return 0;
             return s.Id;
         }
+        public async Task<List<ShopCheckoutCard>> GetShopsForCheckout(List<int> shopIds)
+        {
+            List<ShopCheckoutCard> shops = await _repository.GetShopsForCheckout(shopIds);
+            if (shops.Count == 0) throw new ArgumentException("No shops found!");
+            return shops;
+        }
+
     }
 }

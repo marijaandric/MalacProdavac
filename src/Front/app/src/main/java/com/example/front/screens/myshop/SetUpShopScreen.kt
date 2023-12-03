@@ -31,6 +31,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
+import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -39,6 +40,8 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TimeInput
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -46,6 +49,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
@@ -61,6 +65,8 @@ import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
 import com.example.front.R
+import com.example.front.components.BigBlueButton
+import com.example.front.components.CardButton
 import com.example.front.components.MyTextField
 import com.example.front.components.MyTextFieldWithoutIcon
 import com.example.front.components.OpenNow
@@ -89,6 +95,7 @@ fun SetUpShopScreen(navController : NavHostController) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfilePhoto(context:Context) {
     var uri by remember {
@@ -103,6 +110,7 @@ fun ProfilePhoto(context:Context) {
     var address by remember {
         mutableStateOf("")
     }
+    val state = rememberTimePickerState()
 
     var photoPicker = rememberLauncherForActivityResult(contract = ActivityResultContracts.PickVisualMedia(), onResult = {
         uri?.let {
@@ -185,15 +193,31 @@ fun ProfilePhoto(context:Context) {
             }
         }
 
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(text="Pick up time", style=MaterialTheme.typography.bodyLarge)
-            Text(text = "Opening time", modifier = Modifier.padding(top = 16.dp,start = 10.dp), style=MaterialTheme.typography.displaySmall)
-            //TimePicker()
-            Text(text = "Closing time", modifier = Modifier.padding(top = 16.dp,start = 10.dp), style=MaterialTheme.typography.displaySmall)
-            //TimePicker()
+        Spacer(modifier = Modifier.height(16.dp))
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(20.dp))
+                .padding(10.dp)
+        )
+        {
+            Column(
+                modifier = Modifier
+                    .background(color = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.5f))
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+
+            ) {
+                Text(text="Pick up time", style=MaterialTheme.typography.bodyLarge)
+                Text(text = "Opening time", modifier = Modifier.padding(top = 16.dp,start = 10.dp, bottom = 10.dp), style=MaterialTheme.typography.displaySmall)
+                TimeInput(state = state)
+                Text(text = "Closing time", modifier = Modifier.padding(top = 16.dp,start = 10.dp, bottom = 10.dp), style=MaterialTheme.typography.displaySmall)
+                TimeInput(state = state)
+                CardButton(text = "Apply", onClick = {  }, width = 0.7f, modifier = Modifier, color = MaterialTheme.colorScheme.secondary)
+            }
         }
+        BigBlueButton(text = "Proceed", onClick = {  }, width = 0.9f, modifier = Modifier)
 
     }
 }

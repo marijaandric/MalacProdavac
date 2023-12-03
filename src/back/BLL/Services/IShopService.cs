@@ -23,5 +23,6 @@ namespace back.BLL.Services
         public Task<bool> DeleteProductDisplay(int id);
         public Task<ProductDisplay> GetProductDisplay(int id);
         public Task<int> GetShopId(int userId);
+        public Task<List<ShopCheckoutCard>> GetShopsForCheckout(List<int> shopIds);
     }
 }

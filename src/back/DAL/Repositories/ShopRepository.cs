@@ -360,5 +360,25 @@ namespace back.DAL.Repositories
         {
             return await _context.LikedShops.Where(x => x.ShopId == shopId).ToListAsync();
         }
+
+        public async Task<int> GetOwnerId(int shopId)
+        {
+            return (await _context.Shop.FirstOrDefaultAsync(x => x.Id == shopId)).OwnerId;
+        }
+
+        public async Task<List<ShopCheckoutCard>> GetShopsForCheckout(List<int> shopIds)
+        {
+            return await _context.Shop.Where(s => shopIds.Contains(s.Id)). Select(s => new ShopCheckoutCard 
+                {
+                    Id = s.Id,
+                    Name = s.Name,
+                    Address = s.Address,
+                    Image = s.Image,
+                    WorkingHours = _context.WorkingHours.Where(x => x.ShopId == s.Id).ToList(),
+                    Latitude = s.Latitude,
+                    Longitude = s.Longitude
+                })
+                .ToListAsync();
+        }
     }
 }

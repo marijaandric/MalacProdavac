@@ -34,5 +34,7 @@ namespace back.DAL.Repositories
         public Task<Shop> GetShopByUserId(int userId);
         public Task<List<Shop>> GetAllShops();
         public Task<List<LikedShops>> GetFollowerIds(int shopId);
+        public Task<int> GetOwnerId(int shopId);
+        public Task<List<ShopCheckoutCard>> GetShopsForCheckout(List<int> shopIds);
     }
 }

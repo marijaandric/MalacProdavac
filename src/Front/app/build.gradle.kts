@@ -176,6 +176,10 @@ dependencies {
     //Realm
     implementation("io.realm.kotlin:library-base:1.11.0")
 
+    //calendar
+    implementation("com.maxkeppeler.sheets-compose-dialogs:core:1.2.0")
+    implementation("com.maxkeppeler.sheets-compose-dialogs:calendar:1.2.0")
+
 
 }
 

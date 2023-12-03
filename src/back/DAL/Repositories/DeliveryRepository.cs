@@ -61,6 +61,14 @@ namespace back.DAL.Repositories
             return await _context.SaveChangesAsync() > 0;
         }
 
+        public async Task<bool> DeclineRequest(int requestId)
+        {
+            DeliveryRequest req = await _context.DeliveryRequests.FirstOrDefaultAsync(x => x.Id == requestId);
+            req.ChosenPersonId = null;
+
+            return await _context.SaveChangesAsync() > 0;
+        }
+
         public async Task<List<DeliveryRequestCard>> GetRequestsForDeliveryPerson(int deliveryPerson)
         {
             return (await _context.DeliveryRequests.Where(x => x.RouteId == null && x.ChosenPersonId == deliveryPerson && !x.Accepted != true).Join(_context.Shop, dr => dr.ShopId, s => s.Id, (dr, s) => new { dr, s }).Join(_context.Orders, x => x.dr.OrderId, o => o.Id, (x, o) => new DeliveryRequestCard
@@ -144,6 +152,21 @@ namespace back.DAL.Repositories
                 StartAddress = start,
                 EndAddress = end
             };
+        }
+
+        public async Task<DeliveryRoute> GetRoute(int routeId)
+        {
+            return await _context.DeliveryRoutes.FirstOrDefaultAsync(x => x.Id == routeId);
+        }
+        public async Task<DeliveryRequest> GetBaseRequest(int requestId)
+        {
+            return await _context.DeliveryRequests.FirstOrDefaultAsync(x => x.Id == requestId);
+        }
+
+        public async Task<int> GetCustomerIdForDelivery(int requestId)
+        {
+            int orderId  = (await _context.DeliveryRequests.FirstOrDefaultAsync(x => x.Id == requestId)).OrderId;
+            return (await _context.Orders.FirstOrDefaultAsync(x => x.Id == orderId)).UserId;
         }
     }
 }

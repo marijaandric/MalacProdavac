@@ -10,39 +10,43 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.front.screens.products.AllProducts
 import com.example.front.screens.home.HomePage
+import com.example.front.screens.cart.Cart
+import com.example.front.screens.cart.NewCreditCartScreen
 import com.example.front.screens.categories.RegistrationCategories
+import com.example.front.screens.home.HomePage
 import com.example.front.screens.myshop.MyShopScreen
 import com.example.front.screens.myshop.SetUpShopScreen
 import com.example.front.screens.product.ProductPage
+import com.example.front.screens.products.AllProducts
 import com.example.front.screens.sellers.SellersScreen
 import com.example.front.screens.shop.ShopScreen
 import com.example.front.screens.userprofile.UserProfileScreen
 import com.example.front.viewmodels.cart.CartViewModel
-import com.example.front.viewmodels.splasintro.SplashAndIntroViewModel
 import com.example.front.viewmodels.categories.CategoriesViewModel
 import com.example.front.viewmodels.checkout.CheckoutViewModel
 import com.example.front.viewmodels.home.HomeViewModel
 import com.example.front.viewmodels.login.LoginViewModel
 import com.example.front.viewmodels.myprofile.MyProfileViewModel
+import com.example.front.viewmodels.myshop.MyShopViewModel
 import com.example.front.viewmodels.oneshop.OneShopViewModel
 import com.example.front.viewmodels.product.ProductViewModel
 import com.example.front.viewmodels.register.RegisterViewModel
 import com.example.front.viewmodels.shops.ShopsViewModel
-import com.example.front.viewmodels.myshop.MyShopViewModel
+import com.example.front.viewmodels.splasintro.SplashAndIntroViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun SetupNavGraph(
     navController: NavHostController
-){
+) {
 
     val loginViewModel: LoginViewModel = hiltViewModel()
     val homeViewModel: HomeViewModel = hiltViewModel()
-    val categoriesViewModel : CategoriesViewModel = hiltViewModel()
+    val categoriesViewModel: CategoriesViewModel = hiltViewModel()
     val registerViewModel: RegisterViewModel = hiltViewModel()
     val productViewModel: ProductViewModel = hiltViewModel()
     val splashViewModel: SplashAndIntroViewModel = hiltViewModel()
-    val myProfileViewModel : MyProfileViewModel = hiltViewModel()
+    val myProfileViewModel: MyProfileViewModel = hiltViewModel()
     val shopsViewModel: ShopsViewModel = hiltViewModel()
     val cartViewModel: CartViewModel = hiltViewModel()
     val oneShopViewModel : OneShopViewModel = hiltViewModel()
@@ -51,16 +55,16 @@ fun SetupNavGraph(
 
     NavHost(
         navController = navController,
-        //startDestination = "intro"
-        startDestination = "my_shop"
-        ){
+        startDestination = "home_screen"
+        //startDestination = "my_shop"//"my_shop"`
+    ) {
         composable(
             route = Screen.Home.route
-        ){
+        ) {
             HomePage(navController = navController, homeViewModel)
         }
         composable(
-            route=Screen.Categories.route
+            route = Screen.Categories.route
         )
         {
             RegistrationCategories(navController = navController, categoriesViewModel)
@@ -85,22 +89,38 @@ fun SetupNavGraph(
             route = Screen.AllProduct.route
         )
         {
-            AllProducts(navController = navController, homeViewModel,shopsViewModel)
+            AllProducts(navController = navController, homeViewModel, shopsViewModel)
         }
         composable(
             route = Screen.AllSellers.route
         )
         {
-            SellersScreen(navController = navController,shopsViewModel)
+            SellersScreen(navController = navController, shopsViewModel)
+        }
+        composable(
+            route = Screen.Cart.route
+        )
+        {
+            Cart(cartViewModel, navController)
+        }
+        composable(
+            route = Screen.NewCreditCard.route
+        )
+        {
+            NewCreditCartScreen()
         }
         composable(
             route = "${Screen.Shop.route}/{id}",
-            arguments = listOf(navArgument("id") { type= NavType.IntType})
+            arguments = listOf(navArgument("id") { type = NavType.IntType })
         )
-        {navBackStackEntry ->
+        { navBackStackEntry ->
             val arguments = requireNotNull(navBackStackEntry.arguments)
             val productId = arguments.getInt("id")
-            ShopScreen(navController = navController,oneShopViewModel, productId)
+            ShopScreen(
+                navController = navController,
+                shopViewModel = oneShopViewModel,
+                shopId = productId
+            )
         }
         composable(
             route = Screen.MyShop.route

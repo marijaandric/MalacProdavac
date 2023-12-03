@@ -3,6 +3,7 @@ package com.example.front.screens.shop
 import android.content.Context
 import android.net.Uri
 import android.util.Log
+import android.widget.TimePicker
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -25,6 +26,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -36,16 +38,25 @@ import androidx.compose.material.Checkbox
 import androidx.compose.material.CheckboxDefaults
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DateRangePicker
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.TimeInput
+import androidx.compose.material3.rememberDateRangePickerState
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -64,6 +75,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -91,8 +104,10 @@ import com.example.front.model.DTO.MetricsDTO
 import com.example.front.model.DTO.NewProductDTO
 import com.example.front.model.DTO.WorkingHoursDTO
 import com.example.front.model.user.UserEditDTO
+import com.example.front.screens.myshop.DayOfWeekItem
 import com.example.front.viewmodels.myprofile.MyProfileViewModel
 import com.example.front.viewmodels.oneshop.OneShopViewModel
+import com.google.android.material.datepicker.CalendarConstraints.DateValidator
 import kotlinx.coroutines.delay
 
 @Composable
@@ -151,7 +166,6 @@ fun ShopScreen(navController: NavHostController, shopViewModel: OneShopViewModel
             }
         } else {
             item {
-                //shop for user
                 ProfilePic(shopViewModel, id)
             }
             item {
@@ -1000,6 +1014,9 @@ fun ProfilePic(shopViewModel: OneShopViewModel, id: Int) {
     var showDialog by remember{
         mutableStateOf(false)
     }
+    var showDisplayProduct by remember{
+        mutableStateOf(false)
+    }
     Box(
         modifier = Modifier
             .padding(top = 50.dp, end = 16.dp, start = 16.dp)
@@ -1026,28 +1043,32 @@ fun ProfilePic(shopViewModel: OneShopViewModel, id: Int) {
         }
 
 
-        Image(
-            painter = painterResource(id = if (shopViewModel.state.value.shop!!.isOwner) R.drawable.addshop else R.drawable.navbar_message),
-            contentDescription = "Search icon",
-            modifier = Modifier
-                .size(40.dp)
-                .align(Alignment.TopStart)
-                .clickable {
+        if(shopViewModel.state.value.shop!!.isOwner)
+        {
+            Image(
+                painter = painterResource(id = R.drawable.addshop),
+                contentDescription = "Search icon",
+                modifier = Modifier
+                    .size(40.dp)
+                    .align(Alignment.TopStart)
+                    .clickable {
+                        showDisplayProduct = true
+                    },
+            )
+        }
+        else{
+            Image(
+                painter = painterResource(id = R.drawable.navbar_message),
+                contentDescription = "Search icon",
+                modifier = Modifier
+                    .size(40.dp)
+                    .align(Alignment.TopStart)
+                    .clickable {
 
-                },
-        )
+                    },
+            )
+        }
 
-        Icon(
-            imageVector = Icons.Default.Email,
-            contentDescription = "Search icon",
-            modifier = Modifier
-                .size(40.dp)
-                .align(Alignment.TopStart)
-                .clickable {
-
-                },
-            tint = MaterialTheme.colorScheme.primary
-        )
 
         if (shopViewModel.state.value.shop!!.image == null) {
             if (shopViewModel.state.value.shop!!.image == null) {
@@ -1106,14 +1127,98 @@ fun ProfilePic(shopViewModel: OneShopViewModel, id: Int) {
     {
         EditSellersDialog(onDismiss = { showDialog = false })
     }
+
+    if(showDisplayProduct)
+    {
+        DisplayProductDialog(onDismiss = { showDisplayProduct = false })
+    }
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DisplayProductDialog(onDismiss: () -> Unit) {
+    val overlayColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)
+    val state = rememberDateRangePickerState()
+    val timeStart = rememberTimePickerState()
+
+    Dialog(
+        properties = DialogProperties(usePlatformDefaultWidth = false),
+        onDismissRequest = { onDismiss() }) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(overlayColor)
+                .pointerInput(Unit) {
+                    detectTapGestures { offset ->
+                        onDismiss()
+                    }
+                }
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.9f)
+                    .fillMaxHeight(0.8f)
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(MaterialTheme.colorScheme.background)
+                    .pointerInput(Unit) {
+                        detectTapGestures { offset ->
+
+                        }
+                    }
+                    .padding(16.dp)
+                    .align(Alignment.Center)
+            ) {
+                LazyColumn {
+                    item{
+                        Text("Add product display information", style = MaterialTheme.typography.titleMedium, modifier = Modifier
+                            .padding(bottom = 25.dp))
+
+                        Card(
+
+                        )
+                        {
+                            Box(
+                                modifier = Modifier
+                                    .border(
+                                        2.dp,
+                                        MaterialTheme.colorScheme.tertiary,
+                                        RoundedCornerShape(10.dp)
+                                    )
+                                    .clip(RoundedCornerShape(10.dp))
+                            ){
+                                DateRangePicker(state = state,modifier = Modifier.height(470.dp).background(color=MaterialTheme.colorScheme.background),headline = {
+                                    Text(text = "Select date!", modifier = Modifier.padding(start=10.dp),
+                                        style=MaterialTheme.typography.displaySmall.copy(fontSize = 23.sp)
+                                )}, title=null)
+                            }
+                        }
+                        Text(text = "Start time", modifier = Modifier.padding(top = 16.dp,start = 10.dp, bottom = 10.dp), style=MaterialTheme.typography.displaySmall)
+                        TimeInput(state = timeStart)
+                        Text(text = "End time", modifier = Modifier.padding(top = 16.dp,start = 10.dp, bottom = 10.dp), style=MaterialTheme.typography.displaySmall)
+                        TimeInput(state = timeStart)
+                        CardButton(
+                            text = "Add",
+                            onClick = { onDismiss() },
+                            width = 1f,
+                            modifier = Modifier.height(50.dp),
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    }
+                }
+
+            }
+        }
+    }
+}
+
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditSellersDialog(onDismiss: () -> Unit) {
     val overlayColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)
-
+    val state = rememberTimePickerState()
 
     var name by remember {
         mutableStateOf("")
@@ -1125,9 +1230,9 @@ fun EditSellersDialog(onDismiss: () -> Unit) {
         mutableStateOf(0)
     }
     var categories = mutableListOf<Int>()
-//    var workingHoursDTO by remember {
-//        mutableListOf<WorkingHoursDTO>()
-//    }
+    var workingHour by remember {
+        mutableStateOf(WorkingHoursDTO(0,0,"00","00", "Shop"))
+    }
 
 
     Dialog(
@@ -1146,6 +1251,7 @@ fun EditSellersDialog(onDismiss: () -> Unit) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth(0.8f)
+                    .fillMaxHeight(0.8f)
                     .clip(RoundedCornerShape(20.dp))
                     .background(MaterialTheme.colorScheme.background)
                     .pointerInput(Unit) {
@@ -1156,36 +1262,83 @@ fun EditSellersDialog(onDismiss: () -> Unit) {
                     .padding(16.dp)
                     .align(Alignment.Center)
             ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                        .align(Alignment.Center)
-                ) {
-                    Text("Edit shop", style = MaterialTheme.typography.titleMedium, modifier = Modifier
-                        .padding(bottom = 25.dp)
-                        .align(Alignment.CenterHorizontally))
+                LazyColumn()
+                {
+                    item{
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp)
+                                .align(Alignment.Center)
+                        ) {
+                            Text("Edit shop", style = MaterialTheme.typography.titleMedium, modifier = Modifier
+                                .padding(bottom = 25.dp)
+                                .align(Alignment.CenterHorizontally))
 
-                    MyTextField(
-                        labelValue = "Name",
-                        painterResource = painterResource(id = R.drawable.user),
-                        value = name,
-                        onValueChange = { name = it }
-                    )
+                            MyTextField(
+                                labelValue = "Name",
+                                painterResource = painterResource(id = R.drawable.user),
+                                value = name,
+                                onValueChange = { name = it }
+                            )
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(16.dp))
 
-                    MyTextField(
-                        labelValue = "Address",
-                        painterResource = painterResource(id = R.drawable.user),
-                        value = name,
-                        onValueChange = { name = it }
-                    )
+                            MyTextField(
+                                labelValue = "Address",
+                                painterResource = painterResource(id = R.drawable.user),
+                                value = name,
+                                onValueChange = { name = it }
+                            )
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(16.dp))
 
-                    CardButton(text = "Edit", onClick = { onDismiss() }, width = 1f, modifier = Modifier, color = MaterialTheme.colorScheme.primary)
+                            Text("Working hours", style = MaterialTheme.typography.titleSmall, modifier = Modifier)
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 16.dp, bottom = 16.dp),
+                                horizontalArrangement = Arrangement.SpaceEvenly
+                            ) {
+                                val daysOfWeek = listOf("Mon","Tue","Wed","Thu","Fri","Sat","Sun")
+                                for (day in daysOfWeek) {
+                                    DayOfWeek(day = day, onClick={})
+                                }
+                            }
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(20.dp))
+                                    .padding(10.dp)
+                            )
+                            {
+                                Column(
+                                    modifier = Modifier
+                                        .background(
+                                            color = MaterialTheme.colorScheme.tertiary.copy(
+                                                alpha = 0.5f
+                                            )
+                                        )
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
 
+                                    ) {
+                                    androidx.compose.material3.Text(text="Pick up time", style=MaterialTheme.typography.bodyLarge)
+                                    androidx.compose.material3.Text(text = "Opening time", modifier = Modifier.padding(top = 16.dp,start = 10.dp, bottom = 10.dp), style=MaterialTheme.typography.displaySmall)
+                                    TimeInput(state = state)
+                                    androidx.compose.material3.Text(text = "Closing time", modifier = Modifier.padding(top = 16.dp,start = 10.dp, bottom = 10.dp), style=MaterialTheme.typography.displaySmall)
+                                    TimeInput(state = state)
+                                    CardButton(text = "Apply", onClick = {  }, width = 0.7f, modifier = Modifier, color = MaterialTheme.colorScheme.secondary)
+                                }
+                            }
+
+
+                            CardButton(text = "Edit", onClick = { onDismiss() }, width = 1f, modifier = Modifier, color = MaterialTheme.colorScheme.primary)
+
+                        }
+                    }
                 }
 
             }
@@ -1194,5 +1347,21 @@ fun EditSellersDialog(onDismiss: () -> Unit) {
 }
 
 
-
+@Composable
+fun DayOfWeek(day: String, onClick: () -> Unit ) {
+    Box(
+        modifier = Modifier
+            .background(color = MaterialTheme.colorScheme.primary, RoundedCornerShape(10.dp))
+            .height(35.dp)
+            .width(35.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = day,
+            color = Color.White,
+            fontWeight = FontWeight.Bold,
+            fontSize = 10.sp
+        )
+    }
+}
 
