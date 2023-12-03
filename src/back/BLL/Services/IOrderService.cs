@@ -8,7 +8,7 @@ namespace back.BLL.Services
     {
         public Task<List<OrderCard>> GetOrders(int userId, int? status, int page);
         public Task<OrderInfo> OrderDetails(int orderId);
-        public Task<bool> InsertOrder(OrderDto order);
+        public Task<bool> InsertOrders(List<OrderDto> order);
         public Task<bool> RespondToPickupRequest(int orderId, int resp, string? message);
 
     }

@@ -42,12 +42,12 @@ namespace back.PL.Controllers
             }
         }
 
-        [HttpPost("InsertOrder")]
-        public async Task<IActionResult> InsertOrder(OrderDto order)
+        [HttpPost("InsertOrders")]
+        public async Task<IActionResult> InsertOrders(List<OrderDto> orders)
         {
             try
             {
-                return Ok(new { Success = await _service.InsertOrder(order) });
+                return Ok(new { Success = await _service.InsertOrders(orders) });
             }
             catch (Exception ex)
             {
