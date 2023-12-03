@@ -65,12 +65,9 @@ fun Cart(
     val isButtonVisible by remember { mutableStateOf(false) }
     var sum by remember { mutableDoubleStateOf(0.0) }
     val coroutineScope = rememberCoroutineScope()
+    val cartProducts = cartState.products
+    sum = cartProducts.sumOf { it.price * it.quantity }
 
-    LaunchedEffect(cartState.isLoading) {
-        if (!cartState.isLoading) {
-            sum = calculateTotal(cartState.products)
-        }
-    }
     Surface(
         modifier = Modifier
             .fillMaxSize(),
@@ -195,8 +192,8 @@ fun Cart(
                                         .clickable {
 
                                             coroutineScope.launch {
+                                                sum -= product.price * product.quantity
                                                 viewModel.removeProductFromCart(product.id)
-                                                sum -= calculateTotal(cartState.products)
                                             }
 
                                         }
@@ -223,7 +220,7 @@ fun Cart(
                     ,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text("Total: ${DecimalFormat("#.00").format(sum)} rsd",
+                    Text("Total: ${DecimalFormat("0.00").format(sum)} rsd",
                         modifier = Modifier
                             .padding(vertical = 14.dp)
                         ,
@@ -248,8 +245,4 @@ fun Cart(
 
         }
     }
-}
-
-private fun calculateTotal(products: List<ProductInCart>): Double {
-    return products.sumOf { it.price * it.quantity }
 }

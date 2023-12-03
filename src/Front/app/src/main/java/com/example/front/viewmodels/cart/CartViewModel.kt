@@ -39,7 +39,6 @@ class CartViewModel @Inject constructor(
         mongoRepository.deleteProduct(id)
         getCartProducts()
     }
-
 }
 
 data class CartState(
