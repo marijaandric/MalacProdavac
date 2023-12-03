@@ -82,5 +82,31 @@ namespace back.PL.Controllers
                 return BadRequest(new { Error = ex.Message });
             }
         }
+
+        [HttpPost("AddCard")]
+        public async Task<IActionResult> InsertCard(CardDto dto)
+        {
+            try
+            {
+                return Ok(new { Success = await _service.InsertCard(dto) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
+
+        [HttpDelete("DeleteCard")]
+        public async Task<IActionResult> DeleteCard(int cardId)
+        {
+            try
+            {
+                return Ok(new { Success = await _service.DeleteCard(cardId) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
     }
 }

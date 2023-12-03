@@ -98,5 +98,24 @@ namespace back.BLL.Services
             if (cards.Count == 0) throw new ArgumentException("No cards found!");
             return cards;
         }
+        
+        public async Task<bool> InsertCard(CardDto dto)
+        {
+            Card newCard = new Card
+            {
+                CardNumber = dto.CardNumber,
+                CVV = dto.CVV,
+                ExpirationDate = DateTime.Parse(dto.ExpirationDate),
+                Fullname = dto.FullName,
+                OwnerId = dto.OwnerId
+            };
+
+            return await _repository.InsertCard(newCard);
+        }
+
+        public async Task<bool> DeleteCard(int cardId)
+        {
+            return await _repository.DeleteCard(cardId);
+        }
     }
 }

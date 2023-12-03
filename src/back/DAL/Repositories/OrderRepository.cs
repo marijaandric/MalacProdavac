@@ -171,5 +171,17 @@ namespace back.DAL.Repositories
         {
             return await _context.Cards.Where(x => x.OwnerId == userId).ToListAsync();
         }
+
+        public async Task<bool> InsertCard(Card card)
+        {
+            _context.Cards.Add(card);
+            return await _context.SaveChangesAsync() > 0;
+        }
+
+        public async Task<bool> DeleteCard(int cardId)
+        {
+            _context.Cards.Remove(await _context.Cards.FirstOrDefaultAsync(x => x.Id == cardId));
+            return await _context.SaveChangesAsync() > 0;
+        }
     }
 }

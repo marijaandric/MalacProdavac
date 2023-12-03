@@ -12,7 +12,7 @@ namespace back.Models
         public string Fullname { get; set; }
         public string CardNumber { get; set; }
         public DateTime ExpirationDate { get; set; }
-        public int CVV { get; set; }
+        public string CVV { get; set; }
 
         public User Owner { get; set; }
     }

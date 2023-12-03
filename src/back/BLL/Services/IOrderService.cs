@@ -12,5 +12,7 @@ namespace back.BLL.Services
         public Task<bool> InsertOrders(List<OrderDto> order);
         public Task<bool> RespondToPickupRequest(int orderId, int resp, string? message);
         public Task<List<Card>> GetCards(int userId);
+        public Task<bool> InsertCard(CardDto dto);
+        public Task<bool> DeleteCard(int cardId);
     }
 }
