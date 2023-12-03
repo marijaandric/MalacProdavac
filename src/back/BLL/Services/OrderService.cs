@@ -92,5 +92,11 @@ namespace back.BLL.Services
             return true;
         }
 
+        public async Task<List<Card>> GetCards(int userId)
+        {
+            var cards = await _repository.GetCards(userId);
+            if (cards.Count == 0) throw new ArgumentException("No cards found!");
+            return cards;
+        }
     }
 }

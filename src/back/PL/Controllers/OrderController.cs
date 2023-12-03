@@ -1,6 +1,8 @@
 ﻿using back.BLL.Dtos;
 using back.BLL.Services;
 using back.Models;
+using FirebaseAdmin.Messaging;
+using iText.Layout.Borders;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -61,6 +63,19 @@ namespace back.PL.Controllers
             try
             {
                 return Ok(new { Success = await _service.RespondToPickupRequest(orderId, resp, message) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
+
+        [HttpGet("GetCards")]
+        public async Task<IActionResult> GetCards(int userId)
+        {
+            try
+            {
+                return Ok(await _service.GetCards(userId));
             }
             catch (Exception ex)
             {

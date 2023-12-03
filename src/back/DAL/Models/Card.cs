@@ -1,14 +1,19 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace back.Models
 {
+    [PrimaryKey(nameof(Id))]
     public class Card
     {
-        [Key]
         public int Id { get; set; }
-        public string? Fullname { get; set; }
-        public string? CardNumber { get; set; }
+        [ForeignKey(nameof(OwnerId))]
+        public int OwnerId { get; set; }
+        public string Fullname { get; set; }
+        public string CardNumber { get; set; }
         public DateTime ExpirationDate { get; set; }
         public int CVV { get; set; }
+
+        public User Owner { get; set; }
     }
 }

@@ -166,5 +166,10 @@ namespace back.DAL.Repositories
             _context.Orders.Remove(order);
             return await _context.SaveChangesAsync() > 0;
         }
+
+        public async Task<List<Card>> GetCards(int userId)
+        {
+            return await _context.Cards.Where(x => x.OwnerId == userId).ToListAsync();
+        }
     }
 }
