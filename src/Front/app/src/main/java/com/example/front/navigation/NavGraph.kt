@@ -8,14 +8,13 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.example.front.screens.products.AllProducts
-import com.example.front.screens.home.HomePage
 import com.example.front.screens.cart.Cart
 import com.example.front.screens.cart.NewCreditCartScreen
 import com.example.front.screens.categories.RegistrationCategories
 import com.example.front.screens.home.HomePage
 import com.example.front.screens.myshop.MyShopScreen
 import com.example.front.screens.myshop.SetUpShopScreen
+import com.example.front.screens.notification.NotificationScreen
 import com.example.front.screens.product.ProductPage
 import com.example.front.screens.products.AllProducts
 import com.example.front.screens.sellers.SellersScreen
@@ -49,8 +48,8 @@ fun SetupNavGraph(
     val myProfileViewModel: MyProfileViewModel = hiltViewModel()
     val shopsViewModel: ShopsViewModel = hiltViewModel()
     val cartViewModel: CartViewModel = hiltViewModel()
-    val oneShopViewModel : OneShopViewModel = hiltViewModel()
-    val myShopViewModel : MyShopViewModel = hiltViewModel()
+    val oneShopViewModel: OneShopViewModel = hiltViewModel()
+    val myShopViewModel: MyShopViewModel = hiltViewModel()
     val checkoutViewModel: CheckoutViewModel = hiltViewModel()
 
     NavHost(
@@ -122,6 +121,9 @@ fun SetupNavGraph(
                 shopId = productId
             )
         }
+        composable(route = Screen.Notification.route) {
+            NotificationScreen()
+        }
         composable(
             route = Screen.MyShop.route
         )
@@ -136,7 +138,12 @@ fun SetupNavGraph(
         }
 
         introNavGraph(navController = navController, splashViewModel)
-        authNavGraph(navController = navController, loginViewModel = loginViewModel, registerViewModel = registerViewModel, categoriesViewModel)
+        authNavGraph(
+            navController = navController,
+            loginViewModel = loginViewModel,
+            registerViewModel = registerViewModel,
+            categoriesViewModel
+        )
         orderingNavGraph(navController, cartViewModel, checkoutViewModel)
     }
 }
