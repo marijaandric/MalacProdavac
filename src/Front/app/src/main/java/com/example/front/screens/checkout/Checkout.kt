@@ -175,36 +175,11 @@ fun CheckoutScreen(
                         Text(text = "Ukupno: 400 rsd", modifier = Modifier.padding(bottom = 20.dp))
                     }
                 }
-                LazyColumn(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)){
-                    item {
-                        ButtonWithIcon(
-                            text = "Add Credit/Debit Card",
-                            onClick = { navController.navigate(route = Screen.NewCreditCard.route) },
-                            width = 0.5f,
-                            modifier = Modifier.padding(10.dp),
-                            color = MaterialTheme.colorScheme.primary,
-                            imagePainter = painterResource(id = R.drawable.ion_card_outline),
-                            height = 40
-                        )
-                    }
-                    item {
-                        ButtonWithIcon(
-                            text = "Paypal",
-                            onClick = { /*navController.navigate()*/ },
-                            width = 0.5f,
-                            modifier = Modifier.padding(10.dp),
-                            color = MaterialTheme.colorScheme.primary,
-                            imagePainter = painterResource(id = R.drawable.logos_paypal),
-                            height = 40
-                        )
-                    }
-                }
+
                 LazyRow(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(8.dp)
+                        .padding(10.dp)
                 ) {
                     item {
                         CreditCard()
@@ -217,6 +192,36 @@ fun CheckoutScreen(
                     }
                     item {
                         CreditCard()
+                    }
+                }
+                Column(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                    verticalArrangement = Arrangement.SpaceBetween,
+                    horizontalAlignment = Alignment.CenterHorizontally){
+                    Row(modifier = Modifier
+                        .padding(15.dp)) {
+                        ButtonWithIcon(
+                            text = "Add Credit/Debit Card",
+                            onClick = { navController.navigate(route = Screen.NewCreditCard.route) },
+                            width = 0.8f,
+                            modifier = Modifier.padding(10.dp),
+                            color = MaterialTheme.colorScheme.primary,
+                            imagePainter = painterResource(id = R.drawable.ion_card_outline),
+                            height = 50
+                        )
+                    }
+                    Row(modifier = Modifier
+                        .padding(15.dp)) {
+                        ButtonWithIcon(
+                            text = "Paypal",
+                            onClick = { /*navController.navigate()*/ },
+                            width = 0.8f,
+                            modifier = Modifier.padding(10.dp),
+                            color = MaterialTheme.colorScheme.primary,
+                            imagePainter = painterResource(id = R.drawable.logos_paypal),
+                            height = 50
+                        )
                     }
                 }
             }
