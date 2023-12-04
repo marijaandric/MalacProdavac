@@ -39,14 +39,18 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DrawerState
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -73,39 +77,46 @@ import com.example.front.R
 import com.example.front.components.CardButton
 import com.example.front.components.ImageItemForProfilePic
 import com.example.front.components.MyTextField
+import com.example.front.components.Sidebar
 import com.example.front.model.user.UserEditDTO
 import com.example.front.viewmodels.myprofile.MyProfileViewModel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserProfileScreen(navController: NavHostController, myProfileViewModel: MyProfileViewModel) {
 
     LaunchedEffect(Unit) {
         myProfileViewModel.getUserId()?.let { myProfileViewModel.getMyProfileInfo(it) }
     }
-    if(myProfileViewModel.state.value.isLoading)
-    {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        )
-        {
-            CircularProgressIndicator()
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    Sidebar(
+        drawerState,
+        navController,
+        myProfileViewModel.dataStoreManager
+    ) {
+        if (myProfileViewModel.state.value.isLoading) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            )
+            {
+                CircularProgressIndicator()
+            }
+        } else {
+            Column(
+                modifier = Modifier.background(MaterialTheme.colorScheme.background)
+            ) {
+                TopCenterImages(myProfileViewModel, drawerState)
+                Info(myProfileViewModel)
+            }
         }
     }
-    else{
-        Column(
-            modifier = Modifier.background(MaterialTheme.colorScheme.background)
-        ) {
-            TopCenterImages(myProfileViewModel)
-            Info(myProfileViewModel)
-        }
-    }
-
 }
 
 @SuppressLint("UnusedTransitionTargetStateParameter")
@@ -420,8 +431,9 @@ fun Info(myProfileViewModel: MyProfileViewModel) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopCenterImages(myProfileViewModel: MyProfileViewModel) {
+fun TopCenterImages(myProfileViewModel: MyProfileViewModel, drawerState: DrawerState) {
     val showDialog = remember { mutableStateOf(false) }
 
     //photo picker
@@ -439,6 +451,7 @@ fun TopCenterImages(myProfileViewModel: MyProfileViewModel) {
     })
 
     var imagee by remember { mutableStateOf<String?>(null) }
+    val scope = rememberCoroutineScope()
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
@@ -465,7 +478,8 @@ fun TopCenterImages(myProfileViewModel: MyProfileViewModel) {
                     modifier = Modifier
                         .padding(end = 10.dp)
                         .size(50.dp)
-                        .align(Alignment.CenterVertically),
+                        .align(Alignment.CenterVertically)
+                        .clickable { scope.launch { drawerState.open() }},
                     tint = MaterialTheme.colorScheme.background
                 )
 

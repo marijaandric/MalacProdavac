@@ -50,6 +50,7 @@ import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.example.front.R
 import com.example.front.components.Sidebar
+import com.example.front.components.SmallElipseAndTitle
 import com.example.front.model.product.ProductInCart
 import com.example.front.navigation.Screen
 import com.example.front.ui.theme.Typography
@@ -88,31 +89,8 @@ fun Cart(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-
             ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.elipsemala),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        contentScale = ContentScale.FillWidth,
-
-
-                        )
-                    Text(
-                        text = "Cart",
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .heightIn(min = 80.dp)
-                            .offset(y = 40.dp),
-                        style = Typography.titleLarge,
-                        color = Color.White
-                    )
-                }
+                SmallElipseAndTitle(title = "Cart", drawerState)
 
                 LazyColumn(
                     modifier = Modifier

@@ -21,7 +21,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MyProfileViewModel @Inject constructor(
     private val repository: Repository,
-    private val dataStoreManager: DataStoreManager
+    internal val dataStoreManager: DataStoreManager
 ) : ViewModel() {
 
     private val _state = mutableStateOf(MyProfileState())
