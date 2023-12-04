@@ -101,21 +101,16 @@ fun Sidebar(
                         text = "Logout",
                         modifier = Modifier
                             .clickable {
-                                //pokaze modal da potvrdi da zeli da se izloguje
                                 //ukloni token
                                 //vodi na Login
                                 runBlocking {
                                     dataStoreManager.storeToken("")
                                 }
-//                                val intent = Intent(
-//                                    this@MainActivity,
-//                                    MainActivity::class.java
-//                                )
-//                                intent.flags =
-//                                    Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
-//                                startActivity(intent)
-//                                finish()
-                                navController.navigate(Screen.Login.route)// za sad ide na login, treba da se izmeni da brise BackStack ili da ponovo pokrene aplikaciju
+                                navController.navigate(Screen.Login.route) {
+                                    popUpTo(navController.graph.id) {
+                                            inclusive = true
+                                    }
+                                }
                             },
                         fontSize = 16.sp,
                         color = Color.White
@@ -124,8 +119,5 @@ fun Sidebar(
             }
         },
         content = content
-//        {
-//            SetupNavGraph(navController = navController)
-//        }
     )
 }
