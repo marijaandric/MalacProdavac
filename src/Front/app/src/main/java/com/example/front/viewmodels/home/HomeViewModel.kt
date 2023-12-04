@@ -20,7 +20,7 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val repository: Repository,
-    private val dataStoreManager: DataStoreManager,
+    val dataStoreManager: DataStoreManager,
     private val mongoRepository: MongoRepository
 ) : ViewModel() {
 

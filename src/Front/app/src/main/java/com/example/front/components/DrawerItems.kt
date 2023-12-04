@@ -16,6 +16,7 @@ val DrawerItems = listOf(
     DrawerItem(icon = R.drawable.navbar_profile, label = "Delivery profile", route = Screen.Home.route, secondaryLabel = "",roleId=3),
     DrawerItem(icon = R.drawable.navbar_car, label = "Deliveries", route = Screen.Home.route, secondaryLabel = "",roleId=3),
 )
+var filteredItems = emptyList<DrawerItem>()
 
 data class DrawerItem(
     val icon: Int,

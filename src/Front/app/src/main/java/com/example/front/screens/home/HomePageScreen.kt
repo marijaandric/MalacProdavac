@@ -3,6 +3,7 @@ package com.example.front.screens.home
 import android.icu.util.Calendar
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,15 +20,19 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DrawerState
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,8 +45,12 @@ import androidx.navigation.NavHostController
 import com.example.front.R
 import com.example.front.components.ProductCard
 import com.example.front.components.SellerCard
+import com.example.front.components.Sidebar
+import com.example.front.helper.DataStore.DataStoreManager
 import com.example.front.viewmodels.home.HomeViewModel
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomePage(
     navController: NavHostController,
@@ -51,18 +60,24 @@ fun HomePage(
         homeViewModel.getHomeProducts(homeViewModel.getUserId())
         homeViewModel.getHomeShops(homeViewModel.getUserId())
     }
-
-    LazyColumn(
-        modifier = Modifier.background(MaterialTheme.colorScheme.background)
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    Sidebar(
+        drawerState,
+        navController,
+        homeViewModel.dataStoreManager
     ) {
-        item {
-            Search()
-        }
-        item {
-            Sellers(homeViewModel)
-        }
-        item {
-            Products(homeViewModel, navController)
+        LazyColumn(
+            modifier = Modifier.background(MaterialTheme.colorScheme.background)
+        ) {
+            item {
+                Search(drawerState)
+            }
+            item {
+                Sellers(homeViewModel)
+            }
+            item {
+                Products(homeViewModel, navController)
+            }
         }
     }
 }
@@ -98,7 +113,9 @@ fun Products(viewModel: HomeViewModel, navController: NavHostController) {
         Text(text = "Recommended products",  style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),modifier = Modifier.padding(bottom = 10.dp))
         if (viewModel.state.value.isLoading) {
             Box(
-                modifier=Modifier.padding(top=50.dp).fillMaxWidth(),
+                modifier= Modifier
+                    .padding(top = 50.dp)
+                    .fillMaxWidth(),
                 contentAlignment = Alignment.Center
             )
             {
@@ -157,7 +174,8 @@ fun Sellers(viewModel: HomeViewModel) {
         if(viewModel.stateShop.value.isLoading)
         {
             Box(
-                modifier=Modifier.padding(top=20.dp)
+                modifier= Modifier
+                    .padding(top = 20.dp)
                     .fillMaxWidth(),
                 contentAlignment = Alignment.Center
             )
@@ -204,9 +222,10 @@ fun Sellers(viewModel: HomeViewModel) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Search() {
+fun Search(drawerState: DrawerState) {
     var value by remember { mutableStateOf("") }
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     Box(
         contentAlignment = Alignment.TopCenter,
     ) {
@@ -230,7 +249,8 @@ fun Search() {
                     modifier = Modifier
                         .padding(end = 10.dp)
                         .size(50.dp)
-                        .align(Alignment.CenterVertically),
+                        .align(Alignment.CenterVertically)
+                        .clickable { scope.launch { drawerState.open() }},
                     tint = MaterialTheme.colorScheme.background
                 )
                 Text(getGreetingMessage(),style=MaterialTheme.typography.titleLarge.copy(color = MaterialTheme.colorScheme.background))

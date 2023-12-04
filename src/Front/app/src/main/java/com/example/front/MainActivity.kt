@@ -45,6 +45,7 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.front.components.DrawerItems
+import com.example.front.components.filteredItems
 import com.example.front.helper.DataStore.DataStoreManager
 import com.example.front.navigation.SetupNavGraph
 import com.example.front.ui.theme.FrontTheme
@@ -142,96 +143,98 @@ class MainActivity : ComponentActivity() {
                 ) {
                     navController = rememberNavController()
 
-                    val items = DrawerItems
+//                    val items = DrawerItems
 
                     if (logged) {
                         val roleId = runBlocking { dataStoreManager.getRoleId() }
-                        val filteredItems = items.filter { it.roleId == roleId || it.roleId == 1 }
-                        ModalNavigationDrawer(
-                            drawerState = drawerState,
-                            drawerContent = {
-                                ModalDrawerSheet(
-                                    modifier = Modifier
-                                        .width(324.dp),
-                                    drawerContainerColor = Color(0xFF294E68)
-                                ) {
-                                    Spacer(
-                                        modifier = Modifier
-                                            .height(56.dp)
-                                    )
-
-                                    filteredItems.forEach { item ->
-                                        NavigationDrawerItem(
-                                            label = { Text(text = item.label) },
-                                            selected = false,
-                                            onClick = {
-                                                scope.launch { drawerState.close() }
-                                                navController.navigate(route = item.route)
-                                            },
-                                            icon = {
-                                                Icon(
-                                                    painter = painterResource(id = item.icon),
-                                                    contentDescription = null,
-                                                    modifier = Modifier.height(24.dp)
-                                                )
-                                            },
-                                            colors = colors(
-                                                unselectedContainerColor = Color(0xFF294E68),
-                                                selectedContainerColor = Color(0xFF263e52),
-                                                unselectedTextColor = Color.White,
-                                                selectedTextColor = Color.White,
-                                                unselectedIconColor = Color.White,
-                                                selectedIconColor = Color.White,
-                                            ),
-                                            shape = RectangleShape
-                                        )
-                                    }
-                                    Spacer(modifier = Modifier.weight(1f))
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(start = 12.dp, bottom = 12.dp),
-                                        verticalAlignment = Alignment.CenterVertically
-                                    )
-                                    {
-                                        Image(
-                                            painter = painterResource(id = R.drawable.logout),
-                                            contentDescription = null,
-                                            modifier = Modifier.height(24.dp)
-                                        )
-                                        Text(
-                                            text = "Logout",
-                                            modifier = Modifier
-                                                .clickable {
-                                                    //pokaze modal da potvrdi da zeli da se izloguje
-                                                    //ukloni token
-                                                    //vodi na Login
-                                                    runBlocking {
-                                                        dataStoreManager.storeToken("")
-                                                    }
-                                                    val intent = Intent(
-                                                        this@MainActivity,
-                                                        MainActivity::class.java
-                                                    )
-                                                    intent.flags =
-                                                        Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
-                                                    startActivity(intent)
-                                                    finish()
-                                                },
-                                            fontSize = 16.sp,
-                                            color = Color.White
-                                        )
-                                    }
-                                }
-                            },
-                            content = {
-                                SetupNavGraph(navController = navController)
-                            }
-                        )
-                    } else {
-                        SetupNavGraph(navController = navController)
+//                        filteredItems = items.filter { it.roleId == roleId || it.roleId == 1 }
+                        filteredItems = DrawerItems.filter { it.roleId == roleId || it.roleId == 1 }
+//                        ModalNavigationDrawer(
+//                            drawerState = drawerState,
+//                            drawerContent = {
+//                                ModalDrawerSheet(
+//                                    modifier = Modifier
+//                                        .width(324.dp),
+//                                    drawerContainerColor = Color(0xFF294E68)
+//                                ) {
+//                                    Spacer(
+//                                        modifier = Modifier
+//                                            .height(56.dp)
+//                                    )
+//
+//                                    filteredItems.forEach { item ->
+//                                        NavigationDrawerItem(
+//                                            label = { Text(text = item.label) },
+//                                            selected = false,
+//                                            onClick = {
+//                                                scope.launch { drawerState.close() }
+//                                                navController.navigate(route = item.route)
+//                                            },
+//                                            icon = {
+//                                                Icon(
+//                                                    painter = painterResource(id = item.icon),
+//                                                    contentDescription = null,
+//                                                    modifier = Modifier.height(24.dp)
+//                                                )
+//                                            },
+//                                            colors = colors(
+//                                                unselectedContainerColor = Color(0xFF294E68),
+//                                                selectedContainerColor = Color(0xFF263e52),
+//                                                unselectedTextColor = Color.White,
+//                                                selectedTextColor = Color.White,
+//                                                unselectedIconColor = Color.White,
+//                                                selectedIconColor = Color.White,
+//                                            ),
+//                                            shape = RectangleShape
+//                                        )
+//                                    }
+//                                    Spacer(modifier = Modifier.weight(1f))
+//                                    Row(
+//                                        modifier = Modifier
+//                                            .fillMaxWidth()
+//                                            .padding(start = 12.dp, bottom = 12.dp),
+//                                        verticalAlignment = Alignment.CenterVertically
+//                                    )
+//                                    {
+//                                        Image(
+//                                            painter = painterResource(id = R.drawable.logout),
+//                                            contentDescription = null,
+//                                            modifier = Modifier.height(24.dp)
+//                                        )
+//                                        Text(
+//                                            text = "Logout",
+//                                            modifier = Modifier
+//                                                .clickable {
+//                                                    //pokaze modal da potvrdi da zeli da se izloguje
+//                                                    //ukloni token
+//                                                    //vodi na Login
+//                                                    runBlocking {
+//                                                        dataStoreManager.storeToken("")
+//                                                    }
+//                                                    val intent = Intent(
+//                                                        this@MainActivity,
+//                                                        MainActivity::class.java
+//                                                    )
+//                                                    intent.flags =
+//                                                        Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+//                                                    startActivity(intent)
+//                                                    finish()
+//                                                },
+//                                            fontSize = 16.sp,
+//                                            color = Color.White
+//                                        )
+//                                    }
+//                                }
+//                            },
+//                            content = {
+//                                SetupNavGraph(navController = navController)
+//                            }
+//                        )
+//                    } else {
+//                        SetupNavGraph(navController = navController)
+//                    }
                     }
-
+                    SetupNavGraph(navController = navController)
                 }
             }
         }
