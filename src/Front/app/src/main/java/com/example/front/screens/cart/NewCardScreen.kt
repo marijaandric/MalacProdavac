@@ -18,9 +18,12 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.DrawerState
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -32,23 +35,35 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.example.front.R
+import com.example.front.components.Sidebar
 import com.example.front.components.SmallElipseAndTitle
+import com.example.front.viewmodels.cart.CartViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NewCreditCartScreen() {
-    CardList()
+fun NewCreditCartScreen(navController: NavHostController, viewModel: CartViewModel) {
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    Sidebar(
+        drawerState,
+        navController,
+        viewModel.dataStoreManager
+    ) {
+        CardList(drawerState)
+    }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CardList() {
+fun CardList(drawerState: DrawerState) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        SmallElipseAndTitle("Add New Card")
+        SmallElipseAndTitle("Add New Card", drawerState)
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()

@@ -17,7 +17,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MyShopViewModel @Inject constructor(
     private val repository: Repository,
-    private val dataStoreManager: DataStoreManager
+    val dataStoreManager: DataStoreManager
 ) : ViewModel() {
 
 

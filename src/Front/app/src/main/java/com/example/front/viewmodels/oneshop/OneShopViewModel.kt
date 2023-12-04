@@ -32,7 +32,7 @@ import javax.inject.Inject
 @HiltViewModel
 class OneShopViewModel @Inject constructor(
     private val repository: Repository,
-    private val dataStoreManager: DataStoreManager
+    val dataStoreManager: DataStoreManager
 ) : ViewModel() {
 
     sealed class UploadStatus {

@@ -32,6 +32,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.Card
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -41,6 +42,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TimeInput
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -70,27 +72,37 @@ import com.example.front.components.CardButton
 import com.example.front.components.MyTextField
 import com.example.front.components.MyTextFieldWithoutIcon
 import com.example.front.components.OpenNow
+import com.example.front.components.Sidebar
 import com.example.front.components.SmallElipseAndTitle
 import com.example.front.screens.sellers.FilterCard
 import com.example.front.screens.sellers.ReviewStars
+import com.example.front.viewmodels.myshop.MyShopViewModel
 import java.io.File
 import java.io.FileOutputStream
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SetUpShopScreen(navController : NavHostController) {
+fun SetUpShopScreen(navController : NavHostController, viewModel: MyShopViewModel) {
 
     val context = LocalContext.current
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(color = MaterialTheme.colorScheme.background)
-    )
-    {
-        item{
-            SmallElipseAndTitle(title = "Shop Setup")
-        }
-        item{
-            ProfilePhoto(context)
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    Sidebar(
+        drawerState,
+        navController,
+        viewModel.dataStoreManager
+    ) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(color = MaterialTheme.colorScheme.background)
+        )
+        {
+            item {
+                SmallElipseAndTitle(title = "Shop Setup", drawerState)
+            }
+            item {
+                ProfilePhoto(context)
+            }
         }
     }
 }

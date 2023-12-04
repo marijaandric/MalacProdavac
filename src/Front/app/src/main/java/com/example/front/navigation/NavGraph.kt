@@ -27,6 +27,7 @@ import com.example.front.viewmodels.home.HomeViewModel
 import com.example.front.viewmodels.login.LoginViewModel
 import com.example.front.viewmodels.myprofile.MyProfileViewModel
 import com.example.front.viewmodels.myshop.MyShopViewModel
+import com.example.front.viewmodels.notification.NotificationViewModel
 import com.example.front.viewmodels.oneshop.OneShopViewModel
 import com.example.front.viewmodels.product.ProductViewModel
 import com.example.front.viewmodels.register.RegisterViewModel
@@ -51,6 +52,7 @@ fun SetupNavGraph(
     val oneShopViewModel: OneShopViewModel = hiltViewModel()
     val myShopViewModel: MyShopViewModel = hiltViewModel()
     val checkoutViewModel: CheckoutViewModel = hiltViewModel()
+    val notificationViewModel: NotificationViewModel = hiltViewModel()
 
     NavHost(
         navController = navController,
@@ -106,7 +108,7 @@ fun SetupNavGraph(
             route = Screen.NewCreditCard.route
         )
         {
-            NewCreditCartScreen()
+            NewCreditCartScreen(navController, cartViewModel)
         }
         composable(
             route = "${Screen.Shop.route}/{id}",
@@ -122,7 +124,7 @@ fun SetupNavGraph(
             )
         }
         composable(route = Screen.Notification.route) {
-            NotificationScreen()
+            NotificationScreen(navController, notificationViewModel)
         }
         composable(
             route = Screen.MyShop.route
@@ -134,7 +136,7 @@ fun SetupNavGraph(
             route = Screen.SetUpShop.route
         )
         {
-            SetUpShopScreen(navController = navController)
+            SetUpShopScreen(navController = navController, myShopViewModel)
         }
 
         introNavGraph(navController = navController, splashViewModel)

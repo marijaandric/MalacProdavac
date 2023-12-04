@@ -34,9 +34,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -63,11 +65,13 @@ import com.example.front.components.BigBlueButton
 import com.example.front.components.Paginator
 import com.example.front.components.SearchTextField
 import com.example.front.components.ShopCard
+import com.example.front.components.Sidebar
 import com.example.front.components.SmallElipseAndTitle
 import com.example.front.components.Tabs
 import com.example.front.viewmodels.shops.ShopsViewModel
 import org.osmdroid.util.GeoPoint
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SellersScreen(navController: NavHostController, shopsViewModel: ShopsViewModel) {
 
@@ -91,130 +95,128 @@ fun SellersScreen(navController: NavHostController, shopsViewModel: ShopsViewMod
     val x = Osm(shopsViewModel = shopsViewModel)
     shopsViewModel.changeCoordinates(x)
 
-    LazyColumn(
-        modifier = Modifier
-            .background(color = MaterialTheme.colorScheme.background)
-            .fillMaxSize()
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    Sidebar(
+        drawerState,
+        navController,
+        shopsViewModel.dataStoreManager
     ) {
-        item {
-            SmallElipseAndTitle("Shops")
-        }
-        item {
-            SearchAndFilters(shopsViewModel)
-        }
-        item{
-            Tabs(
-                onShopsSelected = { selectedColumnIndex = true },
-                onFavoritesSelected = { selectedColumnIndex = false },
-                selectedColumnIndex = selectedColumnIndex,
-                "Shops",
-                "Your Favorites",
-                false
-            )
-        }
 
-        item{
-            if(selectedColumnIndex)
-            {
-                if(shopsViewModel.state.value.error.contains("NotFound"))
-                {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp),
-                        contentAlignment = Alignment.Center
-                    )
-                    {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ){
-                            Image(
-                                painter = painterResource(id = R.drawable.nofound),
-                                contentDescription = "",
-                                modifier = Modifier
-                                    .fillMaxWidth(0.5f)
-                                    .padding(top = 55.dp, bottom = 16.dp),
-                                contentScale = ContentScale.FillWidth
-                            )
-                            Text("No shops found", style = MaterialTheme.typography.titleSmall)
-                        }
-                    }
-                }
-                else if(shopsViewModel.state.value.isLoading)
-                {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(160.dp),
-                        contentAlignment = Alignment.Center
-                    )
-                    {
-                        CircularProgressIndicator()
-                    }
-                }
-                else{
-                    AllSellers(navController, shopsViewModel)
-                    totalPages = shopsViewModel.statePageCount.value
-                    Paginator(
-                        currentPage = currentPage,
-                        totalPages = totalPages,
-                        onPageSelected = { newPage ->
-                            if (newPage in 1..totalPages) {
-                                currentPage = newPage
-                                shopsViewModel.ChangePage(currentPage)
-                            }
-                        }
-                    )
-                }
+        LazyColumn(
+            modifier = Modifier
+                .background(color = MaterialTheme.colorScheme.background)
+                .fillMaxSize()
+        ) {
+            item {
+                SmallElipseAndTitle("Shops", drawerState)
             }
-            else{
-                if(shopsViewModel.stateFav.value.error.contains("NotFound"))
-                {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp),
-                        contentAlignment = Alignment.Center
-                    )
-                    {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ){
-                            Image(
-                                painter = painterResource(id = R.drawable.nofound),
-                                contentDescription = "",
-                                modifier = Modifier
-                                    .fillMaxWidth(0.5f)
-                                    .padding(top = 55.dp, bottom = 16.dp),
-                                contentScale = ContentScale.FillWidth
-                            )
-                            Text("No shops found", style = MaterialTheme.typography.titleSmall)
-                        }
-                    }
-                }
-                else if(shopsViewModel.stateFav.value.isLoading)
-                {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(160.dp),
-                        contentAlignment = Alignment.Center
-                    )
-                    {
-                        CircularProgressIndicator()
-                    }
-                }
-                else{
-                    FavItems(navController, shopsViewModel)
-                    Paginator(
-                        currentPage = currentPageFav,
-                        totalPages = totalPagesFav,
-                        onPageSelected = { newPage ->
-                            if (newPage in 1..totalPagesFav) {
-                                currentPageFav = newPage
+            item {
+                SearchAndFilters(shopsViewModel)
+            }
+            item {
+                Tabs(
+                    onShopsSelected = { selectedColumnIndex = true },
+                    onFavoritesSelected = { selectedColumnIndex = false },
+                    selectedColumnIndex = selectedColumnIndex,
+                    "Shops",
+                    "Your Favorites",
+                    false
+                )
+            }
+
+            item {
+                if (selectedColumnIndex) {
+                    if (shopsViewModel.state.value.error.contains("NotFound")) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(16.dp),
+                            contentAlignment = Alignment.Center
+                        )
+                        {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.nofound),
+                                    contentDescription = "",
+                                    modifier = Modifier
+                                        .fillMaxWidth(0.5f)
+                                        .padding(top = 55.dp, bottom = 16.dp),
+                                    contentScale = ContentScale.FillWidth
+                                )
+                                Text("No shops found", style = MaterialTheme.typography.titleSmall)
                             }
                         }
-                    )
+                    } else if (shopsViewModel.state.value.isLoading) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(160.dp),
+                            contentAlignment = Alignment.Center
+                        )
+                        {
+                            CircularProgressIndicator()
+                        }
+                    } else {
+                        AllSellers(navController, shopsViewModel)
+                        totalPages = shopsViewModel.statePageCount.value
+                        Paginator(
+                            currentPage = currentPage,
+                            totalPages = totalPages,
+                            onPageSelected = { newPage ->
+                                if (newPage in 1..totalPages) {
+                                    currentPage = newPage
+                                    shopsViewModel.ChangePage(currentPage)
+                                }
+                            }
+                        )
+                    }
+                } else {
+                    if (shopsViewModel.stateFav.value.error.contains("NotFound")) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(16.dp),
+                            contentAlignment = Alignment.Center
+                        )
+                        {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.nofound),
+                                    contentDescription = "",
+                                    modifier = Modifier
+                                        .fillMaxWidth(0.5f)
+                                        .padding(top = 55.dp, bottom = 16.dp),
+                                    contentScale = ContentScale.FillWidth
+                                )
+                                Text("No shops found", style = MaterialTheme.typography.titleSmall)
+                            }
+                        }
+                    } else if (shopsViewModel.stateFav.value.isLoading) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(160.dp),
+                            contentAlignment = Alignment.Center
+                        )
+                        {
+                            CircularProgressIndicator()
+                        }
+                    } else {
+                        FavItems(navController, shopsViewModel)
+                        Paginator(
+                            currentPage = currentPageFav,
+                            totalPages = totalPagesFav,
+                            onPageSelected = { newPage ->
+                                if (newPage in 1..totalPagesFav) {
+                                    currentPageFav = newPage
+                                }
+                            }
+                        )
+                    }
                 }
             }
         }

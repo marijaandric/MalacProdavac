@@ -14,51 +14,66 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.example.front.R
+import com.example.front.components.Sidebar
 import com.example.front.components.SmallElipseAndTitle
 import com.example.front.ui.theme.Typography
+import com.example.front.viewmodels.cart.CartViewModel
+import com.example.front.viewmodels.notification.NotificationViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NotificationScreen() {
-    SmallElipseAndTitle("Notifications")
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
+fun NotificationScreen(navController: NavHostController, viewModel: NotificationViewModel) {
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    Sidebar(
+        drawerState,
+        navController,
+        viewModel.dataStoreManager
     ) {
-        Spacer(modifier = Modifier.height(150.dp))
-        TypeOfNotifications()
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = "Today",
-                style = Typography.bodyMedium,
-            )
-            Text(text = "Clear all", style = Typography.bodyMedium)
-        }
-        LazyColumn(
+        SmallElipseAndTitle("Notifications", drawerState)
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
         ) {
-            item {
-                NotificationCard()
+            Spacer(modifier = Modifier.height(150.dp))
+            TypeOfNotifications()
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "Today",
+                    style = Typography.bodyMedium,
+                )
+                Text(text = "Clear all", style = Typography.bodyMedium)
             }
-            item {
-                NotificationCard()
-            }
-            item {
-                NotificationCard()
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                item {
+                    NotificationCard()
+                }
+                item {
+                    NotificationCard()
+                }
+                item {
+                    NotificationCard()
+                }
             }
         }
     }

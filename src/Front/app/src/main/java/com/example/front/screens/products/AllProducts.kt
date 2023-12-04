@@ -21,14 +21,19 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DrawerState
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,6 +51,7 @@ import com.example.front.R
 import com.example.front.components.BigBlueButton
 import com.example.front.components.ProductCard
 import com.example.front.components.SearchTextField
+import com.example.front.components.Sidebar
 import com.example.front.components.Tabs
 import com.example.front.screens.home.CardData
 import com.example.front.screens.sellers.CardGrid
@@ -53,33 +59,44 @@ import com.example.front.screens.sellers.MapFilters
 import com.example.front.ui.theme.Typography
 import com.example.front.viewmodels.home.HomeViewModel
 import com.example.front.viewmodels.shops.ShopsViewModel
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AllProducts(
     navController: NavHostController,
     homeViewModel: HomeViewModel,
     shopsViewModel: ShopsViewModel
 ) {
-    Surface(
-        modifier = Modifier
-            .fillMaxSize(),
-        color = Color.White
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    Sidebar(
+        drawerState,
+        navController,
+        homeViewModel.dataStoreManager
     ) {
-        Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-            Search(shopsViewModel)
-            Text(
-                text = "Discover the Best Products",
-                style = Typography.titleMedium,
-                modifier = Modifier.padding(start = 30.dp, end = 30.dp)
-            )
-            Products(homeViewModel, navController)
+        Surface(
+            modifier = Modifier
+                .fillMaxSize(),
+            color = Color.White
+        ) {
+            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                Search(shopsViewModel, drawerState)
+                Text(
+                    text = "Discover the Best Products",
+                    style = Typography.titleMedium,
+                    modifier = Modifier.padding(start = 30.dp, end = 30.dp)
+                )
+                Products(homeViewModel, navController)
+            }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Search(shopsViewModel: ShopsViewModel) {
+fun Search(shopsViewModel: ShopsViewModel, drawerState: DrawerState) {
     var value by remember { mutableStateOf("") }
+    val scope = rememberCoroutineScope()
     Box(
         contentAlignment = Alignment.TopCenter
     ) {
@@ -103,7 +120,8 @@ fun Search(shopsViewModel: ShopsViewModel) {
                     modifier = Modifier
                         .size(50.dp)
                         .align(Alignment.CenterVertically)
-                        .padding(start = 10.dp),
+                        .padding(start = 10.dp)
+                        .clickable { scope.launch { drawerState.open() } },
                     tint = MaterialTheme.colorScheme.background
                 )
                 Text(

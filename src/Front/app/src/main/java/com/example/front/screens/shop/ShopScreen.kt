@@ -49,6 +49,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DateRangePicker
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -56,6 +57,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TimeInput
 import androidx.compose.material3.rememberDateRangePickerState
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -96,6 +98,7 @@ import com.example.front.components.MyTextFieldWithoutIcon
 import com.example.front.components.ReviewCard
 import com.example.front.components.SearchTextField
 import com.example.front.components.ShopProductCard
+import com.example.front.components.Sidebar
 import com.example.front.components.SmallElipseAndTitle
 import com.example.front.components.SortDialog
 import com.example.front.components.ToggleImageButtonFunction
@@ -110,6 +113,7 @@ import com.example.front.viewmodels.oneshop.OneShopViewModel
 import com.google.android.material.datepicker.CalendarConstraints.DateValidator
 import kotlinx.coroutines.delay
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ShopScreen(navController: NavHostController, shopViewModel: OneShopViewModel, shopId: Int) {
     var selectedColumnIndex by remember { mutableStateOf(true) }
@@ -143,36 +147,43 @@ fun ShopScreen(navController: NavHostController, shopViewModel: OneShopViewModel
         shopViewModel.getMetrics()
     }
 
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(color = MaterialTheme.colorScheme.background)
-    )
-    {
-        item {
-            SmallElipseAndTitle(title = "Shop")
-        }
-        if (shopViewModel.state.value.isLoading) {
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    Sidebar(
+        drawerState,
+        navController,
+        shopViewModel.dataStoreManager
+    ) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(color = MaterialTheme.colorScheme.background)
+        )
+        {
             item {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = 100.dp),
-                    contentAlignment = Alignment.Center
-                )
-                {
-                    CircularProgressIndicator()
+                SmallElipseAndTitle(title = "Shop", drawerState)
+            }
+            if (shopViewModel.state.value.isLoading) {
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(top = 100.dp),
+                        contentAlignment = Alignment.Center
+                    )
+                    {
+                        CircularProgressIndicator()
+                    }
+                }
+            } else {
+                item {
+                    ProfilePic(shopViewModel, id)
+                }
+                item {
+                    ShopInfo(shopViewModel, shopId, id)
                 }
             }
-        } else {
-            item {
-                ProfilePic(shopViewModel, id)
-            }
-            item {
-                ShopInfo(shopViewModel, shopId, id)
-            }
-        }
 
+        }
     }
 }
 

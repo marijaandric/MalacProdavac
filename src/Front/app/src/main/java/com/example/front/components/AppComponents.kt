@@ -35,6 +35,7 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -46,6 +47,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -77,6 +79,7 @@ import com.example.front.navigation.Screen
 import com.example.front.ui.theme.LightBlue
 import com.example.front.ui.theme.MainBlue
 import com.example.front.ui.theme.Typography
+import kotlinx.coroutines.launch
 import kotlin.io.encoding.ExperimentalEncodingApi
 
 @Composable
@@ -992,8 +995,10 @@ fun ReviewCard(
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SmallElipseAndTitle(title: String) {
+fun SmallElipseAndTitle(title: String, drawerState: DrawerState) {
+    val scope = rememberCoroutineScope()
     Box(
         contentAlignment = Alignment.CenterStart,
         modifier = Modifier.fillMaxWidth()
@@ -1018,7 +1023,8 @@ fun SmallElipseAndTitle(title: String) {
                 modifier = Modifier
                     .padding(end = 10.dp)
                     .size(50.dp)
-                    .align(Alignment.CenterStart),
+                    .align(Alignment.CenterStart)
+                    .clickable { scope.launch { drawerState.open() }},
                 tint = MaterialTheme.colorScheme.background,
             )
             Text(

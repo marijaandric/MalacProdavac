@@ -23,7 +23,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ShopsViewModel @Inject constructor(
     private val repository: Repository,
-    private val dataStoreManager: DataStoreManager
+    val dataStoreManager: DataStoreManager
 ) : ViewModel() {
 
     private val _state = mutableStateOf(ShopsState())
