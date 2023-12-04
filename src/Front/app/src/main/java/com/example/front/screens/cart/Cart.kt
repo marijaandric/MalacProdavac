@@ -67,7 +67,7 @@ fun Cart(
     val coroutineScope = rememberCoroutineScope()
     val cartProducts = cartState.products
     sum = cartProducts.sumOf { it.price * it.quantity }
-
+    val groupedProducts = cartState.products.groupBy { it.shopName }
     Surface(
         modifier = Modifier
             .fillMaxSize(),
@@ -111,8 +111,20 @@ fun Cart(
                     .weight(1f)
             ) {
 
-                val groupedProducts = cartState.products.groupBy { it.shopName }
+                if(groupedProducts.isEmpty()){
+                    item {
+                        Text(
+                            text = "Your cart is empty",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 16.dp, bottom = 8.dp)
 
+                        )
+                    }
+
+                }
                 groupedProducts.forEach { (shopName, products) ->
 
                     item {
@@ -233,12 +245,16 @@ fun Cart(
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF457FA8)),
                         modifier = Modifier
-                            .padding(vertical = 14.dp)
+                            .padding(vertical = 14.dp),
+                        enabled = cartProducts.isNotEmpty()
                     ) {
-                        Text(text = "Checkout", fontSize = 20.sp, modifier = Modifier,color = Color.White,
-
+                        Text(
+                            text = "Checkout",
+                            fontSize = 20.sp,
                             fontFamily = FontFamily(Font(R.font.lexend)),
-                            fontWeight = FontWeight(300))
+                            fontWeight = FontWeight(300),
+                            modifier = Modifier
+                        )
                     }
                 }
             }

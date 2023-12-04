@@ -15,7 +15,9 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -39,6 +41,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.front.R
+import com.example.front.components.ButtonWithIcon
+import com.example.front.navigation.Screen
+import com.example.front.screens.cart.CreditCard
 import com.example.front.ui.theme.Typography
 import com.example.front.viewmodels.checkout.CheckoutViewModel
 
@@ -47,7 +52,7 @@ import com.example.front.viewmodels.checkout.CheckoutViewModel
 fun CheckoutScreen(
     viewModel: CheckoutViewModel,
     navController: NavHostController
-){
+) {
 
 
     LaunchedEffect(key1 = true) {
@@ -61,22 +66,20 @@ fun CheckoutScreen(
             .fillMaxSize(),
         color = Color.White
     ) {
-        Column (
+        Column(
             modifier = Modifier
                 .fillMaxSize()
 
         ) {
             Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                ,
+                    .fillMaxWidth(),
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.elipsemala),
                     contentDescription = null,
                     modifier = Modifier
-                        .fillMaxWidth()
-                    ,
+                        .fillMaxWidth(),
                     contentScale = ContentScale.FillWidth,
 
 
@@ -109,21 +112,25 @@ fun CheckoutScreen(
             }
 
             //slika, mapa, adresa, ukupno?, deliveri-pickup,
-            Column (
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(8.dp)
-                ,
+                    .padding(8.dp),
             ) {
-                Box (
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp)
 //                        .border(1.dp, Color.Red, RectangleShape)
                 ) {
-                    Image(painter = painterResource(id = R.drawable.ellipsebrojdva), contentDescription = "", modifier = Modifier
-                        .height(50.dp)
-                        .fillMaxWidth(),contentScale = ContentScale.FillBounds)
+                    Image(
+                        painter = painterResource(id = R.drawable.ellipsebrojdva),
+                        contentDescription = "",
+                        modifier = Modifier
+                            .height(50.dp)
+                            .fillMaxWidth(),
+                        contentScale = ContentScale.FillBounds
+                    )
                     Column {
                         Spacer(Modifier.weight(1f))
                         Text(
@@ -140,62 +147,106 @@ fun CheckoutScreen(
                     }
                 }
 
-                Row (
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
 //                        .border(1.dp, Color.Blue, RectangleShape)
                 ) {
                     // mapa
-                    Box(modifier = Modifier
-                        .height(130.dp)
-                        .width(130.dp)
-                        .padding(8.dp)
-                        .border(1.dp, Color.Red, RectangleShape)
-                    ){}
+                    Box(
+                        modifier = Modifier
+                            .height(130.dp)
+                            .width(130.dp)
+                            .padding(8.dp)
+                            .border(1.dp, Color.Red, RectangleShape)
+                    ) {}
                     // adresa
-                    Column (
+                    Column(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(146.dp)
 //                            .border(1.dp, Color.Blue, RectangleShape)
-                            ,
+                        ,
                         verticalArrangement = Arrangement.SpaceBetween,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(text = "Adresa Prodavnice",modifier=Modifier.padding(top = 20.dp))
+                        Text(text = "Adresa Prodavnice", modifier = Modifier.padding(top = 20.dp))
                         // cena?
-                        Text(text = "Ukupno: 400 rsd",modifier=Modifier.padding(bottom = 20.dp))
+                        Text(text = "Ukupno: 400 rsd", modifier = Modifier.padding(bottom = 20.dp))
                     }
                 }
-
-                // slider delivery-pickup
-                var checked by remember { mutableStateOf(false) }
-                Row (
+                LazyColumn(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)){
+                    item {
+                        ButtonWithIcon(
+                            text = "Add Credit/Debit Card",
+                            onClick = { navController.navigate(route = Screen.NewCreditCard.route) },
+                            width = 0.5f,
+                            modifier = Modifier.padding(10.dp),
+                            color = MaterialTheme.colorScheme.primary,
+                            imagePainter = painterResource(id = R.drawable.ion_card_outline),
+                            height = 40
+                        )
+                    }
+                    item {
+                        ButtonWithIcon(
+                            text = "Paypal",
+                            onClick = { /*navController.navigate()*/ },
+                            width = 0.5f,
+                            modifier = Modifier.padding(10.dp),
+                            color = MaterialTheme.colorScheme.primary,
+                            imagePainter = painterResource(id = R.drawable.logos_paypal),
+                            height = 40
+                        )
+                    }
+                }
+                LazyRow(
                     modifier = Modifier
                         .fillMaxWidth()
-//                        .border(1.dp, Color.Yellow, RectangleShape)
-                    ,
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceEvenly
+                        .padding(8.dp)
                 ) {
-
-                    Text(text = "Delivery")
-                    Switch(
-                        checked = checked,
-                        onCheckedChange = {
-                            checked = it
-                        }
-                    )
-                    Text(text = "Self pickup")
-                }
-                // opciono datepicker
-                if (checked) {
-                    Text(text = "Biranje datuma")
-//                    TextField(value = "", onValueChange = {})
+                    item {
+                        CreditCard()
+                    }
+                    item {
+                        CreditCard()
+                    }
+                    item {
+                        CreditCard()
+                    }
+                    item {
+                        CreditCard()
+                    }
                 }
             }
+            // slider delivery-pickup
+            var checked by remember { mutableStateOf(false) }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+//                        .border(1.dp, Color.Yellow, RectangleShape)
+                ,
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
 
+                Text(text = "Delivery")
+                Switch(
+                    checked = checked,
+                    onCheckedChange = {
+                        checked = it
+                    }
+                )
+                Text(text = "Self pickup")
+            }
+            // opciono datepicker
+            if (checked) {
+                Text(text = "Biranje datuma")
+//                    TextField(value = "", onValueChange = {})
+            }
         }
+
     }
 }
 

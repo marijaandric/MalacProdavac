@@ -55,7 +55,7 @@ fun SetupNavGraph(
 
     NavHost(
         navController = navController,
-        startDestination = "home_screen"
+        startDestination = "intro"
         //startDestination = "my_shop"//"my_shop"`
     ) {
         composable(

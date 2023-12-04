@@ -4,6 +4,7 @@ import android.widget.Space
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -26,10 +27,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.front.R
+import com.example.front.components.SmallElipseAndTitle
 
 @Composable
 fun NewCreditCartScreen() {
@@ -44,6 +47,7 @@ fun CardList() {
             .background(Color.White),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        SmallElipseAndTitle("Add New Card")
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -53,7 +57,11 @@ fun CardList() {
         ) {
             item {
                 Spacer(modifier = Modifier.height(50.dp))
-                Row(modifier = Modifier.fillMaxWidth()) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     CreditCard()
                 }
             }
@@ -67,61 +75,71 @@ fun CardList() {
     }
 }
 
+val gradientColors = listOf(
+    Color(0xEA97F8), // Replace with your start color
+    Color(0xA0A7E3)  // Replace with your end color
+)
+
 @Composable
 fun CreditCard() {
     Card(
-        shape = RoundedCornerShape(10.dp), // Add border radius
+        shape = RoundedCornerShape(10.dp),
         modifier = Modifier
-            .padding(10.dp) // Add padding around the Card
+            .padding(10.dp)
             .size(300.dp, 150.dp)
     ) {
-        Column(
-            modifier = Modifier
-                .padding(10.dp)
-                .fillMaxWidth()
-        ) { // Add padding inside the Card
-            Row(
+        Box(modifier = Modifier
+            .fillMaxSize() // Fill the entire space of the Card
+            .background(Brush.linearGradient(gradientColors))
+        ) {
+            Column(
                 modifier = Modifier
+                    .padding(10.dp)
                     .fillMaxWidth()
-                    .padding(bottom = 10.dp), // Add space below the row
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                val cardType = determineCardType("5111")
-                when (cardType) {
-                    "Visa" -> {
-                        Image(
-                            painter = painterResource(id = R.drawable.visa),
-                            contentDescription = "Visa",
-                            modifier = Modifier
-                                .padding(start = 10.dp)
-                                .size(30.dp)
-                        )
-                    }
+            ){ // Add padding inside the Card
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 10.dp), // Add space below the row
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    val cardType = determineCardType("5111")
+                    when (cardType) {
+                        "Visa" -> {
+                            Image(
+                                painter = painterResource(id = R.drawable.visa),
+                                contentDescription = "Visa",
+                                modifier = Modifier
+                                    .padding(start = 10.dp)
+                                    .size(30.dp)
+                            )
+                        }
 
-                    "Mastercard" -> {
-                        Image(
-                            painter = painterResource(id = R.drawable.mastercard),
-                            contentDescription = "MasterCard",
-                            modifier = Modifier
-                                .padding(start = 10.dp)
-                                .size(30.dp)
-                        )
+                        "Mastercard" -> {
+                            Image(
+                                painter = painterResource(id = R.drawable.mastercard),
+                                contentDescription = "MasterCard",
+                                modifier = Modifier
+                                    .padding(start = 10.dp)
+                                    .size(30.dp)
+                            )
+                        }
                     }
+                    Text("Banka Inteza")
                 }
-                Text("Banka Inteza")
-            }
-            Spacer(modifier = Modifier.height(40.dp))
-            Row {
-                Text("**** **** **** 68789")
-            }
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 10.dp), // Add space above the row
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text("Milovan Samardzic")
-                Text("05/24")
+                Spacer(modifier = Modifier.height(40.dp))
+                Row {
+                    Text("**** **** **** 68789")
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 10.dp), // Add space above the row
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text("Milovan Samardzic")
+                    Text("05/24")
+                }
             }
         }
     }
@@ -144,26 +162,38 @@ fun CreditCardInput() {
             value = cardNumber,
             onValueChange = { cardNumber = it },
             label = { Text("Credit Card Number") },
-            modifier = Modifier.padding(5.dp).background(Color.White).fillMaxWidth()
+            modifier = Modifier
+                .padding(5.dp)
+                .background(Color.White)
+                .fillMaxWidth()
         )
         TextField(
             value = nameOnCard,
             onValueChange = { nameOnCard = it },
             label = { Text("Name on Card") },
-            modifier = Modifier.padding(5.dp).background(Color.White).fillMaxWidth()
+            modifier = Modifier
+                .padding(5.dp)
+                .background(Color.White)
+                .fillMaxWidth()
         )
         Row(modifier = Modifier.fillMaxWidth()) {
             TextField(
                 value = expDate,
                 onValueChange = { expDate = it },
                 label = { Text("Exp. Date (MM/YY)") },
-                modifier = Modifier.padding(5.dp).background(Color.White).weight(1f)
+                modifier = Modifier
+                    .padding(5.dp)
+                    .background(Color.White)
+                    .weight(1f)
             )
             TextField(
                 value = cvv,
                 onValueChange = { cvv = it },
                 label = { Text("CVV") },
-                modifier = Modifier.padding(5.dp).background(Color.White).weight(1f)
+                modifier = Modifier
+                    .padding(5.dp)
+                    .background(Color.White)
+                    .weight(1f)
             )
         }
     }
