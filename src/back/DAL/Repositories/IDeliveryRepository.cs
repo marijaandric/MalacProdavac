@@ -17,5 +17,6 @@ namespace back.DAL.Repositories
         public Task<DeliveryRequest> GetBaseRequest(int requestId);
         public Task<DeliveryRoute> GetRoute(int routeId);
         public Task<int> GetCustomerIdForDelivery(int requestId);
+        public Task<bool> ChooseDeliveryPerson(int requestId, int chosenPersonId);
     }
 }

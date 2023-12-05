@@ -168,5 +168,10 @@ namespace back.DAL.Repositories
             int orderId  = (await _context.DeliveryRequests.FirstOrDefaultAsync(x => x.Id == requestId)).OrderId;
             return (await _context.Orders.FirstOrDefaultAsync(x => x.Id == orderId)).UserId;
         }
+
+        public Task<bool> ChooseDeliveryPerson(int requestId, int chosenPersonId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

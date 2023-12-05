@@ -41,6 +41,19 @@ namespace back.PL.Controllers
             }
         }
 
+        [HttpPut("DeclineRequest")]
+        public async Task<IActionResult> DeclineRequest(int reqId)
+        {
+            try
+            {
+                return Ok(new { Success = await _service.DeclineRequest(reqId) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
+
         [HttpGet("GetRequestsForDeliveryPerson")]
         public async Task<IActionResult> GetRequestsForDeliveryPerson(int deliveryPerson)
         {
@@ -67,7 +80,6 @@ namespace back.PL.Controllers
             }
         }
 
-
         [HttpGet("GetRoutesForRequest")]
         public async Task<IActionResult> GetRoutesForRequest(int userId, int requestId)
         {
@@ -87,6 +99,20 @@ namespace back.PL.Controllers
             try
             {
                 return Ok(await _service.GetDeliveryPeopleForRequest(requestId));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
+
+        [HttpPut("ChooseDeliveryPerson")]
+        public async Task<IActionResult> ChooseDeliveryPerson(int requestId, int chosenPersonId)
+        {
+            try
+            {
+                return Ok(await _service.ChooseDeliveryPerson(requestId, chosenPersonId));
+
             }
             catch (Exception ex)
             {

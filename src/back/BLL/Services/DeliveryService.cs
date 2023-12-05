@@ -158,5 +158,10 @@ namespace back.BLL.Services
 
             return deliveryPeopleList.OrderBy(x => x.ClosestRouteDivergence).Take(10).ToList();
         }
+
+        public Task<bool> ChooseDeliveryPerson(int requestId, int chosenPersonId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

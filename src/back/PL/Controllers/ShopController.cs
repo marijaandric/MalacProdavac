@@ -185,11 +185,11 @@ namespace back.PL.Controllers
         }
 
         [HttpGet("GetProductDisplay")]
-        public async Task<IActionResult> GetProductDisplay(int id)
+        public async Task<IActionResult> GetProductDisplay(int userId)
         {
             try
             {
-                return Ok(new { Success = await _service.GetProductDisplay(id) });
+                return Ok(new { Success = await _service.GetProductDisplay(userId) });
             }
             catch (Exception ex)
             {
