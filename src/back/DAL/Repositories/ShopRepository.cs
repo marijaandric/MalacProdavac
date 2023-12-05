@@ -333,9 +333,9 @@ namespace back.DAL.Repositories
             return await _context.SaveChangesAsync() > 0;
         }
 
-        public async Task<ProductDisplay> GetProductDisplay(int userId)
+        public async Task<ProductDisplay> GetProductDisplay(int id)
         {
-            return await _context.ProductDisplays.FirstOrDefaultAsync(x => x.ShopId == _context.Shop.FirstOrDefault(x => x.OwnerId == userId).Id);
+            return await _context.ProductDisplays.FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task<bool> DeleteProductDisplay(int id)
