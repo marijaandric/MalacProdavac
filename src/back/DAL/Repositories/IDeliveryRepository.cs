@@ -6,7 +6,7 @@ namespace back.DAL.Repositories
 {
     public interface IDeliveryRepository
     {
-        public Task<bool> InsertDeliveryRequest(DeliveryRequestDto req);
+        public Task<int> InsertDeliveryRequest(DeliveryRequestDto req);
         public Task<bool?> InsertDeliveryRoute(DeliveryRouteDto route);
         public Task<bool> AddToRoute(int requestId, int routeId);
         public Task<bool> DeclineRequest(int requestId);

@@ -111,7 +111,7 @@ namespace back.PL.Controllers
         {
             try
             {
-                return Ok(await _service.ChooseDeliveryPerson(requestId, chosenPersonId));
+                return Ok(new { Success = await _service.ChooseDeliveryPerson(requestId, chosenPersonId) });
 
             }
             catch (Exception ex)
