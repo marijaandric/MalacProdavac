@@ -29,7 +29,7 @@ namespace back.DAL.Repositories
         public Task<bool> InsertProductDisplay(ProductDisplay productDisplay);
         public Task<List<int>> GetNearbyUsers(float latitude, float longitude, int ownerId);
         public Task<bool> EditProductDisplay(EditProductDisplayDto productDisplayDto);
-        public Task<ProductDisplay> GetProductDisplay(int id);
+        public Task<ProductDisplayInfo> GetProductDisplay(int id);
         public Task<bool> DeleteProductDisplay(int id);
         public Task<Shop> GetShopByUserId(int userId);
         public Task<List<Shop>> GetAllShops();

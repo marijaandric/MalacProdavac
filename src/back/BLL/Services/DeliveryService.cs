@@ -26,7 +26,8 @@ namespace back.BLL.Services
 
         public async Task<bool> InsertDeliveryRequest(DeliveryRequestDto req)
         {
-            return await _repository.InsertDeliveryRequest(req);
+            if (await _repository.InsertDeliveryRequest(req) == -1) return false;
+            return true;
         }
 
         public async Task<List<int>> GetNearbySellers(string routeStart, string routeEnd, double range)

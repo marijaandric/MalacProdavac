@@ -168,7 +168,7 @@ namespace back.BLL.Services
         {
             if (!await _repository.EditProductDisplay(productDisplay)) throw new ArgumentException("Product display information could not be edited!");
 
-            ProductDisplay display = await _repository.GetProductDisplay(productDisplay.Id);
+            ProductDisplayInfo display = await _repository.GetProductDisplay(productDisplay.Id);
             Shop shop = await _repository.GetShop(productDisplay.ShopId);
             List<int> nearbyCustomers = await _repository.GetNearbyUsers(display.Latitude, display.Longitude, shop.OwnerId);
             string shopName = shop.Name;
@@ -177,11 +177,11 @@ namespace back.BLL.Services
             {
                 if (display.StartDate != display.EndDate)
                 {
-                    if (await _notificationRepository.InsertNotification(id, 3, shopName + " product display update!", shopName + " has changed their product display information. Their products will be displayed at " + display.Address + " between " + display.StartDate.ToShortDateString() + " and " + display.EndDate.ToShortDateString() + ", starting from " + display.StartTime + " to " + productDisplay.EndTime + ".\nTap to learn more.", display.ShopId)) Console.WriteLine("Notification sent to " + id);
+                    if (await _notificationRepository.InsertNotification(id, 3, shopName + " product display update!", shopName + " has changed their product display information. Their products will be displayed at " + display.Address + " between " + display.StartDate + " and " + display.EndDate + ", starting from " + display.StartTime + " to " + productDisplay.EndTime + ".\nTap to learn more.", display.ShopId)) Console.WriteLine("Notification sent to " + id);
                 }
                 else
                 {
-                    if (await _notificationRepository.InsertNotification(id, 3, shopName + " product display update!", shopName + " has changed their product display information. Their products will be displayed at " + display.Address + " on " + display.StartDate.ToShortDateString() + ", starting from " + display.StartTime + " to " + display.EndTime + ".\nTap to learn more.", display.ShopId)) Console.WriteLine("Notification sent to " + id);
+                    if (await _notificationRepository.InsertNotification(id, 3, shopName + " product display update!", shopName + " has changed their product display information. Their products will be displayed at " + display.Address + " on " + display.StartDate + ", starting from " + display.StartTime + " to " + display.EndTime + ".\nTap to learn more.", display.ShopId)) Console.WriteLine("Notification sent to " + id);
                 }
             }
 
@@ -195,9 +195,9 @@ namespace back.BLL.Services
             return true;
         }
 
-        public async Task<ProductDisplay> GetProductDisplay(int id)
+        public async Task<ProductDisplayInfo> GetProductDisplay(int id)
         {
-            ProductDisplay pd = await _repository.GetProductDisplay(id);
+            ProductDisplayInfo pd = await _repository.GetProductDisplay(id);
 
             if (pd == null) throw new ArgumentException("Product display not found!");
 

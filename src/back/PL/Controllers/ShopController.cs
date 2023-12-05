@@ -189,7 +189,7 @@ namespace back.PL.Controllers
         {
             try
             {
-                return Ok(new { Success = await _service.GetProductDisplay(id) });
+                return Ok(await _service.GetProductDisplay(id));
             }
             catch (Exception ex)
             {

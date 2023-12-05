@@ -333,9 +333,20 @@ namespace back.DAL.Repositories
             return await _context.SaveChangesAsync() > 0;
         }
 
-        public async Task<ProductDisplay> GetProductDisplay(int id)
+        public async Task<ProductDisplayInfo> GetProductDisplay(int id)
         {
-            return await _context.ProductDisplays.FirstOrDefaultAsync(x => x.Id == id);
+            return await _context.ProductDisplays.Select(x => new ProductDisplayInfo
+            {
+                Address = x.Address,
+                EndDate = x.EndDate.ToShortDateString(),
+                EndTime = x.EndTime,
+                Id = x.Id,
+                Latitude = x.Latitude,
+                Longitude = x.Longitude,
+                ShopId = x.ShopId,
+                StartDate = x.StartDate.ToShortDateString(),
+                StartTime = x.StartTime
+            }).FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task<bool> DeleteProductDisplay(int id)
