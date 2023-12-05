@@ -481,6 +481,62 @@ fun CardButton(text: String, onClick: () -> Unit, width: Float, modifier: Modifi
 }
 
 @Composable
+fun OrderCard(orderid:String, quantity: Int, amount: Float, date: String, status: String) {
+    Column (
+        modifier = Modifier.padding(16.dp)
+    ){
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(20.dp))
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(color = MaterialTheme.colorScheme.surface)
+                    .padding(16.dp)
+                    .height(140.dp)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                )
+                {
+                    Text(orderid, style=MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),modifier = Modifier.weight(1f))
+                    Text(date, style=MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.ExtraLight, color=MaterialTheme.colorScheme.primary))
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                )
+                {
+                    Text("Quantity: ", style=MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.ExtraLight, color=MaterialTheme.colorScheme.primary))
+                    Text(quantity.toString(), style=MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),modifier = Modifier.weight(1f))
+                }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                )
+                {
+                    Text("Total Amount: ", style=MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.ExtraLight, color=MaterialTheme.colorScheme.primary))
+                    Text(amount.toString()+" RSD", style=MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),modifier = Modifier.weight(1f))
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                )
+                {
+                    CardButton(text = "Details", onClick = {  }, width = 0.5f, modifier = Modifier, color = MaterialTheme.colorScheme.secondary)
+                    Text(status, style=MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold, color=MaterialTheme.colorScheme.primary))
+                }
+
+            }
+        }
+    }
+}
+
+@Composable
 fun ButtonWithIcon(
     text: String,
     onClick: () -> Unit,
@@ -1024,7 +1080,7 @@ fun SmallElipseAndTitle(title: String, drawerState: DrawerState) {
                     .padding(end = 10.dp)
                     .size(50.dp)
                     .align(Alignment.CenterStart)
-                    .clickable { scope.launch { drawerState.open() }},
+                    .clickable { scope.launch { drawerState.open() } },
                 tint = MaterialTheme.colorScheme.background,
             )
             Text(
@@ -1088,6 +1144,131 @@ fun Tabs(
             )
 
             if (!selectedColumnIndex) {
+                Image(
+                    painter = painterResource(id = R.drawable.crtica),
+                    contentDescription = "Crtica",
+                    contentScale = ContentScale.FillWidth,
+                    modifier = Modifier
+                        .width(if (!isFilters) 30.dp else 20.dp)
+                        .align(Alignment.CenterHorizontally)
+                        .padding(top = 10.dp)
+                )
+            }
+        }
+    }
+}
+
+
+@Composable
+fun FourTabs(
+    onFirstTabSelected: () -> Unit,
+    onSecondTabSelected: () -> Unit,
+    onThirdTabSelected: () -> Unit,
+    onFourthTabSelected: () -> Unit,
+    selectedColumnIndex: Int,
+    firstTab: String,
+    secondTab: String,
+    thirdTab: String,
+    fourthTab: String,
+    isFilters: Boolean,
+) {
+    Row {
+        Column(
+            modifier = Modifier
+                .padding(start = 20.dp)
+                .clickable { onFirstTabSelected() }
+        ) {
+            Text(
+                text = firstTab,
+                style = MaterialTheme.typography.titleLarge.copy(
+                    color = MaterialTheme.colorScheme.onTertiary,
+                    fontSize = if (!isFilters) 20.sp else 16.sp
+                ),
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+
+            if (selectedColumnIndex == 0) {
+                Image(
+                    painter = painterResource(id = R.drawable.crtica),
+                    contentDescription = "Crtica",
+                    contentScale = ContentScale.FillWidth,
+                    modifier = Modifier
+                        .width(if (!isFilters) 30.dp else 20.dp)
+                        .align(Alignment.CenterHorizontally)
+                        .padding(top = 10.dp)
+                )
+            }
+        }
+
+        Column(
+            modifier = Modifier
+                .padding(start = 20.dp)
+                .clickable { onSecondTabSelected() }
+        ) {
+            Text(
+                text = secondTab,
+                style = MaterialTheme.typography.titleLarge.copy(
+                    color = MaterialTheme.colorScheme.onTertiary,
+                    fontSize = if (!isFilters) 20.sp else 16.sp
+                ),
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+
+            if (selectedColumnIndex == 1) {
+                Image(
+                    painter = painterResource(id = R.drawable.crtica),
+                    contentDescription = "Crtica",
+                    contentScale = ContentScale.FillWidth,
+                    modifier = Modifier
+                        .width(if (!isFilters) 30.dp else 20.dp)
+                        .align(Alignment.CenterHorizontally)
+                        .padding(top = 10.dp)
+                )
+            }
+        }
+
+        Column(
+            modifier = Modifier
+                .padding(start = 20.dp)
+                .clickable { onThirdTabSelected() }
+        ) {
+            Text(
+                text = thirdTab,
+                style = MaterialTheme.typography.titleLarge.copy(
+                    color = MaterialTheme.colorScheme.onTertiary,
+                    fontSize = if (!isFilters) 20.sp else 16.sp
+                ),
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+
+            if (selectedColumnIndex == 2) {
+                Image(
+                    painter = painterResource(id = R.drawable.crtica),
+                    contentDescription = "Crtica",
+                    contentScale = ContentScale.FillWidth,
+                    modifier = Modifier
+                        .width(if (!isFilters) 30.dp else 20.dp)
+                        .align(Alignment.CenterHorizontally)
+                        .padding(top = 10.dp)
+                )
+            }
+        }
+
+        Column(
+            modifier = Modifier
+                .padding(start = 20.dp)
+                .clickable { onFourthTabSelected() }
+        ) {
+            Text(
+                text = fourthTab,
+                style = MaterialTheme.typography.titleLarge.copy(
+                    color = MaterialTheme.colorScheme.onTertiary,
+                    fontSize = if (!isFilters) 20.sp else 16.sp
+                ),
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+
+            if (selectedColumnIndex == 3) {
                 Image(
                     painter = painterResource(id = R.drawable.crtica),
                     contentDescription = "Crtica",
