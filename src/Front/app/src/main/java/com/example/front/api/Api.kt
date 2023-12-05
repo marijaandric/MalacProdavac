@@ -19,6 +19,7 @@ import com.example.front.model.product.ProductInfo
 import com.example.front.model.product.ProductReviewUserInfo
 import com.example.front.model.response.Id
 import com.example.front.model.response.Success
+import com.example.front.model.response.SuccessProductDisplay
 import com.example.front.model.user.MyProfileDTO
 import com.example.front.model.user.UserEditDTO
 import okhttp3.MultipartBody
@@ -189,4 +190,8 @@ interface Api {
         @Part image: MultipartBody.Part
     ): Response<Success>
 
+    @GET("back/Shop/GetProductDisplay")
+    suspend fun getProductDisplay(
+        @Query("id") id: Int,
+    ): Response<SuccessProductDisplay>
 }

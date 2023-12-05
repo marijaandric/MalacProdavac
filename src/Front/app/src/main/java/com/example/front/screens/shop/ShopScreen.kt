@@ -3,7 +3,6 @@ package com.example.front.screens.shop
 import android.content.Context
 import android.net.Uri
 import android.util.Log
-import android.widget.TimePicker
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -34,24 +33,18 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Checkbox
-import androidx.compose.material.CheckboxDefaults
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DateRangePicker
 import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -62,7 +55,6 @@ import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -77,8 +69,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -106,12 +97,9 @@ import com.example.front.model.DTO.CategoriesDTO
 import com.example.front.model.DTO.MetricsDTO
 import com.example.front.model.DTO.NewProductDTO
 import com.example.front.model.DTO.WorkingHoursDTO
-import com.example.front.model.user.UserEditDTO
-import com.example.front.screens.myshop.DayOfWeekItem
-import com.example.front.viewmodels.myprofile.MyProfileViewModel
 import com.example.front.viewmodels.oneshop.OneShopViewModel
-import com.google.android.material.datepicker.CalendarConstraints.DateValidator
 import kotlinx.coroutines.delay
+import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -175,6 +163,14 @@ fun ShopScreen(navController: NavHostController, shopViewModel: OneShopViewModel
                     }
                 }
             } else {
+                if(shopViewModel.state.value.shop!!.productDisplayId != null)
+                {
+                    shopViewModel.state.value.shop!!.productDisplayId?.let {
+                        shopViewModel.getProductDisplay(
+                            it
+                        )
+                    }
+                }
                 item {
                     ProfilePic(shopViewModel, id)
                 }
@@ -1028,6 +1024,9 @@ fun ProfilePic(shopViewModel: OneShopViewModel, id: Int) {
     var showDisplayProduct by remember{
         mutableStateOf(false)
     }
+    var showProductDisplayNotificationDialog by remember {
+        mutableStateOf(false)
+    }
     Box(
         modifier = Modifier
             .padding(top = 50.dp, end = 16.dp, start = 16.dp)
@@ -1081,55 +1080,76 @@ fun ProfilePic(shopViewModel: OneShopViewModel, id: Int) {
         }
 
 
-        if (shopViewModel.state.value.shop!!.image == null) {
-            if (shopViewModel.state.value.shop!!.image == null) {
-                Image(
-                    painter = painterResource(id = R.drawable.imageplaceholder),
-                    contentDescription = "Placeholder",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .size(140.dp)
-                        .clip(CircleShape)
-                        .border(4.dp, Color.White, CircleShape)
-                )
-            } else {
-                val image = shopViewModel.state.value.shop!!.image
-                val imageUrl = "http://softeng.pmf.kg.ac.rs:10015/images/${image}"
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Box (
+            ){
+                if (shopViewModel.state.value.shop?.image == null) {
+                    Image(
+                        painter = painterResource(id = R.drawable.imageplaceholder),
+                        contentDescription = "Placeholder",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(140.dp)
+                            .clip(CircleShape)
+                            .border(4.dp, Color.White, CircleShape)
+                    )
+                } else {
+                    val image = shopViewModel.state.value.shop!!.image
+                    val imageUrl = "http://softeng.pmf.kg.ac.rs:10015/images/${image}"
 
-                val painter: Painter = rememberAsyncImagePainter(model = imageUrl)
-                Image(
-                    painter = painter,
-                    contentDescription = "Placeholder",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .size(140.dp)
-                        .clip(CircleShape)
-                        .border(4.dp, Color.White, CircleShape)
-                )
+                    val painter: Painter = rememberAsyncImagePainter(model = imageUrl)
+                    Image(
+                        painter = painter,
+                        contentDescription = "Placeholder",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(140.dp)
+                            .clip(CircleShape)
+                            .border(4.dp, Color.White, CircleShape)
+                    )
+                }
+
+                if(shopViewModel.stateProductDisplay.value.displayProduct != null)
+                {
+                    Icon(
+                        imageVector = Icons.Default.Info,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.secondary,
+                        modifier = Modifier
+                            .size(40.dp)
+                            .padding(4.dp)
+                            .align(Alignment.TopEnd)
+                            .clickable {
+                                showProductDisplayNotificationDialog = true
+                            }
+                    )
+                }
             }
-        }
-        Box(
-            modifier = Modifier
-                .padding(top = 20.dp)
-                .fillMaxWidth(),
-            contentAlignment = Alignment.Center
-        )
-        {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = state.shop!!.name,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = state.shop!!.address,
-                    style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                RatingBar(rating = shopViewModel.state.value.shop!!.rating!!.toFloat())
-                Spacer(modifier = Modifier.height(30.dp))
+            Box(
+                modifier = Modifier
+                    .padding(top = 20.dp)
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            )
+            {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = state.shop!!.name,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = state.shop!!.address,
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    RatingBar(rating = shopViewModel.state.value.shop!!.rating!!.toFloat())
+                    Spacer(modifier = Modifier.height(30.dp))
+                }
             }
         }
     }
@@ -1142,6 +1162,61 @@ fun ProfilePic(shopViewModel: OneShopViewModel, id: Int) {
     if(showDisplayProduct)
     {
         DisplayProductDialog(onDismiss = { showDisplayProduct = false })
+    }
+
+    if(showProductDisplayNotificationDialog)
+    {
+        ProductDisplayNotification (onDismiss = { showProductDisplayNotificationDialog = false },shopViewModel)
+    }
+}
+
+@Composable
+fun ProductDisplayNotification(onDismiss: () -> Unit, shopViewModel : OneShopViewModel) {
+    val overlayColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)
+    Dialog(
+        properties = DialogProperties(usePlatformDefaultWidth = false),
+        onDismissRequest = { onDismiss() }) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(overlayColor)
+                .pointerInput(Unit) {
+                    detectTapGestures { offset ->
+                        onDismiss()
+                    }
+                }
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.8f)
+                    .fillMaxHeight(0.25f)
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(MaterialTheme.colorScheme.background)
+                    .pointerInput(Unit) {
+                        detectTapGestures { offset ->
+
+                        }
+                    }
+                    .padding(16.dp)
+                    .align(Alignment.Center)
+            ) {
+                if(shopViewModel.stateProductDisplay.value.isLoading)
+                {
+                    CircularProgressIndicator()
+                }
+                else{
+                    val state = shopViewModel.stateProductDisplay.value
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text("Product display", style = MaterialTheme.typography.titleMedium, modifier = Modifier
+                            .padding(bottom = 25.dp))
+                        Text(state.displayProduct!!.success!!.startDate+" - "+state.displayProduct!!.success!!.endDate, style = MaterialTheme.typography.titleSmall)
+                        Text(state.displayProduct!!.success!!.startTime+" - "+state.displayProduct!!.success!!.endTime,style = MaterialTheme.typography.titleSmall)
+                        Spacer(modifier = Modifier.height(20.dp))
+                        Text(state.displayProduct!!.success!!.address, style = MaterialTheme.typography.displaySmall,textAlign=TextAlign.Center)
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -1197,7 +1272,9 @@ fun DisplayProductDialog(onDismiss: () -> Unit) {
                                     )
                                     .clip(RoundedCornerShape(10.dp))
                             ){
-                                DateRangePicker(state = state,modifier = Modifier.height(470.dp).background(color=MaterialTheme.colorScheme.background),headline = {
+                                DateRangePicker(state = state,modifier = Modifier
+                                    .height(470.dp)
+                                    .background(color = MaterialTheme.colorScheme.background),headline = {
                                     Text(text = "Select date!", modifier = Modifier.padding(start=10.dp),
                                         style=MaterialTheme.typography.displaySmall.copy(fontSize = 23.sp)
                                 )}, title=null)

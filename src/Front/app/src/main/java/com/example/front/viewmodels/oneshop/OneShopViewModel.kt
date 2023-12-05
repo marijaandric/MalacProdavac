@@ -13,6 +13,7 @@ import com.example.front.repository.Repository
 import com.example.front.screens.shop.state.GetCategoriesState
 import com.example.front.screens.shop.state.GetMetricsState
 import com.example.front.screens.shop.state.PostReviewState
+import com.example.front.screens.shop.state.ProductDisplayState
 import com.example.front.screens.shop.state.ProductState
 import com.example.front.screens.shop.state.ShopReviewState
 import com.example.front.screens.shop.state.ShopState
@@ -71,6 +72,9 @@ class OneShopViewModel @Inject constructor(
     private val _stateGetCategories = mutableStateOf(GetCategoriesState())
     var stateGetCategories: State<GetCategoriesState> = _stateGetCategories;
 
+    private val _stateProductDisplay = mutableStateOf(ProductDisplayState())
+    var stateProductDisplay: State<ProductDisplayState> = _stateProductDisplay;
+
     suspend fun getShopDetails(userId: Int, shopId: Int) {
         viewModelScope.launch {
             try {
@@ -112,7 +116,6 @@ class OneShopViewModel @Inject constructor(
         inicijalnoStanje()
         viewModelScope.launch {
             try {
-                Log.d("SALJEM", categories.toString())
                 val response = repository.getProducts(
                     userId,
                     categories,
@@ -142,7 +145,6 @@ class OneShopViewModel @Inject constructor(
                     currLat = currLat,
                     currLon = currLong
                 )
-                Log.d("KONACAN RESPONSE", response.toString())
                 if (response.isSuccessful) {
                     val prod = response.body()
                     _stateProduct.value = _stateProduct.value.copy(
@@ -433,6 +435,30 @@ class OneShopViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 _uploadStatus.value = UploadStatus.Error("Upload failed: ${e.message}")
+            }
+        }
+    }
+
+    fun getProductDisplay(id: Int) {
+        viewModelScope.launch {
+            try {
+                val response = repository.getProductDisplay(id)
+                if (response.isSuccessful) {
+                    _stateProductDisplay.value = _stateProductDisplay.value.copy(
+                        isLoading = false,
+                        displayProduct = response.body(),
+                        error = ""
+                    )
+                } else {
+                    _stateProductDisplay.value = _stateProductDisplay.value.copy(
+                        isLoading = false,
+                        error = "No product display"
+                    )
+                }
+            } catch (e: Exception) {
+                _stateProductDisplay.value = _stateProductDisplay.value.copy(
+                    error = e.message.toString()
+                )
             }
         }
     }
