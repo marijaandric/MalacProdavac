@@ -16,16 +16,19 @@ namespace back.DAL.Repositories
             _context = context;
         }
 
-        public async Task<bool> InsertDeliveryRequest(DeliveryRequestDto dto)
+        public async Task<int> InsertDeliveryRequest(DeliveryRequestDto dto)
         {
-            await _context.DeliveryRequests.AddAsync(new DeliveryRequest
+            DeliveryRequest req = new DeliveryRequest
             {
                 OrderId = dto.OrderId,
                 ShopId = dto.ShopId,
                 CreatedOn = DateTime.Now
-            });
+            };
 
-            return await _context.SaveChangesAsync() > 0;
+            await _context.DeliveryRequests.AddAsync(req);
+
+            if (await _context.SaveChangesAsync() > 0) return req.Id;
+            return -1;
         }
 
         public async Task<bool?> InsertDeliveryRoute(DeliveryRouteDto route)
@@ -167,6 +170,13 @@ namespace back.DAL.Repositories
         {
             int orderId  = (await _context.DeliveryRequests.FirstOrDefaultAsync(x => x.Id == requestId)).OrderId;
             return (await _context.Orders.FirstOrDefaultAsync(x => x.Id == orderId)).UserId;
+        }
+
+        public async Task<bool> ChooseDeliveryPerson(int requestId, int chosenPersonId)
+        {
+            DeliveryRequest req = await _context.DeliveryRequests.FirstOrDefaultAsync(x => x.Id == requestId);
+            req.ChosenPersonId = chosenPersonId;
+            return await _context.SaveChangesAsync() > 0;
         }
     }
 }

@@ -158,5 +158,17 @@ namespace back.BLL.Services
 
             return deliveryPeopleList.OrderBy(x => x.ClosestRouteDivergence).Take(10).ToList();
         }
+
+        public async Task<bool> ChooseDeliveryPerson(int requestId, int chosenPersonId)
+        {
+            DeliveryRequest req = await _repository.GetBaseRequest(requestId);
+            Order o = await _orderRepository.GetOrder(req.OrderId);
+            string shopName = (await _shopRepository.GetShop(o.ShopId)).Name;
+
+            if (!await _repository.ChooseDeliveryPerson(requestId, chosenPersonId)) return false;
+            if (await _notificationRepository.InsertNotification(chosenPersonId, 5, "New delivery request!", "You have a delivery request from " + shopName + " for order #" + o.Id + "!\nPlease respond to this request.", req.Id)) Console.WriteLine("Notification sent!");
+
+            return true;
+        }
     }
 }
