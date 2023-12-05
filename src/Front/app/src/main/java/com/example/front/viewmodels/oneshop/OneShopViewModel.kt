@@ -72,8 +72,11 @@ class OneShopViewModel @Inject constructor(
     private val _stateGetCategories = mutableStateOf(GetCategoriesState())
     var stateGetCategories: State<GetCategoriesState> = _stateGetCategories;
 
+    // prikaz product display
     private val _stateProductDisplay = mutableStateOf(ProductDisplayState())
     var stateProductDisplay: State<ProductDisplayState> = _stateProductDisplay;
+
+    //
 
     suspend fun getShopDetails(userId: Int, shopId: Int) {
         viewModelScope.launch {

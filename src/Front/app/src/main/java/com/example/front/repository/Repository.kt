@@ -21,6 +21,7 @@ import com.example.front.model.product.ProductInfo
 import com.example.front.model.product.ProductReviewUserInfo
 import com.example.front.model.response.Id
 import com.example.front.model.response.Success
+import com.example.front.model.response.SuccessBoolean
 import com.example.front.model.response.SuccessProductDisplay
 import com.example.front.model.user.MyProfileDTO
 import com.example.front.model.user.UserEditDTO
@@ -122,5 +123,9 @@ class Repository @Inject constructor(private val api: Api) {
     suspend fun getProductDisplay(id:Int):Response<SuccessProductDisplay>
     {
         return api.getProductDisplay(id)
+    }
+    suspend fun deleteProductDisplay(id:Int):Response<SuccessBoolean>
+    {
+        return api.deleteProductDisplay(id)
     }
 }

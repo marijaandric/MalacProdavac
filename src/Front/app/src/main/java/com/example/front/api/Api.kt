@@ -19,6 +19,7 @@ import com.example.front.model.product.ProductInfo
 import com.example.front.model.product.ProductReviewUserInfo
 import com.example.front.model.response.Id
 import com.example.front.model.response.Success
+import com.example.front.model.response.SuccessBoolean
 import com.example.front.model.response.SuccessProductDisplay
 import com.example.front.model.user.MyProfileDTO
 import com.example.front.model.user.UserEditDTO
@@ -26,6 +27,7 @@ import okhttp3.MultipartBody
 import org.w3c.dom.Comment
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.Multipart
@@ -194,4 +196,9 @@ interface Api {
     suspend fun getProductDisplay(
         @Query("id") id: Int,
     ): Response<SuccessProductDisplay>
+
+    @DELETE("back/Shop/DeleteProductDisplay")
+    suspend fun deleteProductDisplay(
+        @Query("id") id: Int,
+    ):Response<SuccessBoolean>
 }

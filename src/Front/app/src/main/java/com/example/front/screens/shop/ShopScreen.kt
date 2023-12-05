@@ -35,6 +35,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -1173,6 +1174,9 @@ fun ProfilePic(shopViewModel: OneShopViewModel, id: Int) {
 @Composable
 fun ProductDisplayNotification(onDismiss: () -> Unit, shopViewModel : OneShopViewModel) {
     val overlayColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)
+    var deletedialog by remember {
+        mutableStateOf(false)
+    }
     Dialog(
         properties = DialogProperties(usePlatformDefaultWidth = false),
         onDismissRequest = { onDismiss() }) {
@@ -1206,13 +1210,114 @@ fun ProductDisplayNotification(onDismiss: () -> Unit, shopViewModel : OneShopVie
                 }
                 else{
                     val state = shopViewModel.stateProductDisplay.value
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("Product display", style = MaterialTheme.typography.titleMedium, modifier = Modifier
-                            .padding(bottom = 25.dp))
+                    Column(horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            modifier = Modifier
+                                .padding(bottom = 25.dp)
+                                .fillMaxWidth()
+                        ) {
+                            if(shopViewModel.state.value.shop!!.isOwner)
+                            {
+                                Icon(
+                                    imageVector = Icons.Default.Edit,
+                                    contentDescription = "Delete Icon",
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier
+                                        .clickable { }
+                                        .size(30.dp)
+                                )
+                            }
+                            Text(
+                                text = "Product display",
+                                style = MaterialTheme.typography.titleMedium,
+                                modifier = Modifier//.padding(bottom = 25.dp)
+                            )
+                            if(shopViewModel.state.value.shop!!.isOwner)
+                            {
+                                Icon(
+                                    imageVector = Icons.Default.Delete,
+                                    contentDescription = "Delete Icon",
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier
+                                        .clickable {
+                                            deletedialog = true
+                                        }
+                                        .size(30.dp)
+                                )
+                            }
+
+                        }
                         Text(state.displayProduct!!.success!!.startDate+" - "+state.displayProduct!!.success!!.endDate, style = MaterialTheme.typography.titleSmall)
                         Text(state.displayProduct!!.success!!.startTime+" - "+state.displayProduct!!.success!!.endTime,style = MaterialTheme.typography.titleSmall)
                         Spacer(modifier = Modifier.height(20.dp))
                         Text(state.displayProduct!!.success!!.address, style = MaterialTheme.typography.displaySmall,textAlign=TextAlign.Center)
+                    }
+                }
+            }
+        }
+    }
+
+    if(deletedialog)
+    {
+        DeleteDialog(onDismiss = { deletedialog = false }, shopViewModel = shopViewModel)
+    }
+}
+
+@Composable
+fun DeleteDialog(onDismiss: () -> Unit, shopViewModel: OneShopViewModel) {
+    val overlayColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)
+
+    Dialog(
+        properties = DialogProperties(usePlatformDefaultWidth = false),
+        onDismissRequest = { onDismiss() }) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(overlayColor)
+                .pointerInput(Unit) {
+                    detectTapGestures { offset ->
+                        onDismiss()
+                    }
+                }
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.7f)
+                    .fillMaxHeight(0.2f)
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(MaterialTheme.colorScheme.background)
+                    .pointerInput(Unit) {
+                        detectTapGestures { offset ->
+
+                        }
+                    }
+                    .padding(16.dp)
+                    .align(Alignment.Center)
+            ) {
+                Column {
+                    Text("Are you sure you want to delete this?", style = MaterialTheme.typography.titleSmall, modifier = Modifier
+                        .padding(bottom = 25.dp), textAlign = TextAlign.Center)
+                    Row()
+                    {
+                        CardButton(
+                            text = "No",
+                            onClick = { /*TODO*/ },
+                            width = 0.5f,
+                            modifier = Modifier,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                        Spacer(modifier = Modifier.width(5.dp))
+                        CardButton(
+                            text = "Yes",
+                            onClick = { /*TODO*/ },
+                            width = 0.95f,
+                            modifier = Modifier,
+                            color = MaterialTheme.colorScheme.primary
+                        )
                     }
                 }
             }
@@ -1226,6 +1331,9 @@ fun DisplayProductDialog(onDismiss: () -> Unit) {
     val overlayColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)
     val state = rememberDateRangePickerState()
     val timeStart = rememberTimePickerState()
+    var value by remember {
+        mutableStateOf("")
+    }
 
     Dialog(
         properties = DialogProperties(usePlatformDefaultWidth = false),
@@ -1258,6 +1366,13 @@ fun DisplayProductDialog(onDismiss: () -> Unit) {
                     item{
                         Text("Add product display information", style = MaterialTheme.typography.titleMedium, modifier = Modifier
                             .padding(bottom = 25.dp))
+
+                        MyTextFieldWithoutIcon(
+                            labelValue = "Address",
+                            value = value,
+                            onValueChange = {value = it},
+                            modifier = Modifier.padding(bottom=16.dp)
+                        )
 
                         Card(
 
