@@ -15,6 +15,7 @@ import com.example.front.model.DTO.ReviewDTO
 import com.example.front.model.request.RegistrationRequest
 import com.example.front.model.response.LoginResponse
 import com.example.front.model.DTO.ShopDTO
+import com.example.front.model.DTO.ShopDetailsCheckoutDTO
 import com.example.front.model.DTO.ShopDetailsDTO
 import com.example.front.model.DTO.ShopPagesDTO
 import com.example.front.model.DTO.ToggleLikeDTO
@@ -128,5 +129,9 @@ class Repository @Inject constructor(private val api: Api) {
     suspend fun deleteProductDisplay(id:Int):Response<SuccessBoolean>
     {
         return api.deleteProductDisplay(id)
+    }
+    suspend fun getShopsForCheckout(shopIds: List<Int>): Response<List<ShopDetailsCheckoutDTO>>
+    {
+        return api.getShopsForCheckout(shopIds)
     }
 }

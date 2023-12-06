@@ -22,7 +22,7 @@ fun NavGraphBuilder.orderingNavGraph(
             Cart(viewModel = cartViewModel, navController = navController)
         }
         composable(route = Screen.Checkout.route) {
-            CheckoutScreen(viewModel = checkoutViewModel, navController = navController, checkoutViewModel)
+            CheckoutScreen(viewModel = checkoutViewModel, navController = navController)
         }
     }
 }

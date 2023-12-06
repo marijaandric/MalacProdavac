@@ -13,6 +13,7 @@ import com.example.front.model.DTO.ReviewDTO
 import com.example.front.model.request.RegistrationRequest
 import com.example.front.model.response.LoginResponse
 import com.example.front.model.DTO.ShopDTO
+import com.example.front.model.DTO.ShopDetailsCheckoutDTO
 import com.example.front.model.DTO.ShopDetailsDTO
 import com.example.front.model.DTO.ShopPagesDTO
 import com.example.front.model.DTO.ToggleLikeDTO
@@ -202,4 +203,9 @@ interface Api {
     suspend fun deleteProductDisplay(
         @Query("id") id: Int,
     ):Response<SuccessBoolean>
+
+    @GET("back/Shop/GetShopsForCheckout")
+    suspend fun getShopsForCheckout(
+        @Query("shopIds") shopIds: List<Int>
+    ):Response<List<ShopDetailsCheckoutDTO>>
 }

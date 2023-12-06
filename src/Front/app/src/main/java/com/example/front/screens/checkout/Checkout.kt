@@ -56,8 +56,7 @@ import com.example.front.viewmodels.checkout.CheckoutViewModel
 @Composable
 fun CheckoutScreen(
     viewModel: CheckoutViewModel,
-    navController: NavHostController,
-    checkoutViewModel: CheckoutViewModel
+    navController: NavHostController
 ) {
 
 
@@ -66,12 +65,13 @@ fun CheckoutScreen(
     }
 
     val checkoutState = viewModel.state.value
+    val shops = viewModel.shopsForCheckout.value
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     Sidebar(
         drawerState,
         navController,
-        checkoutViewModel.dataStoreManager
+        viewModel.dataStoreManager
     ) {
         Surface(
             modifier = Modifier
@@ -85,6 +85,69 @@ fun CheckoutScreen(
             ) {
                 SmallElipseAndTitle(title = "Checkout", drawerState)
 
+                //kartice
+//                LazyRow(
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .padding(10.dp)
+//                ) {
+//                    item {
+//                        CreditCard()
+//                    }
+//                    item {
+//                        CreditCard()
+//                    }
+//                    item {
+//                        CreditCard()
+//                    }
+//                    item {
+//                        CreditCard()
+//                    }
+//                }
+//
+//                //dodavanje novih kartica
+//                Column(
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .padding(8.dp),
+//                    verticalArrangement = Arrangement.SpaceBetween,
+//                    horizontalAlignment = Alignment.CenterHorizontally
+//                ) {
+//                    Row(
+//                        modifier = Modifier
+//                            .padding(15.dp)
+//                    ) {
+//                        ButtonWithIcon(
+//                            text = "Add Credit/Debit Card",
+//                            onClick = { navController.navigate(route = Screen.NewCreditCard.route) },
+//                            width = 0.8f,
+//                            modifier = Modifier.padding(10.dp),
+//                            color = MaterialTheme.colorScheme.primary,
+//                            imagePainter = painterResource(id = R.drawable.ion_card_outline),
+//                            height = 50
+//                        )
+//                    }
+//                    Row(
+//                        modifier = Modifier
+//                            .padding(15.dp)
+//                    ) {
+//                        ButtonWithIcon(
+//                            text = "Paypal",
+//                            onClick = { /*navController.navigate()*/ },
+//                            width = 0.8f,
+//                            modifier = Modifier.padding(10.dp),
+//                            color = MaterialTheme.colorScheme.primary,
+//                            imagePainter = painterResource(id = R.drawable.logos_paypal),
+//                            height = 50
+//                        )
+//                    }
+//                }
+
+
+
+
+
+
                 //Spisak prodavnica
                 LazyColumn(
                     modifier = Modifier
@@ -92,10 +155,12 @@ fun CheckoutScreen(
                         .padding(horizontal = 16.dp, vertical = 0.dp)
                         .weight(1f)
                 ) {
-                    checkoutState.forEach { shop ->
+                    shops.forEach { shop ->
                         item {
+
                             Text(
-                                text = shop.toString()
+                                text = shop.name,
+                                modifier = Modifier.height(40.dp)
                             )
                         }
                     }
@@ -168,61 +233,6 @@ fun CheckoutScreen(
                             Text(
                                 text = "Ukupno: 400 rsd",
                                 modifier = Modifier.padding(bottom = 20.dp)
-                            )
-                        }
-                    }
-
-                    LazyRow(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(10.dp)
-                    ) {
-                        item {
-                            CreditCard()
-                        }
-                        item {
-                            CreditCard()
-                        }
-                        item {
-                            CreditCard()
-                        }
-                        item {
-                            CreditCard()
-                        }
-                    }
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp),
-                        verticalArrangement = Arrangement.SpaceBetween,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .padding(15.dp)
-                        ) {
-                            ButtonWithIcon(
-                                text = "Add Credit/Debit Card",
-                                onClick = { navController.navigate(route = Screen.NewCreditCard.route) },
-                                width = 0.8f,
-                                modifier = Modifier.padding(10.dp),
-                                color = MaterialTheme.colorScheme.primary,
-                                imagePainter = painterResource(id = R.drawable.ion_card_outline),
-                                height = 50
-                            )
-                        }
-                        Row(
-                            modifier = Modifier
-                                .padding(15.dp)
-                        ) {
-                            ButtonWithIcon(
-                                text = "Paypal",
-                                onClick = { /*navController.navigate()*/ },
-                                width = 0.8f,
-                                modifier = Modifier.padding(10.dp),
-                                color = MaterialTheme.colorScheme.primary,
-                                imagePainter = painterResource(id = R.drawable.logos_paypal),
-                                height = 50
                             )
                         }
                     }
