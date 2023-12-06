@@ -1251,10 +1251,13 @@ fun ProductDisplayNotification(onDismiss: () -> Unit, shopViewModel : OneShopVie
                             }
 
                         }
-                        Text(state.displayProduct!!.success!!.startDate+" - "+state.displayProduct!!.success!!.endDate, style = MaterialTheme.typography.titleSmall)
-                        Text(state.displayProduct!!.success!!.startTime+" - "+state.displayProduct!!.success!!.endTime,style = MaterialTheme.typography.titleSmall)
-                        Spacer(modifier = Modifier.height(20.dp))
-                        Text(state.displayProduct!!.success!!.address, style = MaterialTheme.typography.displaySmall,textAlign=TextAlign.Center)
+                        if(state != null)
+                        {
+                            Text(state.displayProduct!!.startDate+" - "+state.displayProduct!!.endDate, style = MaterialTheme.typography.titleSmall)
+                            Text(state.displayProduct!!.startTime+" - "+state.displayProduct!!.endTime,style = MaterialTheme.typography.titleSmall)
+                            Spacer(modifier = Modifier.height(20.dp))
+                            Text(state.displayProduct!!.address, style = MaterialTheme.typography.displaySmall,textAlign=TextAlign.Center)
+                        }
                     }
                 }
             }

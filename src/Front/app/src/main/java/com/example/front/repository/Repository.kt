@@ -10,6 +10,7 @@ import com.example.front.model.DTO.LoginDTO
 import com.example.front.model.DTO.MetricsDTO
 import com.example.front.model.DTO.NewProductDTO
 import com.example.front.model.DTO.ProductDTO
+import com.example.front.model.DTO.ProductDisplayDTO
 import com.example.front.model.DTO.ReviewDTO
 import com.example.front.model.request.RegistrationRequest
 import com.example.front.model.response.LoginResponse
@@ -120,7 +121,7 @@ class Repository @Inject constructor(private val api: Api) {
     suspend fun uploadImage(type: Int, id: Int, imagePart: MultipartBody.Part): Response<Success> {
         return api.uploadImage(type, id, imagePart)
     }
-    suspend fun getProductDisplay(id:Int):Response<SuccessProductDisplay>
+    suspend fun getProductDisplay(id:Int):Response<ProductDisplayDTO>
     {
         return api.getProductDisplay(id)
     }

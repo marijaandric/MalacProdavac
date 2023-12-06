@@ -8,6 +8,7 @@ import com.example.front.model.DTO.LoginDTO
 import com.example.front.model.DTO.MetricsDTO
 import com.example.front.model.DTO.NewProductDTO
 import com.example.front.model.DTO.ProductDTO
+import com.example.front.model.DTO.ProductDisplayDTO
 import com.example.front.model.DTO.ReviewDTO
 import com.example.front.model.request.RegistrationRequest
 import com.example.front.model.response.LoginResponse
@@ -195,7 +196,7 @@ interface Api {
     @GET("back/Shop/GetProductDisplay")
     suspend fun getProductDisplay(
         @Query("id") id: Int,
-    ): Response<SuccessProductDisplay>
+    ): Response<ProductDisplayDTO>
 
     @DELETE("back/Shop/DeleteProductDisplay")
     suspend fun deleteProductDisplay(
