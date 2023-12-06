@@ -10,7 +10,7 @@ namespace back.BLL.Services
         public Task<double> Route(string start, string end, string shop, string shipping);
         public Task<List<Metric>> GetMetrics();
         public Task<List<Size>> GetSizes();
-        public Task<List<(double, double)>> GetWaypoints(string routeStart, string routeEnd);
+        public Task<List<(double, double)>> GetWaypoints(string routeStart, string routeEnd, List<string>? waypoints);
         public Task<bool> NearRoute(List<(double, double)> routeWaypoints, double shopLat, double shopLong, double range);
     }
 }

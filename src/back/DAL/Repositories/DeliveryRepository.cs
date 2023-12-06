@@ -10,7 +10,6 @@ namespace back.DAL.Repositories
     public class DeliveryRepository : IDeliveryRepository
     {
         Context _context;
-        public static double priceMax = 350;
         public DeliveryRepository(Context context)
         {
             _context = context;
@@ -31,14 +30,12 @@ namespace back.DAL.Repositories
             return -1;
         }
 
-        public async Task<bool?> InsertDeliveryRoute(DeliveryRouteDto route)
+        public async Task<DeliveryRoute> InsertDeliveryRoute(DeliveryRouteDto route)
         {
-            if (route.FixedCost > priceMax) return null;
-
             (double, double) startCoords = await HelperService.GetCoordinates(route.StartLocation);
             (double, double) endCoords = await HelperService.GetCoordinates(route.EndLocation);
 
-            await _context.DeliveryRoutes.AddAsync(new DeliveryRoute
+            DeliveryRoute r = new DeliveryRoute
             {
                 DeliveryPersonId = route.UserId,
                 StartDate = route.StartDate,
@@ -50,9 +47,12 @@ namespace back.DAL.Repositories
                 EndLatitude = endCoords.Item1,
                 EndLongitude = endCoords.Item2,
                 FixedCost = (float)route.FixedCost
-            });
+            };
 
-            return await _context.SaveChangesAsync() > 0;
+            await _context.DeliveryRoutes.AddAsync(r);
+            if (await _context.SaveChangesAsync() <= 0) return null;
+
+            return r;
         }
 
         public async Task<bool> AddToRoute(int requestId, int routeId)
@@ -177,6 +177,11 @@ namespace back.DAL.Repositories
             DeliveryRequest req = await _context.DeliveryRequests.FirstOrDefaultAsync(x => x.Id == requestId);
             req.ChosenPersonId = chosenPersonId;
             return await _context.SaveChangesAsync() > 0;
+        }
+
+        public async Task<List<string>> GetRequestCoordinates(int routeId)
+        {
+            return await _context.DeliveryRequests.Where(x => x.RouteId == routeId).Join(_context.Orders, dr => dr.OrderId, o => o.Id, (dr, o) => o).Select(x => x.ShippingAddress).ToListAsync();
         }
     }
 }

@@ -18,6 +18,7 @@ namespace back.BLL.Services
         IOrderRepository _orderRepository;
         
         public string folderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..\\..\\..\\images");
+        static string apiKey = "Aj_nYJhXf_C_QoPf7gOQch6KOhTJo2iX2VIyvOlwb7hDpGCtS8rOhyQYp5kAbR54";
 
         public HelperService(IShopRepository shopRepository, IProductRepository productRepository, IAuthRepository authRepository, IOrderRepository orderRepository)
         {
@@ -80,10 +81,8 @@ namespace back.BLL.Services
 
         public static async Task<(double, double)> GetCoordinates(string address)
         {
-            var bingMapsApiKey = "Aj_nYJhXf_C_QoPf7gOQch6KOhTJo2iX2VIyvOlwb7hDpGCtS8rOhyQYp5kAbR54";
-
             var urlBuilder = new UriBuilder("http://dev.virtualearth.net/REST/v1/Locations");
-            urlBuilder.Query = $"q={Uri.EscapeDataString(address)}&key={bingMapsApiKey}";
+            urlBuilder.Query = $"q={Uri.EscapeDataString(address)}&key={apiKey}";
             var url = urlBuilder.ToString();
 
             HttpClient _httpClient = new HttpClient();
@@ -186,7 +185,6 @@ namespace back.BLL.Services
 
             using (var client = new HttpClient())
             {
-                string apiKey = "Aj_nYJhXf_C_QoPf7gOQch6KOhTJo2iX2VIyvOlwb7hDpGCtS8rOhyQYp5kAbR54";
 
                 string apiUrl = $"https://dev.virtualearth.net/REST/v1/Routes/Driving?wp.0={start}&wp.1={end}&key={apiKey}";
 
@@ -252,34 +250,35 @@ namespace back.BLL.Services
             return await _productRepository.GetSizes();
         }
 
-        public async Task<List<(double, double)>> GetWaypoints(string routeStart, string routeEnd)
+        public async Task<List<(double, double)>> GetWaypoints(string startLocation, string endLocation, List<string>? waypoints)
         {
-            List<(double, double)> waypoints = new List<(double, double)>();
-
-            using (var client = new HttpClient())
+            using (var httpClient = new HttpClient())
             {
-                string apiKey = "Aj_nYJhXf_C_QoPf7gOQch6KOhTJo2iX2VIyvOlwb7hDpGCtS8rOhyQYp5kAbR54";
+                var apiUrl = $"https://dev.virtualearth.net/REST/v1/Routes/OptimizeItinerary?wp.0={startLocation}&wp.1={endLocation}&key={apiKey}&optimize=true";
 
-                string apiUrl = $"https://dev.virtualearth.net/REST/v1/Routes/Driving?wp.0={routeStart}&wp.1={routeEnd}&key={apiKey}";
-
-                HttpResponseMessage response = await client.GetAsync(apiUrl);
-
-                if (response.IsSuccessStatusCode)
+                for (var i = 2; i < waypoints.Count + 2; i++)
                 {
-                    string result = await response.Content.ReadAsStringAsync();
-                    JObject json = JObject.Parse(result);
+                    apiUrl += $"&wp.{i}={waypoints[i - 2]}";
+                }
 
-                    foreach (var item in json["resourceSets"][0]["resources"][0]["routeLegs"][0]["itineraryItems"])
+                var response = await httpClient.GetStringAsync(apiUrl);
+
+                var jsonResponse = JObject.Parse(response);
+
+                var coordinates = new List<(double, double)>();
+
+                if (jsonResponse["resourceSets"] is JArray resourceSets && resourceSets.Count > 0 && resourceSets[0]["resources"] is JArray resources && resources.Count > 0 && resources[0]["routeLegs"] is JArray routeLegs && routeLegs.Count > 0)
+                {
+                    foreach (var itineraryItem in routeLegs[0]["itineraryItems"])
                     {
-                        double xLat = (double)item["maneuverPoint"]["coordinates"][0];
-                        double xLong = (double)item["maneuverPoint"]["coordinates"][1];
-
-                        waypoints.Add((xLat, xLong));
+                        var latitude = (double)itineraryItem["maneuverPoint"]["coordinates"][0];
+                        var longitude = (double)itineraryItem["maneuverPoint"]["coordinates"][1];
+                        coordinates.Add((latitude, longitude));
                     }
                 }
-            }
 
-            return waypoints;
+                return coordinates;
+            }
         }
 
         public async Task<bool> NearRoute(List<(double, double)> routeWaypoints, double shopLat, double shopLong, double range)

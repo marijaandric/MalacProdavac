@@ -14,6 +14,8 @@ namespace back.BLL.Services
         INotificationRepository _notificationRepository;
         IOrderRepository _orderRepository;
 
+        public static double priceMax = 350;
+
         public DeliveryService(IDeliveryRepository repository, IHelperService helperService, IUserRepository userRepository, IShopRepository shopRepository, INotificationRepository notificationRepository, IOrderRepository orderRepository)
         {
             _repository = repository;
@@ -30,9 +32,10 @@ namespace back.BLL.Services
             return true;
         }
 
-        public async Task<List<int>> GetNearbySellers(string routeStart, string routeEnd, double range)
+        public async Task<List<int>> GetNearbySellers(int routeId, double range)
         {
-            List<(double, double)> waypoints = await _helperService.GetWaypoints(routeStart, routeEnd);
+            DeliveryRoute route = await _repository.GetRoute(routeId);
+            List<(double, double)> waypoints = await _helperService.GetWaypoints(route.StartLocation, route.EndLocation, await _repository.GetRequestCoordinates(routeId));
             var shops = await _shopRepository.GetAllShops();
             return shops.Where(x => _helperService.NearRoute(waypoints, (double)x.Latitude, (double)x.Longitude, range).Result).Select(x => x.OwnerId).ToList();
         }
@@ -47,13 +50,14 @@ namespace back.BLL.Services
 
         public async Task<bool> InsertDeliveryRoute(DeliveryRouteDto route)
         {
-            string username = await _userRepository.GetUsername(route.UserId);
-            bool? ind = await _repository.InsertDeliveryRoute(route);
-            if (ind == null) throw new ArgumentException("Price is too high! The highest value is 350.");
+            if (route.FixedCost > priceMax) throw new ArgumentException("Price is too high! The highest value is 350.");
             
-            List<int> ownerIds = await GetNearbySellers(route.StartLocation, route.EndLocation, 10);
-
-            if (ind == false) return false;
+            string username = await _userRepository.GetUsername(route.UserId);
+            DeliveryRoute r = await _repository.InsertDeliveryRoute(route);
+            
+            if (r == null) return false;
+            
+            List<int> ownerIds = await GetNearbySellers(r.Id, 10);
 
             foreach (int ownerId in ownerIds)
             {
@@ -67,7 +71,7 @@ namespace back.BLL.Services
                 Shop s = await _shopRepository.GetShop(followerId.ShopId);
                 if (followerId.UserId != route.UserId && await _notificationRepository.InsertNotification(followerId.UserId, 0, "Delivery person near "+ s.Name +"!", "Delivery person " + username + " just made a route close to your favorite shop "+ s.Name+"!\nThe route starts in " + route.StartLocation + " on " + route.StartDate.ToShortDateString() + " at " + route.StartTime + " and ends in " + route.EndLocation + ".", -1)) Console.WriteLine("Notification sent!");
             }
-            return (bool)ind;
+            return true;
         }
 
         public async Task<bool> AddToRoute(int requestId, int routeId)
