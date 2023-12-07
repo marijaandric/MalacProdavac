@@ -18,6 +18,15 @@ namespace back.DAL.Repositories
 
         int numberOfItems = 10;
 
+        public async Task<int> GetOrdersPageCount(int userId, int? status)
+        {
+            if (status == null)
+            {
+                return (int)Math.Ceiling((double)(await _context.Orders.Where(x => x.UserId == userId).CountAsync()) / numberOfItems);
+            }
+            return (int)Math.Ceiling((double)(await _context.Orders.Where(x => x.UserId == userId && x.StatusId == status).CountAsync()) / numberOfItems);
+        }
+
         public async Task<List<OrderCard>> GetOrders(int userId, int? status, int page)
         {
             if (status == null)

@@ -7,6 +7,7 @@ namespace back.BLL.Services
 {
     public interface IOrderService
     {
+        public Task<int> GetOrdersPageCount(int userId, int? status);
         public Task<List<OrderCard>> GetOrders(int userId, int? status, int page);
         public Task<OrderInfo> OrderDetails(int orderId);
         public Task<bool> InsertOrders(List<OrderDto> order);

@@ -22,6 +22,11 @@ namespace back.BLL.Services
             _deliveryRepository = deliveryRepository;
         }
 
+        public async Task<int> GetOrdersPageCount(int userId, int? status)
+        {
+            return await _repository.GetOrdersPageCount(userId, status);
+        }
+
         public async Task<List<OrderCard>> GetOrders(int userId, int? status, int page)
         {
             List<OrderCard> orders = await _repository.GetOrders(userId, status, page);

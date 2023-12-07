@@ -18,6 +18,19 @@ namespace back.PL.Controllers
             _service = service;
         }
 
+        [HttpGet("GetOrdersPageCount")]
+        public async Task<IActionResult> GetOrdersPageCount(int userId, int? status)
+        {
+            try
+            {
+                return Ok(new { Count = await _service.GetOrdersPageCount(userId, status) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         [HttpGet("GetOrders")]
         public async Task<IActionResult> GetOrders(int userId, int? status, int page)
         {
