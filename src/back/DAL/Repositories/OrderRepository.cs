@@ -27,7 +27,7 @@ namespace back.DAL.Repositories
                     Id = x.Id,
                     Quantity = _context.OrderItems.Where(i => i.OrderId == x.Id).Count(),
                     Amount = _context.OrderItems.Where(i => i.OrderId == x.Id).Sum(i => i.Price),
-                    CreatedOn = x.CreatedOn,
+                    CreatedOn = x.CreatedOn.ToShortDateString(),
                     Status = _context.OrderStatuses.FirstOrDefault(s => s.Id == x.StatusId).Name
                     
                 }).ToListAsync();
@@ -38,7 +38,7 @@ namespace back.DAL.Repositories
                 Id = x.Id,
                 Quantity = _context.OrderItems.Where(i => i.OrderId == x.Id).Count(),
                 Amount = _context.OrderItems.Where(i => i.OrderId == x.Id).Sum(i => i.Price),
-                CreatedOn = x.CreatedOn,
+                CreatedOn = x.CreatedOn.ToShortDateString(),
                 Status = _context.OrderStatuses.FirstOrDefault(s => s.Id == x.StatusId).Name
 
             }).ToListAsync();
@@ -51,7 +51,7 @@ namespace back.DAL.Repositories
                 Id = x.Id,
                 Quantity = _context.OrderItems.Where(i => i.OrderId == x.Id).Count(),
                 Amount = _context.OrderItems.Where(i => i.OrderId == x.Id).Sum(i => i.Price),
-                CreatedOn = x.CreatedOn,
+                CreatedOn = x.CreatedOn.ToShortDateString(),
                 Status = _context.OrderStatuses.FirstOrDefault(s => s.Id == x.StatusId).Name,
                 DeliveryMethod = _context.DeliveryMethods.FirstOrDefault(dm => dm.Id == x.DeliveryMethodId).Name,
                 PaymentMethod = _context.PaymentMethods.FirstOrDefault(pm => pm.Id == x.PaymentMethodId).Name,

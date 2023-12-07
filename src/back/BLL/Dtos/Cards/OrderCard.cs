@@ -6,6 +6,6 @@
         public int Quantity { get; set; }
         public float Amount { get; set; }
         public string Status { get; set; }
-        public DateTime CreatedOn { get; set; }
+        public string CreatedOn { get; set; }
     }
 }
