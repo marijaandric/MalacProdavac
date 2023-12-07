@@ -10,6 +10,7 @@ import com.example.front.helper.DataStore.DataStoreManager
 import com.example.front.model.DTO.FiltersDTO
 import com.example.front.model.DTO.NewProductDTO
 import com.example.front.repository.Repository
+import com.example.front.screens.shop.state.DeleteProductDisplayState
 import com.example.front.screens.shop.state.GetCategoriesState
 import com.example.front.screens.shop.state.GetMetricsState
 import com.example.front.screens.shop.state.PostReviewState
@@ -76,7 +77,9 @@ class OneShopViewModel @Inject constructor(
     private val _stateProductDisplay = mutableStateOf(ProductDisplayState())
     var stateProductDisplay: State<ProductDisplayState> = _stateProductDisplay;
 
-    //
+    //delete product display
+    private val _stateDeleteProductDisplay = mutableStateOf(DeleteProductDisplayState())
+    var stateDeleteProductDisplay: State<DeleteProductDisplayState> = _stateDeleteProductDisplay;
 
     suspend fun getShopDetails(userId: Int, shopId: Int) {
         viewModelScope.launch {
@@ -460,6 +463,37 @@ class OneShopViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 _stateProductDisplay.value = _stateProductDisplay.value.copy(
+                    error = e.message.toString()
+                )
+            }
+        }
+    }
+
+    fun deleteProductDisplay(id: Int?) {
+        viewModelScope.launch {
+            try {
+                var x = 0
+                if(id != null) {
+                    x = id
+                    val response = repository.deleteProductDisplay(x)
+                    Log.d("DELETE PROCESS", response.body().toString())
+                    if (response.isSuccessful) {
+                        val res = response.body()
+                        _stateDeleteProductDisplay.value = _stateDeleteProductDisplay.value.copy(
+                            isLoading = false,
+                            success = res
+                        )
+                        _stateProductDisplay.value = _stateProductDisplay.value.copy(
+                            displayProduct = null
+                        )
+                    } else {
+                        _stateDeleteProductDisplay.value = _stateDeleteProductDisplay.value.copy(
+                            error = "NotFound"
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                _stateDeleteProductDisplay.value = _stateDeleteProductDisplay.value.copy(
                     error = e.message.toString()
                 )
             }

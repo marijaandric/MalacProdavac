@@ -1028,6 +1028,7 @@ fun ProfilePic(shopViewModel: OneShopViewModel, id: Int) {
     var showProductDisplayNotificationDialog by remember {
         mutableStateOf(false)
     }
+
     Box(
         modifier = Modifier
             .padding(top = 50.dp, end = 16.dp, start = 16.dp)
@@ -1266,12 +1267,12 @@ fun ProductDisplayNotification(onDismiss: () -> Unit, shopViewModel : OneShopVie
 
     if(deletedialog)
     {
-        DeleteDialog(onDismiss = { deletedialog = false }, shopViewModel = shopViewModel)
+        DeleteDialog(onDismiss = { deletedialog = false },onYesClick = {deletedialog = false; onDismiss()}, shopViewModel = shopViewModel)
     }
 }
 
 @Composable
-fun DeleteDialog(onDismiss: () -> Unit, shopViewModel: OneShopViewModel) {
+fun DeleteDialog(onDismiss: () -> Unit, onYesClick: () -> Unit, shopViewModel: OneShopViewModel) {
     val overlayColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)
 
     Dialog(
@@ -1308,18 +1309,21 @@ fun DeleteDialog(onDismiss: () -> Unit, shopViewModel: OneShopViewModel) {
                     {
                         CardButton(
                             text = "No",
-                            onClick = { /*TODO*/ },
+                            onClick = { onDismiss() },
                             width = 0.5f,
                             modifier = Modifier,
-                            color = MaterialTheme.colorScheme.secondary
+                            color = MaterialTheme.colorScheme.primary
                         )
                         Spacer(modifier = Modifier.width(5.dp))
                         CardButton(
                             text = "Yes",
-                            onClick = { /*TODO*/ },
+                            onClick = {
+                                shopViewModel.deleteProductDisplay(shopViewModel.state.value.shop!!.productDisplayId)
+                                onYesClick()
+                            },
                             width = 0.95f,
                             modifier = Modifier,
-                            color = MaterialTheme.colorScheme.primary
+                            color = MaterialTheme.colorScheme.secondary
                         )
                     }
                 }

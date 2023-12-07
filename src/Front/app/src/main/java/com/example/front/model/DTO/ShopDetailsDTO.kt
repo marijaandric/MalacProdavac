@@ -6,7 +6,7 @@ data class ShopDetailsDTO (
     @SerializedName("rating") val rating: Float?,
     @SerializedName("liked") val liked: Boolean,
     @SerializedName("boughtFrom") val boughtFrom: Boolean?,
-    @SerializedName("productDisplayId") val productDisplayId: Int?,
+    @SerializedName("productDisplayId") var productDisplayId: Int?,
     @SerializedName("rated") val rated: Boolean,
     @SerializedName("isOwner") val isOwner: Boolean,
     @SerializedName("categories") val categories: List<String>,
