@@ -9,6 +9,7 @@ import com.example.front.model.DTO.LeaveReviewDTO
 import com.example.front.model.DTO.LoginDTO
 import com.example.front.model.DTO.MetricsDTO
 import com.example.front.model.DTO.NewProductDTO
+import com.example.front.model.DTO.OrdersDTO
 import com.example.front.model.DTO.ProductDTO
 import com.example.front.model.DTO.ProductDisplayDTO
 import com.example.front.model.DTO.ReviewDTO
@@ -133,5 +134,9 @@ class Repository @Inject constructor(private val api: Api) {
     suspend fun getShopsForCheckout(shopIds: List<Int>): Response<List<ShopDetailsCheckoutDTO>>
     {
         return api.getShopsForCheckout(shopIds)
+    }
+    suspend fun getOrders(userId: Int, status: Int?, page:Int?): Response<List<OrdersDTO>>
+    {
+        return api.getOrders(userId,status,page)
     }
 }

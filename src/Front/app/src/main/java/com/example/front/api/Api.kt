@@ -7,6 +7,7 @@ import com.example.front.model.DTO.LeaveReviewDTO
 import com.example.front.model.DTO.LoginDTO
 import com.example.front.model.DTO.MetricsDTO
 import com.example.front.model.DTO.NewProductDTO
+import com.example.front.model.DTO.OrdersDTO
 import com.example.front.model.DTO.ProductDTO
 import com.example.front.model.DTO.ProductDisplayDTO
 import com.example.front.model.DTO.ReviewDTO
@@ -208,4 +209,11 @@ interface Api {
     suspend fun getShopsForCheckout(
         @Query("shopIds") shopIds: List<Int>
     ):Response<List<ShopDetailsCheckoutDTO>>
+
+    @GET("back/Order/GetOrders")
+    suspend fun getOrders(
+        @Query("userId") userId: Int,
+        @Query("status") status: Int?,
+        @Query("page") shopIds: Int?
+    ): Response<List<OrdersDTO>>
 }
