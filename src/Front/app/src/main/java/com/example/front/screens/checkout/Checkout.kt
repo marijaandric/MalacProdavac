@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -48,8 +50,6 @@ import com.example.front.components.Sidebar
 import com.example.front.components.SmallElipseAndTitle
 import com.example.front.navigation.Screen
 import com.example.front.screens.cart.CreditCard
-import com.example.front.ui.theme.Typography
-import com.example.front.viewmodels.cart.CartViewModel
 import com.example.front.viewmodels.checkout.CheckoutViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -66,6 +66,7 @@ fun CheckoutScreen(
 
     val checkoutState = viewModel.state.value
     val shops = viewModel.shopsForCheckout.value
+    val scrollState = rememberScrollState()
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     Sidebar(
@@ -75,195 +76,193 @@ fun CheckoutScreen(
     ) {
         Surface(
             modifier = Modifier
-                .fillMaxSize(),
+                .fillMaxSize()
+                .verticalScroll(scrollState),
             color = Color.White
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-
-            ) {
-                SmallElipseAndTitle(title = "Checkout", drawerState)
-
-                //kartice
-//                LazyRow(
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .padding(10.dp)
-//                ) {
-//                    item {
-//                        CreditCard()
-//                    }
-//                    item {
-//                        CreditCard()
-//                    }
-//                    item {
-//                        CreditCard()
-//                    }
-//                    item {
-//                        CreditCard()
-//                    }
-//                }
-//
-//                //dodavanje novih kartica
-//                Column(
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .padding(8.dp),
-//                    verticalArrangement = Arrangement.SpaceBetween,
-//                    horizontalAlignment = Alignment.CenterHorizontally
-//                ) {
-//                    Row(
-//                        modifier = Modifier
-//                            .padding(15.dp)
-//                    ) {
-//                        ButtonWithIcon(
-//                            text = "Add Credit/Debit Card",
-//                            onClick = { navController.navigate(route = Screen.NewCreditCard.route) },
-//                            width = 0.8f,
-//                            modifier = Modifier.padding(10.dp),
-//                            color = MaterialTheme.colorScheme.primary,
-//                            imagePainter = painterResource(id = R.drawable.ion_card_outline),
-//                            height = 50
-//                        )
-//                    }
-//                    Row(
-//                        modifier = Modifier
-//                            .padding(15.dp)
-//                    ) {
-//                        ButtonWithIcon(
-//                            text = "Paypal",
-//                            onClick = { /*navController.navigate()*/ },
-//                            width = 0.8f,
-//                            modifier = Modifier.padding(10.dp),
-//                            color = MaterialTheme.colorScheme.primary,
-//                            imagePainter = painterResource(id = R.drawable.logos_paypal),
-//                            height = 50
-//                        )
-//                    }
-//                }
-
-
-
-
-
-
-                //Spisak prodavnica
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 16.dp, vertical = 0.dp)
-                        .weight(1f)
-                ) {
-                    shops.forEach { shop ->
-                        item {
-
-                            Text(
-                                text = shop.name,
-                                modifier = Modifier.height(40.dp)
-                            )
-                        }
-                    }
-                }
-
-                //slika, mapa, adresa, ukupno?, deliveri-pickup,
                 Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp),
+                        .fillMaxSize()
+//                        .verticalScroll(scrollState)
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp)
-//                        .border(1.dp, Color.Red, RectangleShape)
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.ellipsebrojdva),
-                            contentDescription = "",
-                            modifier = Modifier
-                                .height(50.dp)
-                                .fillMaxWidth(),
-                            contentScale = ContentScale.FillBounds
-                        )
-                        Column {
-                            Spacer(Modifier.weight(1f))
-                            Text(
-                                text = "Naziv Prodavnice",
-                                fontSize = 24.sp,
-                                fontFamily = FontFamily(Font(R.font.lexend)),
-                                fontWeight = FontWeight(500),
-                                textAlign = TextAlign.Center,
-                                color = Color.White,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(8.dp)
-                            )
-                        }
-                    }
+                    SmallElipseAndTitle(title = "Checkout", drawerState)
 
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-//                        .border(1.dp, Color.Blue, RectangleShape)
-                    ) {
-                        // mapa
-                        Box(
+
+
+
+                        //kartice
+                        LazyRow(
                             modifier = Modifier
-                                .height(130.dp)
-                                .width(130.dp)
-                                .padding(8.dp)
-                                .border(1.dp, Color.Red, RectangleShape)
-                        ) {}
-                        // adresa
+                                .fillMaxWidth()
+                                .padding(10.dp)
+                        ) {
+                            item {
+                                CreditCard()
+                            }
+                            item {
+                                CreditCard()
+                            }
+                            item {
+                                CreditCard()
+                            }
+                            item {
+                                CreditCard()
+                            }
+                        }
+
+                        //dodavanje novih kartica
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(146.dp)
-//                            .border(1.dp, Color.Blue, RectangleShape)
-                            ,
+                                .padding(8.dp),
                             verticalArrangement = Arrangement.SpaceBetween,
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Text(
-                                text = "Adresa Prodavnice",
-                                modifier = Modifier.padding(top = 20.dp)
-                            )
-                            // cena?
-                            Text(
-                                text = "Ukupno: 400 rsd",
-                                modifier = Modifier.padding(bottom = 20.dp)
-                            )
+                            Row(
+                                modifier = Modifier
+                                    .padding(15.dp)
+                            ) {
+                                ButtonWithIcon(
+                                    text = "Add Credit/Debit Card",
+                                    onClick = { navController.navigate(route = Screen.NewCreditCard.route) },
+                                    width = 0.8f,
+                                    modifier = Modifier.padding(10.dp),
+                                    color = MaterialTheme.colorScheme.primary,
+                                    imagePainter = painterResource(id = R.drawable.ion_card_outline),
+                                    height = 50
+                                )
+                            }
+                            Row(
+                                modifier = Modifier
+                                    .padding(15.dp)
+                            ) {
+                                ButtonWithIcon(
+                                    text = "Paypal",
+                                    onClick = { /*navController.navigate()*/ },
+                                    width = 0.8f,
+                                    modifier = Modifier.padding(10.dp),
+                                    color = MaterialTheme.colorScheme.primary,
+                                    imagePainter = painterResource(id = R.drawable.logos_paypal),
+                                    height = 50
+                                )
+                            }
                         }
-                    }
-                }
-                // slider delivery-pickup
-                var checked by remember { mutableStateOf(false) }
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-//                        .border(1.dp, Color.Yellow, RectangleShape)
-                    ,
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
 
-                    Text(text = "Delivery")
-                    Switch(
-                        checked = checked,
-                        onCheckedChange = {
-                            checked = it
-                        }
-                    )
-                    Text(text = "Self pickup")
-                }
-                // opciono datepicker
-                if (checked) {
-                    Text(text = "Biranje datuma")
+
+                        //Spisak prodavnica
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(horizontal = 16.dp, vertical = 0.dp)
+//                                .weight(1f)
+                        ) {
+                            shops.forEach { shop ->
+//                                item {
+
+                                //slika, mapa, adresa, ukupno?, deliveri-pickup,
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(8.dp),
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(50.dp)
+//                                        .border(1.dp, Color.Red, RectangleShape)
+                                    ) {
+                                        Image(
+                                            painter = painterResource(id = R.drawable.ellipsebrojdva),
+                                            contentDescription = "",
+                                            modifier = Modifier
+                                                .height(50.dp)
+                                                .fillMaxWidth(),
+                                            contentScale = ContentScale.FillBounds
+                                        )
+                                        Column {
+                                            Spacer(Modifier.weight(1f))
+                                            Text(
+                                                text = shop.name,
+                                                fontSize = 24.sp,
+                                                fontFamily = FontFamily(Font(R.font.lexend)),
+                                                fontWeight = FontWeight(500),
+                                                textAlign = TextAlign.Center,
+                                                color = Color.White,
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(8.dp)
+                                            )
+                                        }
+                                    }
+
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+//                                        .border(1.dp, Color.Blue, RectangleShape)
+                                    ) {
+                                        // mapa
+                                        Box(
+                                            modifier = Modifier
+                                                .height(130.dp)
+                                                .width(130.dp)
+                                                .padding(8.dp)
+                                                .border(1.dp, Color.Red, RectangleShape)
+                                        ) {}
+                                        // adresa
+                                        Column(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .height(146.dp)
+//                                            .border(1.dp, Color.Blue, RectangleShape)
+                                            ,
+                                            verticalArrangement = Arrangement.SpaceBetween,
+                                            horizontalAlignment = Alignment.CenterHorizontally
+                                        ) {
+                                            Text(
+                                                text = shop.address,
+                                                modifier = Modifier.padding(top = 20.dp)
+                                            )
+                                            // cena?
+                                            Text(
+                                                text = "Ukupno: 400 rsd",
+                                                modifier = Modifier.padding(bottom = 20.dp)
+                                            )
+                                        }
+                                    }
+                                }
+
+                                // slider delivery-pickup
+                                var checked by remember { mutableStateOf(false) }
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+//                                    .border(1.dp, Color.Yellow, RectangleShape)
+                                    ,
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceEvenly
+                                ) {
+
+                                    Text(text = "Delivery")
+                                    Switch(
+                                        checked = checked,
+                                        onCheckedChange = {
+                                            checked = it
+                                        }
+                                    )
+                                    Text(text = "Self pickup")
+                                }
+                                // opciono datepicker
+                                if (checked) {
+                                    Text(text = "Biranje datuma")
 //                    TextField(value = "", onValueChange = {})
-                }
-            }
+//                                    }
+                                }
+                            }
+                        }
 
+
+                }
+//            }
         }
     }
 }
