@@ -193,23 +193,38 @@ namespace back.DAL.Repositories
         public async Task<DeliveryRouteInfo> GetRouteDetails(int routeId)
         {
             DeliveryRoute route = await _context.DeliveryRoutes.FirstOrDefaultAsync(x => x.Id == routeId);
-            var stops = await _context.DeliveryRequests.Where(x => x.RouteId == routeId).Join(_context.Orders, r => r.OrderId, o => o.Id, (r, o) => o).Select(x => new DeliveryStop
+            List<DeliveryStop> stops = new List<DeliveryStop>
             {
-               Addres = x.ShippingAddress,
+                new DeliveryStop
+                {
+                    Address = route.StartLocation,
+                    Latitude = (float)route.StartLatitude,
+                    Longitude = (float)route.StartLongitude
+                },
+                new DeliveryStop
+                {
+                    Address = route.EndLocation,
+                    Latitude = (float)route.EndLatitude,
+                    Longitude = (float)route.EndLongitude
+                }
+            };
+
+            stops.AddRange(await _context.DeliveryRequests.Where(x => x.RouteId == routeId).Join(_context.Orders, r => r.OrderId, o => o.Id, (r, o) => o).Select(x => new DeliveryStop
+            {
+               Address = x.ShippingAddress,
                Latitude = (float)x.Latitude,
                Longitude = (float)x.Longitude,
-            }).ToListAsync();
+            }).ToListAsync());
 
-            var shops = await _context.DeliveryRequests.Where(x => x.RouteId == routeId).Join(_context.Orders, r => r.OrderId, o => o.Id, (r, o) => o).Join(_context.Shop, o => o.ShopId, s => s.Id, (o, s) => s).Select(x => new DeliveryStop
+            stops.AddRange(await _context.DeliveryRequests.Where(x => x.RouteId == routeId).Join(_context.Orders, r => r.OrderId, o => o.Id, (r, o) => o).Join(_context.Shop, o => o.ShopId, s => s.Id, (o, s) => s).Select(x => new DeliveryStop
             {
-                Addres = x.Address,
+                Address = x.Address,
                 Latitude = (float)x.Latitude,
                 Longitude = (float)x.Longitude,
                 ShopName = x.Name
-            }).ToListAsync();
-
-            stops.AddRange(shops);
-
+            }).ToListAsync());
+            
+            
             return new DeliveryRouteInfo
             {
                 Locations = route.StartLocation
