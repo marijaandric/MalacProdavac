@@ -21,8 +21,9 @@ fun NavGraphBuilder.orderingNavGraph(
         composable(route = Screen.Cart.route) {
             Cart(viewModel = cartViewModel, navController = navController)
         }
-        composable(route = Screen.Checkout.route) {
-            CheckoutScreen(viewModel = checkoutViewModel, navController = navController)
+        composable(route = Screen.Checkout.route + "/{totalsByShop}") {
+            val totalByShop = it.arguments?.getString("totalsByShop")
+            CheckoutScreen(viewModel = checkoutViewModel, navController = navController, totalByShop)
         }
     }
 }

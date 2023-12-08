@@ -24,27 +24,39 @@ class CheckoutViewModel @Inject constructor(
     private val _shopsForCheckout = mutableStateOf<List<ShopDetailsCheckoutDTO>>(emptyList())
     val shopsForCheckout: State<List<ShopDetailsCheckoutDTO>> = _shopsForCheckout
 
-    suspend fun getCheckoutData() {
+    suspend fun getCheckoutData(totalsByShop: Map<Int, Double>) {
         try {
             mongoRepository.getUniqueShops().collect() { shops ->
                 _state.value = shops
-                fetchShopsForCheckout(state.value)
+                fetchShopsForCheckout(state.value, totalsByShop)
             }
         } catch (e: Exception) {
             Log.e("CheckoutViewModel", "Error fetching checkout data: ${e.message}")
         }
     }
 
-    private suspend fun fetchShopsForCheckout(shopsIds: List<Int>) {
+    private suspend fun fetchShopsForCheckout(shopsIds: List<Int>, totalsByShop: Map<Int, Double>) {
         try {
             val response = repository.getShopsForCheckout(shopsIds)
             if (response.isSuccessful) {
                 _shopsForCheckout.value = response.body() ?: emptyList()
+                _shopsForCheckout.value.forEach { shop ->
+                    shop.total = totalsByShop[shop.id] ?: 0.0
+                }
             } else {
                 Log.e("CheckoutViewModel", "Error fetching shop details checkout: ${response.message()}")
             }
         } catch (e: Exception) {
             Log.e("CheckoutViewModel", "Error fetching shop details checkout: ${e.message}")
+        }
+    }
+
+    fun updateSelfPickup(shopId: Int, value: Boolean) {
+        val updatedShops = _shopsForCheckout.value.toMutableList()
+        val shopIndex = updatedShops.indexOfFirst { it.id == shopId }
+        if (shopIndex != -1) {
+            updatedShops[shopIndex] = updatedShops[shopIndex].copy(selfpickup = value)
+            _shopsForCheckout.value = updatedShops
         }
     }
 }

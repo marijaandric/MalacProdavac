@@ -44,6 +44,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -105,6 +106,7 @@ fun Cart(
                                 text = "Your cart is empty",
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold,
+                                textAlign = TextAlign.Center,
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(top = 16.dp, bottom = 8.dp)
@@ -112,105 +114,106 @@ fun Cart(
                             )
                         }
 
-                    }
-                    groupedProducts.forEach { (shopName, products) ->
+                    } else {
+                        groupedProducts.forEach { (shopName, products) ->
 
-                        item {
-                            Text(
-                                text = shopName,
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(top = 16.dp, bottom = 8.dp)
-
-                            )
-                        }
-
-                        item {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(1.dp)
-                                    .background(Color(0xFF3A5163))
-                                    .padding(horizontal = 8.dp)
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                        }
-
-                        // Prikaz svakog proizvoda iz trenutne prodavnice
-                        items(products) { product ->
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(4.dp)
-                                    .height(96.dp),
-                            ) {
-                                Image(
-                                    painter = rememberAsyncImagePainter(model = "http://softeng.pmf.kg.ac.rs:10015/images/${product.image}"),
-                                    contentDescription = "",
+                            item {
+                                Text(
+                                    text = shopName,
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold,
                                     modifier = Modifier
-                                        .width(96.dp)
-                                        .height(96.dp)
-//                                    .border(1.dp, Color.Red, RectangleShape)
-                                        .graphicsLayer(
-                                            clip = true,
-                                            shape = RoundedCornerShape(16.dp)
-                                        )
+                                        .fillMaxWidth()
+                                        .padding(top = 16.dp, bottom = 8.dp)
 
                                 )
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxHeight()
-                                        .weight(1f)
-                                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                                    verticalArrangement = Arrangement.SpaceBetween
-                                ) {
-                                    Text(
-                                        product.name,
-                                        fontSize = 16.sp,
-                                        fontWeight = FontWeight.SemiBold
-                                    )
-                                    Text(
-                                        DecimalFormat("#.00").format(product.quantity) + " " + product.metric,
-                                        Modifier,
-                                        Color(0xFFE15F26)
-                                    )
-                                    Text(
-                                        DecimalFormat("#.00").format(product.price * product.quantity)
-                                            .toString() + " rsd"
-                                    )
-//                                Text("Slika: " + product.image)
-                                }
+                            }
 
+                            item {
                                 Box(
                                     modifier = Modifier
-                                        .fillMaxHeight()
-                                        .width(24.dp)
+                                        .fillMaxWidth()
+                                        .height(1.dp)
+                                        .background(Color(0xFF3A5163))
+                                        .padding(horizontal = 8.dp)
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                            }
+
+                            // Prikaz svakog proizvoda iz trenutne prodavnice
+                            items(products) { product ->
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(4.dp)
+                                        .height(96.dp),
                                 ) {
                                     Image(
-                                        painter = painterResource(id = R.drawable.bin),
+                                        painter = rememberAsyncImagePainter(model = "http://softeng.pmf.kg.ac.rs:10015/images/${product.image}"),
                                         contentDescription = "",
-                                        colorFilter = ColorFilter.tint(Color(0xFFAC1D1D)),
                                         modifier = Modifier
-                                            .padding(vertical = 8.dp)
-                                            .height(16.dp)
-                                            .clickable {
+                                            .width(96.dp)
+                                            .height(96.dp)
+//                                    .border(1.dp, Color.Red, RectangleShape)
+                                            .graphicsLayer(
+                                                clip = true,
+                                                shape = RoundedCornerShape(16.dp)
+                                            )
 
-                                                coroutineScope.launch {
-                                                    sum -= product.price * product.quantity
-                                                    viewModel.removeProductFromCart(product.id)
-                                                }
-
-                                            }
                                     )
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxHeight()
+                                            .weight(1f)
+                                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                                        verticalArrangement = Arrangement.SpaceBetween
+                                    ) {
+                                        Text(
+                                            product.name,
+                                            fontSize = 16.sp,
+                                            fontWeight = FontWeight.SemiBold
+                                        )
+                                        Text(
+                                            DecimalFormat("#.00").format(product.quantity) + " " + product.metric,
+                                            Modifier,
+                                            Color(0xFFE15F26)
+                                        )
+                                        Text(
+                                            DecimalFormat("#.00").format(product.price * product.quantity)
+                                                .toString() + " rsd"
+                                        )
+//                                Text("Slika: " + product.image)
+                                    }
+
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxHeight()
+                                            .width(24.dp)
+                                    ) {
+                                        Image(
+                                            painter = painterResource(id = R.drawable.bin),
+                                            contentDescription = "",
+                                            colorFilter = ColorFilter.tint(Color(0xFFAC1D1D)),
+                                            modifier = Modifier
+                                                .padding(vertical = 8.dp)
+                                                .height(16.dp)
+                                                .clickable {
+
+                                                    coroutineScope.launch {
+                                                        sum -= product.price * product.quantity
+                                                        viewModel.removeProductFromCart(product.id)
+                                                    }
+
+                                                }
+                                        )
+                                    }
                                 }
                             }
-                        }
 
-                        item {
-                            Spacer(modifier = Modifier.height(16.dp))
+                            item {
+                                Spacer(modifier = Modifier.height(16.dp))
 
+                            }
                         }
                     }
                 }
@@ -234,7 +237,19 @@ fun Cart(
                         )
                         Button(
                             onClick = {
-                                navController.navigate(route = Screen.Checkout.route)
+                                if (cartProducts.isNotEmpty()) {
+                                    val groupedProducts = cartState.products.groupBy { it.shopId }
+                                    val totalsByShop = mutableMapOf<Int, Double>()
+
+                                    for ((shopId, products) in groupedProducts) {
+                                        val totalForShop = products.sumOf { it.price * it.quantity }
+                                        totalsByShop[shopId] = totalForShop
+                                    }
+
+                                    println(totalsByShop)
+                                    navController.navigate(Screen.Checkout.route + "/${totalsByShop}")
+//                                navController.navigate(route = Screen.Checkout.route)
+                                }
                             },
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF457FA8)),
                             modifier = Modifier

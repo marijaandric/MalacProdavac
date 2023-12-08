@@ -51,17 +51,19 @@ import com.example.front.components.SmallElipseAndTitle
 import com.example.front.navigation.Screen
 import com.example.front.screens.cart.CreditCard
 import com.example.front.viewmodels.checkout.CheckoutViewModel
+import com.google.gson.JsonParser
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CheckoutScreen(
     viewModel: CheckoutViewModel,
-    navController: NavHostController
+    navController: NavHostController,
+    totalsByShop: String?
 ) {
 
-
     LaunchedEffect(key1 = true) {
-        viewModel.getCheckoutData()
+        val shopsTotals = parseTotalsByShop(totalsByShop ?: "")
+        viewModel.getCheckoutData(shopsTotals)
     }
 
     val checkoutState = viewModel.state.value
@@ -83,13 +85,8 @@ fun CheckoutScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-//                        .verticalScroll(scrollState)
                 ) {
                     SmallElipseAndTitle(title = "Checkout", drawerState)
-
-
-
-
                         //kartice
                         LazyRow(
                             modifier = Modifier
@@ -219,12 +216,12 @@ fun CheckoutScreen(
                                             horizontalAlignment = Alignment.CenterHorizontally
                                         ) {
                                             Text(
-                                                text = shop.address,
+                                                text = shop.address.substring(0,shop.address.length-8),
                                                 modifier = Modifier.padding(top = 20.dp)
+
                                             )
-                                            // cena?
                                             Text(
-                                                text = "Ukupno: 400 rsd",
+                                                text = "Ukupno: ${shop.total} rsd",
                                                 modifier = Modifier.padding(bottom = 20.dp)
                                             )
                                         }
@@ -232,7 +229,6 @@ fun CheckoutScreen(
                                 }
 
                                 // slider delivery-pickup
-                                var checked by remember { mutableStateOf(false) }
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -244,15 +240,16 @@ fun CheckoutScreen(
 
                                     Text(text = "Delivery")
                                     Switch(
-                                        checked = checked,
+                                        checked = shop.selfpickup,
                                         onCheckedChange = {
-                                            checked = it
+                                            viewModel.updateSelfPickup(shop.id, it)
+                                            println(shop.selfpickup)
                                         }
                                     )
                                     Text(text = "Self pickup")
                                 }
                                 // opciono datepicker
-                                if (checked) {
+                                if (shop.selfpickup) {
                                     Text(text = "Biranje datuma")
 //                    TextField(value = "", onValueChange = {})
 //                                    }
@@ -267,3 +264,17 @@ fun CheckoutScreen(
     }
 }
 
+private fun parseTotalsByShop(totalsByShop: String): Map<Int, Double> {
+    val resultMap = mutableMapOf<Int, Double>()
+
+    try {
+        val jsonObject = JsonParser.parseString(totalsByShop).asJsonObject
+        for ((key, value) in jsonObject.entrySet()) {
+            resultMap[key.toInt()] = value.asDouble
+        }
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
+
+    return resultMap
+}

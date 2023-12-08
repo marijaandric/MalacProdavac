@@ -9,5 +9,7 @@ data class ShopDetailsCheckoutDTO (
     @SerializedName("image") val image: String,
     @SerializedName("workingHours") val workingHours: List<WorkingHoursDTO>,
     @SerializedName("latitude") val latitude: Double,
-    @SerializedName("longitude") val longitude: Double
+    @SerializedName("longitude") val longitude: Double,
+    @SerializedName("selfpickup") var selfpickup: Boolean = false,
+    @SerializedName("total") var total: Double = 0.0,
 )
