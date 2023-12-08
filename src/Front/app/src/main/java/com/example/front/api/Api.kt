@@ -8,6 +8,7 @@ import com.example.front.model.DTO.LoginDTO
 import com.example.front.model.DTO.MetricsDTO
 import com.example.front.model.DTO.NewProductDTO
 import com.example.front.model.DTO.OrdersDTO
+import com.example.front.model.DTO.OrdersPagesDTO
 import com.example.front.model.DTO.ProductDTO
 import com.example.front.model.DTO.ProductDisplayDTO
 import com.example.front.model.DTO.ReviewDTO
@@ -216,4 +217,10 @@ interface Api {
         @Query("status") status: Int?,
         @Query("page") shopIds: Int?
     ): Response<List<OrdersDTO>>
+
+    @GET("back/Order/GetOrdersPageCount")
+    suspend fun getOrdersPage(
+        @Query("userId") userId: Int,
+        @Query("status") status: Int?
+    ): Response<OrdersPagesDTO>
 }
