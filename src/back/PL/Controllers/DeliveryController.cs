@@ -119,5 +119,19 @@ namespace back.PL.Controllers
                 return BadRequest(new { Error = ex.Message });
             }
         }
+
+        [HttpGet("GetRouteDetails")]
+        public async Task<IActionResult> GetRouteDetails(int routeId)
+        {
+            try
+            {
+                return Ok(new { Details = await _service.GetRouteDetails(routeId) });
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
     }
 }
