@@ -1,6 +1,7 @@
 ﻿using back.BLL.Dtos;
 using back.BLL.Dtos.Cards;
 using back.BLL.Dtos.Infos;
+using back.BLL.Services;
 using back.DAL.Contexts;
 using back.DAL.Models;
 using back.Models;
@@ -108,6 +109,13 @@ namespace back.DAL.Repositories
                 ShopId = order.ShopId
             };
 
+            (double, double) coords;
+            if (order.ShippingAddress != null)
+            {
+                coords = await HelperService.GetCoordinates(order.ShippingAddress);
+                newOrder.Latitude = (float)coords.Item1;
+                newOrder.Longitude = (float)coords.Item2;
+            }
             await _context.Orders.AddAsync(newOrder);
             await _context.SaveChangesAsync();
 

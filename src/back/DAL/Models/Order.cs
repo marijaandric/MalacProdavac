@@ -19,6 +19,8 @@ namespace back.Models
         [ForeignKey("Status")]
         public int StatusId { get; set; }
         public string? ShippingAddress { get; set; }
+        public float? Latitude { get; set; }
+        public float? Longitude { get; set; }
         public DateTime? PickupTime { get; set; }
         public int? Accepted { get; set; }
         public User User { get; set; }
