@@ -1,5 +1,6 @@
 ﻿using back.BLL.Dtos;
 using back.BLL.Dtos.Cards;
+using back.BLL.Dtos.Infos;
 using back.Models;
 
 namespace back.DAL.Repositories
@@ -19,5 +20,6 @@ namespace back.DAL.Repositories
         public Task<int> GetCustomerIdForDelivery(int requestId);
         public Task<bool> ChooseDeliveryPerson(int requestId, int chosenPersonId);
         public Task<List<string>> GetRequestCoordinates(int routeId);
+        public Task<DeliveryRouteInfo> GetRouteDetails(int routeId);
     }
 }

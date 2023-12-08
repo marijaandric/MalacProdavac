@@ -1,5 +1,7 @@
 ﻿using back.BLL.Dtos;
 using back.BLL.Dtos.Cards;
+using back.BLL.Dtos.HelpModels;
+using back.BLL.Dtos.Infos;
 using back.BLL.Services;
 using back.DAL.Contexts;
 using back.Models;
@@ -181,7 +183,63 @@ namespace back.DAL.Repositories
 
         public async Task<List<string>> GetRequestCoordinates(int routeId)
         {
-            return await _context.DeliveryRequests.Where(x => x.RouteId == routeId).Join(_context.Orders, dr => dr.OrderId, o => o.Id, (dr, o) => o).Select(x => x.ShippingAddress).ToListAsync();
+            List<string> shippingAddresses = await _context.DeliveryRequests.Where(x => x.RouteId == routeId).Join(_context.Orders, dr => dr.OrderId, o => o.Id, (dr, o) => o).Select(x => x.ShippingAddress).ToListAsync();
+            List<string> shops = await _context.DeliveryRequests.Where(x => x.RouteId == routeId).Join(_context.Orders, dr => dr.OrderId, o => o.Id, (dr, o) => o).Join(_context.Shop, o => o.ShopId, s => s.Id, (o, s) => s).Select(x => x.Address).ToListAsync();
+            shippingAddresses.AddRange(shops);
+            
+            return shippingAddresses;
+        }
+
+        public async Task<DeliveryRouteInfo> GetRouteDetails(int routeId)
+        {
+            DeliveryRoute route = await _context.DeliveryRoutes.FirstOrDefaultAsync(x => x.Id == routeId);
+            List<DeliveryStop> stops = new List<DeliveryStop>
+            {
+                new DeliveryStop
+                {
+                    Address = route.StartLocation,
+                    Latitude = (float)route.StartLatitude,
+                    Longitude = (float)route.StartLongitude
+                },
+                new DeliveryStop
+                {
+                    Address = route.EndLocation,
+                    Latitude = (float)route.EndLatitude,
+                    Longitude = (float)route.EndLongitude
+                }
+            };
+
+            stops.AddRange(await _context.DeliveryRequests.Where(x => x.RouteId == routeId).Join(_context.Orders, r => r.OrderId, o => o.Id, (r, o) => o).Select(x => new DeliveryStop
+            {
+               Address = x.ShippingAddress,
+               Latitude = (float)x.Latitude,
+               Longitude = (float)x.Longitude,
+            }).ToListAsync());
+
+            stops.AddRange(await _context.DeliveryRequests.Where(x => x.RouteId == routeId).Join(_context.Orders, r => r.OrderId, o => o.Id, (r, o) => o).Join(_context.Shop, o => o.ShopId, s => s.Id, (o, s) => s).Select(x => new DeliveryStop
+            {
+                Address = x.Address,
+                Latitude = (float)x.Latitude,
+                Longitude = (float)x.Longitude,
+                ShopName = x.Name
+            }).ToListAsync());
+            
+            
+            return new DeliveryRouteInfo
+            {
+                Locations = route.StartLocation
+                .Substring(route.StartLocation.IndexOf(',') + 1)
+                .Substring(0, route.StartLocation.Substring(route.StartLocation.IndexOf(',') + 1).IndexOf(','))
+                .Trim() + " - " +
+                route.EndLocation
+                .Substring(route.EndLocation.IndexOf(',') + 1)
+                .Substring(0, route.EndLocation.Substring(route.EndLocation.IndexOf(',') + 1).IndexOf(','))
+                .Trim(),
+                StartDate = route.StartDate.ToShortDateString(),
+                StartTime = route.StartTime,
+                Stops = stops
+            };
+
         }
     }
 }

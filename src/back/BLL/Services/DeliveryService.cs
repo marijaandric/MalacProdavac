@@ -1,5 +1,7 @@
 ﻿using back.BLL.Dtos;
 using back.BLL.Dtos.Cards;
+using back.BLL.Dtos.HelpModels;
+using back.BLL.Dtos.Infos;
 using back.DAL.Repositories;
 using back.Models;
 
@@ -174,6 +176,22 @@ namespace back.BLL.Services
             if (await _notificationRepository.InsertNotification(chosenPersonId, 5, "New delivery request!", "You have a delivery request from " + shopName + " for order #" + o.Id + "!\nPlease respond to this request.", req.Id)) Console.WriteLine("Notification sent!");
 
             return true;
+        }
+
+        public async Task<DeliveryRouteInfo> GetRouteDetails(int routeId)
+        {
+            DeliveryRouteInfo route = await _repository.GetRouteDetails(routeId);
+            if (route == null) throw new ArgumentException("No route found!");
+            
+            var start = route.Stops[0];
+            var end = route.Stops[1];
+            var tail = route.Stops.Skip(2).ToList();
+
+            tail.OrderBy(x => HelperService.CalculateDistance(start.Latitude, start.Longitude, x.Latitude, x.Longitude));
+            route.Stops = new List<DeliveryStop>{ start };
+            route.Stops.AddRange(tail);
+            route.Stops.Add(end);
+            return route;
         }
     }
 }
