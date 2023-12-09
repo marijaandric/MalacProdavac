@@ -201,5 +201,11 @@ namespace back.BLL.Services
 
             return req;
         }
+
+        public async Task<bool> DeleteRoute(int routeId)
+        {
+            if ((await _repository.GetRequestCoordinates(routeId)).Count > 0) throw new ArgumentException("Can't delete a route with existing requests!");
+            return await _repository.DeleteRoute(routeId);
+        }
     }
 }

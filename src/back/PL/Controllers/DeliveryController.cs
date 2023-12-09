@@ -147,5 +147,19 @@ namespace back.PL.Controllers
                 return BadRequest(new { Error = ex.Message });
             }
         }
+
+        [HttpDelete("DeleteRoute")]
+        public async Task<IActionResult> DeleteRoute(int routeId)
+        {
+            try
+            {
+                return Ok(new { Success = await _service.DeleteRoute(routeId) });
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
     }
 }

@@ -22,5 +22,6 @@ namespace back.DAL.Repositories
         public Task<List<string>> GetRequestCoordinates(int routeId);
         public Task<DeliveryRouteInfo> GetRouteDetails(int routeId);
         public Task<DeliveryRequestInfo> GetRequestDetails(int requestId);
+        public Task<bool> DeleteRoute(int routeId);
     }
 }

@@ -277,5 +277,12 @@ namespace back.DAL.Repositories
                 Items = items
             };
         }
+
+        public async Task<bool> DeleteRoute(int routeId)
+        {
+            DeliveryRoute route = await GetRoute(routeId);
+            _context.DeliveryRoutes.Remove(route);
+            return await _context.SaveChangesAsync() > 0;
+        }
     }
 }
