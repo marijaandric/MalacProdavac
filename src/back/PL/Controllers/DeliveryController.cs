@@ -161,5 +161,19 @@ namespace back.PL.Controllers
                 return BadRequest(new { Error = ex.Message });
             }
         }
+
+        [HttpPut("EditRoute")]
+        public async Task<IActionResult> EditRoute(EditDeliveryRouteDto dto)
+        {
+            try
+            {
+                return Ok(new { Success = await _service.EditRoute(dto) });
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
     }
 }

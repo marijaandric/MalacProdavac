@@ -284,5 +284,12 @@ namespace back.DAL.Repositories
             _context.DeliveryRoutes.Remove(route);
             return await _context.SaveChangesAsync() > 0;
         }
+
+        public async Task<bool> EditRoute(DeliveryRoute newRoute)
+        {
+            DeliveryRoute existingRoute = await _context.DeliveryRoutes.FirstOrDefaultAsync(x => x.Id == newRoute.Id);
+            existingRoute = newRoute;
+            return await _context.SaveChangesAsync() > 0;
+        }
     }
 }

@@ -18,5 +18,6 @@ namespace back.BLL.Services
         public Task<DeliveryRouteInfo> GetRouteDetails(int routeId);
         public Task<DeliveryRequestInfo> GetRequestDetails(int requestId);
         public Task<bool> DeleteRoute(int routeId);
+        public Task<bool> EditRoute(EditDeliveryRouteDto dto);
     }
 }

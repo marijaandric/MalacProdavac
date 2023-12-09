@@ -207,5 +207,35 @@ namespace back.BLL.Services
             if ((await _repository.GetRequestCoordinates(routeId)).Count > 0) throw new ArgumentException("Can't delete a route with existing requests!");
             return await _repository.DeleteRoute(routeId);
         }
+
+        public async Task<bool> EditRoute(EditDeliveryRouteDto dto)
+        {
+            DeliveryRoute route = await _repository.GetRoute(dto.Id);
+            if ((await _repository.GetRequestCoordinates(dto.Id)).Count > 0) throw new ArgumentException("Can't edit a route with existing requests!");
+
+            if (dto.StartDate != null) route.StartDate = DateTime.Parse(dto.StartDate);
+            if (dto.StartTime != null) route.StartTime = TimeSpan.Parse(dto.StartTime);
+            if (dto.FixedCost != null)
+            {
+                if (dto.FixedCost <= priceMax) route.FixedCost = (float)dto.FixedCost;
+                else throw new ArgumentException("Cost is too high!");
+            }
+            if (dto.StartLocation != null)
+            {
+                route.StartLocation = dto.StartLocation;
+                (double, double) coords = await HelperService.GetCoordinates(dto.StartLocation);
+                route.StartLatitude = coords.Item1;
+                route.StartLongitude = coords.Item2;
+            }
+            if (dto.EndLocation != null)
+            {
+                route.EndLocation = dto.EndLocation;
+                (double, double) coords = await HelperService.GetCoordinates(dto.EndLocation);
+                route.EndLatitude = coords.Item1;
+                route.EndLongitude = coords.Item2;
+            }
+
+            return await _repository.EditRoute(route);
+        }
     }
 }
