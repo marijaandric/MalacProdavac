@@ -193,5 +193,13 @@ namespace back.BLL.Services
             route.Stops.Add(end);
             return route;
         }
+
+        public async Task<DeliveryRequestInfo> GetRequestDetails(int requestId)
+        {
+            DeliveryRequestInfo req = await _repository.GetRequestDetails(requestId);
+            if (req == null) throw new ArgumentException("No request found!");
+
+            return req;
+        }
     }
 }

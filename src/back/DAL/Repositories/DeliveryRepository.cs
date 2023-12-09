@@ -241,5 +241,41 @@ namespace back.DAL.Repositories
             };
 
         }
+
+        public async Task<DeliveryRequestInfo> GetRequestDetails(int requestId)
+        {
+            var req = await _context.DeliveryRequests.FirstOrDefaultAsync(x => x.Id == requestId);
+            int shopId = req.ShopId;
+            int orderId = req.OrderId;
+
+            var shop = await _context.Shop.FirstOrDefaultAsync(x => x.Id == shopId);
+            var order = await _context.Orders.FirstOrDefaultAsync(x => x.Id == orderId);
+            var items = await _context.OrderItems.Where(x => x.OrderId == orderId).Join(_context.Products, oi => oi.ProductId, p => p.Id, (oi, p) => new { oi, p }).Join(_context.Metrics, i => i.p.MetricId, m => m.Id, (i, m) => new {i, m}).Select(x => new DeliveryItem
+            {
+                Name = x.i.p.Name,
+                Metric = x.m.Name,
+                Quantity = x.i.oi.Quantity
+            }).ToListAsync();
+
+            return new DeliveryRequestInfo
+            {
+                Locations = shop.Address
+                .Substring(shop.Address.IndexOf(',') + 1)
+                .Substring(0, shop.Address.Substring(shop.Address.IndexOf(',') + 1).IndexOf(','))
+                .Trim() + " - " +
+                order.ShippingAddress
+                .Substring(order.ShippingAddress.IndexOf(',') + 1)
+                .Substring(0, order.ShippingAddress.Substring(order.ShippingAddress.IndexOf(',') + 1).IndexOf(','))
+                .Trim(),
+                Id = requestId,
+                ShippingAddress = order.ShippingAddress,
+                ShippingLatitude = (float)order.Latitude,
+                ShippingLongitude = (float)order.Longitude,
+                ShopAddress = shop.Address,
+                ShopLatitude = (float)shop.Latitude,
+                ShopLongitude = (float)shop.Longitude,
+                Items = items
+            };
+        }
     }
 }

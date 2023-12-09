@@ -16,5 +16,6 @@ namespace back.BLL.Services
         public Task<List<DeliveryPersonCard>> GetDeliveryPeopleForRequest(int requestId);
         public Task<bool> ChooseDeliveryPerson(int requestId, int chosenPersonId);
         public Task<DeliveryRouteInfo> GetRouteDetails(int routeId);
+        public Task<DeliveryRequestInfo> GetRequestDetails(int requestId);
     }
 }

@@ -21,5 +21,6 @@ namespace back.DAL.Repositories
         public Task<bool> ChooseDeliveryPerson(int requestId, int chosenPersonId);
         public Task<List<string>> GetRequestCoordinates(int routeId);
         public Task<DeliveryRouteInfo> GetRouteDetails(int routeId);
+        public Task<DeliveryRequestInfo> GetRequestDetails(int requestId);
     }
 }
