@@ -141,6 +141,24 @@ fun ShopScreen(navController: NavHostController, shopViewModel: OneShopViewModel
         shopViewModel.getMetrics()
     }
 
+    LaunchedEffect(shopViewModel.stateNewProductDisplay.value)
+    {
+        Log.d("USAO SAM", "USAO")
+        shopViewModel.getShopDetails(id, shopId)
+
+        if(shopViewModel.state.value.shop != null)
+        {
+            if(shopViewModel.state.value.shop!!.productDisplayId != null){
+                shopViewModel.state.value.shop!!.productDisplayId?.let {
+                    shopViewModel.getProductDisplay(
+                        it
+                    )
+                }
+            }
+
+        }
+    }
+
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     Sidebar(
         drawerState,
@@ -1169,13 +1187,7 @@ fun ProfilePic(shopViewModel: OneShopViewModel, id: Int, shopId:Int) {
     if(showDisplayProduct)
     {
         shopViewModel.inicijalnoStanjeNewPD();
-        DisplayProductDialog(onDismiss = { showDisplayProduct = false
-            shopViewModel.state.value.shop!!.productDisplayId?.let {
-                shopViewModel.getProductDisplay(
-                    it
-                )
-            };
-                                         }, shopViewModel, shopId, id)
+        DisplayProductDialog(onDismiss = { showDisplayProduct = false}, shopViewModel, shopId, id)
     }
 
     if(showProductDisplayNotificationDialog)
@@ -1233,17 +1245,17 @@ fun ProductDisplayNotification(onDismiss: () -> Unit, shopViewModel : OneShopVie
                                 .padding(bottom = 25.dp)
                                 .fillMaxWidth()
                         ) {
-                            if(shopViewModel.state.value.shop!!.isOwner)
-                            {
-                                Icon(
-                                    imageVector = Icons.Default.Edit,
-                                    contentDescription = "Delete Icon",
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier
-                                        .clickable { }
-                                        .size(30.dp)
-                                )
-                            }
+//                            if(shopViewModel.state.value.shop!!.isOwner)
+//                            {
+//                                Icon(
+//                                    imageVector = Icons.Default.Edit,
+//                                    contentDescription = "Delete Icon",
+//                                    tint = MaterialTheme.colorScheme.primary,
+//                                    modifier = Modifier
+//                                        .clickable { }
+//                                        .size(30.dp)
+//                                )
+//                            }
                             Text(
                                 text = "Product display",
                                 style = MaterialTheme.typography.titleMedium,
@@ -1445,7 +1457,8 @@ fun DisplayProductDialog(onDismiss: () -> Unit, shopViewModel: OneShopViewModel,
                                         address = value
                                     )
                                     shopViewModel.newProductDisplay(newPD);
-                                    shopViewModel.getShopDetails(id, shopId);
+
+                                    onDismiss()
                                 }
                             },
                             width = 1f,
@@ -1487,6 +1500,7 @@ fun DisplayProductDialog(onDismiss: () -> Unit, shopViewModel: OneShopViewModel,
                     address = value
                 )
                 shopViewModel.newProductDisplay(newPD);
+                onDismiss()
                          },
             shopViewModel = shopViewModel,
             id = id,

@@ -464,6 +464,7 @@ class OneShopViewModel @Inject constructor(
                 } else {
                     _stateProductDisplay.value = _stateProductDisplay.value.copy(
                         isLoading = false,
+                        displayProduct = null,
                         error = "No product display"
                     )
                 }
