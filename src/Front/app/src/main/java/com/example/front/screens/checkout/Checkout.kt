@@ -38,6 +38,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
@@ -248,7 +249,8 @@ fun CheckoutScreen(
                                 Column(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(8.dp),
+                                        .padding(8.dp)
+                                        .shadow(4.dp),
                                 ) {
                                     Box(
                                         modifier = Modifier
@@ -261,7 +263,8 @@ fun CheckoutScreen(
                                             contentDescription = "",
                                             modifier = Modifier
                                                 .height(50.dp)
-                                                .fillMaxWidth(),
+                                                .fillMaxWidth()
+                                                .padding(horizontal = 4.dp),
                                             contentScale = ContentScale.FillBounds
                                         )
                                         Column {
@@ -304,7 +307,10 @@ fun CheckoutScreen(
                                             horizontalAlignment = Alignment.CenterHorizontally
                                         ) {
                                             Text(
-                                                text = shop.address.substring(0,shop.address.length-8),
+                                                text = shop.address.substring(
+                                                    0,
+                                                    shop.address.length - 8
+                                                ),
                                                 modifier = Modifier.padding(top = 20.dp)
 
                                             )
@@ -314,63 +320,75 @@ fun CheckoutScreen(
                                             )
                                         }
                                     }
-                                }
 
-                                // slider delivery-pickup
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
+
+                                    // slider delivery-pickup
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
 //                                    .border(1.dp, Color.Yellow, RectangleShape)
-                                    ,
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.SpaceEvenly
-                                ) {
+                                        ,
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.SpaceEvenly
+                                    ) {
 
-                                    Text(text = "Delivery")
-                                    Switch(
-                                        checked = shop.selfpickup,
-                                        onCheckedChange = {
-                                            viewModel.updateSelfPickup(shop.id, it)
-                                            println(shop.selfpickup)
-                                        }
-                                    )
-                                    Text(text = "Self pickup")
-                                }
-                                // opciono datepicker
-                                if (shop.selfpickup) {
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-
-                                        OutlinedTextField(
-                                            readOnly = true,
-                                            value = dateMap[shop.id]?.format(DateTimeFormatter.ISO_DATE) ?: "",
-                                            label = { Text("Date") },
-                                            onValueChange = {})
-
-                                        IconButton(
-                                            onClick = { isOpenMap[shop.id] = true }
-                                        ) {
-                                            Icon(imageVector = Icons.Default.DateRange, contentDescription = "Calendar")
-                                        }
-                                    }
-
-                                    if (isOpenMap[shop.id] == true) {
-                                        ModalDatePicker(
-                                            onAccept = {
-                                                isOpenMap[shop.id] = false
-
-                                                if (it != null) { // Set the date
-                                                    dateMap[shop.id] = Instant
-                                                        .ofEpochMilli(it)
-                                                        .atZone(ZoneId.of("UTC"))
-                                                        .toLocalDate()
-                                                }
-                                            },
-                                            onCancel = {
-                                                isOpenMap[shop.id] = false //close dialog
+                                        Text(text = "Delivery")
+                                        Switch(
+                                            checked = shop.selfpickup,
+                                            onCheckedChange = {
+                                                viewModel.updateSelfPickup(shop.id, it)
+                                                println(shop.selfpickup)
                                             }
                                         )
+                                        Text(text = "Self pickup")
+                                    }
+                                    // opciono datepicker
+                                    if (shop.selfpickup) {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.Center,
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(bottom = 8.dp)
+                                        ) {
+                                            OutlinedTextField(
+                                                readOnly = true,
+                                                value = dateMap[shop.id]?.format(DateTimeFormatter.ISO_DATE)
+                                                    ?: "",
+                                                label = { Text("Date") },
+                                                onValueChange = {})
+
+                                            IconButton(
+                                                onClick = { isOpenMap[shop.id] = true }
+                                            ) {
+                                                Icon(
+                                                    imageVector = Icons.Default.DateRange,
+                                                    contentDescription = "Calendar"
+                                                )
+                                            }
+                                        }
+
+                                        if (isOpenMap[shop.id] == true) {
+                                            ModalDatePicker(
+                                                onAccept = {
+                                                    isOpenMap[shop.id] = false
+
+                                                    if (it != null) { // Set the date
+                                                        dateMap[shop.id] = Instant
+                                                            .ofEpochMilli(it)
+                                                            .atZone(ZoneId.of("UTC"))
+                                                            .toLocalDate()
+                                                    }
+                                                },
+                                                onCancel = {
+                                                    isOpenMap[shop.id] = false //close dialog
+                                                }
+                                            )
+                                        }
                                     }
                                 }
+                                Spacer(modifier = Modifier.height(22.dp))
+                                
                             }
                         }
 
