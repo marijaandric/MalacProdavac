@@ -10,6 +10,7 @@ import com.example.front.model.DTO.LoginDTO
 import com.example.front.model.DTO.MetricsDTO
 import com.example.front.model.DTO.NewProductDTO
 import com.example.front.model.DTO.NewProductDisplayDTO
+import com.example.front.model.DTO.OrderInfoDTO
 import com.example.front.model.DTO.OrdersDTO
 import com.example.front.model.DTO.OrdersPagesDTO
 import com.example.front.model.DTO.ProductDTO
@@ -148,6 +149,10 @@ class Repository @Inject constructor(private val api: Api) {
     suspend fun newProductDisplay(newProductDisplayDTO: NewProductDisplayDTO): Response<SuccessBoolean>
     {
         return api.newProductDisplay(newProductDisplayDTO);
+    }
+    suspend fun getOrderInfo(orderId: Int): Response<OrderInfoDTO>
+    {
+        return  api.getOrderInfo(orderId)
     }
 
 }

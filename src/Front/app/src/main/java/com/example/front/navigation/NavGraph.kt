@@ -31,6 +31,7 @@ import com.example.front.viewmodels.myprofile.MyProfileViewModel
 import com.example.front.viewmodels.myshop.MyShopViewModel
 import com.example.front.viewmodels.notification.NotificationViewModel
 import com.example.front.viewmodels.oneshop.OneShopViewModel
+import com.example.front.viewmodels.orderinfo.OrderInfoViewModel
 import com.example.front.viewmodels.orders.OrdersViewModel
 import com.example.front.viewmodels.product.ProductViewModel
 import com.example.front.viewmodels.register.RegisterViewModel
@@ -57,11 +58,12 @@ fun SetupNavGraph(
     val checkoutViewModel: CheckoutViewModel = hiltViewModel()
     val notificationViewModel: NotificationViewModel = hiltViewModel()
     val ordersViewModel : OrdersViewModel = hiltViewModel()
+    val orderInfoViewModel : OrderInfoViewModel = hiltViewModel()
 
     NavHost(
         navController = navController,
         //startDestination = "intro"
-        startDestination = "order"//"my_shop"`
+        startDestination = "orders"//"my_shop"`
     ) {
         composable(
             route = Screen.Home.route
@@ -146,10 +148,22 @@ fun SetupNavGraph(
         {
             OrdersScreen(navController = navController,ordersViewModel)
         }
-        composable(route = Screen.Order.route)
-        {
-            OrderScreen(navController = navController)
+        composable(route = "${Screen.Order.route}/{orderId}",
+            arguments = listOf(navArgument("orderId") { type = NavType.IntType })
+            )
+        {navBackStackEntry ->
+            val arguments = requireNotNull(navBackStackEntry.arguments)
+            val orderId = arguments.getInt("orderId")
+            OrderScreen(navController = navController, orderId, orderInfoViewModel)
         }
+        //composable(
+        //            route = "${Screen.Product.route}/{id}",
+        //            arguments = listOf(navArgument("id") { type = NavType.IntType })
+        //        ) { navBackStackEntry ->
+        //            val arguments = requireNotNull(navBackStackEntry.arguments)
+        //            val productId = arguments.getInt("id")
+        //            ProductPage(navController, productViewModel, productId)
+        //        }
 
         introNavGraph(navController = navController, splashViewModel)
         authNavGraph(

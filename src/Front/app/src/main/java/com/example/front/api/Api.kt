@@ -8,6 +8,7 @@ import com.example.front.model.DTO.LoginDTO
 import com.example.front.model.DTO.MetricsDTO
 import com.example.front.model.DTO.NewProductDTO
 import com.example.front.model.DTO.NewProductDisplayDTO
+import com.example.front.model.DTO.OrderInfoDTO
 import com.example.front.model.DTO.OrdersDTO
 import com.example.front.model.DTO.OrdersPagesDTO
 import com.example.front.model.DTO.ProductDTO
@@ -229,5 +230,10 @@ interface Api {
     suspend fun newProductDisplay(
         @Body data : NewProductDisplayDTO
     ):Response<SuccessBoolean>
+
+    @GET("back/Order/OrderDetails")
+    suspend fun getOrderInfo(
+        @Query("orderId") orderId: Int
+    ):Response<OrderInfoDTO>
 
 }

@@ -115,7 +115,7 @@ fun OrdersScreen(navController: NavHostController,ordersViewModel: OrdersViewMod
                     }
                 }
                 else{
-                    Orders(ordersViewModel)
+                    Orders(ordersViewModel, navController)
                 }
             }
             item {
@@ -151,7 +151,7 @@ fun OrdersScreen(navController: NavHostController,ordersViewModel: OrdersViewMod
 }
 
 @Composable
-fun Orders(ordersViewModel: OrdersViewModel) {
+fun Orders(ordersViewModel: OrdersViewModel, navController: NavHostController) {
 
     var orders = ordersViewModel.state.value.orders
     Column(
@@ -165,7 +165,9 @@ fun Orders(ordersViewModel: OrdersViewModel) {
                 quantity = order.quantity,
                 amount = order.amount,
                 date = order.createdOn,
-                status = order.status
+                status = order.status,
+                navController = navController,
+                order.id
             )
             Spacer(modifier = Modifier.height(16.dp))
         }

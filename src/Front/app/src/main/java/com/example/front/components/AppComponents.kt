@@ -482,7 +482,7 @@ fun CardButton(text: String, onClick: () -> Unit, width: Float, modifier: Modifi
 }
 
 @Composable
-fun OrderCard(orderid:String, quantity: Int, amount: Float, date: String, status: String) {
+fun OrderCard(orderid:String, quantity: Int, amount: Float, date: String, status: String, navController: NavHostController, id: Int) {
     Column (
         modifier = Modifier.padding(16.dp)
     ){
@@ -528,7 +528,9 @@ fun OrderCard(orderid:String, quantity: Int, amount: Float, date: String, status
                     horizontalArrangement = Arrangement.SpaceBetween
                 )
                 {
-                    CardButton(text = "Details", onClick = {  }, width = 0.5f, modifier = Modifier, color = MaterialTheme.colorScheme.secondary)
+                    CardButton(text = "Details", onClick = {
+                        navController.navigate("${Screen.Order.route}/$id")
+                    }, width = 0.5f, modifier = Modifier, color = MaterialTheme.colorScheme.secondary)
                     Text(status, style=MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold, color=MaterialTheme.colorScheme.primary))
                 }
 
