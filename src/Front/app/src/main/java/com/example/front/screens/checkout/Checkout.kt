@@ -33,10 +33,12 @@ import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
@@ -101,6 +103,12 @@ fun CheckoutScreen(
 
     val date = remember { mutableStateOf(LocalDate.now())}
     val isOpen = remember { mutableStateOf(false)}
+//    val isOpenMap = remember { mutableStateMapOf<Int, Boolean>() }
+//    val isOpenMap = remember { mutableStateMapOf<Int, MutableState<Boolean>>() }
+//    val dateMap = remember { mutableStateMapOf<Int, MutableState<LocalDate>>() }
+    val isOpenMap = remember { mutableStateMapOf<Int, Boolean>() }
+    val dateMap = remember { mutableStateMapOf<Int, LocalDate>() }
+
 
 
     val checkoutState = viewModel.state.value
@@ -108,6 +116,16 @@ fun CheckoutScreen(
     val scrollState = rememberScrollState()
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+
+    //sa listof unit pokrece samo jednom (kad se pokrene stranica prvi put)
+    LaunchedEffect(key1 = listOf<Unit>()) {
+        println("USAO")
+        shops.forEach { shop ->
+            isOpenMap[shop.id] = false
+            dateMap[shop.id] = LocalDate.now()
+        }
+    }
+
     Sidebar(
         drawerState,
         navController,
@@ -125,37 +143,37 @@ fun CheckoutScreen(
                 ) {
                     SmallElipseAndTitle(title = "Checkout", drawerState)
 
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-
-                        OutlinedTextField(
-                            readOnly = true,
-                            value = date.value.format(DateTimeFormatter.ISO_DATE),
-                            label = { Text("Date") },
-                            onValueChange = {})
-
-                        IconButton(
-                            onClick = { isOpen.value = true } // show de dialog
-                        ) {
-                            Icon(imageVector = Icons.Default.DateRange, contentDescription = "Calendar")
-                        }
-                    }
-                    if (isOpen.value) {
-                        ModalDatePicker(
-                            onAccept = {
-                                isOpen.value = false // close dialog
-
-                                if (it != null) { // Set the date
-                                    date.value = Instant
-                                        .ofEpochMilli(it)
-                                        .atZone(ZoneId.of("UTC"))
-                                        .toLocalDate()
-                                }
-                            },
-                            onCancel = {
-                                isOpen.value = false //close dialog
-                            }
-                        )
-                    }
+//                    Row(verticalAlignment = Alignment.CenterVertically) {
+//
+//                        OutlinedTextField(
+//                            readOnly = true,
+//                            value = date.value.format(DateTimeFormatter.ISO_DATE),
+//                            label = { Text("Date") },
+//                            onValueChange = {})
+//
+//                        IconButton(
+//                            onClick = { isOpen.value = true } // show de dialog
+//                        ) {
+//                            Icon(imageVector = Icons.Default.DateRange, contentDescription = "Calendar")
+//                        }
+//                    }
+//                    if (isOpen.value) {
+//                        ModalDatePicker(
+//                            onAccept = {
+//                                isOpen.value = false // close dialog
+//
+//                                if (it != null) { // Set the date
+//                                    date.value = Instant
+//                                        .ofEpochMilli(it)
+//                                        .atZone(ZoneId.of("UTC"))
+//                                        .toLocalDate()
+//                                }
+//                            },
+//                            onCancel = {
+//                                isOpen.value = false //close dialog
+//                            }
+//                        )
+//                    }
 //                    DatePicker(state = datePickerState, )
 
                         //kartice
@@ -231,7 +249,8 @@ fun CheckoutScreen(
                                 Column(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(8.dp),
+                                        .padding(8.dp)
+                                        .shadow(4.dp),
                                 ) {
                                     Box(
                                         modifier = Modifier
@@ -244,7 +263,8 @@ fun CheckoutScreen(
                                             contentDescription = "",
                                             modifier = Modifier
                                                 .height(50.dp)
-                                                .fillMaxWidth(),
+                                                .fillMaxWidth()
+                                                .padding(horizontal = 4.dp),
                                             contentScale = ContentScale.FillBounds
                                         )
                                         Column {
@@ -287,7 +307,10 @@ fun CheckoutScreen(
                                             horizontalAlignment = Alignment.CenterHorizontally
                                         ) {
                                             Text(
-                                                text = shop.address.substring(0,shop.address.length-8),
+                                                text = shop.address.substring(
+                                                    0,
+                                                    shop.address.length - 8
+                                                ),
                                                 modifier = Modifier.padding(top = 20.dp)
 
                                             )
@@ -297,32 +320,75 @@ fun CheckoutScreen(
                                             )
                                         }
                                     }
-                                }
 
-                                // slider delivery-pickup
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
+
+                                    // slider delivery-pickup
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
 //                                    .border(1.dp, Color.Yellow, RectangleShape)
-                                    ,
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.SpaceEvenly
-                                ) {
+                                        ,
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.SpaceEvenly
+                                    ) {
 
-                                    Text(text = "Delivery")
-                                    Switch(
-                                        checked = shop.selfpickup,
-                                        onCheckedChange = {
-                                            viewModel.updateSelfPickup(shop.id, it)
-                                            println(shop.selfpickup)
+                                        Text(text = "Delivery")
+                                        Switch(
+                                            checked = shop.selfpickup,
+                                            onCheckedChange = {
+                                                viewModel.updateSelfPickup(shop.id, it)
+                                                println(shop.selfpickup)
+                                            }
+                                        )
+                                        Text(text = "Self pickup")
+                                    }
+                                    // opciono datepicker
+                                    if (shop.selfpickup) {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.Center,
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(bottom = 8.dp)
+                                        ) {
+                                            OutlinedTextField(
+                                                readOnly = true,
+                                                value = dateMap[shop.id]?.format(DateTimeFormatter.ISO_DATE)
+                                                    ?: "",
+                                                label = { Text("Date") },
+                                                onValueChange = {})
+
+                                            IconButton(
+                                                onClick = { isOpenMap[shop.id] = true }
+                                            ) {
+                                                Icon(
+                                                    imageVector = Icons.Default.DateRange,
+                                                    contentDescription = "Calendar"
+                                                )
+                                            }
                                         }
-                                    )
-                                    Text(text = "Self pickup")
+
+                                        if (isOpenMap[shop.id] == true) {
+                                            ModalDatePicker(
+                                                onAccept = {
+                                                    isOpenMap[shop.id] = false
+
+                                                    if (it != null) { // Set the date
+                                                        dateMap[shop.id] = Instant
+                                                            .ofEpochMilli(it)
+                                                            .atZone(ZoneId.of("UTC"))
+                                                            .toLocalDate()
+                                                    }
+                                                },
+                                                onCancel = {
+                                                    isOpenMap[shop.id] = false //close dialog
+                                                }
+                                            )
+                                        }
+                                    }
                                 }
-                                // opciono datepicker
-                                if (shop.selfpickup) {
-                                    Text(text = "Biranje datuma")
-                                }
+                                Spacer(modifier = Modifier.height(22.dp))
+                                
                             }
                         }
 
