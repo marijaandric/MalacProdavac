@@ -80,6 +80,7 @@ import com.example.front.ui.theme.LightBlue
 import com.example.front.ui.theme.MainBlue
 import com.example.front.ui.theme.Typography
 import kotlinx.coroutines.launch
+import org.checkerframework.common.subtyping.qual.Bottom
 import kotlin.io.encoding.ExperimentalEncodingApi
 
 @Composable
@@ -596,6 +597,99 @@ fun BigBlueButton(text: String, onClick: () -> Unit, width: Float, modifier: Mod
             text = text,
             style = Typography.labelSmall.copy(MaterialTheme.colorScheme.background)
         )
+    }
+}
+
+
+
+@Composable
+fun CardForOneOrderWithoutButton(
+    title: String,
+    seller: String,
+    imageResource: String?,
+    navController: NavHostController,
+    id: Int,
+    total: String,
+    price: String,
+    onClick: () -> Unit = {}
+) {
+    val onClick: () -> Unit = remember {
+        {
+            navController.navigate("${Screen.Product.route}/$id")
+        }
+    }
+    Card(
+        modifier = Modifier
+            .clip(RoundedCornerShape(20.dp))
+            .fillMaxWidth(1f)
+            .padding(bottom = 15.dp, end = 16.dp, start = 16.dp)
+            .clickable(onClick = onClick)
+    ) {
+        val imageUrl = "http://softeng.pmf.kg.ac.rs:10015/images/${imageResource}"
+
+        val painter: Painter = rememberAsyncImagePainter(model = imageUrl)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(color = MaterialTheme.colorScheme.surface)
+        ) {
+            if(imageResource != null)
+            {
+                Image(
+                    painter = painter,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(120.dp)
+                        .padding(13.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                )
+            }
+            else{
+                Image(
+                    painter = painterResource(id = R.drawable.imageplaceholder),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(120.dp)
+                        .padding(13.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                )
+            }
+
+
+            Column(
+                modifier = Modifier.padding(10.dp)
+            ) {
+                Text(text = title, fontWeight = FontWeight.Bold, fontSize = 17.sp)
+                Text(
+                    text = seller,
+                    fontWeight = FontWeight.Light,
+                    fontSize = 15.sp,
+                    modifier = Modifier.padding(bottom = 25.dp, top = 5.dp),
+                    color = MaterialTheme.colorScheme.secondary
+                )
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                )
+                {
+                    Text(
+                        text = total,
+                        modifier = Modifier,
+                        style = MaterialTheme.typography.displaySmall.copy(color = MaterialTheme.colorScheme.onSurface)
+                    )
+                    Text(
+                        text = price,
+                        modifier = Modifier,
+                        style = MaterialTheme.typography.displaySmall.copy(color = MaterialTheme.colorScheme.onSurface)
+                    )
+                }
+            }
+        }
     }
 }
 

@@ -64,74 +64,75 @@ fun OrdersScreen(navController: NavHostController,ordersViewModel: OrdersViewMod
             ordersViewModel.getUserId()?.let{ ordersViewModel.getOrdersPage(it, selectedTabIndex);}
         }
     }
-//    Sidebar(
-//        drawerState,
-//        navController,
-//        shopViewModel.dataStoreManager
-//    )
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(color = MaterialTheme.colorScheme.background)
+    Sidebar(
+        drawerState,
+        navController,
+        ordersViewModel.dataStoreManager
     )
     {
-        item{
-            SmallElipseAndTitle(title = "Orders", drawerState = drawerState)
-        }
-        item {
-            FourTabs(
-                onFirstTabSelected = { selectedTabIndex = 0 },
-                onSecondTabSelected = { selectedTabIndex = 1 },
-                onThirdTabSelected = { selectedTabIndex = 2 },
-                onFourthTabSelected = { selectedTabIndex = 3},
-                selectedColumnIndex = selectedTabIndex,
-                firstTab = "All",
-                secondTab = "Delivered",
-                thirdTab = "Pending",
-                fourthTab = "Ready for pickup",
-                isFilters = true
-            )
-        }
-        item{
-            if(ordersViewModel.state.value.isLoading)
-            {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = 170.dp),
-                    verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    CircularProgressIndicator()
-                }
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(color = MaterialTheme.colorScheme.background)
+        )
+        {
+            item{
+                SmallElipseAndTitle(title = "Orders", drawerState = drawerState)
             }
-            else if(ordersViewModel.state.value.error.contains("NotFound"))
-            {
-                Column(modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top = 170.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-                    Image(painter = painterResource(id = R.drawable.nofound), contentDescription = null, modifier = Modifier.size(200.dp))
-                    Text("No orders found", style = MaterialTheme.typography.titleSmall)
-                }
+            item {
+                FourTabs(
+                    onFirstTabSelected = { selectedTabIndex = 0 },
+                    onSecondTabSelected = { selectedTabIndex = 1 },
+                    onThirdTabSelected = { selectedTabIndex = 2 },
+                    onFourthTabSelected = { selectedTabIndex = 3},
+                    selectedColumnIndex = selectedTabIndex,
+                    firstTab = "All",
+                    secondTab = "Delivered",
+                    thirdTab = "Pending",
+                    fourthTab = "Ready for pickup",
+                    isFilters = true
+                )
             }
-            else{
-                Orders(ordersViewModel)
-            }
-        }
-        item {
-            val totalPages = ordersViewModel.statePageCount.value
-            if(!totalPages.isLoading)
-            {
-                if(totalPages.ordersPage!!.count != 0 )
+            item{
+                if(ordersViewModel.state.value.isLoading)
                 {
-                    Paginator(currentPage = currentPage, totalPages = totalPages.ordersPage!!.count, onPageSelected = { newPage ->
-                        if(newPage in 1..totalPages.ordersPage!!.count)
-                        {
-                            currentPage = newPage
-                            ordersViewModel.getOrders(userId, selectedTabIndex, currentPage)
-                        }
-                    })
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(top = 170.dp),
+                        verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
+                else if(ordersViewModel.state.value.error.contains("NotFound"))
+                {
+                    Column(modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = 170.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                        Image(painter = painterResource(id = R.drawable.nofound), contentDescription = null, modifier = Modifier.size(200.dp))
+                        Text("No orders found", style = MaterialTheme.typography.titleSmall)
+                    }
+                }
+                else{
+                    Orders(ordersViewModel)
                 }
             }
+            item {
+                val totalPages = ordersViewModel.statePageCount.value
+                if(!totalPages.isLoading)
+                {
+                    if(totalPages.ordersPage!!.count != 0 )
+                    {
+                        Paginator(currentPage = currentPage, totalPages = totalPages.ordersPage!!.count, onPageSelected = { newPage ->
+                            if(newPage in 1..totalPages.ordersPage!!.count)
+                            {
+                                currentPage = newPage
+                                ordersViewModel.getOrders(userId, selectedTabIndex, currentPage)
+                            }
+                        })
+                    }
+                }
 //                    totalPages = shopsViewModel.statePageCount.value
 //            Paginator(
 //                currentPage = currentPage,
@@ -143,8 +144,10 @@ fun OrdersScreen(navController: NavHostController,ordersViewModel: OrdersViewMod
 //                    }
 //                }
 //            )
+            }
         }
     }
+
 }
 
 @Composable

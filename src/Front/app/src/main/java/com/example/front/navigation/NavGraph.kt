@@ -15,6 +15,7 @@ import com.example.front.screens.home.HomePage
 import com.example.front.screens.myshop.MyShopScreen
 import com.example.front.screens.myshop.SetUpShopScreen
 import com.example.front.screens.notification.NotificationScreen
+import com.example.front.screens.order.OrderScreen
 import com.example.front.screens.orders.OrdersScreen
 import com.example.front.screens.product.ProductPage
 import com.example.front.screens.products.AllProducts
@@ -60,7 +61,7 @@ fun SetupNavGraph(
     NavHost(
         navController = navController,
         //startDestination = "intro"
-        startDestination = "my_shop"//"my_shop"`
+        startDestination = "order"//"my_shop"`
     ) {
         composable(
             route = Screen.Home.route
@@ -144,6 +145,10 @@ fun SetupNavGraph(
         composable(route = Screen.Orders.route)
         {
             OrdersScreen(navController = navController,ordersViewModel)
+        }
+        composable(route = Screen.Order.route)
+        {
+            OrderScreen(navController = navController)
         }
 
         introNavGraph(navController = navController, splashViewModel)
