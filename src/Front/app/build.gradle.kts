@@ -1,5 +1,3 @@
-import com.android.build.api.dsl.Packaging
-
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -171,7 +169,7 @@ dependencies {
 
     implementation("androidx.work:work-runtime:2.8.1")
 
-    implementation("androidx.compose.material3:material3")
+    implementation("androidx.compose.material3:material3:1.2.0-alpha12")
     
     //Realm
     implementation("io.realm.kotlin:library-base:1.11.0")
