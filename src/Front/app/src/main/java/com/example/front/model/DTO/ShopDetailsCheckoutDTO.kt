@@ -12,4 +12,5 @@ data class ShopDetailsCheckoutDTO (
     @SerializedName("longitude") val longitude: Double,
     @SerializedName("selfpickup") var selfpickup: Boolean = false,
     @SerializedName("total") var total: Double = 0.0,
+    @SerializedName("date") var date: Long? = 0,
 )

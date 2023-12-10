@@ -33,6 +33,7 @@ import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -101,6 +102,12 @@ fun CheckoutScreen(
 
     val date = remember { mutableStateOf(LocalDate.now())}
     val isOpen = remember { mutableStateOf(false)}
+//    val isOpenMap = remember { mutableStateMapOf<Int, Boolean>() }
+//    val isOpenMap = remember { mutableStateMapOf<Int, MutableState<Boolean>>() }
+//    val dateMap = remember { mutableStateMapOf<Int, MutableState<LocalDate>>() }
+    val isOpenMap = remember { mutableStateMapOf<Int, Boolean>() }
+    val dateMap = remember { mutableStateMapOf<Int, LocalDate>() }
+
 
 
     val checkoutState = viewModel.state.value
@@ -108,6 +115,16 @@ fun CheckoutScreen(
     val scrollState = rememberScrollState()
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+
+    //sa listof unit pokrece samo jednom (kad se pokrene stranica prvi put)
+    LaunchedEffect(key1 = listOf<Unit>()) {
+        println("USAO")
+        shops.forEach { shop ->
+            isOpenMap[shop.id] = false
+            dateMap[shop.id] = LocalDate.now()
+        }
+    }
+
     Sidebar(
         drawerState,
         navController,
@@ -125,37 +142,37 @@ fun CheckoutScreen(
                 ) {
                     SmallElipseAndTitle(title = "Checkout", drawerState)
 
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-
-                        OutlinedTextField(
-                            readOnly = true,
-                            value = date.value.format(DateTimeFormatter.ISO_DATE),
-                            label = { Text("Date") },
-                            onValueChange = {})
-
-                        IconButton(
-                            onClick = { isOpen.value = true } // show de dialog
-                        ) {
-                            Icon(imageVector = Icons.Default.DateRange, contentDescription = "Calendar")
-                        }
-                    }
-                    if (isOpen.value) {
-                        ModalDatePicker(
-                            onAccept = {
-                                isOpen.value = false // close dialog
-
-                                if (it != null) { // Set the date
-                                    date.value = Instant
-                                        .ofEpochMilli(it)
-                                        .atZone(ZoneId.of("UTC"))
-                                        .toLocalDate()
-                                }
-                            },
-                            onCancel = {
-                                isOpen.value = false //close dialog
-                            }
-                        )
-                    }
+//                    Row(verticalAlignment = Alignment.CenterVertically) {
+//
+//                        OutlinedTextField(
+//                            readOnly = true,
+//                            value = date.value.format(DateTimeFormatter.ISO_DATE),
+//                            label = { Text("Date") },
+//                            onValueChange = {})
+//
+//                        IconButton(
+//                            onClick = { isOpen.value = true } // show de dialog
+//                        ) {
+//                            Icon(imageVector = Icons.Default.DateRange, contentDescription = "Calendar")
+//                        }
+//                    }
+//                    if (isOpen.value) {
+//                        ModalDatePicker(
+//                            onAccept = {
+//                                isOpen.value = false // close dialog
+//
+//                                if (it != null) { // Set the date
+//                                    date.value = Instant
+//                                        .ofEpochMilli(it)
+//                                        .atZone(ZoneId.of("UTC"))
+//                                        .toLocalDate()
+//                                }
+//                            },
+//                            onCancel = {
+//                                isOpen.value = false //close dialog
+//                            }
+//                        )
+//                    }
 //                    DatePicker(state = datePickerState, )
 
                         //kartice
@@ -321,7 +338,38 @@ fun CheckoutScreen(
                                 }
                                 // opciono datepicker
                                 if (shop.selfpickup) {
-                                    Text(text = "Biranje datuma")
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+
+                                        OutlinedTextField(
+                                            readOnly = true,
+                                            value = dateMap[shop.id]?.format(DateTimeFormatter.ISO_DATE) ?: "",
+                                            label = { Text("Date") },
+                                            onValueChange = {})
+
+                                        IconButton(
+                                            onClick = { isOpenMap[shop.id] = true }
+                                        ) {
+                                            Icon(imageVector = Icons.Default.DateRange, contentDescription = "Calendar")
+                                        }
+                                    }
+
+                                    if (isOpenMap[shop.id] == true) {
+                                        ModalDatePicker(
+                                            onAccept = {
+                                                isOpenMap[shop.id] = false
+
+                                                if (it != null) { // Set the date
+                                                    dateMap[shop.id] = Instant
+                                                        .ofEpochMilli(it)
+                                                        .atZone(ZoneId.of("UTC"))
+                                                        .toLocalDate()
+                                                }
+                                            },
+                                            onCancel = {
+                                                isOpenMap[shop.id] = false //close dialog
+                                            }
+                                        )
+                                    }
                                 }
                             }
                         }
