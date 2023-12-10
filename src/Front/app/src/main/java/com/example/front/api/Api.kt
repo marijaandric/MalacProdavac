@@ -7,6 +7,7 @@ import com.example.front.model.DTO.LeaveReviewDTO
 import com.example.front.model.DTO.LoginDTO
 import com.example.front.model.DTO.MetricsDTO
 import com.example.front.model.DTO.NewProductDTO
+import com.example.front.model.DTO.NewProductDisplayDTO
 import com.example.front.model.DTO.OrdersDTO
 import com.example.front.model.DTO.OrdersPagesDTO
 import com.example.front.model.DTO.ProductDTO
@@ -223,4 +224,10 @@ interface Api {
         @Query("userId") userId: Int,
         @Query("status") status: Int?
     ): Response<OrdersPagesDTO>
+
+    @POST("back/Shop/NewProductDisplay")
+    suspend fun newProductDisplay(
+        @Body data : NewProductDisplayDTO
+    ):Response<SuccessBoolean>
+
 }

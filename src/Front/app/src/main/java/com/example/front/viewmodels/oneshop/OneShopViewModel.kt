@@ -9,10 +9,12 @@ import androidx.lifecycle.viewModelScope
 import com.example.front.helper.DataStore.DataStoreManager
 import com.example.front.model.DTO.FiltersDTO
 import com.example.front.model.DTO.NewProductDTO
+import com.example.front.model.DTO.NewProductDisplayDTO
 import com.example.front.repository.Repository
 import com.example.front.screens.shop.state.DeleteProductDisplayState
 import com.example.front.screens.shop.state.GetCategoriesState
 import com.example.front.screens.shop.state.GetMetricsState
+import com.example.front.screens.shop.state.NewDisplayState
 import com.example.front.screens.shop.state.PostReviewState
 import com.example.front.screens.shop.state.ProductDisplayState
 import com.example.front.screens.shop.state.ProductState
@@ -79,9 +81,13 @@ class OneShopViewModel @Inject constructor(
 
     //delete product display
     private val _stateDeleteProductDisplay = mutableStateOf(DeleteProductDisplayState())
-    var stateDeleteProductDisplay: State<DeleteProductDisplayState> = _stateDeleteProductDisplay;
+    var stateDeleteProductDisplay: State<DeleteProductDisplayState> = _stateDeleteProductDisplay;//
 
-    suspend fun getShopDetails(userId: Int, shopId: Int) {
+    //newProductDisplay
+    private val _stateNewProductDisplay = mutableStateOf(NewDisplayState())
+    var stateNewProductDisplay: State<NewDisplayState> = _stateNewProductDisplay;
+
+    fun getShopDetails(userId: Int, shopId: Int) {
         viewModelScope.launch {
             try {
                 val response = repository.getShopDetails(userId, shopId)
@@ -476,7 +482,6 @@ class OneShopViewModel @Inject constructor(
                 if(id != null) {
                     x = id
                     val response = repository.deleteProductDisplay(x)
-                    Log.d("DELETE PROCESS", response.body().toString())
                     if (response.isSuccessful) {
                         val res = response.body()
                         _stateDeleteProductDisplay.value = _stateDeleteProductDisplay.value.copy(
@@ -494,6 +499,42 @@ class OneShopViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 _stateDeleteProductDisplay.value = _stateDeleteProductDisplay.value.copy(
+                    error = e.message.toString()
+                )
+            }
+        }
+    }
+
+    fun inicijalnoStanjeNewPD()
+    {
+        _stateNewProductDisplay.value = _stateNewProductDisplay.value.copy(
+            isLoading = true,
+            newProductDisplay = null,
+            error = ""
+        )
+    }
+
+    fun newProductDisplay(productDisplay: NewProductDisplayDTO) {
+        viewModelScope.launch {
+            Log.d("SALJEM", productDisplay.toString())
+            try {
+                val response = repository.newProductDisplay(productDisplay)
+                Log.d("NEW PRODUCT", response.body().toString())
+                if (response.isSuccessful) {
+                    val res = response.body()
+                    _stateNewProductDisplay.value = _stateNewProductDisplay.value.copy(
+                        isLoading = false,
+                        newProductDisplay = res
+                    )
+                } else {
+                    _stateNewProductDisplay.value = _stateNewProductDisplay.value.copy(
+                        error = "NotFound",
+                        newProductDisplay = null,
+                        isLoading = false
+                    )
+                }
+            } catch (e: Exception) {
+                _stateNewProductDisplay.value = _stateNewProductDisplay.value.copy(
                     error = e.message.toString()
                 )
             }

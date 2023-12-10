@@ -97,10 +97,15 @@ import com.example.front.components.ToggleImageButtonFunction
 import com.example.front.model.DTO.CategoriesDTO
 import com.example.front.model.DTO.MetricsDTO
 import com.example.front.model.DTO.NewProductDTO
+import com.example.front.model.DTO.NewProductDisplayDTO
 import com.example.front.model.DTO.WorkingHoursDTO
 import com.example.front.viewmodels.oneshop.OneShopViewModel
 import kotlinx.coroutines.delay
 import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
+import java.text.DateFormat
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -173,7 +178,7 @@ fun ShopScreen(navController: NavHostController, shopViewModel: OneShopViewModel
                     }
                 }
                 item {
-                    ProfilePic(shopViewModel, id)
+                    ProfilePic(shopViewModel, id, shopId)
                 }
                 item {
                     ShopInfo(shopViewModel, shopId, id)
@@ -1017,7 +1022,7 @@ fun Info(
 }
 
 @Composable
-fun ProfilePic(shopViewModel: OneShopViewModel, id: Int) {
+fun ProfilePic(shopViewModel: OneShopViewModel, id: Int, shopId:Int) {
     val state = shopViewModel.state.value
     var showDialog by remember{
         mutableStateOf(false)
@@ -1163,17 +1168,24 @@ fun ProfilePic(shopViewModel: OneShopViewModel, id: Int) {
 
     if(showDisplayProduct)
     {
-        DisplayProductDialog(onDismiss = { showDisplayProduct = false })
+        shopViewModel.inicijalnoStanjeNewPD();
+        DisplayProductDialog(onDismiss = { showDisplayProduct = false
+            shopViewModel.state.value.shop!!.productDisplayId?.let {
+                shopViewModel.getProductDisplay(
+                    it
+                )
+            };
+                                         }, shopViewModel, shopId, id)
     }
 
     if(showProductDisplayNotificationDialog)
     {
-        ProductDisplayNotification (onDismiss = { showProductDisplayNotificationDialog = false },shopViewModel)
+        ProductDisplayNotification (onDismiss = { showProductDisplayNotificationDialog = false },shopViewModel, id, shopId)
     }
 }
 
 @Composable
-fun ProductDisplayNotification(onDismiss: () -> Unit, shopViewModel : OneShopViewModel) {
+fun ProductDisplayNotification(onDismiss: () -> Unit, shopViewModel : OneShopViewModel, id: Int, shopId: Int) {
     val overlayColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)
     var deletedialog by remember {
         mutableStateOf(false)
@@ -1267,12 +1279,12 @@ fun ProductDisplayNotification(onDismiss: () -> Unit, shopViewModel : OneShopVie
 
     if(deletedialog)
     {
-        DeleteDialog(onDismiss = { deletedialog = false },onYesClick = {deletedialog = false; onDismiss()}, shopViewModel = shopViewModel)
+        DeleteDialog(text = "Do you want to delete the product display?",onDismiss = { deletedialog = false },onYesClick = {deletedialog = false; onDismiss()}, shopViewModel = shopViewModel, id, shopId)
     }
 }
 
 @Composable
-fun DeleteDialog(onDismiss: () -> Unit, onYesClick: () -> Unit, shopViewModel: OneShopViewModel) {
+fun DeleteDialog(text : String, onDismiss: () -> Unit, onYesClick: () -> Unit, shopViewModel: OneShopViewModel, id: Int, shopId: Int) {
     val overlayColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)
 
     Dialog(
@@ -1291,7 +1303,6 @@ fun DeleteDialog(onDismiss: () -> Unit, onYesClick: () -> Unit, shopViewModel: O
             Box(
                 modifier = Modifier
                     .fillMaxWidth(0.7f)
-                    .fillMaxHeight(0.2f)
                     .clip(RoundedCornerShape(20.dp))
                     .background(MaterialTheme.colorScheme.background)
                     .pointerInput(Unit) {
@@ -1303,7 +1314,7 @@ fun DeleteDialog(onDismiss: () -> Unit, onYesClick: () -> Unit, shopViewModel: O
                     .align(Alignment.Center)
             ) {
                 Column {
-                    Text("Are you sure you want to delete this?", style = MaterialTheme.typography.titleSmall, modifier = Modifier
+                    Text(text, style = MaterialTheme.typography.titleSmall, modifier = Modifier
                         .padding(bottom = 25.dp), textAlign = TextAlign.Center)
                     Row()
                     {
@@ -1319,6 +1330,7 @@ fun DeleteDialog(onDismiss: () -> Unit, onYesClick: () -> Unit, shopViewModel: O
                             text = "Yes",
                             onClick = {
                                 shopViewModel.deleteProductDisplay(shopViewModel.state.value.shop!!.productDisplayId)
+                                shopViewModel.getShopDetails(id, shopId)
                                 onYesClick()
                             },
                             width = 0.95f,
@@ -1334,13 +1346,19 @@ fun DeleteDialog(onDismiss: () -> Unit, onYesClick: () -> Unit, shopViewModel: O
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DisplayProductDialog(onDismiss: () -> Unit) {
+fun DisplayProductDialog(onDismiss: () -> Unit, shopViewModel: OneShopViewModel, shopId : Int, id: Int) {
     val overlayColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)
     val state = rememberDateRangePickerState()
     val timeStart = rememberTimePickerState()
+    val timeEnd = rememberTimePickerState()
     var value by remember {
         mutableStateOf("")
     }
+    var showDeleteDialog by remember {
+        mutableStateOf(false)
+    }
+
+
 
     Dialog(
         properties = DialogProperties(usePlatformDefaultWidth = false),
@@ -1405,19 +1423,75 @@ fun DisplayProductDialog(onDismiss: () -> Unit) {
                         Text(text = "Start time", modifier = Modifier.padding(top = 16.dp,start = 10.dp, bottom = 10.dp), style=MaterialTheme.typography.displaySmall)
                         TimeInput(state = timeStart)
                         Text(text = "End time", modifier = Modifier.padding(top = 16.dp,start = 10.dp, bottom = 10.dp), style=MaterialTheme.typography.displaySmall)
-                        TimeInput(state = timeStart)
+                        TimeInput(state = timeEnd)
                         CardButton(
                             text = "Add",
-                            onClick = { onDismiss() },
+                            onClick = {
+                                if(shopViewModel.state.value.shop!!.productDisplayId != null && shopViewModel.state.value.shop!!.productDisplayId != 0)
+                                {
+                                    showDeleteDialog = true;
+                                }
+                                else{
+                                    val newPD = NewProductDisplayDTO(
+                                        shopId = shopId,
+                                        startDate = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+                                            .format(state.selectedStartDateMillis?.let { Date(it) }),
+                                        endDate = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+                                            .format(state.selectedEndDateMillis?.let { Date(it) }),
+                                        startTime = SimpleDateFormat("HH:mm", Locale.getDefault())
+                                            .format(Date().apply { hours = timeStart.hour; minutes = timeStart.minute }),
+                                        endTime = SimpleDateFormat("HH:mm", Locale.getDefault())
+                                            .format(Date().apply { hours = timeEnd.hour; minutes = timeEnd.minute }),
+                                        address = value
+                                    )
+                                    shopViewModel.newProductDisplay(newPD);
+                                    shopViewModel.getShopDetails(id, shopId);
+                                }
+                            },
                             width = 1f,
                             modifier = Modifier.height(50.dp),
                             color = MaterialTheme.colorScheme.secondary
                         )
+                        if(shopViewModel.stateNewProductDisplay.value.error.isNotEmpty())
+                        {
+                            Text("Please check all fields!", style = MaterialTheme.typography.displaySmall, modifier = Modifier)
+                        }
+                        if(shopViewModel.stateNewProductDisplay.value.isLoading == false)
+                        {
+                            shopViewModel.getShopDetails(id, shopId);
+                            onDismiss();
+                        }
                     }
                 }
 
             }
         }
+    }
+
+    if(showDeleteDialog)
+    {
+        DeleteDialog(
+            text = "If you want to add a new product display, you will have to delete the old one. Do you want to delete the old one?",
+            onDismiss = { showDeleteDialog = false; shopViewModel.getShopDetails(id, shopId); },
+            onYesClick = { showDeleteDialog = false;
+                val newPD = NewProductDisplayDTO(
+                    shopId = shopId,
+                    startDate = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+                        .format(state.selectedStartDateMillis?.let { Date(it) }),
+                    endDate = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+                        .format(state.selectedEndDateMillis?.let { Date(it) }),
+                    startTime = SimpleDateFormat("HH:mm", Locale.getDefault())
+                        .format(Date().apply { hours = timeStart.hour; minutes = timeStart.minute }),
+                    endTime = SimpleDateFormat("HH:mm", Locale.getDefault())
+                        .format(Date().apply { hours = timeEnd.hour; minutes = timeEnd.minute }),
+                    address = value
+                )
+                shopViewModel.newProductDisplay(newPD);
+                         },
+            shopViewModel = shopViewModel,
+            id = id,
+            shopId = shopId
+        )
     }
 }
 
