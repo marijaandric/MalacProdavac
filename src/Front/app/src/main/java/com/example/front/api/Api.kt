@@ -14,6 +14,7 @@ import com.example.front.model.DTO.OrdersPagesDTO
 import com.example.front.model.DTO.ProductDTO
 import com.example.front.model.DTO.ProductDisplayDTO
 import com.example.front.model.DTO.ReviewDTO
+import com.example.front.model.DTO.RouteDetails
 import com.example.front.model.request.RegistrationRequest
 import com.example.front.model.response.LoginResponse
 import com.example.front.model.DTO.ShopDTO
@@ -236,4 +237,8 @@ interface Api {
         @Query("orderId") orderId: Int
     ):Response<OrderInfoDTO>
 
+    @GET("/back/Delivery/GetRouteDetails")
+    suspend fun getRouteDetails(
+        @Query("routeId") routeId: Int
+    ):Response<RouteDetails>
 }

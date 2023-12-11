@@ -52,6 +52,7 @@ import com.example.front.components.BigBlueButton
 import com.example.front.components.ProductCard
 import com.example.front.components.SearchTextField
 import com.example.front.components.Sidebar
+import com.example.front.components.SmallElipseAndTitle
 import com.example.front.components.Tabs
 import com.example.front.screens.home.CardData
 import com.example.front.screens.sellers.CardGrid
@@ -80,7 +81,7 @@ fun AllProducts(
             color = Color.White
         ) {
             Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-                Search(shopsViewModel, drawerState)
+                SmallElipseAndTitle("All products", drawerState)
                 Text(
                     text = "Discover the Best Products",
                     style = Typography.titleMedium,
@@ -89,69 +90,6 @@ fun AllProducts(
                 Products(homeViewModel, navController)
             }
         }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun Search(shopsViewModel: ShopsViewModel, drawerState: DrawerState) {
-    var value by remember { mutableStateOf("") }
-    val scope = rememberCoroutineScope()
-    Box(
-        contentAlignment = Alignment.TopCenter
-    ) {
-        Image(
-            painter = painterResource(id = R.drawable.rsz_elipse),
-            contentDescription = "Elipse",
-            contentScale = ContentScale.FillWidth,
-            modifier = Modifier
-                .fillMaxWidth()
-        )
-
-        Column {
-            Row(
-                modifier = Modifier
-                    .padding(top = 15.dp, start = 15.dp)
-                    .fillMaxWidth()
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Menu,
-                    contentDescription = "Search icon",
-                    modifier = Modifier
-                        .size(50.dp)
-                        .align(Alignment.CenterVertically)
-                        .padding(start = 10.dp)
-                        .clickable { scope.launch { drawerState.open() } },
-                    tint = MaterialTheme.colorScheme.background
-                )
-                Text(
-                    text = "Products",
-                    style = Typography.titleLarge,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .weight(1f) // This will make the Text take the remaining space and be centered
-                        .align(Alignment.CenterVertically)
-                        .padding(end = 75.dp)
-                )
-            }
-        }
-    }
-    Column(
-        modifier = Modifier.padding(top = 30.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        SearchAndFilters(shopsViewModel)
-
-        Image(
-            painter = painterResource(id = R.drawable.productspage),
-            contentDescription = "HomePageAction",
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .fillMaxWidth(0.9f)
-                .align(Alignment.CenterHorizontally)
-                .padding(top = 35.dp)
-
-        )
     }
 }
 

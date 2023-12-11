@@ -16,6 +16,7 @@ import com.example.front.model.DTO.OrdersPagesDTO
 import com.example.front.model.DTO.ProductDTO
 import com.example.front.model.DTO.ProductDisplayDTO
 import com.example.front.model.DTO.ReviewDTO
+import com.example.front.model.DTO.RouteDetails
 import com.example.front.model.request.RegistrationRequest
 import com.example.front.model.response.LoginResponse
 import com.example.front.model.DTO.ShopDTO
@@ -153,6 +154,11 @@ class Repository @Inject constructor(private val api: Api) {
     suspend fun getOrderInfo(orderId: Int): Response<OrderInfoDTO>
     {
         return  api.getOrderInfo(orderId)
+    }
+
+    suspend fun getRouteDetails(routeId: Int): Response<RouteDetails>
+    {
+        return api.getRouteDetails(routeId)
     }
 
 }

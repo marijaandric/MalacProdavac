@@ -10,27 +10,13 @@ import android.graphics.drawable.BitmapDrawable
 import android.location.LocationManager
 import android.util.Log
 import android.view.ViewGroup
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-import androidx.core.graphics.drawable.toBitmap
 import com.example.front.R
 import com.example.front.viewmodels.shops.ShopsViewModel
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withContext
 import org.osmdroid.config.Configuration
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
@@ -38,7 +24,7 @@ import org.osmdroid.views.overlay.Marker
 
 
 @Composable
-fun Osm(shopsViewModel: ShopsViewModel) : GeoPoint {
+fun Osm(shopsViewModel: ShopsViewModel): GeoPoint {
     val context = LocalContext.current
     val yourUserAgent = "YourUserAgentName"
     Configuration.getInstance().userAgentValue = yourUserAgent
@@ -64,8 +50,7 @@ private fun mapView(context: Context, shopsViewModel: ShopsViewModel): MapView {
     val btmp = BitmapFactory.decodeResource(context.resources, R.drawable.marker)
     val mapMarker = Bitmap.createScaledBitmap(btmp, 100, 100, false)
 
-    if(shopsViewModel.state.value.shops!!.isNotEmpty())
-    {
+    if (shopsViewModel.state.value.shops!!.isNotEmpty()) {
         for (geoPoint in shopsViewModel.state.value.shops!!) {
             val marker = Marker(mapView)
             marker.position = GeoPoint(geoPoint.latitude.toDouble(), geoPoint.longitude.toDouble())
@@ -108,8 +93,7 @@ private fun getCurrentLocation(context: Context): GeoPoint {
             lastKnownLocation?.let {
                 location = GeoPoint(it.latitude, it.longitude)
             }
-        }
-        else{
+        } else {
             ActivityCompat.requestPermissions(
                 context as Activity,
                 arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
