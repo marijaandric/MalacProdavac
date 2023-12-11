@@ -138,7 +138,7 @@ namespace back.PL.Controllers
         {
             try
             {
-                return Ok(new { Details = await _service.GetRouteDetails(routeId) });
+                return Ok(await _service.GetRouteDetails(routeId));
 
             }
             catch (Exception ex)
@@ -152,7 +152,7 @@ namespace back.PL.Controllers
         {
             try
             {
-                return Ok(new { Details = await _service.GetRequestDetails(reqId) });
+                return Ok(await _service.GetRequestDetails(reqId));
 
             }
             catch (Exception ex)
