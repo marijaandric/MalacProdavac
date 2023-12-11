@@ -8,9 +8,11 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.example.front.screens.delivery.DeliveryScreen
 import com.example.front.screens.cart.Cart
 import com.example.front.screens.cart.NewCreditCartScreen
 import com.example.front.screens.categories.RegistrationCategories
+import com.example.front.screens.delivery.RouteDetailsScreen
 import com.example.front.screens.home.HomePage
 import com.example.front.screens.myshop.MyShopScreen
 import com.example.front.screens.myshop.SetUpShopScreen
@@ -25,6 +27,8 @@ import com.example.front.screens.userprofile.UserProfileScreen
 import com.example.front.viewmodels.cart.CartViewModel
 import com.example.front.viewmodels.categories.CategoriesViewModel
 import com.example.front.viewmodels.checkout.CheckoutViewModel
+import com.example.front.viewmodels.delivery.DeliveryViewModel
+import com.example.front.viewmodels.delivery.RouteDetailsViewModel
 import com.example.front.viewmodels.home.HomeViewModel
 import com.example.front.viewmodels.login.LoginViewModel
 import com.example.front.viewmodels.myprofile.MyProfileViewModel
@@ -57,13 +61,14 @@ fun SetupNavGraph(
     val myShopViewModel: MyShopViewModel = hiltViewModel()
     val checkoutViewModel: CheckoutViewModel = hiltViewModel()
     val notificationViewModel: NotificationViewModel = hiltViewModel()
-    val ordersViewModel : OrdersViewModel = hiltViewModel()
+    val ordersViewModel: OrdersViewModel = hiltViewModel()
     val orderInfoViewModel : OrderInfoViewModel = hiltViewModel()
+    val deliveryViewModel : DeliveryViewModel = hiltViewModel()
+    val routedetailsViewModel : RouteDetailsViewModel = hiltViewModel()
 
     NavHost(
         navController = navController,
-        //startDestination = "intro"
-        startDestination = "orders"//"my_shop"`
+        startDestination = "intro"
     ) {
         composable(
             route = Screen.Home.route
@@ -98,6 +103,9 @@ fun SetupNavGraph(
         {
             AllProducts(navController = navController, homeViewModel, shopsViewModel)
         }
+        composable(route = Screen.Delivery.route) {
+            DeliveryScreen(navController,deliveryViewModel)
+        }
         composable(
             route = Screen.AllSellers.route
         )
@@ -109,6 +117,12 @@ fun SetupNavGraph(
         )
         {
             Cart(cartViewModel, navController)
+        }
+        composable(
+            route = Screen.Route.route
+        )
+        {
+            RouteDetailsScreen(navController, routedetailsViewModel)
         }
         composable(
             route = Screen.NewCreditCard.route
@@ -146,7 +160,7 @@ fun SetupNavGraph(
         }
         composable(route = Screen.Orders.route)
         {
-            OrdersScreen(navController = navController,ordersViewModel)
+            OrdersScreen(navController = navController, ordersViewModel)
         }
         composable(route = "${Screen.Order.route}/{orderId}",
             arguments = listOf(navArgument("orderId") { type = NavType.IntType })
