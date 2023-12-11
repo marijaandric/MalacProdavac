@@ -80,6 +80,19 @@ namespace back.PL.Controllers
             }
         }
 
+        [HttpGet("GetRoutesForDeliveryPerson")]
+        public async Task<IActionResult> GetRoutesForDeliveryPerson(int userId)
+        {
+            try
+            {
+                return Ok(await _service.GetRoutesForDeliveryPerson(userId));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
+
         [HttpGet("GetRoutesForRequest")]
         public async Task<IActionResult> GetRoutesForRequest(int userId, int requestId)
         {

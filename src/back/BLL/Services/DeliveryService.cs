@@ -145,6 +145,13 @@ namespace back.BLL.Services
 
         }
 
+        public async Task<List<DeliveryRouteCard>> GetRoutesForDeliveryPerson(int userId)
+        {
+            var routes = await _repository.GetRoutesForDeliveryPerson(userId);
+            if (routes.Count == 0) throw new ArgumentException("No routes found!");
+            return routes;
+        }
+
         public async Task<List<DeliveryPersonCard>> GetDeliveryPeopleForRequest(int requestId)
         {
             List<User> deliveryPeople = await _userRepository.GetDeliveryPeople();

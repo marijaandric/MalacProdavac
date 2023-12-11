@@ -12,6 +12,7 @@ namespace back.BLL.Services
         public Task<bool> DeclineRequest(int requestId);
         public Task<List<DeliveryRequestCard>> GetRequestsForDeliveryPerson(int deliveryPerson);
         public Task<List<DeliveryRequestCard>> GetRequestsForShop(int userId);
+        public Task<List<DeliveryRouteCard>> GetRoutesForDeliveryPerson(int userId);
         public Task<List<DeliveryRouteCard>> GetRoutesForRequest(int userId, int requestId);
         public Task<List<DeliveryPersonCard>> GetDeliveryPeopleForRequest(int requestId);
         public Task<bool> ChooseDeliveryPerson(int requestId, int chosenPersonId);
