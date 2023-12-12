@@ -80,6 +80,8 @@ namespace back.DAL.Repositories
                         WorkingHours = _context.WorkingHours.Where(x => x.ShopId == s.Id).ToList(),
                         Liked = _context.LikedShops.Any(x => x.ShopId == s.Id && x.UserId == userId),
                         Rating = sr.DefaultIfEmpty().Select(x => x.AvgRating).FirstOrDefault(),
+                        Latitude = (float)s.Latitude,
+                        Longitude = (float)s.Longitude
                     })
                 .Where(x => x.Rating >= rating)
                 .Join(_context.ShopCategories.Where(x => categories.Contains(x.CategoryId)), s => s.Id, sr => sr.ShopId, (s, sr) => s)
