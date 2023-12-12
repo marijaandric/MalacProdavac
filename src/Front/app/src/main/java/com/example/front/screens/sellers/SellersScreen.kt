@@ -93,8 +93,8 @@ fun SellersScreen(navController: NavHostController, shopsViewModel: ShopsViewMod
         shopsViewModel.getUserId()
             ?.let { shopsViewModel.getShopPages(it,false)}
     }
-
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+
     Sidebar(
         drawerState,
         navController,

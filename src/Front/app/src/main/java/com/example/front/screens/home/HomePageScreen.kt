@@ -73,7 +73,7 @@ fun HomePage(
                 Search(drawerState)
             }
             item {
-                Sellers(homeViewModel)
+                Sellers(homeViewModel, navController)
             }
             item {
                 Products(homeViewModel, navController)
@@ -152,7 +152,7 @@ fun Products(viewModel: HomeViewModel, navController: NavHostController) {
 }
 
 @Composable
-fun Sellers(viewModel: HomeViewModel) {
+fun Sellers(viewModel: HomeViewModel, navController: NavHostController) {
     val state = viewModel.stateShop.value
 
     val sellers = state.shops?.mapIndexed { index, shopState ->
@@ -197,7 +197,9 @@ fun Sellers(viewModel: HomeViewModel) {
                             onClick = {
                                 viewModel.updateLikeStatus(index, !cardData.isLiked)
                                 viewModel.changeLikedState(cardData.id)
-                            }
+                            },
+                            navController = navController,
+                            id = cardData.id
                         )
                     } ?: run {
                         // Use a default image placeholder when cardData.imageResource is null
@@ -209,7 +211,9 @@ fun Sellers(viewModel: HomeViewModel) {
                             onClick = {
                                 viewModel.updateLikeStatus(index, !cardData.isLiked)
                                 viewModel.changeLikedState(cardData.id)
-                            }
+                            },
+                            navController = navController,
+                            id = cardData.id
                         )
                     }
                     Spacer(modifier = Modifier.width(16.dp))

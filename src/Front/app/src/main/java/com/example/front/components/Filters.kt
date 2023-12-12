@@ -53,6 +53,15 @@ fun FilterDialogProducts(onDismiss: () -> Unit, shopsViewModel: OneShopViewModel
     var location by remember { mutableStateOf(if(shopsViewModel.filtersState.value.location == null) "" else shopsViewModel.filtersState.value.location.toString()) }
     var range by remember { mutableStateOf(if(shopsViewModel.filtersState.value.range != null) shopsViewModel.filtersState.value.range!!.toFloat() else 0f) }
 
+    LaunchedEffect(shopsViewModel.filtersState.value)
+    {
+        selectedCategories = shopsViewModel.filtersState.value.categories!!.toMutableList()
+        review = shopsViewModel.filtersState.value.rating
+        open = if(shopsViewModel.filtersState.value.open != null)shopsViewModel.filtersState.value.open else false
+        location = if(shopsViewModel.filtersState.value.location == null) "" else shopsViewModel.filtersState.value.location.toString()
+        range = if(shopsViewModel.filtersState.value.range != null) shopsViewModel.filtersState.value.range!!.toFloat() else 0f
+    }
+
     Dialog(
         properties = DialogProperties(usePlatformDefaultWidth = false),
         onDismissRequest = { onDismiss() }) {

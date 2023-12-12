@@ -99,6 +99,7 @@ import com.example.front.model.DTO.MetricsDTO
 import com.example.front.model.DTO.NewProductDTO
 import com.example.front.model.DTO.NewProductDisplayDTO
 import com.example.front.model.DTO.WorkingHoursDTO
+import com.example.front.navigation.Screen
 import com.example.front.viewmodels.oneshop.OneShopViewModel
 import kotlinx.coroutines.delay
 import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
@@ -143,7 +144,6 @@ fun ShopScreen(navController: NavHostController, shopViewModel: OneShopViewModel
 
     LaunchedEffect(shopViewModel.stateNewProductDisplay.value)
     {
-        Log.d("USAO SAM", "USAO")
         shopViewModel.getShopDetails(id, shopId)
 
         if(shopViewModel.state.value.shop != null)
@@ -199,7 +199,7 @@ fun ShopScreen(navController: NavHostController, shopViewModel: OneShopViewModel
                     ProfilePic(shopViewModel, id, shopId)
                 }
                 item {
-                    ShopInfo(shopViewModel, shopId, id)
+                    ShopInfo(shopViewModel, shopId, id,navController)
                 }
             }
 
@@ -209,7 +209,7 @@ fun ShopScreen(navController: NavHostController, shopViewModel: OneShopViewModel
 
 
 @Composable
-fun ShopInfo(shopViewModel: OneShopViewModel, shopId: Int, userID: Int) {
+fun ShopInfo(shopViewModel: OneShopViewModel, shopId: Int, userID: Int,navController:NavHostController) {
     var isImageClicked by remember { mutableStateOf(true) }
     var shopReviewsPage by remember { mutableStateOf(0f) }
 
@@ -298,7 +298,7 @@ fun ShopInfo(shopViewModel: OneShopViewModel, shopId: Int, userID: Int) {
                 }
 
                 Info(isImageClicked, shopViewModel, shopId, userID, LocalContext.current)
-                Products(isImageClicked, shopViewModel, shopId)
+                Products(isImageClicked, shopViewModel, shopId,navController)
 
             }
         }
@@ -306,7 +306,7 @@ fun ShopInfo(shopViewModel: OneShopViewModel, shopId: Int, userID: Int) {
 }
 
 @Composable
-fun Products(isImageClicked: Boolean, shopViewModel: OneShopViewModel, shopId: Int) {
+fun Products(isImageClicked: Boolean, shopViewModel: OneShopViewModel, shopId: Int,navController: NavHostController) {
     var showElseText by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
     var showAddProduct by remember { mutableStateOf(false) }
@@ -399,12 +399,13 @@ fun Products(isImageClicked: Boolean, shopViewModel: OneShopViewModel, shopId: I
                 ) {
                     shopViewModel.stateProduct.value.products?.let { products ->
                         items(products) { product ->
+                            val id = product.id
                             ShopProductCard(
                                 imageRes = product.image,
                                 text = product.name,
                                 price = "${product.price} din/kom",
                                 onClick = {
-
+                                    navController.navigate("${Screen.Product.route}/$id")
                                 }
                             )
                         }

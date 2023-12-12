@@ -67,6 +67,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -701,7 +702,9 @@ fun SellerCard(
     author: String,
     imageResource: String,
     isLiked: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    navController: NavHostController,
+    id: Int
 ) {
     Card(
         modifier = Modifier
@@ -752,15 +755,21 @@ fun SellerCard(
                     .fillMaxWidth()
                     .padding(start = 16.dp, bottom = 16.dp, end = 16.dp)
             ) {
-                Text(text = title, fontWeight = FontWeight.Bold, fontSize = 17.sp)
-                Text(text = author, fontSize = 14.sp)
+                Text(text = title, fontWeight = FontWeight.Bold, fontSize = 17.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis)
+                Text(text = author, fontSize = 14.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis)
                 Row(
                     modifier = Modifier.padding(top = 10.dp)
                 )
                 {
                     CardButton(
                         text = "More info",
-                        onClick = { /*TODO*/ },
+                        onClick = {
+                            navController.navigate("${Screen.Shop.route}/$id")
+                        },
                         width = 0.52f,
                         modifier = Modifier
                             .padding(end = 8.dp)
@@ -823,13 +832,16 @@ fun ProductCard(
             Column(
                 modifier = Modifier.padding(10.dp)
             ) {
-                Text(text = title, fontWeight = FontWeight.Bold, fontSize = 17.sp)
+                Text(text = title, fontWeight = FontWeight.Bold, fontSize = 17.sp,maxLines = 1,
+                    overflow = TextOverflow.Ellipsis)
                 Text(
                     text = price,
                     fontWeight = FontWeight.Bold,
                     fontSize = 15.sp,
                     modifier = Modifier.padding(bottom = 25.dp, top = 5.dp),
-                    color = MaterialTheme.colorScheme.secondary
+                    color = MaterialTheme.colorScheme.secondary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
                 ButtonWithIcon(
                     text = "Add to cart",
@@ -895,6 +907,8 @@ fun ShopProductCard(imageRes: String?, text: String, price: String, onClick: () 
                 text = text,
                 style = MaterialTheme.typography.titleSmall.copy(color = Color.White),
                 modifier = Modifier.padding(top = 8.dp),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
             Text(
                 text = price,
@@ -903,6 +917,8 @@ fun ShopProductCard(imageRes: String?, text: String, price: String, onClick: () 
                     fontSize = 12.sp,
                     color = Color.White
                 ),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.padding(top = 8.dp),
             )
         }
@@ -948,13 +964,17 @@ fun ShopCard(
             Column(
                 modifier = Modifier.padding(8.dp),
             ) {
-                Text(text = title, fontWeight = FontWeight.Bold, fontSize = 17.sp)
+                Text(text = title, fontWeight = FontWeight.Bold, fontSize = 17.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis)
                 Text(
                     text = price,
                     fontWeight = FontWeight.Bold,
                     fontSize = 15.sp,
                     modifier = Modifier.padding(top = 5.dp),
-                    color = MaterialTheme.colorScheme.onTertiary
+                    color = MaterialTheme.colorScheme.onTertiary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
 
                 Row(
@@ -973,7 +993,9 @@ fun ShopCard(
                         fontWeight = FontWeight.Bold,
                         fontSize = 15.sp,
                         modifier = Modifier.padding(start = 5.dp),
-                        color = MaterialTheme.colorScheme.secondary
+                        color = MaterialTheme.colorScheme.secondary,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
             }
