@@ -17,7 +17,7 @@ namespace back.DAL.Repositories
         {
             List<PendingReview> userProductPairs = new List<PendingReview>();
 
-            userProductPairs.AddRange(await _context.DeliveryRequests.Where(x => x.PickupDate <= DateTime.Now)
+            userProductPairs.AddRange(await _context.DeliveryRequests.Where(x => ((DateTime)x.PickupDate).AddDays(1) <= DateTime.Now)
             .Join(_context.Orders, dr => dr.OrderId, o => o.Id, (dr, o) => o)
             .Join(_context.OrderItems, o => o.Id, oi => oi.OrderId, (o, oi) => new {o, oi})
             .Where(x => !_context.ProductReviews.Any(y => y.ReviewerId == x.o.UserId && y.ProductId == x.oi.ProductId))
@@ -43,7 +43,7 @@ namespace back.DAL.Repositories
         {
             List<PendingReview> userProductPairs = new List<PendingReview>();
 
-            userProductPairs.AddRange(await _context.DeliveryRequests.Where(x => x.PickupDate <= DateTime.Now)
+            userProductPairs.AddRange(await _context.DeliveryRequests.Where(x => ((DateTime)x.PickupDate).AddDays(1) <= DateTime.Now)
             .Join(_context.Orders, dr => dr.OrderId, o => o.Id, (dr, o) => o)
             .Where(x => !_context.ShopReviews.Any(y => y.ReviewerId == x.UserId && y.ShopId == x.ShopId))
             .Select(x => new PendingReview
@@ -64,7 +64,7 @@ namespace back.DAL.Repositories
 
         public async Task<List<PendingReview>> PendingDeliveryPersonReviews()
         {
-            return await _context.DeliveryRequests.Where(x => x.PickupDate <= DateTime.Now)
+            return await _context.DeliveryRequests.Where(x => ((DateTime)x.PickupDate).AddDays(1) <= DateTime.Now)
             .Join(_context.Orders, dr => dr.OrderId, o => o.Id, (dr, o) => new { dr, o })
             .Where(x => !_context.Ratings.Any(y => y.RaterId == x.o.UserId && y.RatedId == x.dr.ChosenPersonId))
             .Select(x => new PendingReview
@@ -72,6 +72,13 @@ namespace back.DAL.Repositories
                 ItemId = (int)x.dr.ChosenPersonId,
                 UserId = x.o.UserId
             }).Distinct().ToListAsync();
+        }
+
+        public async Task DeletePastProductDisplays()
+        {
+            var toDelete = (await _context.ProductDisplays.ToListAsync()).Where(x => x.EndDate.Date < DateTime.Now || (x.EndDate.Date == DateTime.Now && x.EndTime <= DateTime.Now.TimeOfDay));
+            _context.ProductDisplays.RemoveRange(toDelete);
+            await _context.SaveChangesAsync();
         }
     }
 }

@@ -47,6 +47,8 @@ namespace back.BLL.Services
                     {
                         _logger.LogInformation(dr.UserId + " " + dr.ItemId);
                     }
+
+                    await _backgroundRepository.DeletePastProductDisplays();
                 }
 
                 await Task.Delay(1000, stoppingToken);
