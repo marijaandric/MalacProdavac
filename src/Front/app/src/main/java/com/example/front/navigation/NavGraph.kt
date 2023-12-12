@@ -131,16 +131,19 @@ fun SetupNavGraph(
             NewCreditCartScreen(navController, cartViewModel)
         }
         composable(
-            route = "${Screen.Shop.route}/{id}",
-            arguments = listOf(navArgument("id") { type = NavType.IntType })
+            route = "${Screen.Shop.route}/{id}/{info}",
+            arguments = listOf(navArgument("id") { type = NavType.IntType },
+                navArgument("info") { type = NavType.IntType })
         )
         { navBackStackEntry ->
             val arguments = requireNotNull(navBackStackEntry.arguments)
             val productId = arguments.getInt("id")
+            val info = arguments.getInt("info")
             ShopScreen(
                 navController = navController,
                 shopViewModel = oneShopViewModel,
-                shopId = productId
+                shopId = productId,
+                info = info
             )
         }
         composable(route = Screen.Notification.route) {

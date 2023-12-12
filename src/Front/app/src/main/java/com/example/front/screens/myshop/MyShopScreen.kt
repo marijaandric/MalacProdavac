@@ -132,14 +132,14 @@ fun MyShopScreen(navController : NavHostController, myShopViewModel: MyShopViewM
                 }
 
             }
-//        else{
-//            if(myShopViewModel.state.value.shopId != null)
-//            {
-//                val shopId = myShopViewModel.state.value.shopId!!.id
-//                Log.d("IDDDDDDDDDDD", shopId.toString())
-//                navController.navigate("${Screen.Shop.route}/$shopId")
-//            }
-//        }
+            else{
+                if(myShopViewModel.state.value.shopId != null)
+                {
+                    val x = 1
+                    val shopId = myShopViewModel.state.value.shopId!!.id
+                    navController.navigate("${Screen.Shop.route}/$shopId/$x")
+                }
+            }
         }
     }
 }

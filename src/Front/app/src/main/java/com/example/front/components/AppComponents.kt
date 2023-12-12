@@ -767,7 +767,8 @@ fun SellerCard(
                     CardButton(
                         text = "More info",
                         onClick = {
-                            navController.navigate("${Screen.Shop.route}/$id")
+                            val x = 1
+                            navController.navigate("${Screen.Shop.route}/$id/$x")
                         },
                         width = 0.52f,
                         modifier = Modifier
@@ -777,7 +778,10 @@ fun SellerCard(
                     )
                     CardButton(
                         text = "Products",
-                        onClick = { /*TODO*/ },
+                        onClick = {
+                            val x = 2
+                            navController.navigate("${Screen.Shop.route}/$id/$x")
+                        },
                         width = 1f,
                         modifier = Modifier.height(32.dp),
                         color = MaterialTheme.colorScheme.primary
@@ -939,7 +943,8 @@ fun ShopCard(
             .padding(bottom = 15.dp)
             .fillMaxWidth()
             .clickable {
-                navController.navigate("${Screen.Shop.route}/$id")
+                val x = 1
+                navController.navigate("${Screen.Shop.route}/$id/$x")
             },
     ) {
         Row(

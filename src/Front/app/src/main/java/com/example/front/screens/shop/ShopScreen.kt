@@ -110,7 +110,7 @@ import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ShopScreen(navController: NavHostController, shopViewModel: OneShopViewModel, shopId: Int) {
+fun ShopScreen(navController: NavHostController, shopViewModel: OneShopViewModel, shopId: Int, info :Int) {
     var selectedColumnIndex by remember { mutableStateOf(true) }
     var id by remember { mutableStateOf(0) }
     LaunchedEffect(Unit) {
@@ -199,7 +199,7 @@ fun ShopScreen(navController: NavHostController, shopViewModel: OneShopViewModel
                     ProfilePic(shopViewModel, id, shopId)
                 }
                 item {
-                    ShopInfo(shopViewModel, shopId, id,navController)
+                    ShopInfo(shopViewModel, shopId, id,navController, info)
                 }
             }
 
@@ -209,8 +209,8 @@ fun ShopScreen(navController: NavHostController, shopViewModel: OneShopViewModel
 
 
 @Composable
-fun ShopInfo(shopViewModel: OneShopViewModel, shopId: Int, userID: Int,navController:NavHostController) {
-    var isImageClicked by remember { mutableStateOf(true) }
+fun ShopInfo(shopViewModel: OneShopViewModel, shopId: Int, userID: Int,navController:NavHostController, info: Int) {
+    var isImageClicked by remember { mutableStateOf(if(info == 1) true else false) }
     var shopReviewsPage by remember { mutableStateOf(0f) }
 
     val scaleImage1 by animateDpAsState(

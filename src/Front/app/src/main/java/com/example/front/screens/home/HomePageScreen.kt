@@ -17,6 +17,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.CircularProgressIndicator
@@ -122,28 +124,19 @@ fun Products(viewModel: HomeViewModel, navController: NavHostController) {
                 CircularProgressIndicator()
             }
         } else {
-            LazyColumn(
-                modifier = Modifier.heightIn(100.dp, 600.dp)
+            Column(
+                //modifier = Modifier.verticalScroll(rememberScrollState())
             ) {
-                items(products) { cardData ->
-                    cardData.imageResource?.let { imageResource ->
-                        ProductCard(
-                            title = cardData.title,
-                            price = cardData.description,
-                            imageResource = imageResource,
-                            navController,
-                            cardData.id
-                        )
-                    } ?: run {
-                        // Use a default image placeholder when cardData.imageResource is null
-                        ProductCard(
-                            title = cardData.title,
-                            price = cardData.description,
-                            imageResource = "imageplaceholder.jpg", // Replace with your default image placeholder
-                            navController,
-                            cardData.id
-                        )
-                    }
+                products.forEach { cardData ->
+                    val imageResource = cardData.imageResource ?: "imageplaceholder.jpg"
+
+                    ProductCard(
+                        title = cardData.title,
+                        price = cardData.description,
+                        imageResource = imageResource,
+                        navController,
+                        cardData.id
+                    )
                 }
             }
         }

@@ -517,10 +517,9 @@ class OneShopViewModel @Inject constructor(
 
     fun newProductDisplay(productDisplay: NewProductDisplayDTO) {
         viewModelScope.launch {
-            Log.d("SALJEM", productDisplay.toString())
             try {
                 val response = repository.newProductDisplay(productDisplay)
-                Log.d("NEW PRODUCT", response.body().toString())
+
                 if (response.isSuccessful) {
                     val res = response.body()
                     _stateNewProductDisplay.value = _stateNewProductDisplay.value.copy(
