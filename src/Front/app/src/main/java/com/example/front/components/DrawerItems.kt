@@ -4,6 +4,7 @@ import com.example.front.R
 import com.example.front.navigation.Screen
 
 val DrawerItems = listOf(
+    DrawerItem(icon = R.drawable.navbar_profile, label = "Profile", route = Screen.MyProfile.route, secondaryLabel = "",roleId=1),
     DrawerItem(icon = R.drawable.navbar_home, label = "Home", route = Screen.Home.route, secondaryLabel = "",roleId=1),
     DrawerItem(icon = R.drawable.navbar_cart2, label = "My cart", route = Screen.Cart.route, secondaryLabel = "",roleId=1),
     DrawerItem(icon = R.drawable.navbar_cart1, label = "My orders", route = Screen.Orders.route, secondaryLabel = "",roleId=1),
@@ -12,7 +13,6 @@ val DrawerItems = listOf(
     DrawerItem(icon = R.drawable.navbar_bell, label = "Notifications", route = Screen.Notification.route, secondaryLabel = "",roleId=1),
     DrawerItem(icon = R.drawable.navbar_shop2, label = "My shop", route = Screen.MyShop.route, secondaryLabel = "",roleId=2),
     DrawerItem(icon = R.drawable.navbar_message, label = "Messages", route = Screen.Home.route, secondaryLabel = "",roleId=1),
-    DrawerItem(icon = R.drawable.navbar_profile, label = "Profile", route = Screen.MyProfile.route, secondaryLabel = "",roleId=1),
     DrawerItem(icon = R.drawable.navbar_profile, label = "Delivery profile", route = Screen.Home.route, secondaryLabel = "",roleId=3),
     DrawerItem(icon = R.drawable.navbar_car, label = "Deliveries", route = Screen.Delivery.route, secondaryLabel = "",roleId=3),
 )

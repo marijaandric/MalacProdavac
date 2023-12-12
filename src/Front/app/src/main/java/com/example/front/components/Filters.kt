@@ -419,27 +419,27 @@ fun SortDialog(onDismiss: () -> Unit, shopsViewModel: OneShopViewModel, shopId: 
                     Text(
                         "Default", style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.primary), modifier = Modifier
                             .padding(bottom = 16.dp)
-                            .clickable { shopsViewModel.Sort(0,shopId) }
+                            .clickable { shopsViewModel.Sort(0,shopId); onDismiss() }
                     )
                     Text(
                         "Rating (lowest first)", style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.primary), modifier = Modifier
                             .padding(bottom = 16.dp)
-                            .clickable { shopsViewModel.Sort(1,shopId) }
+                            .clickable { shopsViewModel.Sort(1,shopId); onDismiss() }
                     )
                     Text(
                         "Rating (highest first)", style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.primary), modifier = Modifier
                             .padding(bottom = 16.dp)
-                            .clickable { shopsViewModel.Sort(2,shopId) }
+                            .clickable { shopsViewModel.Sort(2,shopId); onDismiss() }
                     )
                     Text(
                         "Alphabetically (ascending)", style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.primary), modifier = Modifier
                             .padding(bottom = 16.dp)
-                            .clickable { shopsViewModel.Sort(3,shopId) }
+                            .clickable { shopsViewModel.Sort(3,shopId); onDismiss() }
                     )
                     Text(
                         "Alphabetically (descending)", style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.primary), modifier = Modifier
                             .padding(bottom = 16.dp)
-                            .clickable { shopsViewModel.Sort(4,shopId) }
+                            .clickable { shopsViewModel.Sort(4,shopId) ; onDismiss()}
                     )
                 }
             }

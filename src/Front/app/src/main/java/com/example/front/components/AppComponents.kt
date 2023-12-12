@@ -342,8 +342,8 @@ fun SearchTextField(
         placeholder = {
             Text(
                 text = placeh,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth() // Ensure the Text takes up the full width
+                textAlign = TextAlign.Left,
+                modifier = Modifier.fillMaxWidth()
             )
         }
     )

@@ -2,7 +2,7 @@ package com.example.front.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
+val Purple80 = Color(0xff77a7ca)
 val PurpleGrey80 = Color(0xFFDDDDDD)
 val Pink80 = Color(0xFFEFB8C8)
 
@@ -14,7 +14,7 @@ val MainBlue = Color(0xff457fa8)
 val LightBlue = Color(0xff77a7ca)
 val DarkBlue = Color(0xff294e68)
 val Orange = Color(0xffe48359)
-val LightGrey  = Color(0xFFDDDDDD)
+val LightGrey  = Color(0xFFECECEC)
 val DarkGrey = Color(0xff2e2e2e)
 
 val Black = Color(0xFF000000)

@@ -61,6 +61,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -328,7 +329,7 @@ fun Products(isImageClicked: Boolean, shopViewModel: OneShopViewModel, shopId: I
     }
     if (showElseText && !isImageClicked) {
         Column {
-            if (!shopViewModel.state.value.shop!!.isOwner) {
+            if (shopViewModel.state.value.shop!!.isOwner) {
                 Column(
                     modifier = Modifier
                         .padding(top = 30.dp)
@@ -921,59 +922,63 @@ fun Info(
                         style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onSurface)
                     )
                 }
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                )
+                if (!shopViewModel.state.value.shop!!.isOwner)
                 {
-                    Text(
-                        text = "Leave a review",
-                        modifier = Modifier.padding(top = 8.dp),
-                        style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onBackground)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     )
-                    Icon(
-                        imageVector = if (leaveAReview) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .clickable {
-                                leaveAReview = !leaveAReview
-                            }
-                            .padding(top = 8.dp)
-                            .size(30.dp),
-                        tint = MaterialTheme.colorScheme.onBackground
-                    )
-                }
-                if (leaveAReview) {
-                    StarRating { rating ->
-                        selectedRating = rating
-                    }
-                    CommentsTextBox(
-                        onReviewTextChanged = { newText -> comment = newText },
-                        placeholder = "Leave a review"
-                    )
-                    CardButton(
-                        "Submit review", onClick = {
-                            shopViewModel.leaveReview(shopId, userID, selectedRating, comment)
-                            toast = true
-                        }, 0.9f,
-                        Modifier
-                            .align(Alignment.CenterHorizontally)
-                            .height(50.dp), MaterialTheme.colorScheme.secondary
-                    )
-                    if (!shopViewModel.statePostReview.value.isLoading && toast) {
-                        Toast.makeText(context, "Review successfully submitted", Toast.LENGTH_LONG)
-                            .show()
-                        shopViewModel.getShopReview(
-                            shopId,
-                            reviewPage
+                    {
+                        Text(
+                            text = "Leave a review",
+                            modifier = Modifier.padding(top = 8.dp),
+                            style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onBackground)
                         )
-                        toast = false
-                    } else if (shopViewModel.statePostReview.value.error.isNotEmpty() && toast) {
-                        Toast.makeText(context, "Error", Toast.LENGTH_LONG).show()
-                        toast = false
+                        Icon(
+                            imageVector = if (leaveAReview) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .clickable {
+                                    leaveAReview = !leaveAReview
+                                }
+                                .padding(top = 8.dp)
+                                .size(30.dp),
+                            tint = MaterialTheme.colorScheme.onBackground
+                        )
+                    }
+                    if (leaveAReview) {
+                        StarRating { rating ->
+                            selectedRating = rating
+                        }
+                        CommentsTextBox(
+                            onReviewTextChanged = { newText -> comment = newText },
+                            placeholder = "Leave a review"
+                        )
+                        CardButton(
+                            "Submit review", onClick = {
+                                shopViewModel.leaveReview(shopId, userID, selectedRating, comment)
+                                toast = true
+                            }, 0.9f,
+                            Modifier
+                                .align(Alignment.CenterHorizontally)
+                                .height(50.dp), MaterialTheme.colorScheme.secondary
+                        )
+                        if (!shopViewModel.statePostReview.value.isLoading && toast) {
+                            Toast.makeText(context, "Review successfully submitted", Toast.LENGTH_LONG)
+                                .show()
+                            shopViewModel.getShopReview(
+                                shopId,
+                                reviewPage
+                            )
+                            toast = false
+                        } else if (shopViewModel.statePostReview.value.error.isNotEmpty() && toast) {
+                            Toast.makeText(context, "Error", Toast.LENGTH_LONG).show()
+                            toast = false
+                        }
                     }
                 }
+
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,

@@ -303,13 +303,12 @@ fun ShopsComponent(products: List<DataCard>, navController: NavHostController) {
         modifier = Modifier
             .padding(20.dp)
     ) {
-        LazyColumn(
-            modifier = Modifier.heightIn(100.dp, 600.dp)
+        Column(
+
         ) {
-            items(products) { cardData ->
+            products.forEach { cardData ->
                 var rating: String = "Rate this store first!"
-                if(cardData.rating > 0f)
-                {
+                if (cardData.rating > 0f) {
                     rating = cardData.rating.toString()
                 }
                 ShopCard(
@@ -649,8 +648,8 @@ fun MapFilters(
                         sliderValue = newValue
                         onSliderChange(sliderValue)
                     },
-                    valueRange = 10f..100f,
                     steps = 9,
+                    valueRange = 5f..100f,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 16.dp),
