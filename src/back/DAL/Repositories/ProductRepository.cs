@@ -361,7 +361,7 @@ namespace back.DAL.Repositories
                     { "score", "850" },
                     { "time", "2:45" },
                     },
-                    Token = "dNfa7FR1Rne-30sShKnHRQ:APA91bFa_Mc6KQMDzSVt1tXvfea7M986PDwq3Tp0SKbK-ITWn5928p1PSDxUxwdTdah4XB4-2NhaflYifX6gJByopXPj61n6uCZeYD9v7nvyx5O5mgiGwdW9GHqzURH7DVxPGsgvRcx8",
+                    Token = fcmToken,
                 };
 
                 try

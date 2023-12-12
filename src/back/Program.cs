@@ -15,7 +15,7 @@ builder.Services.AddDbContext<Context>();
 
 FirebaseApp.Create(new AppOptions
 {
-    Credential = GoogleCredential.FromFile("front-6a640-firebase-adminsdk-nli5s-90e9291907.json")
+    Credential = GoogleCredential.FromFile("smalltrades-74681-firebase-adminsdk-f0k76-16312ec3fb.json")
 });
 
 builder.Services.AddAuthentication(x =>

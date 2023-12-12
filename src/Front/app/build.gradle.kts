@@ -5,8 +5,9 @@ plugins {
     kotlin("kapt")
     id("com.google.dagger.hilt.android")
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
-    id("com.google.gms.google-services")
     id("io.realm.kotlin") version "1.11.0" apply true
+    id("kotlin-android")
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -28,11 +29,12 @@ android {
     }
 
     buildTypes {
-        release {
+        getByName("release") {
             isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
         }
     }
+
     compileOptions {
         //sourceCompatibility = JavaVersion.VERSION_1_8
         //targetCompatibility = JavaVersion.VERSION_1_8
@@ -54,6 +56,7 @@ android {
             excludes.add("META-INF/*")
         }
     }
+    buildToolsVersion = "34.0.0"
 
 }
 
@@ -67,13 +70,7 @@ dependencies {
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
-    implementation("androidx.compose.material3:material3")
-    implementation("com.google.firebase:firebase-messaging-ktx:23.3.1")
-    implementation("com.google.firebase:firebase-messaging:23.3.1")
-    implementation("com.google.firebase:firebase-common-ktx:20.4.2")
     implementation("androidx.work:work-runtime-ktx:2.8.1")
-    implementation("com.google.firebase:firebase-auth-ktx:22.3.0")
-    implementation("com.google.firebase:firebase-appdistribution-gradle:4.0.1")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
@@ -102,8 +99,10 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.11.0")
 
     // retrofit
-    implementation ("com.squareup.retrofit2:retrofit:2.7.2")
-    implementation ("com.squareup.retrofit2:converter-gson:2.7.2")
+    implementation("com.squareup.retrofit2:retrofit:2.7.2")
+    implementation("com.squareup.retrofit2:converter-gson:2.7.2")
+
+    implementation("com.google.code.gson:gson:2.8.6")
 
     //material za snackbar
     implementation("androidx.compose.material:material:1.0.3")
@@ -142,35 +141,16 @@ dependencies {
     implementation("com.google.android.gms:play-services-maps:18.1.0")
 
     // osm
-    implementation ("org.osmdroid:osmdroid-android:6.1.10")
-    implementation ("com.google.android.gms:play-services-location:17.1.0")
+    implementation("org.osmdroid:osmdroid-android:6.1.10")
+    implementation("com.google.android.gms:play-services-location:17.1.0")
 
 
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1")
 
-    // Required when asking for permission to post notifications (starting in Android 13)
-    implementation("androidx.activity:activity-ktx:1.8.1")
-    implementation("androidx.fragment:fragment-ktx:1.6.2")
-
-    implementation("com.google.android.material:material:1.9.0")
-
-    // Import the Firebase BoM (see: https://firebase.google.com/docs/android/learn-more#bom)
-    implementation(platform("com.google.firebase:firebase-bom:32.6.0"))
-
-    // Firebase Cloud Messaging
-    implementation("com.google.firebase:firebase-messaging:23.3.1")
-
-    // For an optimal experience using FCM, add the Firebase SDK
-    // for Google Analytics. This is recommended, but not required.
-    implementation("com.google.firebase:firebase-analytics")
-
-    
-    implementation("com.google.firebase:firebase-installations:17.2.0")
-
     implementation("androidx.work:work-runtime:2.8.1")
 
     implementation("androidx.compose.material3:material3:1.2.0-alpha12")
-    
+
     //Realm
     implementation("io.realm.kotlin:library-base:1.11.0")
 
@@ -178,7 +158,9 @@ dependencies {
     implementation("com.maxkeppeler.sheets-compose-dialogs:core:1.2.0")
     implementation("com.maxkeppeler.sheets-compose-dialogs:calendar:1.2.0")
 
-
+    implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
+    implementation("com.google.firebase:firebase-messaging")
+    implementation("com.google.firebase:firebase-analytics-ktx")
 }
 
 kapt {

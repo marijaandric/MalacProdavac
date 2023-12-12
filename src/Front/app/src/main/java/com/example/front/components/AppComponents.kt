@@ -81,7 +81,6 @@ import com.example.front.ui.theme.LightBlue
 import com.example.front.ui.theme.MainBlue
 import com.example.front.ui.theme.Typography
 import kotlinx.coroutines.launch
-import org.checkerframework.common.subtyping.qual.Bottom
 import kotlin.io.encoding.ExperimentalEncodingApi
 
 @Composable

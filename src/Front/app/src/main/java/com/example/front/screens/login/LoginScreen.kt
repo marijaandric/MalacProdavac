@@ -49,8 +49,8 @@ fun LoginScreen(
     navController: NavHostController,
     viewModel: LoginViewModel
 ) {
-    var userInput by remember { mutableStateOf("marija.andric") }
-    var passwordInput by remember { mutableStateOf("MejoSmrdi123!") }
+    var userInput by remember { mutableStateOf("milica.vasovic") }
+    var passwordInput by remember { mutableStateOf("ComeSmrdi123!") }
 
     var scaffoldState: ScaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()

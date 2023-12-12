@@ -101,14 +101,13 @@ fun CheckoutScreen(
         viewModel.getCheckoutData(shopsTotals)
     }
 
-    val date = remember { mutableStateOf(LocalDate.now())}
-    val isOpen = remember { mutableStateOf(false)}
+    val date = remember { mutableStateOf(LocalDate.now()) }
+    val isOpen = remember { mutableStateOf(false) }
 //    val isOpenMap = remember { mutableStateMapOf<Int, Boolean>() }
 //    val isOpenMap = remember { mutableStateMapOf<Int, MutableState<Boolean>>() }
 //    val dateMap = remember { mutableStateMapOf<Int, MutableState<LocalDate>>() }
     val isOpenMap = remember { mutableStateMapOf<Int, Boolean>() }
     val dateMap = remember { mutableStateMapOf<Int, LocalDate>() }
-
 
 
     val checkoutState = viewModel.state.value
@@ -137,11 +136,11 @@ fun CheckoutScreen(
                 .verticalScroll(scrollState),
             color = Color.White
         ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                ) {
-                    SmallElipseAndTitle(title = "Checkout", drawerState)
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                SmallElipseAndTitle(title = "Checkout", drawerState)
 
 //                    Row(verticalAlignment = Alignment.CenterVertically) {
 //
@@ -176,224 +175,224 @@ fun CheckoutScreen(
 //                    }
 //                    DatePicker(state = datePickerState, )
 
-                        //kartice
-                        LazyRow(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(10.dp)
-                        ) {
-                            item {
-                                CreditCard()
-                            }
-                            item {
-                                CreditCard()
-                            }
-                            item {
-                                CreditCard()
-                            }
-                            item {
-                                CreditCard()
-                            }
-                        }
+                //kartice
+                LazyRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp)
+                ) {
+                    item {
+                        CreditCard()
+                    }
+                    item {
+                        CreditCard()
+                    }
+                    item {
+                        CreditCard()
+                    }
+                    item {
+                        CreditCard()
+                    }
+                }
 
-                        //dodavanje novih kartica
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(8.dp),
-                            verticalArrangement = Arrangement.SpaceBetween,
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Row(
-                                modifier = Modifier
-                                    .padding(15.dp)
-                            ) {
-                                ButtonWithIcon(
-                                    text = "Add Credit/Debit Card",
-                                    onClick = { navController.navigate(route = Screen.NewCreditCard.route) },
-                                    width = 0.8f,
-                                    modifier = Modifier.padding(10.dp),
-                                    color = MaterialTheme.colorScheme.primary,
-                                    imagePainter = painterResource(id = R.drawable.ion_card_outline),
-                                    height = 50
-                                )
-                            }
-                            Row(
-                                modifier = Modifier
-                                    .padding(15.dp)
-                            ) {
-                                ButtonWithIcon(
-                                    text = "Paypal",
-                                    onClick = { /*navController.navigate()*/ },
-                                    width = 0.8f,
-                                    modifier = Modifier.padding(10.dp),
-                                    color = MaterialTheme.colorScheme.primary,
-                                    imagePainter = painterResource(id = R.drawable.logos_paypal),
-                                    height = 50
-                                )
-                            }
-                        }
+                //dodavanje novih kartica
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    verticalArrangement = Arrangement.SpaceBetween,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .padding(15.dp)
+                    ) {
+                        ButtonWithIcon(
+                            text = "Add Credit/Debit Card",
+                            onClick = { navController.navigate(route = Screen.NewCreditCard.route) },
+                            width = 0.8f,
+                            modifier = Modifier.padding(10.dp),
+                            color = MaterialTheme.colorScheme.primary,
+                            imagePainter = painterResource(id = R.drawable.ion_card_outline),
+                            height = 50
+                        )
+                    }
+                    Row(
+                        modifier = Modifier
+                            .padding(15.dp)
+                    ) {
+                        ButtonWithIcon(
+                            text = "Paypal",
+                            onClick = { /*navController.navigate()*/ },
+                            width = 0.8f,
+                            modifier = Modifier.padding(10.dp),
+                            color = MaterialTheme.colorScheme.primary,
+                            imagePainter = painterResource(id = R.drawable.logos_paypal),
+                            height = 50
+                        )
+                    }
+                }
 
 
-                        //Spisak prodavnica
-                        Column(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(horizontal = 16.dp, vertical = 0.dp)
+                //Spisak prodavnica
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 16.dp, vertical = 0.dp)
 //                                .weight(1f)
-                        ) {
-                            shops.forEach { shop ->
+                ) {
+                    shops.forEach { shop ->
 //                                item {
 
-                                //slika, mapa, adresa, ukupno?, deliveri-pickup,
+                        //slika, mapa, adresa, ukupno?, deliveri-pickup,
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp)
+                                .shadow(4.dp),
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(50.dp)
+//                                        .border(1.dp, Color.Red, RectangleShape)
+                            ) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.ellipsebrojdva),
+                                    contentDescription = "",
+                                    modifier = Modifier
+                                        .height(50.dp)
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 4.dp),
+                                    contentScale = ContentScale.FillBounds
+                                )
+                                Column {
+                                    Spacer(Modifier.weight(1f))
+                                    Text(
+                                        text = shop.name,
+                                        fontSize = 24.sp,
+                                        fontFamily = FontFamily(Font(R.font.lexend)),
+                                        fontWeight = FontWeight(500),
+                                        textAlign = TextAlign.Center,
+                                        color = Color.White,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(8.dp)
+                                    )
+                                }
+                            }
+
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+//                                        .border(1.dp, Color.Blue, RectangleShape)
+                            ) {
+                                // mapa
+                                Box(
+                                    modifier = Modifier
+                                        .height(130.dp)
+                                        .width(130.dp)
+                                        .padding(8.dp)
+                                        .border(1.dp, Color.Red, RectangleShape)
+                                ) {}
+                                // adresa
                                 Column(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(8.dp)
-                                        .shadow(4.dp),
-                                ) {
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .height(50.dp)
-//                                        .border(1.dp, Color.Red, RectangleShape)
-                                    ) {
-                                        Image(
-                                            painter = painterResource(id = R.drawable.ellipsebrojdva),
-                                            contentDescription = "",
-                                            modifier = Modifier
-                                                .height(50.dp)
-                                                .fillMaxWidth()
-                                                .padding(horizontal = 4.dp),
-                                            contentScale = ContentScale.FillBounds
-                                        )
-                                        Column {
-                                            Spacer(Modifier.weight(1f))
-                                            Text(
-                                                text = shop.name,
-                                                fontSize = 24.sp,
-                                                fontFamily = FontFamily(Font(R.font.lexend)),
-                                                fontWeight = FontWeight(500),
-                                                textAlign = TextAlign.Center,
-                                                color = Color.White,
-                                                modifier = Modifier
-                                                    .fillMaxWidth()
-                                                    .padding(8.dp)
-                                            )
-                                        }
-                                    }
-
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-//                                        .border(1.dp, Color.Blue, RectangleShape)
-                                    ) {
-                                        // mapa
-                                        Box(
-                                            modifier = Modifier
-                                                .height(130.dp)
-                                                .width(130.dp)
-                                                .padding(8.dp)
-                                                .border(1.dp, Color.Red, RectangleShape)
-                                        ) {}
-                                        // adresa
-                                        Column(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .height(146.dp)
+                                        .height(146.dp)
 //                                            .border(1.dp, Color.Blue, RectangleShape)
-                                            ,
-                                            verticalArrangement = Arrangement.SpaceBetween,
-                                            horizontalAlignment = Alignment.CenterHorizontally
-                                        ) {
-                                            Text(
-                                                text = shop.address.substring(
-                                                    0,
-                                                    shop.address.length - 8
-                                                ),
-                                                modifier = Modifier.padding(top = 20.dp)
+                                    ,
+                                    verticalArrangement = Arrangement.SpaceBetween,
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Text(
+                                        text = shop.address.substring(
+                                            0,
+                                            shop.address.length - 8
+                                        ),
+                                        modifier = Modifier.padding(top = 20.dp)
 
-                                            )
-                                            Text(
-                                                text = "Ukupno: ${shop.total} rsd",
-                                                modifier = Modifier.padding(bottom = 20.dp)
-                                            )
-                                        }
-                                    }
+                                    )
+                                    Text(
+                                        text = "Ukupno: ${shop.total} rsd",
+                                        modifier = Modifier.padding(bottom = 20.dp)
+                                    )
+                                }
+                            }
 
 
-                                    // slider delivery-pickup
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
+                            // slider delivery-pickup
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
 //                                    .border(1.dp, Color.Yellow, RectangleShape)
-                                        ,
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.SpaceEvenly
-                                    ) {
+                                ,
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceEvenly
+                            ) {
 
-                                        Text(text = "Delivery")
-                                        Switch(
-                                            checked = shop.selfpickup,
-                                            onCheckedChange = {
-                                                viewModel.updateSelfPickup(shop.id, it)
-                                                println(shop.selfpickup)
-                                            }
-                                        )
-                                        Text(text = "Self pickup")
+                                Text(text = "Delivery")
+                                Switch(
+                                    checked = shop.selfpickup,
+                                    onCheckedChange = {
+                                        viewModel.updateSelfPickup(shop.id, it)
+                                        println(shop.selfpickup)
                                     }
-                                    // opciono datepicker
-                                    if (shop.selfpickup) {
-                                        Row(
-                                            verticalAlignment = Alignment.CenterVertically,
-                                            horizontalArrangement = Arrangement.Center,
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(bottom = 8.dp)
-                                        ) {
-                                            OutlinedTextField(
-                                                readOnly = true,
-                                                value = dateMap[shop.id]?.format(DateTimeFormatter.ISO_DATE)
-                                                    ?: "",
-                                                label = { Text("Date") },
-                                                onValueChange = {})
+                                )
+                                Text(text = "Self pickup")
+                            }
+                            // opciono datepicker
+                            if (shop.selfpickup) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.Center,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(bottom = 8.dp)
+                                ) {
+                                    OutlinedTextField(
+                                        readOnly = true,
+                                        value = dateMap[shop.id]?.format(DateTimeFormatter.ISO_DATE)
+                                            ?: "",
+                                        label = { Text("Date") },
+                                        onValueChange = {})
 
-                                            IconButton(
-                                                onClick = { isOpenMap[shop.id] = true }
-                                            ) {
-                                                Icon(
-                                                    imageVector = Icons.Default.DateRange,
-                                                    contentDescription = "Calendar"
-                                                )
-                                            }
-                                        }
-
-                                        if (isOpenMap[shop.id] == true) {
-                                            ModalDatePicker(
-                                                onAccept = {
-                                                    isOpenMap[shop.id] = false
-
-                                                    if (it != null) { // Set the date
-                                                        dateMap[shop.id] = Instant
-                                                            .ofEpochMilli(it)
-                                                            .atZone(ZoneId.of("UTC"))
-                                                            .toLocalDate()
-                                                    }
-                                                },
-                                                onCancel = {
-                                                    isOpenMap[shop.id] = false //close dialog
-                                                }
-                                            )
-                                        }
+                                    IconButton(
+                                        onClick = { isOpenMap[shop.id] = true }
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.DateRange,
+                                            contentDescription = "Calendar"
+                                        )
                                     }
                                 }
-                                Spacer(modifier = Modifier.height(22.dp))
-                                
+
+                                if (isOpenMap[shop.id] == true) {
+                                    ModalDatePicker(
+                                        onAccept = {
+                                            isOpenMap[shop.id] = false
+
+                                            if (it != null) { // Set the date
+                                                dateMap[shop.id] = Instant
+                                                    .ofEpochMilli(it)
+                                                    .atZone(ZoneId.of("UTC"))
+                                                    .toLocalDate()
+                                            }
+                                        },
+                                        onCancel = {
+                                            isOpenMap[shop.id] = false //close dialog
+                                        }
+                                    )
+                                }
                             }
                         }
+                        Spacer(modifier = Modifier.height(22.dp))
 
-
+                    }
                 }
+
+
+            }
 //            }
         }
     }
