@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "36660902632",
+    "project_id": "smalltrades-74681",
+    "storage_bucket": "smalltrades-74681.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:36660902632:android:289c374e710733f003275d",
+        "android_client_info": {
+          "package_name": "com.example.front"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDSB5qSl5q-23YnUQl92hE_RfuZsjC6gaQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
