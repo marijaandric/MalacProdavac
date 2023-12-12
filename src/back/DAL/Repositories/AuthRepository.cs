@@ -19,7 +19,7 @@ namespace back.DAL.Repositories
         }
         public async Task<User> GetUser(string username)
         {
-            return await _context.Users.Where(x => x.Username.Equals(username)).FirstOrDefaultAsync();
+            return await _context.Users.Where(x => x.Username.Equals(username) || x.Email.Equals(username)).FirstOrDefaultAsync();
         }
         public async Task<User> GetUser(int userId)
         {

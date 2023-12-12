@@ -76,6 +76,10 @@ namespace back.BLL.Services
         public async Task<bool> InsertShop(ShopDto shop)
         {
             (double, double) coords = await HelperService.GetCoordinates(shop.Address);
+            string? accNum = null;
+
+            if (shop.AccountNumber != null) accNum = shop.AccountNumber;
+
             Shop s = new Shop
             {
                 Address = shop.Address,
@@ -83,7 +87,8 @@ namespace back.BLL.Services
                 OwnerId = shop.OwnerId,
                 PIB = shop.PIB,
                 Latitude = (float)coords.Item1,
-                Longitude = (float)coords.Item2
+                Longitude = (float)coords.Item2,
+                AccountNumber = accNum
             };
 
             if (!await _repository.InsertShop(s)) throw new ArgumentException("Shop couldn't be saved!");

@@ -3,6 +3,7 @@ using back.DAL.Repositories;
 using back.Models;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Linq;
+using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -134,10 +135,12 @@ namespace back.BLL.Services
             if (!CheckAddress(userDto.Address)) throw new ArgumentException("Invalid form. \nRequired form: Street, City, Country");
             #endregion
 
+            TextInfo textInfo = CultureInfo.CurrentCulture.TextInfo;
+
             User user = new User();
 
-            user.Name = userDto.Name;
-            user.Lastname = userDto.Lastname;
+            user.Name = textInfo.ToTitleCase(userDto.Name);
+            user.Lastname = textInfo.ToTitleCase(userDto.Lastname);
             user.Username = CreateUsername(user.Name, user.Lastname);
             user.Email = userDto.Email.ToLower();
             user.Address = userDto.Address;

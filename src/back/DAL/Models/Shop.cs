@@ -15,6 +15,7 @@ namespace back.Models
         public float? Latitude { get; set; }
         public float? Longitude { get; set; }
         public string? Image {  get; set; }
+        public string? AccountNumber { get; set; }
 
         public User Owner { get; set; }
     }

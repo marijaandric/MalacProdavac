@@ -164,8 +164,8 @@ namespace back.DAL.Repositories
         public async Task<PaymentSlipInfo> GetPaymentSlipInfo(int userId, int shopId)
         {
             User u = await _context.Users.FirstOrDefaultAsync(x => x.Id == userId);
-            int rcvId = (await _context.Shop.FirstOrDefaultAsync(x => x.Id == shopId)).OwnerId;
-            User rcv = await _context.Users.FirstOrDefaultAsync(x => x.Id == rcvId);
+            Shop shop = await _context.Shop.FirstOrDefaultAsync(x => x.Id == shopId);
+            User rcv = await _context.Users.FirstOrDefaultAsync(x => x.Id == shop.OwnerId);
             return new PaymentSlipInfo
             {
                 Name = u.Name,
@@ -174,7 +174,7 @@ namespace back.DAL.Repositories
                 NameRcv = rcv.Name,
                 LastnameRcv = rcv.Lastname,
                 AddressRcv = rcv.Address,
-                AccountNumberRcv = rcv.AccountNumber,
+                AccountNumberRcv = shop.AccountNumber,
             };
         }
 

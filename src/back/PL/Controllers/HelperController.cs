@@ -28,11 +28,11 @@ namespace back.PL.Controllers
         }
 
         [HttpGet("GeneratePaymentSlip")]
-        public async Task<IActionResult> GeneratePaymentSlip(int userId, int shopId, float amount, string? address)
+        public async Task<IActionResult> GeneratePaymentSlip(int userId, int shopId, float amount)
         {
             try
             {
-                return Ok(new { Success = await _service.GeneratePaymentSlip(userId, shopId, amount, address) });
+                return Ok(new { Success = await _service.GeneratePaymentSlip(userId, shopId, amount) });
             }
             catch (Exception ex)
             {

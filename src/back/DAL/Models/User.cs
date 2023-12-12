@@ -24,7 +24,6 @@ namespace back.Models
         public string? Image {  get; set; }
         public float LatestLatitude { get; set; }
         public float LatestLongitude { get; set; }
-        public string? AccountNumber { get; set; }
         public Role Role { get; set; }
 
         public String? FCMToken { get; set; }

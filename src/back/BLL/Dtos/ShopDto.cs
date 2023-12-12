@@ -10,5 +10,6 @@ namespace back.BLL.Dtos
         public List<int> Categories { get; set; }
         public List<WorkingHoursDto> WorkingHours { get; set; }
         public int PIB {  get; set; }
+        public string? AccountNumber { get; set; }
     }
 }

@@ -7,6 +7,7 @@ using iText.Kernel.Pdf;
 using iText.Layout;
 using iText.IO.Image;
 using back.Models;
+using System.Globalization;
 
 namespace back.BLL.Services
 {
@@ -117,11 +118,11 @@ namespace back.BLL.Services
             return distance;
         }
 
-        public async Task<string> GeneratePaymentSlip(int userId, int shopId, float amount, string? address)
+        public async Task<string> GeneratePaymentSlip(int userId, int shopId, float amount)
         {
 
             PaymentSlipInfo info = await _orderRepository.GetPaymentSlipInfo(userId, shopId);
-            if (address != null) info.Address = address;
+            if (info.AccountNumberRcv == null) throw new ArgumentException("Cannot generate payment slip. The shop owner did not specify their account number.");
 
             string imagePath = Path.Combine(folderPath, "template.jpg");
             string output, outputPath;
@@ -132,7 +133,9 @@ namespace back.BLL.Services
                 {
                     Font font = new Font("Arial", 10, FontStyle.Regular, GraphicsUnit.Pixel);
 
-                    string snd = info.Name + " " + info.Lastname + "\n" + info.Address;
+                    string snd = info.Name + " " + info.Lastname;
+                    if (info.Address != null) snd += "\n" + info.Address;
+
                     string purpose = "Placanje porudzbine";
                     string rcv = info.NameRcv + " " + info.LastnameRcv + "\n" + info.AddressRcv;
                     string amountStr = "= " + amount.ToString("N2", new System.Globalization.CultureInfo("de-DE"));
