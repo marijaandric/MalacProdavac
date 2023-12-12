@@ -70,6 +70,7 @@ private fun mapView(context: Context, shopsViewModel: ShopsViewModel): MapView {
     marker.icon = BitmapDrawable(context.resources, currPic)
     marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
     marker.position = geoPoint
+    shopsViewModel.changeCoordinates(geoPoint)
     val title = "Your Current Position!"
     marker.title = title
     mapView.overlays.add(marker)

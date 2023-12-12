@@ -1,5 +1,6 @@
 package com.example.front.screens.sellers
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -42,6 +43,7 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -91,9 +93,6 @@ fun SellersScreen(navController: NavHostController, shopsViewModel: ShopsViewMod
         shopsViewModel.getUserId()
             ?.let { shopsViewModel.getShopPages(it,false)}
     }
-
-    val x = Osm(shopsViewModel = shopsViewModel)
-    shopsViewModel.changeCoordinates(x)
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     Sidebar(
@@ -446,6 +445,7 @@ fun Overlay(onDismiss: () -> Unit, shopsViewModel:ShopsViewModel) {
 }
 
 
+@SuppressLint("UnrememberedMutableState")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FiltersDialog(onDismiss: () -> Unit, shopsViewModel: ShopsViewModel) {
@@ -457,6 +457,15 @@ fun FiltersDialog(onDismiss: () -> Unit, shopsViewModel: ShopsViewModel) {
     var open by remember { mutableStateOf(if(shopsViewModel.filtersState.value.open != null)shopsViewModel.filtersState.value.open else false ) }
     var location by remember { mutableStateOf(if(shopsViewModel.filtersState.value.location == null) "" else shopsViewModel.filtersState.value.location.toString()) }
     var range by remember {mutableStateOf(if(shopsViewModel.filtersState.value.range != null) shopsViewModel.filtersState.value.range!!.toFloat() else 0f)}
+
+    LaunchedEffect(shopsViewModel.filtersState.value)
+    {
+        selectedCategories = shopsViewModel.filtersState.value.categories!!.toMutableList()
+        review = shopsViewModel.filtersState.value.rating
+        open = if(shopsViewModel.filtersState.value.open != null)shopsViewModel.filtersState.value.open else false
+        location = if(shopsViewModel.filtersState.value.location == null) "" else shopsViewModel.filtersState.value.location.toString()
+        range = if(shopsViewModel.filtersState.value.range != null) shopsViewModel.filtersState.value.range!!.toFloat() else 0f
+    }
 
     Dialog(
         properties = DialogProperties(usePlatformDefaultWidth = false),
@@ -580,7 +589,7 @@ fun MapFilters(
         val switch = if(shopsViewModel.filtersState.value.range == null)false else if(shopsViewModel.filtersState.value.range != 0) true else false
         val slider =if(shopsViewModel.filtersState.value.range != null) shopsViewModel.filtersState.value.range!!.toFloat() else 0f
 
-        value = if(location == null) "" else location.toString()
+        value = if(location == null || location == "") "" else location.toString()
         switchState = switch
         sliderValue = slider
     }

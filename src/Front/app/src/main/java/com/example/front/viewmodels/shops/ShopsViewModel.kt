@@ -184,7 +184,7 @@ class ShopsViewModel @Inject constructor(
     fun withoutFilters()
     {
         _filtersState.value = _filtersState.value.copy(
-            1, listOf(), null, null,0, null, 0, null, 1
+            userId = 1,categories = listOf(),rating= null, open=null,range=0,location= null,sort= 0, search = null,page =1
         )
     }
 
@@ -221,7 +221,6 @@ class ShopsViewModel @Inject constructor(
 
     fun changeCoordinates(geoPoint: GeoPoint?)
     {
-        Log.d("Promena", geoPoint.toString())
         _filtersState.value = _filtersState.value.copy(
             currLat = geoPoint!!.latitude.toFloat(),
             currLon = geoPoint!!.longitude.toFloat(),
