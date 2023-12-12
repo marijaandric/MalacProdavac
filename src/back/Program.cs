@@ -57,6 +57,8 @@ builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IDeliveryRepository, DeliveryRepository>();
 builder.Services.AddScoped<IDeliveryService, DeliveryService>();
+builder.Services.AddScoped<IBackgroundRepository, BackgroundRepository>();
+builder.Services.AddHostedService<BackgroundHandlerService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
