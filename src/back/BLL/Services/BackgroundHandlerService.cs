@@ -23,13 +23,32 @@ namespace back.BLL.Services
                     var _notificationRepository = scope.ServiceProvider.GetRequiredService<INotificationRepository>();
                     var _backgroundRepository = scope.ServiceProvider.GetRequiredService<IBackgroundRepository>();
 
-                    foreach (var pr in await _backgroundRepository.PendingProductReviews())
+                    var pendingProductReviews = await _backgroundRepository.PendingProductReviews();
+                    var pendingShopReviews = await _backgroundRepository.PendingShopReviews();
+                    var pendingDeliveryPersonReviews = await _backgroundRepository.PendingDeliveryPersonReviews();
+
+                    _logger.LogInformation("Pending product reviews");
+
+                    foreach (var pr in pendingProductReviews)
                     {
-                        _logger.LogInformation(pr.UserId + " " + pr.ProductId);
+                        _logger.LogInformation(pr.UserId + " " + pr.ItemId);
                     }
 
+                    _logger.LogInformation("Pending shop reviews");
+
+                    foreach (var sr in pendingShopReviews)
+                    {
+                        _logger.LogInformation(sr.UserId + " " + sr.ItemId);
+                    }
+
+                    _logger.LogInformation("Pending delivery person reviews");
+
+                    foreach (var dr in pendingDeliveryPersonReviews)
+                    {
+                        _logger.LogInformation(dr.UserId + " " + dr.ItemId);
+                    }
                 }
-                _logger.LogInformation("logovano");
+
                 await Task.Delay(1000, stoppingToken);
             }
         }
