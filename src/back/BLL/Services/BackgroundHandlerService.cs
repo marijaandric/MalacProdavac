@@ -51,7 +51,7 @@ namespace back.BLL.Services
                     await _backgroundRepository.DeletePastProductDisplays();
                 }
 
-                await Task.Delay(1000, stoppingToken);
+                await Task.Delay(3600000, stoppingToken);
             }
         }
     }
