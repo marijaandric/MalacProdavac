@@ -27,10 +27,15 @@ namespace back.DAL.Repositories
             float avg = ratings.Count > 0 ? ratings.Average(x => x.Average) : 0;
             float moneySpent = await _context.Orders.Where(x => x.UserId == userId).Join(_context.OrderItems, o => o.Id, oi => oi.OrderId, (o, oi) => oi).SumAsync(x => x.Price * x.Quantity);
             float moneyEarned = 0;
+
             if (user.RoleId == 2)
             {
-                int shopId = (await _context.Shop.FirstOrDefaultAsync(x => x.OwnerId == userId)).Id;
-                moneyEarned = await _context.OrderItems.Join(_context.Products.Where(x => x.ShopId == shopId), oi => oi.ProductId, p => p.Id, (oi, p) => oi).SumAsync(x => x.Price * x.Quantity);
+                var shop = await _context.Shop.FirstOrDefaultAsync(x => x.OwnerId == userId);
+                if (shop != null)
+                {
+                    int shopId = shop.Id;
+                    moneyEarned = await _context.OrderItems.Join(_context.Products.Where(x => x.ShopId == shopId), oi => oi.ProductId, p => p.Id, (oi, p) => oi).SumAsync(x => x.Price * x.Quantity);
+                }
             }
             return new MyProfileInfo
             {
