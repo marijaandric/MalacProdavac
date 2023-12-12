@@ -159,6 +159,19 @@ fun ShopScreen(navController: NavHostController, shopViewModel: OneShopViewModel
 
         }
     }
+    val context = LocalContext.current
+
+    LaunchedEffect(shopViewModel.statedeleteShop.value) {
+        val state = shopViewModel.statedeleteShop.value
+
+        if (state?.success != null) {
+            if (state.success!!.success != null) {
+                navController.navigate(route = Screen.Home.route)
+        }
+        } else if (state.error.contains("NotFound")) {
+            Toast.makeText(context, state.error, Toast.LENGTH_SHORT).show()
+        }
+    }
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     Sidebar(
@@ -1057,6 +1070,9 @@ fun ProfilePic(shopViewModel: OneShopViewModel, id: Int, shopId:Int) {
     var showProductDisplayNotificationDialog by remember {
         mutableStateOf(false)
     }
+    var showDeleteShopDialog by remember {
+        mutableStateOf(false)
+    }
 
     Box(
         modifier = Modifier
@@ -1079,7 +1095,7 @@ fun ProfilePic(shopViewModel: OneShopViewModel, id: Int, shopId:Int) {
                     .clickable {
                         showDialog = true
                     },
-                tint = MaterialTheme.colorScheme.primary
+                tint = MaterialTheme.colorScheme.onBackground
             )
         }
 
@@ -1179,6 +1195,16 @@ fun ProfilePic(shopViewModel: OneShopViewModel, id: Int, shopId:Int) {
                         color = MaterialTheme.colorScheme.primary
                     )
                     RatingBar(rating = shopViewModel.state.value.shop!!.rating!!.toFloat())
+                    if(shopViewModel.state.value.shop!!.isOwner)
+                    {
+                        CardButton(
+                            text = "Delete this shop",
+                            onClick = { showDeleteShopDialog = true },
+                            width = 0.45f,
+                            modifier = Modifier,
+                            color = MaterialTheme.colorScheme.tertiary
+                        )
+                    }
                     Spacer(modifier = Modifier.height(30.dp))
                 }
             }
@@ -1199,6 +1225,72 @@ fun ProfilePic(shopViewModel: OneShopViewModel, id: Int, shopId:Int) {
     if(showProductDisplayNotificationDialog)
     {
         ProductDisplayNotification (onDismiss = { showProductDisplayNotificationDialog = false },shopViewModel, id, shopId)
+    }
+    if(showDeleteShopDialog)
+    {
+        DeleteShopDialog(onDismiss = { showDeleteShopDialog = false}, shopViewModel, shopId)
+    }
+}
+
+@Composable
+fun DeleteShopDialog(onDismiss: () -> Unit, shopViewModel : OneShopViewModel, shopId: Int) {
+    val overlayColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)
+    var deletedialog by remember {
+        mutableStateOf(false)
+    }
+    Dialog(
+        properties = DialogProperties(usePlatformDefaultWidth = false),
+        onDismissRequest = { onDismiss() }) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(overlayColor)
+                .pointerInput(Unit) {
+                    detectTapGestures { offset ->
+                        onDismiss()
+                    }
+                }
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.8f)
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(MaterialTheme.colorScheme.background)
+                    .pointerInput(Unit) {
+                        detectTapGestures { offset ->
+
+                        }
+                    }
+                    .padding(16.dp)
+                    .align(Alignment.Center)
+            ) {
+                Column {
+                    Text("Are you sure you want to delete your store?", style = MaterialTheme.typography.titleSmall, modifier = Modifier
+                        .padding(bottom = 25.dp), textAlign = TextAlign.Center)
+                    Row()
+                    {
+                        CardButton(
+                            text = "No",
+                            onClick = { onDismiss() },
+                            width = 0.5f,
+                            modifier = Modifier,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.width(5.dp))
+                        CardButton(
+                            text = "Yes",
+                            onClick = {
+                                shopViewModel.deleteShop(shopId)
+                                onDismiss()
+                            },
+                            width = 0.95f,
+                            modifier = Modifier,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    }
+                }
+            }
+        }
     }
 }
 

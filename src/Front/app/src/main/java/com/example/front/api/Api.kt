@@ -241,4 +241,9 @@ interface Api {
     suspend fun getRouteDetails(
         @Query("routeId") routeId: Int
     ):Response<RouteDetails>
+
+    @DELETE("back/Shop/DeleteShop")
+    suspend fun deleteShop(
+        @Query("shopId") shopId: Int
+    ):Response<SuccessBoolean>
 }

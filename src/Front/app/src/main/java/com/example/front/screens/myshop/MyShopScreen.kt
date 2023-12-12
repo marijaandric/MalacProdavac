@@ -59,7 +59,8 @@ fun MyShopScreen(navController : NavHostController, myShopViewModel: MyShopViewM
         if (!myShopViewModel.state.value.isLoading) {
             val shopId = myShopViewModel.state.value.shopId?.id
             if (shopId != null && shopId != 0) {
-                navController.navigate("${Screen.Shop.route}/$shopId")
+                val x = 1
+                navController.navigate("${Screen.Shop.route}/$shopId/$x")
             }
         }
         onDispose { /* Cleanup, if needed */ }
@@ -132,14 +133,14 @@ fun MyShopScreen(navController : NavHostController, myShopViewModel: MyShopViewM
                 }
 
             }
-            else{
-                if(myShopViewModel.state.value.shopId != null)
-                {
-                    val x = 1
-                    val shopId = myShopViewModel.state.value.shopId!!.id
-                    navController.navigate("${Screen.Shop.route}/$shopId/$x")
-                }
-            }
+//            else{
+//                if(myShopViewModel.state.value.shopId != null)
+//                {
+//                    val x = 1
+//                    val shopId = myShopViewModel.state.value.shopId!!.id
+//                    navController.navigate("${Screen.Shop.route}/$shopId/$x")
+//                }
+//            }
         }
     }
 }

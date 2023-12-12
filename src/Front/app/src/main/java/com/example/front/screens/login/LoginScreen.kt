@@ -149,6 +149,10 @@ fun LoginScreen(
                         fontWeight = FontWeight(600),
                         fontSize = 16.sp
                     )
+                    if(viewModel.state.value.loginState == true)
+                    {
+
+                    }
                 }
             }
         })

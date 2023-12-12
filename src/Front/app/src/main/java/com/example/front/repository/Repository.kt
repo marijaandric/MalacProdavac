@@ -160,5 +160,9 @@ class Repository @Inject constructor(private val api: Api) {
     {
         return api.getRouteDetails(routeId)
     }
+    suspend fun deleteShop(shopId: Int):Response<SuccessBoolean>
+    {
+        return api.deleteShop(shopId)
+    }
 
 }
