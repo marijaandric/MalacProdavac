@@ -9,8 +9,8 @@ namespace back.Models
         public int Id { get; set; }
         [ForeignKey("Shop")]
         public int ShopId { get; set; }
-        public string? Name { get; set; }
-        public string? Description { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
         public float Price { get; set; }
         [ForeignKey("Metric")]
         public int MetricId { get; set; }

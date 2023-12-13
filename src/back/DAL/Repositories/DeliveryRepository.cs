@@ -190,9 +190,10 @@ namespace back.DAL.Repositories
             return shippingAddresses;
         }
 
-        public async Task<DeliveryRouteInfo> GetRouteDetails(int routeId)
+        public async Task<List<DeliveryStop>> GetDeliveryStopDetails(int routeId)
         {
             DeliveryRoute route = await _context.DeliveryRoutes.FirstOrDefaultAsync(x => x.Id == routeId);
+
             List<DeliveryStop> stops = new List<DeliveryStop>
             {
                 new DeliveryStop
@@ -209,21 +210,60 @@ namespace back.DAL.Repositories
                 }
             };
 
-            stops.AddRange(await _context.DeliveryRequests.Where(x => x.RouteId == routeId).Join(_context.Orders, r => r.OrderId, o => o.Id, (r, o) => o).Select(x => new DeliveryStop
+            var addresses = await _context.DeliveryRequests
+            .Where(x => x.RouteId == routeId)
+            .Join(_context.Orders, r => r.OrderId, o => o.Id, (r, o) => o)
+            .Join(_context.OrderItems, o => o.Id, oi => oi.OrderId, (o, oi) => new { o, oi })
+            .Join(_context.Products, order => order.oi.ProductId, p => p.Id, (order, p) => new { order.o, order.oi, p })
+            .Join(_context.Metrics, order => order.p.MetricId, m => m.Id, (order, m) => new { order.o, order.oi, order.p, m })
+            .GroupBy(x => new { x.o.ShippingAddress, x.o.Latitude, x.o.Longitude }).ToListAsync();
+            stops.AddRange(addresses.Select(group => new DeliveryStop
             {
-               Address = x.ShippingAddress,
-               Latitude = (float)x.Latitude,
-               Longitude = (float)x.Longitude,
-            }).ToListAsync());
+                Address = group.Key.ShippingAddress,
+                Latitude = (float)group.Key.Latitude,
+                Longitude = (float)group.Key.Longitude,
+                Items = group.GroupBy(item => new { Name = item.p.Name, Metric = item.m.Name })
+                     .Select(itemGroup => new DeliveryItem
+                     {
+                         Name = itemGroup.Key.Name,
+                         Metric = itemGroup.Key.Metric,
+                         Quantity = itemGroup.Sum(item => item.oi.Quantity)
+                     })
+                     .ToList()
+            })
+            .ToList());
 
-            stops.AddRange(await _context.DeliveryRequests.Where(x => x.RouteId == routeId).Join(_context.Orders, r => r.OrderId, o => o.Id, (r, o) => o).Join(_context.Shop, o => o.ShopId, s => s.Id, (o, s) => s).Select(x => new DeliveryStop
+            var shops = await _context.DeliveryRequests
+                .Where(x => x.RouteId == routeId)
+                .Join(_context.Orders, r => r.OrderId, o => o.Id, (r, o) => o)
+                .Join(_context.OrderItems, o => o.Id, oi => oi.OrderId, (o, oi) => new { o, oi })
+            .Join(_context.Products, order => order.oi.ProductId, p => p.Id, (order, p) => new { order.o, order.oi, p })
+            .Join(_context.Metrics, order => order.p.MetricId, m => m.Id, (order, m) => new { order.o, order.oi, order.p, m })
+            .Join(_context.Shop, order => order.o.ShopId, s => s.Id, (o, s) => new { o.o, o.oi, o.p, o.m, s }).ToListAsync();
+
+            stops.AddRange(shops.GroupBy(x => new { x.s.Address, x.s.Latitude, x.s.Longitude, x.s.Name })        
+           .Select(group => new DeliveryStop
             {
-                Address = x.Address,
-                Latitude = (float)x.Latitude,
-                Longitude = (float)x.Longitude,
-                ShopName = x.Name
-            }).ToListAsync());
-            
+               Address = group.Key.Address,
+               Latitude = (float)group.Key.Latitude,
+               Longitude = (float)group.Key.Longitude,
+               ShopName = group.Key.Name,
+               Items = group.GroupBy(item => new { Name = item.p.Name, Metric = item.m.Name })
+                     .Select(itemGroup => new DeliveryItem
+                     {
+                         Name = itemGroup.Key.Name,
+                         Metric = itemGroup.Key.Metric,
+                         Quantity = itemGroup.Sum(item => item.oi.Quantity)
+                     })
+                     .ToList()
+           }).ToList());
+
+            return stops;
+        }
+
+        public async Task<DeliveryRouteInfo> GetRouteDetails(int routeId)
+        {
+            DeliveryRoute route = await _context.DeliveryRoutes.FirstOrDefaultAsync(x => x.Id == routeId);         
             
             return new DeliveryRouteInfo
             {
@@ -237,7 +277,7 @@ namespace back.DAL.Repositories
                 .Trim(),
                 StartDate = route.StartDate.ToShortDateString(),
                 StartTime = route.StartTime,
-                Stops = stops
+                Stops = await GetDeliveryStopDetails(routeId)
             };
 
         }
