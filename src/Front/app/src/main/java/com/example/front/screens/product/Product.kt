@@ -305,13 +305,14 @@ fun ProductPage(
                     ) {
                         Button(
                             onClick = {
+                                println("VELICINE   " + productInfo?.sizes)
                                 if (productInfo?.name != null &&
                                     productInfo?.price != null &&
                                     productInfo.shopId != null &&
                                     productInfo?.shopName != null &&
                                     productInfo.images?.isNotEmpty() == true &&
                                     productInfo.metric != null &&
-                                    (productInfo.sizes == null || selectedSize != null)
+                                    (productInfo.sizes?.isEmpty() == true || selectedSize != null)
                                 )
                                 {
                                     productViewModel.addToCart(
@@ -327,6 +328,8 @@ fun ProductPage(
                                     )
 
                                     Toast.makeText(context, "Product added to cart", Toast.LENGTH_SHORT).show()
+                                } else if(productInfo?.sizes?.isNotEmpty() == true || selectedSize != null) {
+                                    Toast.makeText(context, "Please select size", Toast.LENGTH_SHORT).show()
                                 }
                             },
                             modifier = Modifier
