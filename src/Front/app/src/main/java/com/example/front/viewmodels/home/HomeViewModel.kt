@@ -43,7 +43,7 @@ class HomeViewModel @Inject constructor(
                 val id = dataStoreManager.getUserIdFromToken()
                 if(id != null)
                 {
-                    val response = userId?.let { repository.getHomeProducts(5) }
+                    val response = userId?.let { repository.getHomeProducts(id) }
 
                     if (response != null) {
                         if (response.isSuccessful) {
@@ -68,7 +68,7 @@ class HomeViewModel @Inject constructor(
             val id = dataStoreManager.getUserIdFromToken()
             if(id != null) {
                 try{
-                    val response = userId?.let { repository.getHomeShops(5) }
+                    val response = userId?.let { repository.getHomeShops(id) }
 
                     if (response != null) {
                         if (response.isSuccessful) {
@@ -126,6 +126,7 @@ class HomeViewModel @Inject constructor(
             updatedShops[index] = updatedShop
             _stateShop.value = currentState.copy(shops = updatedShops)
         }
+        Log.d("Promenjen like status? ", _stateShop.value.toString())
     }
 
     fun addToCart(

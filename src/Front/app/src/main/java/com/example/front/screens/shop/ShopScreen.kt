@@ -801,6 +801,7 @@ fun Info(
     }
     var selectedRating by remember { mutableStateOf(0) }
     var toast by remember { mutableStateOf(false) }
+    var feedback by remember { mutableStateOf(false) }
 
 
     if (isImageClicked) {
@@ -961,34 +962,48 @@ fun Info(
                         )
                     }
                     if (leaveAReview) {
-                        StarRating { rating ->
-                            selectedRating = rating
-                        }
-                        CommentsTextBox(
-                            onReviewTextChanged = { newText -> comment = newText },
-                            placeholder = "Leave a review"
-                        )
-                        CardButton(
-                            "Submit review", onClick = {
-                                shopViewModel.leaveReview(shopId, userID, selectedRating, comment)
-                                toast = true
-                            }, 0.9f,
-                            Modifier
-                                .align(Alignment.CenterHorizontally)
-                                .height(50.dp), MaterialTheme.colorScheme.secondary
-                        )
-                        if (!shopViewModel.statePostReview.value.isLoading && toast) {
-                            Toast.makeText(context, "Review successfully submitted", Toast.LENGTH_LONG)
-                                .show()
-                            shopViewModel.getShopReview(
-                                shopId,
-                                reviewPage
+                        if(shopViewModel.state.value.shop!!.rated || feedback)
+                        {
+                            Text(
+                                "A review from you has already been submitted.",
+                                style = MaterialTheme.typography.titleSmall,
+                                modifier = Modifier
+                                    .align(Alignment.CenterHorizontally)
+                                    .padding(top = 20.dp)
                             )
-                            toast = false
-                        } else if (shopViewModel.statePostReview.value.error.isNotEmpty() && toast) {
-                            Toast.makeText(context, "Error", Toast.LENGTH_LONG).show()
-                            toast = false
                         }
+                        else{
+                            StarRating { rating ->
+                                selectedRating = rating
+                            }
+                            CommentsTextBox(
+                                onReviewTextChanged = { newText -> comment = newText },
+                                placeholder = "Leave a review"
+                            )
+                            CardButton(
+                                "Submit review", onClick = {
+                                    shopViewModel.leaveReview(shopId, userID, selectedRating, comment)
+                                    toast = true
+                                }, 0.9f,
+                                Modifier
+                                    .align(Alignment.CenterHorizontally)
+                                    .height(50.dp), MaterialTheme.colorScheme.secondary
+                            )
+                            if (!shopViewModel.statePostReview.value.isLoading && toast) {
+                                Toast.makeText(context, "Review successfully submitted", Toast.LENGTH_LONG)
+                                    .show()
+                                shopViewModel.getShopReview(
+                                    shopId,
+                                    reviewPage
+                                )
+                                toast = false
+                                feedback = true
+                            } else if (shopViewModel.statePostReview.value.error.isNotEmpty() && toast) {
+                                Toast.makeText(context, "Error", Toast.LENGTH_LONG).show()
+                                toast = false
+                            }
+                        }
+
                     }
                 }
 
@@ -1084,7 +1099,7 @@ fun ProfilePic(shopViewModel: OneShopViewModel, id: Int, shopId:Int) {
         if (!shopViewModel.state.value.shop!!.isOwner) {
             ToggleImageButtonFunction(modifier = Modifier.align(Alignment.TopEnd), onClick = {
                 shopViewModel.changeToggleLike(id, shopViewModel.state.value.shop!!.id)
-            })
+            }, shopViewModel.state.value.shop!!.liked)
         } else {
             Icon(
                 imageVector = Icons.Default.Edit,
