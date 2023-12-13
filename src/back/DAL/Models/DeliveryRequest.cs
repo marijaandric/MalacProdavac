@@ -17,7 +17,6 @@ namespace back.Models
         public DateTime CreatedOn { get; set; }
         [ForeignKey("User")]
         public int? ChosenPersonId { get; set; }
-        public bool? Accepted {  get; set; } 
 
         public DeliveryRoute? Route { get; set; }
         public Shop Shop { get; set; }

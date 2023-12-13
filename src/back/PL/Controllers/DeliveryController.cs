@@ -161,6 +161,20 @@ namespace back.PL.Controllers
             }
         }
 
+        [HttpPut("RemoveRequestRoute")]
+        public async Task<IActionResult> RemoveRequestRoute(int requestId)
+        {
+            try
+            {
+                return Ok(new { Success = await _service.RemoveRequest(requestId) });
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
+
         [HttpDelete("DeleteRoute")]
         public async Task<IActionResult> DeleteRoute(int routeId)
         {

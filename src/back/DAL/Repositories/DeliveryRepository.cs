@@ -23,7 +23,7 @@ namespace back.DAL.Repositories
             {
                 OrderId = dto.OrderId,
                 ShopId = dto.ShopId,
-                CreatedOn = DateTime.Now
+                CreatedOn = DateTime.Now,
             };
 
             await _context.DeliveryRequests.AddAsync(req);
@@ -70,13 +70,12 @@ namespace back.DAL.Repositories
         {
             DeliveryRequest req = await _context.DeliveryRequests.FirstOrDefaultAsync(x => x.Id == requestId);
             req.ChosenPersonId = null;
-
             return await _context.SaveChangesAsync() > 0;
         }
 
         public async Task<List<DeliveryRequestCard>> GetRequestsForDeliveryPerson(int deliveryPerson)
         {
-            return (await _context.DeliveryRequests.Where(x => x.RouteId == null && x.ChosenPersonId == deliveryPerson && !x.Accepted != true).Join(_context.Shop, dr => dr.ShopId, s => s.Id, (dr, s) => new { dr, s }).Join(_context.Orders, x => x.dr.OrderId, o => o.Id, (x, o) => new DeliveryRequestCard
+            return (await _context.DeliveryRequests.Where(x => x.RouteId == null && x.ChosenPersonId == deliveryPerson).Join(_context.Shop, dr => dr.ShopId, s => s.Id, (dr, s) => new { dr, s }).Join(_context.Orders, x => x.dr.OrderId, o => o.Id, (x, o) => new DeliveryRequestCard
             {
                 Id = x.dr.Id,
                 Locations = x.s.Address
@@ -315,6 +314,13 @@ namespace back.DAL.Repositories
                 ShopLongitude = (float)shop.Longitude,
                 Items = items
             };
+        }
+
+        public async Task<bool> RemoveRequest(int requestId)
+        {
+            var req = await _context.DeliveryRequests.FirstOrDefaultAsync(x => x.Id == requestId);
+            req.RouteId = null;
+            return await _context.SaveChangesAsync() > 0;
         }
 
         public async Task<bool> DeleteRoute(int routeId)
