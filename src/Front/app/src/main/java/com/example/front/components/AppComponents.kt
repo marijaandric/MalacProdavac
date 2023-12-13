@@ -5,7 +5,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -847,7 +846,7 @@ fun ProductCard(
                     overflow = TextOverflow.Ellipsis
                 )
                 ButtonWithIcon(
-                    text = "Add to cart",
+                    text = "Show info",
                     onClick = onClick,
                     width = 0.8f,
                     modifier = Modifier,

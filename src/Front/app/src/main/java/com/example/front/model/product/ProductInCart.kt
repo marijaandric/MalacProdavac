@@ -1,10 +1,9 @@
 package com.example.front.model.product
 
 import io.realm.kotlin.types.RealmObject
-import io.realm.kotlin.types.annotations.PrimaryKey
 
 class ProductInCart : RealmObject {
-    @PrimaryKey
+//    @PrimaryKey
     var id: Int = 0
     var name: String = ""
     var price: Float = 0.0f
@@ -13,4 +12,5 @@ class ProductInCart : RealmObject {
     var shopName: String = ""
     var image: String = ""
     var metric: String = ""
+    var size: String? = null
 }
