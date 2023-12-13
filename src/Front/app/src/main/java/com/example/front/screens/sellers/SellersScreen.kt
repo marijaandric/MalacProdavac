@@ -80,10 +80,10 @@ fun SellersScreen(navController: NavHostController, shopsViewModel: ShopsViewMod
     var selectedColumnIndex by remember { mutableStateOf(true) }
 
     var currentPage by remember { mutableStateOf(1) }
-    var totalPages = 10
+    var totalPages = 1
 
     var currentPageFav by remember { mutableStateOf(1) }
-    val totalPagesFav = 10
+    val totalPagesFav = 1
 
     LaunchedEffect(Unit) {
         shopsViewModel.getUserId()
@@ -92,6 +92,8 @@ fun SellersScreen(navController: NavHostController, shopsViewModel: ShopsViewMod
             ?.let { shopsViewModel.getShops(it,listOf(),null,false,0,null,0,null,1,true, null, null) }
         shopsViewModel.getUserId()
             ?.let { shopsViewModel.getShopPages(it,false)}
+        shopsViewModel.getUserId()
+            ?.let { shopsViewModel.getShopPages(it,true)}
     }
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
@@ -206,6 +208,7 @@ fun SellersScreen(navController: NavHostController, shopsViewModel: ShopsViewMod
                         }
                     } else {
                         FavItems(navController, shopsViewModel)
+                        totalPages = shopsViewModel.statePageCountFav.value
                         Paginator(
                             currentPage = currentPageFav,
                             totalPages = totalPagesFav,
@@ -414,27 +417,27 @@ fun Overlay(onDismiss: () -> Unit, shopsViewModel:ShopsViewModel) {
                     Text(
                         "Default", style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.primary), modifier = Modifier
                             .padding(bottom = 16.dp)
-                            .clickable { shopsViewModel.Sort(0) }
+                            .clickable { shopsViewModel.Sort(0); onDismiss() }
                     )
                     Text(
                         "Rating (lowest first)", style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.primary), modifier = Modifier
                             .padding(bottom = 16.dp)
-                            .clickable { shopsViewModel.Sort(1) }
+                            .clickable { shopsViewModel.Sort(1); onDismiss() }
                     )
                     Text(
                         "Rating (highest first)", style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.primary), modifier = Modifier
                             .padding(bottom = 16.dp)
-                            .clickable { shopsViewModel.Sort(2) }
+                            .clickable { shopsViewModel.Sort(2); onDismiss() }
                     )
                     Text(
                         "Alphabetically (ascending)", style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.primary), modifier = Modifier
                             .padding(bottom = 16.dp)
-                            .clickable { shopsViewModel.Sort(3) }
+                            .clickable { shopsViewModel.Sort(3); onDismiss() }
                     )
                     Text(
                         "Alphabetically (descending)", style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.primary), modifier = Modifier
                             .padding(bottom = 16.dp)
-                            .clickable { shopsViewModel.Sort(4) }
+                            .clickable { shopsViewModel.Sort(4); onDismiss() }
                     )
 
                 }

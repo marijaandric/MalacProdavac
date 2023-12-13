@@ -239,7 +239,7 @@ class OneShopViewModel @Inject constructor(
     fun changeToggleLike(userId: Int, shopId: Int) {
         viewModelScope.launch {
             try {
-                val response = repository.toggleLike(userId, shopId)
+                val response = repository.toggleLike(shopId, userId)
             } catch (e: Exception) {
                 Log.d("Error", "Error - cant change")
             }
@@ -397,7 +397,7 @@ class OneShopViewModel @Inject constructor(
                     )
                 }
             } catch (e: Exception) {
-                _stateReview.value = _stateReview.value.copy(
+                _stateGetCategories.value = _stateGetCategories.value.copy(
                     error = e.message.toString()
                 )
             }
@@ -420,7 +420,7 @@ class OneShopViewModel @Inject constructor(
                     )
                 }
             } catch (e: Exception) {
-                _stateReview.value = _stateReview.value.copy(
+                _stateGetCategories.value = _stateGetCategories.value.copy(
                     error = e.message.toString()
                 )
             }

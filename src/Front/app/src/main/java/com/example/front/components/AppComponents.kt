@@ -398,8 +398,8 @@ fun ToggleImageButton(modifier: Modifier) {
 }
 
 @Composable
-fun ToggleImageButtonFunction(modifier: Modifier, onClick: () -> Unit) {
-    var isToggled by remember { mutableStateOf(false) }
+fun ToggleImageButtonFunction(modifier: Modifier, onClick: () -> Unit, isLiked: Boolean) {
+    var isToggled by remember { mutableStateOf(isLiked) }
 
     val currentImage = if (isToggled) painterResource(id = R.drawable.srcefull)
     else painterResource(id = R.drawable.srce)

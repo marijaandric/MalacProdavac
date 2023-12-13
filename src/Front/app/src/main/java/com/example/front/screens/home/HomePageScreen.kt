@@ -1,6 +1,7 @@
 package com.example.front.screens.home
 
 import android.icu.util.Calendar
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -195,11 +196,10 @@ fun Sellers(viewModel: HomeViewModel, navController: NavHostController) {
                             id = cardData.id
                         )
                     } ?: run {
-                        // Use a default image placeholder when cardData.imageResource is null
                         SellerCard(
                             title = cardData.title,
                             author = cardData.description,
-                            imageResource = "imageplaceholder.jpg", // Replace with your default image placeholder
+                            imageResource = "imageplaceholder.jpg",
                             isLiked = cardData.isLiked,
                             onClick = {
                                 viewModel.updateLikeStatus(index, !cardData.isLiked)
@@ -274,7 +274,7 @@ fun getGreetingMessage(): String {
         hour in 6..11 -> "Good morning!"
         hour in 12..16 -> "Good afternoon!"
         hour in 17..20 -> "Good evening!"
-        else -> "Good night!"
+        else -> "Good evening!"
     }
 }
 
