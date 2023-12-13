@@ -143,7 +143,7 @@ namespace back.BLL.Services
             user.Lastname = textInfo.ToTitleCase(userDto.Lastname);
             user.Username = CreateUsername(user.Name, user.Lastname);
             user.Email = userDto.Email.ToLower();
-            user.Address = userDto.Address;
+            if (userDto.Address.Length > 0) user.Address = userDto.Address;
             user.RoleId = userDto.RoleId;
             user.LoggedIn = true;
             user.LightTheme = true;
