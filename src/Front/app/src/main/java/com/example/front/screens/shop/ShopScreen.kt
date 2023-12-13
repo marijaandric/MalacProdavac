@@ -168,7 +168,7 @@ fun ShopScreen(navController: NavHostController, shopViewModel: OneShopViewModel
             if (state.success!!.success != null) {
                 navController.navigate(route = Screen.Home.route)
         }
-        } else if (state.error.contains("NotFound")) {
+        } else if (state.error.contains("You cannot delete the store now! Try it later.")) {
             Toast.makeText(context, state.error, Toast.LENGTH_SHORT).show()
         }
     }

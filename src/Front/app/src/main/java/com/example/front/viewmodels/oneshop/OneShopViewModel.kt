@@ -560,7 +560,7 @@ class OneShopViewModel @Inject constructor(
                     )
                 } else {
                     _stateDeleteShop.value = _stateDeleteShop.value.copy(
-                        error = "NotFound"
+                        error = "You cannot delete the store now! Try it later."
                     )
                 }
             } catch (e: Exception) {

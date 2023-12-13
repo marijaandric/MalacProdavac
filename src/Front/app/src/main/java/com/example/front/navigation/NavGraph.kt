@@ -68,7 +68,7 @@ fun SetupNavGraph(
 
     NavHost(
         navController = navController,
-        startDestination = "route"
+        startDestination = "my_profile"
     ) {
         composable(
             route = Screen.Home.route
