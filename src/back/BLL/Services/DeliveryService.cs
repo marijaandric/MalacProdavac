@@ -193,10 +193,13 @@ namespace back.BLL.Services
             var start = route.Stops[0];
             var end = route.Stops[1];
             var tail = route.Stops.Skip(2).ToList();
-
-            tail.OrderBy(x => HelperService.CalculateDistance(start.Latitude, start.Longitude, x.Latitude, x.Longitude));
+            var shops = tail.Where(x => x.ShopName != null);
+            var addresses = tail.Where(x => x.ShopName == null);
+            shops.OrderBy(x => HelperService.CalculateDistance(start.Latitude, start.Longitude, x.Latitude, x.Longitude));
+            addresses.OrderBy(x => HelperService.CalculateDistance(start.Latitude, start.Longitude, x.Latitude, x.Longitude));
             route.Stops = new List<DeliveryStop>{ start };
-            route.Stops.AddRange(tail);
+            route.Stops.AddRange(shops);
+            route.Stops.AddRange(addresses);
             route.Stops.Add(end);
             return route;
         }

@@ -279,7 +279,6 @@ namespace back.DAL.Repositories
                 StartTime = route.StartTime,
                 Stops = await GetDeliveryStopDetails(routeId)
             };
-
         }
 
         public async Task<DeliveryRequestInfo> GetRequestDetails(int requestId)
