@@ -316,6 +316,11 @@ namespace back.DAL.Repositories
             };
         }
 
+        public async Task<List<int>> GetRequestIdsByRoute(int routeId)
+        {
+            return await _context.DeliveryRequests.Where(x => x.RouteId == routeId).Select(x => x.Id).ToListAsync();
+        }
+
         public async Task<bool> RemoveRequest(int requestId)
         {
             var req = await _context.DeliveryRequests.FirstOrDefaultAsync(x => x.Id == requestId);
