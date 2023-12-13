@@ -44,6 +44,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavHostController
 import com.example.front.components.Sidebar
 import com.example.front.components.SmallElipseAndTitle
+import com.example.front.model.DTO.RouteStopsSection
 import com.example.front.model.DTO.Stop
 import com.example.front.viewmodels.delivery.RouteDetailsViewModel
 import kotlinx.coroutines.Dispatchers
@@ -56,7 +57,6 @@ import org.osmdroid.views.overlay.Polyline
 import java.io.BufferedReader
 import java.net.HttpURLConnection
 import java.net.URL
-import android.graphics.Color as AndroidColor
 
 @Composable
 fun RouteDetailsScreen(
@@ -136,20 +136,41 @@ fun RouteDetailsScreen(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    RouteStopsSection(
-                        stops = listOf(
-                            "Raška 6, Kragujevac" to "Domaćinstvo Jovanović",
-                            "Vlastimira Petrovića 12, Miločaj" to "Radionica Andrić"
-                        ),
-                        additionalStops = listOf(
-                            "Stop 3 Address" to "Stop 3 Description",
-                            "Stop 4 Address" to "Stop 4 Description"
-                        )
+                    val routeStops =
+                        createRouteStopsSection(routedetailsViewModel.state.value.details?.stops!!)
+
+                    val mainStops = routeStops.stops.take(2)
+
+                    val additionalStops = routeStops.stops.drop(2)
+
+                    com.example.front.screens.delivery.RouteStopsSection(
+                        stops = mainStops,
+                        additionalStops = additionalStops
                     )
+
                 }
             }
         }
     }
+}
+
+fun createRouteStopsSection(allStops: List<Stop>): RouteStopsSection {
+    // Transform Stop objects into pairs of address and shopName
+    val transformedStops = allStops.map { stop ->
+        stop.address to (stop.shopName ?: "Unknown Shop")
+    }
+
+    // Split the list into main stops and additional stops
+    val (mainStops, additionalStops) = transformedStops.partition {
+        it == transformedStops.first() || it == transformedStops.getOrNull(
+            1
+        )
+    }
+
+    return RouteStopsSection(
+        stops = mainStops,
+        additionalStops = additionalStops
+    )
 }
 
 @Composable
@@ -160,46 +181,56 @@ fun Osm(stops: List<Stop>) {
     org.osmdroid.config.Configuration.getInstance()
         .load(context, context.getSharedPreferences("osmdroid", 0))
 
-    // State to hold route points
     var routePoints by remember { mutableStateOf(listOf<GeoPoint>()) }
+    var isLoading by remember { mutableStateOf(true) } // Loading state
 
     LaunchedEffect(stops) {
+        isLoading = true
         routePoints = withContext(Dispatchers.IO) {
             fetchRoute(stops)
         }
+        isLoading = false
     }
 
-    AndroidView(
-        modifier = Modifier.fillMaxSize(),
-        factory = { mapView(context) },
-        update = { mapView ->
-            // Create and update the polyline for the route
-            val route = Polyline().apply {
-                setPoints(routePoints)
-                color = android.graphics.Color.BLUE
-            }
-
-            mapView.overlays.clear()
-            mapView.overlays.add(route)
-
-            routePoints.forEach { point ->
-                val marker = Marker(mapView).apply {
-                    position = point
+    if (isLoading) {
+        // Display a loading indicator
+        CircularProgressIndicator()
+    } else {
+        // Display the map view
+        AndroidView(
+            modifier = Modifier.fillMaxSize(),
+            factory = { mapView(context) },
+            update = { mapView ->
+                val route = Polyline().apply {
+                    setPoints(routePoints)
+                    color = android.graphics.Color.BLUE
                 }
-                mapView.overlays.add(marker)
-            }
 
-            mapView.invalidate()
-            if (routePoints.isNotEmpty()) {
-                mapView.controller.setCenter(routePoints.first())
+                mapView.overlays.clear()
+                mapView.overlays.add(route)
+
+                routePoints.forEach { point ->
+                    val marker = Marker(mapView).apply {
+                        position = point
+                    }
+
+//                    mapView.overlays.add(marker)
+                }
+
+                mapView.invalidate()
+                if (routePoints.isNotEmpty()) {
+                    mapView.controller.setCenter(routePoints.first())
+                }
             }
-        }
-    )
+        )
+    }
 }
 
+
 fun fetchRoute(stops: List<Stop>): List<GeoPoint> {
-    val apiKey = "5b3ce3597851110001cf6248fc9e15141a974854817f85dee9e19f1f"
-    val urlString = "https://api.openrouteservice.org/v2/directions/driving-car"
+    val apiKey =
+        "5b3ce3597851110001cf6248fc9e15141a974854817f85dee9e19f1f" // Replace with your actual API key
+    val urlString = "https://api.openrouteservice.org/v2/directions/driving-car/geojson"
     val geoPoints = mutableListOf<GeoPoint>()
 
     try {
@@ -208,14 +239,18 @@ fun fetchRoute(stops: List<Stop>): List<GeoPoint> {
             put("coordinates", JSONArray(stops.map { listOf(it.longitude, it.latitude) }))
         }
 
+        Log.d("fetchRoute", "Request Body: ${requestBody.toString()}")
+
         // Establish connection
         val url = URL(urlString)
         val connection = url.openConnection() as HttpURLConnection
         connection.requestMethod = "POST"
         connection.setRequestProperty("Authorization", apiKey)
         connection.setRequestProperty("Content-Type", "application/json; utf-8")
-        connection.setRequestProperty("Accept", "application/json")
+        connection.setRequestProperty("Accept", "application/geo+json")
         connection.doOutput = true
+
+        Log.d("fetchRoute", "Sending request to $urlString")
 
         // Send request
         connection.outputStream.use { os ->
@@ -223,30 +258,52 @@ fun fetchRoute(stops: List<Stop>): List<GeoPoint> {
             os.write(input, 0, input.size)
         }
 
-        // Read response
-        connection.inputStream.use { stream ->
-            val response = stream.bufferedReader().use(BufferedReader::readText)
-            val jsonResponse = JSONObject(response)
-            val coordinates = jsonResponse.getJSONObject("routes")
-                .getJSONArray("features")
-                .getJSONObject(0)
-                .getJSONObject("geometry")
-                .getJSONArray("coordinates")
+        Log.d("fetchRoute", "Request sent")
 
-            for (i in 0 until coordinates.length()) {
-                val coordinate = coordinates.getJSONArray(i)
-                val latitude = coordinate.getDouble(1)
-                val longitude = coordinate.getDouble(0)
-                geoPoints.add(GeoPoint(latitude, longitude))
+        // Check response code
+        val responseCode = connection.responseCode
+        Log.d("fetchRoute", "Response Code: $responseCode")
+
+        // Read response based on the response code
+        val response = if (responseCode in 200..299) {
+            // Success response
+            connection.inputStream.bufferedReader().use(BufferedReader::readText)
+        } else {
+            // Error response
+            connection.errorStream.bufferedReader().use(BufferedReader::readText)
+        }
+
+        Log.d("fetchRoute", "Response: $response")
+
+        if (responseCode in 200..299) {
+            val jsonResponse = JSONObject(response)
+            val features = jsonResponse.getJSONArray("features")
+
+            // Assuming the first feature is the one we are interested in
+            if (features.length() > 0) {
+                val feature = features.getJSONObject(0)
+                val geometry = feature.getJSONObject("geometry")
+                val coordinatesArray = geometry.getJSONArray("coordinates")
+
+                for (i in 0 until coordinatesArray.length()) {
+                    val coordinatePair = coordinatesArray.getJSONArray(i)
+                    val longitude = coordinatePair.getDouble(0)
+                    val latitude = coordinatePair.getDouble(1)
+                    geoPoints.add(GeoPoint(latitude, longitude))
+                }
             }
+        } else {
+            Log.e("fetchRoute", "Error in fetching route: $response")
         }
     } catch (e: Exception) {
+        Log.e("fetchRoute", "Exception: ${e.message}")
         e.printStackTrace()
-        // Handle errors appropriately
     }
 
+    Log.d("fetchRoute", "GeoPoints retrieved: ${geoPoints.size}")
     return geoPoints
 }
+
 
 private fun mapView(context: Context): org.osmdroid.views.MapView {
     val mapView = org.osmdroid.views.MapView(context)
@@ -283,13 +340,10 @@ fun RouteStopsSection(
             }
         }
 
-        Text(
-            text = if (expanded) "Less stops" else "2 more stops - click to expand",
-            fontSize = 14.sp,
-            color = Color.Blue,
-            modifier = Modifier
-                .clickable { expanded = !expanded }
-                .padding(vertical = 8.dp)
+        ExpandableText(
+            additionalStops = additionalStops,
+            expanded = expanded,
+            onToggleExpand = { expanded = !expanded }
         )
 
         Divider(color = Color(0xFFDADADA), thickness = 1.dp)
@@ -303,6 +357,23 @@ fun RouteStopsSection(
         )
     }
 }
+
+@Composable
+fun ExpandableText(additionalStops: List<Pair<String, String>>, expanded: Boolean, onToggleExpand: () -> Unit) {
+    if (additionalStops.isNotEmpty()) {
+        val text = if (expanded) "Less stops" else "${additionalStops.size} more stops - click to expand"
+
+        Text(
+            text = text,
+            fontSize = 14.sp,
+            color = Color.Blue,
+            modifier = Modifier
+                .clickable(onClick = onToggleExpand)
+                .padding(vertical = 8.dp)
+        )
+    }
+}
+
 
 @Composable
 fun RouteStopItem(address: String, description: String) {
@@ -331,28 +402,4 @@ fun RouteStopItem(address: String, description: String) {
             )
         }
     }
-}
-
-@Composable
-fun MoreStopsText(moreStops: String) {
-    Text(
-        text = moreStops,
-        fontSize = 14.sp,
-        color = Color.Blue,
-        modifier = Modifier
-            .clickable { /* Handle click here to expand the list */ }
-            .padding(vertical = 8.dp)
-    )
-}
-
-@Composable
-fun ExpandableText(text: String) {
-    Text(
-        text = text,
-        fontSize = 14.sp,
-        color = Color.Blue,
-        modifier = Modifier
-            .clickable { /* Handle click here to navigate to delivery details */ }
-            .padding(vertical = 8.dp)
-    )
 }

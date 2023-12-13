@@ -27,5 +27,24 @@ data class Stop(
     val address: String,
 
     @SerializedName("shopName")
-    val shopName: String?
+    val shopName: String?,
+
+    @SerializedName("items")
+    val items: List<Item>
+)
+
+data class RouteStopsSection(
+    val stops: List<Pair<String, String>>,
+    val additionalStops: List<Pair<String, String>>
+)
+
+data class Item(
+    @SerializedName("name")
+    val name: String,
+
+    @SerializedName("quantity")
+    val quantity: Int,
+
+    @SerializedName("metric")
+    val metric: String
 )
