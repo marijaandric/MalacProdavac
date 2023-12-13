@@ -15,6 +15,7 @@ import com.example.front.screens.home.states.HomeProductsState
 import com.example.front.screens.login.state.LoginState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.json.JSONException
 import org.json.JSONObject
@@ -34,8 +35,8 @@ class LoginViewModel @Inject constructor(
     var state : State<LoginState> = _state;
 
 
-    fun getLoginInfo(login: LoginDTO) {
-        viewModelScope.launch {
+    fun getLoginInfo(login: LoginDTO) : Job {
+        return viewModelScope.launch {
             try {
                 val response = repository.getLogin(login)
 
@@ -80,7 +81,9 @@ class LoginViewModel @Inject constructor(
     ): Boolean {
         try {
             val data = LoginDTO(userInput, passwordInput)
-            getLoginInfo(data)
+
+            getLoginInfo(data).join()
+
             val token = jwtToken.value
             val errorMess = errorMessage.value
             if (token != null && errorMess == null) {
