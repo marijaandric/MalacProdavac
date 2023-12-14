@@ -256,18 +256,25 @@ fun Cart(
                                     coroutineScope.launch {
                                         viewModel.isAvailable(cartProducts)
                                         //da proveri da li svaki ima na stanju, ako ima ide na checkout
+                                        ////PROVERITI DA LI LEPO RACUNA DA LI IMA NA STANJU
+                                        var br = 0
+                                        cartProducts.forEach {
+                                            if (it.available < it.quantity){ br ++}
+                                        }
+                                        if(br != 0)
+                                        {
+                                            val groupedProducts = cartState.products.groupBy { it.shopId }
+                                            val totalsByShop = mutableMapOf<Int, Double>()
+
+                                            for ((shopId, products) in groupedProducts) {
+                                                val totalForShop = products.sumOf { it.price * it.quantity }
+                                                totalsByShop[shopId] = totalForShop
+                                            }
+
+                                            println(totalsByShop)
+                                            navController.navigate(Screen.Checkout.route + "/${totalsByShop}")
+                                        }
                                     }
-
-                                    val groupedProducts = cartState.products.groupBy { it.shopId }
-                                    val totalsByShop = mutableMapOf<Int, Double>()
-
-                                    for ((shopId, products) in groupedProducts) {
-                                        val totalForShop = products.sumOf { it.price * it.quantity }
-                                        totalsByShop[shopId] = totalForShop
-                                    }
-
-                                    println(totalsByShop)
-                                    navController.navigate(Screen.Checkout.route + "/${totalsByShop}")
                                 }
                             },
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF457FA8)),

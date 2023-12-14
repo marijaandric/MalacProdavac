@@ -100,7 +100,8 @@ class ProductViewModel @Inject constructor(
                 productInCart.shopName = shopName
                 productInCart.image = image
                 productInCart.metric = metric
-                productInCart.size = size 
+                productInCart.size = size
+                productInCart.available = quantity.toDouble()
 
                 mongoRepository.updateProduct(productInCart)
             } catch (e: Exception) {
