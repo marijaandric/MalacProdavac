@@ -12,18 +12,16 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.Surface
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
@@ -39,7 +37,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -52,9 +49,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.front.R
 import com.example.front.components.Sidebar
 import com.example.front.components.SmallElipseAndTitle
-import com.example.front.model.product.ProductInCart
 import com.example.front.navigation.Screen
-import com.example.front.ui.theme.Typography
 import com.example.front.viewmodels.cart.CartViewModel
 import kotlinx.coroutines.launch
 import java.text.DecimalFormat
@@ -173,11 +168,20 @@ fun Cart(
                                             fontSize = 16.sp,
                                             fontWeight = FontWeight.SemiBold
                                         )
-                                        Text(
-                                            DecimalFormat("#.00").format(product.quantity) + " " + product.metric,
-                                            Modifier,
-                                            Color(0xFFE15F26)
-                                        )
+                                        Row(modifier=Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                            Text(
+                                                DecimalFormat("#.00").format(product.quantity) + " " + product.metric,
+                                                Modifier,
+                                                Color(0xFFE15F26)
+                                            )
+                                            if (product.size != "" && product.size != "None") {
+                                                Text(
+                                                    "Size: " + product.size,
+                                                    Modifier,
+//                                                    Color(0xFFE15F26)
+                                                )
+                                            }
+                                        }
                                         Text(
                                             DecimalFormat("#.00").format(product.price * product.quantity)
                                                 .toString() + " rsd"
@@ -238,6 +242,10 @@ fun Cart(
                         Button(
                             onClick = {
                                 if (cartProducts.isNotEmpty()) {
+                                    //salje upit da li je na stanju
+//                                    val result = viewModel.isAvailable(cardProducts)
+
+
                                     val groupedProducts = cartState.products.groupBy { it.shopId }
                                     val totalsByShop = mutableMapOf<Int, Double>()
 
