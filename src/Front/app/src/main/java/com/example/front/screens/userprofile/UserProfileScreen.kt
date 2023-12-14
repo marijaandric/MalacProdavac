@@ -73,12 +73,14 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
+import coil.compose.rememberImagePainter
 import com.example.front.R
 import com.example.front.components.CardButton
 import com.example.front.components.ImageItemForProfilePic
 import com.example.front.components.MyTextField
 import com.example.front.components.Sidebar
 import com.example.front.model.user.UserEditDTO
+import com.example.front.screens.myshop.getMultipartBodyPart
 import com.example.front.viewmodels.myprofile.MyProfileViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -440,15 +442,25 @@ fun TopCenterImages(myProfileViewModel: MyProfileViewModel, drawerState: DrawerS
     var uri by remember {
         mutableStateOf<Uri?>(null)
     }
+    var selectedImageUri by remember {
+        mutableStateOf<Uri?>(null)
+    }
     val context = LocalContext.current
 
     val bitmap = remember {
         mutableStateOf<Bitmap?>(null)
     }
 
-    val photoPicker = rememberLauncherForActivityResult(contract = ActivityResultContracts.PickVisualMedia(), onResult = {
-        uri = it
-    })
+    val photoPicker = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri ->
+        uri?.let {
+            selectedImageUri = uri
+            if( selectedImageUri != null)
+            {
+                val x = getMultipartBodyPart(context, selectedImageUri!!)
+                Log.d("SLIKA", x.toString())
+            }
+        }
+    }
 
     var imagee by remember { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
@@ -517,11 +529,43 @@ fun TopCenterImages(myProfileViewModel: MyProfileViewModel, drawerState: DrawerS
                             .border(4.dp, Color.White, CircleShape)
                     )
                 }
+                else if (selectedImageUri != null) {
+                    Box{
+                        Image(
+                            painter = rememberImagePainter(
+                                data = selectedImageUri,
+                                builder = {
+                                    crossfade(true)
+                                }
+                            ),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(140.dp)
+                                .clip(CircleShape).border(4.dp, Color.White, CircleShape)
+                        )
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .background(MaterialTheme.colorScheme.onBackground, shape = CircleShape)
+                                .padding(8.dp)
+                                .clickable {
+                                    photoPicker.launch("image/*")
+                                }
+                        ) {
+                            androidx.compose.material3.Icon(
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = "Edit",
+                                tint = Color.White,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
+                    }
+                }
                 else{
                     if(myProfileViewModel.state.value.info!!.image.isNotEmpty())
                     {
                         ImageItemForProfilePic(image = myProfileViewModel.state.value!!.info!!.image, onEditClick = {
-                            photoPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                            photoPicker.launch("image/*")
                         })
                     }
                 }
