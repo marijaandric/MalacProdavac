@@ -4,6 +4,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.example.front.helper.DataStore.DataStoreManager
+import com.example.front.model.DTO.CheckAvailabilityReqDTO
 import com.example.front.model.product.ProductInCart
 import com.example.front.repository.MongoRepository
 import com.example.front.repository.Repository
@@ -40,12 +41,26 @@ class CartViewModel @Inject constructor(
         getCartProducts()
     }
 
-//    fun isAvailable(cardProducts: List<ProductInCart>): Any {
-//        var lista = emptyList<ProductInCart>()
-//        cardProducts.forEach {
-//            var nesto = CheckAvailabilityReqDTO(it.id, it.size ?: "None", it.quantity)
-//        }
-//    }
+    suspend fun isAvailable(cardProducts: List<ProductInCart>) {
+        var products = cardProducts.map {
+            CheckAvailabilityReqDTO(it.id, it.size, it.quantity)
+        }
+        println("LISTA: $products")
+
+        try {
+            val response = repository.checkProductsAvailability(products)
+            if (response.isSuccessful) {
+                _state.value.products.forEach { product ->
+                    val nesto = response.body()?.find {
+                        it.id == product.id
+                    }?.available
+                    product.available = nesto ?: product.available
+                }
+            }
+        } catch (e: Exception) {
+            println("Exception in isAvailable(): $e")
+        }
+    }
 }
 
 data class CartState(

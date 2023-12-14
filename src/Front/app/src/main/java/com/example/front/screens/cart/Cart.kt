@@ -212,6 +212,16 @@ fun Cart(
                                         )
                                     }
                                 }
+                                if (product.available < product.quantity) {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(4.dp)
+//                                        .height(96.dp),
+                                    ) {
+                                        Text(text = "Currently available: ${product.available}")
+                                    }
+                                }
                             }
 
                             item {
@@ -243,8 +253,10 @@ fun Cart(
                             onClick = {
                                 if (cartProducts.isNotEmpty()) {
                                     //salje upit da li je na stanju
-//                                    val result = viewModel.isAvailable(cardProducts)
-
+                                    coroutineScope.launch {
+                                        viewModel.isAvailable(cartProducts)
+                                        //da proveri da li svaki ima na stanju, ako ima ide na checkout
+                                    }
 
                                     val groupedProducts = cartState.products.groupBy { it.shopId }
                                     val totalsByShop = mutableMapOf<Int, Double>()
@@ -256,7 +268,6 @@ fun Cart(
 
                                     println(totalsByShop)
                                     navController.navigate(Screen.Checkout.route + "/${totalsByShop}")
-//                                navController.navigate(route = Screen.Checkout.route)
                                 }
                             },
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF457FA8)),

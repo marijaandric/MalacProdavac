@@ -1,6 +1,8 @@
 package com.example.front.api
 
 import com.example.front.model.DTO.CategoriesDTO
+import com.example.front.model.DTO.CheckAvailabilityReqDTO
+import com.example.front.model.DTO.CheckAvailabilityResDTO
 import com.example.front.model.DTO.ChosenCategoriesDTO
 import com.example.front.model.DTO.HomeProductDTO
 import com.example.front.model.DTO.LeaveReviewDTO
@@ -16,8 +18,6 @@ import com.example.front.model.DTO.ProductDTO
 import com.example.front.model.DTO.ProductDisplayDTO
 import com.example.front.model.DTO.ReviewDTO
 import com.example.front.model.DTO.RouteDetails
-import com.example.front.model.request.RegistrationRequest
-import com.example.front.model.response.LoginResponse
 import com.example.front.model.DTO.ShopDTO
 import com.example.front.model.DTO.ShopDetailsCheckoutDTO
 import com.example.front.model.DTO.ShopDetailsDTO
@@ -26,7 +26,9 @@ import com.example.front.model.DTO.ToggleLikeDTO
 import com.example.front.model.DTO.Trip
 import com.example.front.model.product.ProductInfo
 import com.example.front.model.product.ProductReviewUserInfo
+import com.example.front.model.request.RegistrationRequest
 import com.example.front.model.response.Id
+import com.example.front.model.response.LoginResponse
 import com.example.front.model.response.Success
 import com.example.front.model.response.SuccessBoolean
 import com.example.front.model.response.SuccessInt
@@ -34,7 +36,6 @@ import com.example.front.model.response.SuccessProductDisplay
 import com.example.front.model.user.MyProfileDTO
 import com.example.front.model.user.UserEditDTO
 import okhttp3.MultipartBody
-import org.w3c.dom.Comment
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -267,4 +268,11 @@ interface Api {
         @Query("id") page: Int,
         @Part image: MultipartBody.Part
     ): Response<SuccessBoolean>
+
+    //// POPUNITI
+    @GET("back/Product/CheckAvailability")
+    suspend fun checkProductsAvailability(
+        @Query("products") products: List<CheckAvailabilityReqDTO>
+    ): Response<List<CheckAvailabilityResDTO>>
+
 }

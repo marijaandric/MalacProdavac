@@ -13,4 +13,5 @@ class ProductInCart : RealmObject {
     var image: String = ""
     var metric: String = ""
     var size: String = "None"
+    var available: Double = 0.0
 }
