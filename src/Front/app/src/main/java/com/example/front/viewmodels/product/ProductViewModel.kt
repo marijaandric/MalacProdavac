@@ -19,7 +19,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ProductViewModel @Inject constructor(
     private val repository: Repository,
-    private val dataStoreManager: DataStoreManager,
+    internal val dataStoreManager: DataStoreManager,
     private val mongoRepository: MongoRepository
 ) : ViewModel() {
 

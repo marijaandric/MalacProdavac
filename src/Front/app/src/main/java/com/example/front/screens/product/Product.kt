@@ -54,6 +54,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.front.R
 import com.example.front.components.GalleryComponent
 import com.example.front.components.ProductImage
+import com.example.front.components.Sidebar
 import com.example.front.components.ToggleImageButton
 import com.example.front.model.DTO.WorkingHoursDTO
 import com.example.front.model.product.ProductReviewUserInfo
@@ -92,318 +93,166 @@ fun ProductPage(
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        if (productViewModel.state.value.isLoading) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.background),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                CircularProgressIndicator()
-            }
-        } else {
-            val productInfo = productViewModel.state.value.product
-            var selectedImage by remember { mutableStateOf(productInfo?.images?.get(0)) }
-
-            LaunchedEffect(productInfo) {
-                selectedImage = productInfo?.images?.get(0)
-            }
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1.5f)
-                    .align(Alignment.CenterHorizontally)
-                    .background(Color.Transparent)
-            ) {
-                if (productInfo != null) {
-                    selectedImage?.let { image ->
-                        if (image.image.isNotEmpty()) {
-                            ProductImage(image.image, modifier = Modifier)
-                        }
-                    }
-                }
-
-                ToggleImageButton(modifier = Modifier.align(Alignment.TopEnd))
-
-                Image(
-                    painter = painterResource(id = R.drawable.backarrow),
-                    contentDescription = "",
-                    modifier = Modifier
-                        .size(50.dp)
-                        .padding(5.dp)
-                        .align(Alignment.TopStart)
-                        .clickable { navHostController.navigate(Screen.Home.route) }
-                )
-            }
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(3f)
-                    .border(
-                        1.dp,
-                        Color.Black,
-                        shape = RoundedCornerShape(
-                            topStart = 20.dp,
-                            topEnd = 20.dp,
-                            bottomStart = 0.dp,
-                            bottomEnd = 0.dp
-                        )
-                    )
-                    .background(Color.Transparent)
-            ) {
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    Sidebar(drawerState, navHostController, productViewModel.dataStoreManager) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.White),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            if (productViewModel.state.value.isLoading) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(Color.White)
-                        .padding(
-                            top = 20.dp,
-                            start = 20.dp,
-                            end = 20.dp,
-                            bottom = 0.dp
-                        )
-                        .verticalScroll(rememberScrollState())
+                        .background(MaterialTheme.colorScheme.background),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    productInfo?.images?.let { images ->
-                        GalleryComponent(
-                            modifier = Modifier.padding(20.dp),
-                            images = images,
-                            selectedImage = selectedImage
-                        ) { selectedImage = it }
-                    }
+                    CircularProgressIndicator()
+                }
+            } else {
+                val productInfo = productViewModel.state.value.product
+                var selectedImage by remember { mutableStateOf(productInfo?.images?.get(0)) }
 
-                    productInfo?.name?.let {
-                        Text(
-                            text = it,
-                            modifier = Modifier
-                                .padding(5.dp)
-                                .fillMaxWidth(),
-                            style = Typography.titleMedium,
-                            color = DarkBlue
-                        )
-                    }
+                LaunchedEffect(productInfo) {
+                    selectedImage = productInfo?.images?.get(0)
+                }
 
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Row(modifier = Modifier.clickable {
-                            navHostController.navigate("${Screen.Shop.route}/${productInfo?.shopId}")
-                        }) {
-                            productInfo?.shopName?.let {
-                                Text(
-                                    text = it,
-                                    modifier = Modifier
-                                        .padding(5.dp),
-                                    style = Typography.titleSmall,
-                                    textAlign = TextAlign.Center
-                                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1.5f)
+                        .align(Alignment.CenterHorizontally)
+                        .background(Color.Transparent)
+                ) {
+                    if (productInfo != null) {
+                        selectedImage?.let { image ->
+                            if (image.image.isNotEmpty()) {
+                                ProductImage(image.image, modifier = Modifier)
                             }
+                        }
+                    }
 
-                            Image(
-                                painter = painterResource(R.drawable.strelica),
-                                contentDescription = "",
+                    ToggleImageButton(modifier = Modifier.align(Alignment.TopEnd))
+
+                    Image(
+                        painter = painterResource(id = R.drawable.backarrow),
+                        contentDescription = "",
+                        modifier = Modifier
+                            .size(50.dp)
+                            .padding(5.dp)
+                            .align(Alignment.TopStart)
+                            .clickable { navHostController.popBackStack() }
+                    )
+                }
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(3f)
+                        .border(
+                            1.dp,
+                            Color.Black,
+                            shape = RoundedCornerShape(
+                                topStart = 20.dp,
+                                topEnd = 20.dp,
+                                bottomStart = 0.dp,
+                                bottomEnd = 0.dp
+                            )
+                        )
+                        .background(Color.Transparent)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color.White)
+                            .padding(
+                                top = 20.dp,
+                                start = 20.dp,
+                                end = 20.dp,
+                                bottom = 0.dp
+                            )
+                            .verticalScroll(rememberScrollState())
+                    ) {
+                        productInfo?.images?.let { images ->
+                            GalleryComponent(
+                                modifier = Modifier.padding(20.dp),
+                                images = images,
+                                selectedImage = selectedImage
+                            ) { selectedImage = it }
+                        }
+
+                        productInfo?.name?.let {
+                            Text(
+                                text = it,
                                 modifier = Modifier
-                                    .size(29.dp)
+                                    .padding(5.dp)
+                                    .fillMaxWidth(),
+                                style = Typography.titleMedium,
+                                color = DarkBlue
                             )
                         }
-                    }
 
-                    Text(
-                        text = "${productInfo?.price} rsd",
-                        modifier = Modifier
-                            .padding(20.dp)
-                            .fillMaxWidth(),
-                        style = Typography.titleLarge,
-                        color = DarkBlue,
-                        textAlign = TextAlign.Center
-                    )
-
-                    productInfo?.saleMessage?.let {
-                        Text(
-                            text = it,
-                            modifier = Modifier.fillMaxWidth(),
-                            style = Typography.titleMedium,
-                            textAlign = TextAlign.Center,
-                            color = Orange
-                        )
-                    }
-
-                    productInfo?.description?.let {
-                        Text(
-                            text = it,
-                            modifier = Modifier
-                                .padding(10.dp)
-                                .fillMaxWidth(),
-                            style = Typography.bodySmall,
-                            textAlign = TextAlign.Center,
-                            color = Color.Black
-                        )
-                    }
-
-                    Divider(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(1.dp)
-                            .padding(horizontal = 16.dp),
-                        color = Color.Gray
-                    )
-
-                    productInfo?.workingHours?.let { ExpandableRow(it) }
-
-                    // velicine
-                    if (productInfo?.sizes != null && productInfo.sizes[0].size != "None") {
-                        LazyRow(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 22.dp)
-                        ) {
-                            productInfo.sizes.forEach {
-                                item {
-                                    Box(
-                                        modifier = Modifier
-                                            .border(1.dp, Color.Gray, RectangleShape)
-//                                            .height(32.dp)
-//                                            .width(32.dp)
-                                            .background(
-                                                color = if (it.size == selectedSize) Color.Gray else Color.White
-                                            )
-                                            .clickable {
-                                                selectedSize = it.size
-                                            }
-                                            .padding(4.dp)
-                                    ) {
-                                        Text(
-                                            text = it.size,
-                                            fontSize = 24.sp,
-                                            modifier = Modifier
-                                                .padding(4.dp)
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(10.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "Quantity",
-                            style = Typography.titleSmall,
-                            color = Color.Black
-                        )
-
-                        NumberPicker(
-                            value = quantity,
-                            onValueChange = { newValue -> quantity = newValue })
-                    }
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Button(
-                            onClick = {
-                                println("VELICINE   " + productInfo?.sizes)
-                                if (productInfo?.name != null &&
-                                    productInfo?.price != null &&
-                                    productInfo.shopId != null &&
-                                    productInfo?.shopName != null &&
-                                    productInfo.images?.isNotEmpty() == true &&
-                                    productInfo.metric != null &&
-                                    (
-                                            productInfo.sizes?.isEmpty() == true ||
-                                            (productInfo.sizes != null && productInfo.sizes[0].size == "None") ||
-                                            selectedSize != null
-                                    )
-                                ) {
-                                    productViewModel.addToCart(
-                                        productID,
-                                        productInfo.name,
-                                        productInfo.price,
-                                        quantity,
-                                        productInfo.shopId,
-                                        productInfo.shopName,
-                                        productInfo.images[0].image,
-                                        productInfo.metric,
-                                        selectedSize ?: "None"
-                                    )
-
-                                    coroutineScope.launch {
-                                        try {
-                                            toastHostState.showToast(
-                                                "Product added to cart",
-                                                Icons.Default.Check
-                                            )
-                                        } catch (e: Exception) {
-                                            Log.e("ToastError", "Error showing toast", e)
-                                        }
-                                    }
-                                } else if (productInfo?.sizes?.isNotEmpty() == true || selectedSize != null) {
-                                    coroutineScope.launch {
-                                        try {
-                                            toastHostState.showToast(
-                                                "Please select size",
-                                                Icons.Default.Clear
-                                            )
-                                        } catch (e: Exception) {
-                                            Log.e("ToastError", "Error showing toast", e)
-                                        }
-                                    }
-                                }
-                            },
-                            modifier = Modifier
-                                .height(80.dp)
-                                .width(300.dp)
-                                .padding(20.dp),
-                        ) {
-                            Text(text = "Add To Cart", style = Typography.titleSmall)
-                        }
-                    }
-                    Divider(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(1.dp)
-                            .padding(horizontal = 16.dp),
-                        color = Color.Gray
-                    )
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(30.dp), horizontalArrangement = Arrangement.SpaceBetween
+                                .padding(16.dp),
+                            horizontalArrangement = Arrangement.Center
                         ) {
-                            Text(text = "Product reviews", style = Typography.bodyLarge)
-                            Row {
-                                if (productInfo != null) {
+                            Row(modifier = Modifier.clickable {
+                                navHostController.navigate("${Screen.Shop.route}/${productInfo?.shopId}")
+                            }) {
+                                productInfo?.shopName?.let {
                                     Text(
-                                        text = "${productInfo.rating}",
-                                        style = Typography.bodyLarge
+                                        text = it,
+                                        modifier = Modifier
+                                            .padding(5.dp),
+                                        style = Typography.titleSmall,
+                                        textAlign = TextAlign.Center
                                     )
                                 }
-                                Icon(
-                                    imageVector = Icons.Default.Star,
-                                    contentDescription = "Star icon"
+
+                                Image(
+                                    painter = painterResource(R.drawable.strelica),
+                                    contentDescription = "",
+                                    modifier = Modifier
+                                        .size(29.dp)
                                 )
                             }
                         }
+
+                        Text(
+                            text = "${productInfo?.price} rsd",
+                            modifier = Modifier
+                                .padding(20.dp)
+                                .fillMaxWidth(),
+                            style = Typography.titleLarge,
+                            color = DarkBlue,
+                            textAlign = TextAlign.Center
+                        )
+
+                        productInfo?.saleMessage?.let {
+                            Text(
+                                text = it,
+                                modifier = Modifier.fillMaxWidth(),
+                                style = Typography.titleMedium,
+                                textAlign = TextAlign.Center,
+                                color = Orange
+                            )
+                        }
+
+                        productInfo?.description?.let {
+                            Text(
+                                text = it,
+                                modifier = Modifier
+                                    .padding(10.dp)
+                                    .fillMaxWidth(),
+                                style = Typography.bodySmall,
+                                textAlign = TextAlign.Center,
+                                color = Color.Black
+                            )
+                        }
+
                         Divider(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -411,56 +260,121 @@ fun ProductPage(
                                 .padding(horizontal = 16.dp),
                             color = Color.Gray
                         )
-                        Row(modifier = Modifier.padding(10.dp)) {
-                            val reviews = productViewModel.stateReview.value.reviews
 
-                            if (reviews.isNullOrEmpty()) {
-                                Text("No reviews available", style = Typography.bodySmall)
-                            } else {
-                                Column {
-                                    ReviewCard(productReviewUserInfo = reviews[0])
+                        productInfo?.workingHours?.let { ExpandableRow(it) }
 
-                                    var reviewCounter by remember { mutableStateOf(1) }
-                                    var showAllReviews by remember { mutableStateOf(false) }
-
-                                    if (showAllReviews) {
-                                        for (i in 1..reviewCounter) {
-                                            ReviewCard(productReviewUserInfo = reviews[i - 1])
-                                        }
-                                    }
-                                    Row(modifier = Modifier.fillMaxWidth(), Arrangement.Center) {
-
-                                        Button(
-                                            onClick = {
-                                                showAllReviews = !showAllReviews
-
-                                                if (showAllReviews) {
-                                                    GlobalScope.launch {
-                                                        productViewModel.getReviewsForProduct(
-                                                            productID,
-                                                            reviews.size
-                                                        )
-                                                    }
-                                                }
-                                            }
-                                        ) {
-                                            Text(if (showAllReviews) "Show less reviews" else "Show all reviews")
-                                        }
-                                    }
-
-                                    DisposableEffect(reviewCounter) {
-                                        if (showAllReviews) {
-                                            GlobalScope.launch {
-                                                productViewModel.getReviewsForProduct(
-                                                    productID,
-                                                    reviews.size
+                        // velicine
+                        if (productInfo?.sizes != null && productInfo.sizes[0].size != "None") {
+                            LazyRow(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 22.dp)
+                            ) {
+                                productInfo.sizes.forEach {
+                                    item {
+                                        Box(
+                                            modifier = Modifier
+                                                .border(1.dp, Color.Gray, RectangleShape)
+//                                            .height(32.dp)
+//                                            .width(32.dp)
+                                                .background(
+                                                    color = if (it.size == selectedSize) Color.Gray else Color.White
                                                 )
-                                            }
-                                        }
-                                        onDispose {
+                                                .clickable {
+                                                    selectedSize = it.size
+                                                }
+                                                .padding(4.dp)
+                                        ) {
+                                            Text(
+                                                text = it.size,
+                                                fontSize = 24.sp,
+                                                modifier = Modifier
+                                                    .padding(4.dp)
+                                            )
                                         }
                                     }
                                 }
+                            }
+                        }
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(10.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "Quantity",
+                                style = Typography.titleSmall,
+                                color = Color.Black
+                            )
+
+                            NumberPicker(
+                                value = quantity,
+                                onValueChange = { newValue -> quantity = newValue })
+                        }
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Button(
+                                onClick = {
+                                    println("VELICINE   " + productInfo?.sizes)
+                                    if (productInfo?.name != null &&
+                                        productInfo?.price != null &&
+                                        productInfo.shopId != null &&
+                                        productInfo?.shopName != null &&
+                                        productInfo.images?.isNotEmpty() == true &&
+                                        productInfo.metric != null &&
+                                        (
+                                                productInfo.sizes?.isEmpty() == true ||
+                                                        (productInfo.sizes != null && productInfo.sizes[0].size == "None") ||
+                                                        selectedSize != null
+                                                )
+                                    ) {
+                                        productViewModel.addToCart(
+                                            productID,
+                                            productInfo.name,
+                                            productInfo.price,
+                                            quantity,
+                                            productInfo.shopId,
+                                            productInfo.shopName,
+                                            productInfo.images[0].image,
+                                            productInfo.metric,
+                                            selectedSize ?: "None"
+                                        )
+
+                                        coroutineScope.launch {
+                                            try {
+                                                toastHostState.showToast(
+                                                    "Product added to cart",
+                                                    Icons.Default.Check
+                                                )
+                                            } catch (e: Exception) {
+                                                Log.e("ToastError", "Error showing toast", e)
+                                            }
+                                        }
+                                    } else if (productInfo?.sizes?.isNotEmpty() == true || selectedSize != null) {
+                                        coroutineScope.launch {
+                                            try {
+                                                toastHostState.showToast(
+                                                    "Please select size",
+                                                    Icons.Default.Clear
+                                                )
+                                            } catch (e: Exception) {
+                                                Log.e("ToastError", "Error showing toast", e)
+                                            }
+                                        }
+                                    }
+                                },
+                                modifier = Modifier
+                                    .height(80.dp)
+                                    .width(300.dp)
+                                    .padding(20.dp),
+                            ) {
+                                Text(text = "Add To Cart", style = Typography.titleSmall)
                             }
                         }
                         Divider(
@@ -470,11 +384,105 @@ fun ProductPage(
                                 .padding(horizontal = 16.dp),
                             color = Color.Gray
                         )
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(30.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(text = "Product reviews", style = Typography.bodyLarge)
+                                Row {
+                                    if (productInfo != null) {
+                                        Text(
+                                            text = "${productInfo.rating}",
+                                            style = Typography.bodyLarge
+                                        )
+                                    }
+                                    Icon(
+                                        imageVector = Icons.Default.Star,
+                                        contentDescription = "Star icon"
+                                    )
+                                }
+                            }
+                            Divider(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(1.dp)
+                                    .padding(horizontal = 16.dp),
+                                color = Color.Gray
+                            )
+                            Row(modifier = Modifier.padding(10.dp)) {
+                                val reviews = productViewModel.stateReview.value.reviews
+
+                                if (reviews.isNullOrEmpty()) {
+                                    Text("No reviews available", style = Typography.bodySmall)
+                                } else {
+                                    Column {
+                                        ReviewCard(productReviewUserInfo = reviews[0])
+
+                                        var reviewCounter by remember { mutableStateOf(1) }
+                                        var showAllReviews by remember { mutableStateOf(false) }
+
+                                        if (showAllReviews) {
+                                            for (i in 1..reviewCounter) {
+                                                ReviewCard(productReviewUserInfo = reviews[i - 1])
+                                            }
+                                        }
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            Arrangement.Center
+                                        ) {
+
+                                            Button(
+                                                onClick = {
+                                                    showAllReviews = !showAllReviews
+
+                                                    if (showAllReviews) {
+                                                        GlobalScope.launch {
+                                                            productViewModel.getReviewsForProduct(
+                                                                productID,
+                                                                reviews.size
+                                                            )
+                                                        }
+                                                    }
+                                                }
+                                            ) {
+                                                Text(if (showAllReviews) "Show less reviews" else "Show all reviews")
+                                            }
+                                        }
+
+                                        DisposableEffect(reviewCounter) {
+                                            if (showAllReviews) {
+                                                GlobalScope.launch {
+                                                    productViewModel.getReviewsForProduct(
+                                                        productID,
+                                                        reviews.size
+                                                    )
+                                                }
+                                            }
+                                            onDispose {
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            Divider(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(1.dp)
+                                    .padding(horizontal = 16.dp),
+                                color = Color.Gray
+                            )
+                        }
                     }
                 }
             }
-        }
 
+        }
     }
     ToastHost(hostState = toastHostState)
 }
