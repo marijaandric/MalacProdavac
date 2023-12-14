@@ -18,5 +18,6 @@ namespace back.DAL.Repositories
         public Task<List<Card>> GetCards(int userId);
         public Task<bool> InsertCard(Card card);
         public Task<bool> DeleteCard(int cardId);
+        public Task<CheckedStockDto> CheckStock(StockToCheckDto toCheck);
     }
 }

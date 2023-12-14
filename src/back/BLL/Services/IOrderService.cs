@@ -15,5 +15,6 @@ namespace back.BLL.Services
         public Task<List<Card>> GetCards(int userId);
         public Task<bool> InsertCard(CardDto dto);
         public Task<bool> DeleteCard(int cardId);
+        public Task<List<CheckedStockDto>> CheckStock(List<StockToCheckDto> toCheck);
     }
 }

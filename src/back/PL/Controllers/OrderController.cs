@@ -121,5 +121,18 @@ namespace back.PL.Controllers
                 return BadRequest(new { Error = ex.Message });
             }
         }
+
+        [HttpPost("CheckStock")]
+        public async Task<IActionResult> CheckStock([FromBody]List<StockToCheckDto> toCheck)
+        {
+            try
+            {
+                return Ok(await _service.CheckStock(toCheck));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
     }
 }

@@ -200,5 +200,17 @@ namespace back.DAL.Repositories
             _context.Cards.Remove(await _context.Cards.FirstOrDefaultAsync(x => x.Id == cardId));
             return await _context.SaveChangesAsync() > 0;
         }
+
+        public async Task<CheckedStockDto> CheckStock(StockToCheckDto toCheck)
+        {
+            int stock = (await _context.ProductSizes.Join(_context.Sizes, ps => ps.SizeId, s => s.Id, (ps, s) => new { ps, s }).FirstOrDefaultAsync(x => x.ps.ProductId == toCheck.Id && x.s.Name.Equals(toCheck.Size))).ps.Stock;
+            return new CheckedStockDto
+            {
+                Id = toCheck.Id,
+                Quantity = toCheck.Quantity,
+                Size = toCheck.Size,
+                Available = stock
+            };
+        }
     }
 }

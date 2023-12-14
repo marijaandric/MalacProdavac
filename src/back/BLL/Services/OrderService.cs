@@ -123,5 +123,13 @@ namespace back.BLL.Services
         {
             return await _repository.DeleteCard(cardId);
         }
+
+        public async Task<List<CheckedStockDto>> CheckStock(List<StockToCheckDto> toCheck)
+        {
+            List<CheckedStockDto> checkedItems = new List<CheckedStockDto>();
+            foreach(var check in toCheck) checkedItems.Add(await _repository.CheckStock(check));
+
+            return checkedItems;
+        }
     }
 }
