@@ -1,7 +1,8 @@
 package com.example.front.screens.product
 
+import ToastHost
 import android.annotation.SuppressLint
-import android.widget.Toast
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -24,6 +25,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -32,6 +34,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -60,6 +63,7 @@ import com.example.front.ui.theme.Typography
 import com.example.front.viewmodels.product.ProductViewModel
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import rememberToastHostState
 import java.lang.Integer.max
 
 @SuppressLint("SuspiciousIndentation")
@@ -72,6 +76,8 @@ fun ProductPage(
 
     var quantity by remember { mutableStateOf(1) }
     val context = LocalContext.current
+    val toastHostState = rememberToastHostState()
+    val coroutineScope = rememberCoroutineScope()
     var selectedSize by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(Unit) {
@@ -151,7 +157,7 @@ fun ProductPage(
                         )
                     )
                     .background(Color.Transparent)
-            ){
+            ) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -165,7 +171,11 @@ fun ProductPage(
                         .verticalScroll(rememberScrollState())
                 ) {
                     productInfo?.images?.let { images ->
-                        GalleryComponent(modifier = Modifier.padding(20.dp),images = images, selectedImage = selectedImage) { selectedImage = it }
+                        GalleryComponent(
+                            modifier = Modifier.padding(20.dp),
+                            images = images,
+                            selectedImage = selectedImage
+                        ) { selectedImage = it }
                     }
 
                     productInfo?.name?.let {
@@ -250,7 +260,7 @@ fun ProductPage(
                     productInfo?.workingHours?.let { ExpandableRow(it) }
 
                     // velicine
-                    if(productInfo?.sizes != null) {
+                    if (productInfo?.sizes != null) {
                         LazyRow(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -258,7 +268,7 @@ fun ProductPage(
                         ) {
                             productInfo.sizes.forEach {
                                 item {
-                                    Box (
+                                    Box(
                                         modifier = Modifier
                                             .border(1.dp, Color.Gray, RectangleShape)
 //                                            .height(32.dp)
@@ -296,7 +306,9 @@ fun ProductPage(
                             color = Color.Black
                         )
 
-                        NumberPicker(value = quantity, onValueChange = { newValue -> quantity = newValue })
+                        NumberPicker(
+                            value = quantity,
+                            onValueChange = { newValue -> quantity = newValue })
                     }
 
                     Row(
@@ -313,8 +325,7 @@ fun ProductPage(
                                     productInfo.images?.isNotEmpty() == true &&
                                     productInfo.metric != null &&
                                     (productInfo.sizes?.isEmpty() == true || selectedSize != null)
-                                )
-                                {
+                                ) {
                                     productViewModel.addToCart(
                                         productID,
                                         productInfo.name,
@@ -327,9 +338,27 @@ fun ProductPage(
                                         selectedSize
                                     )
 
-                                    Toast.makeText(context, "Product added to cart", Toast.LENGTH_SHORT).show()
-                                } else if(productInfo?.sizes?.isNotEmpty() == true || selectedSize != null) {
-                                    Toast.makeText(context, "Please select size", Toast.LENGTH_SHORT).show()
+                                    coroutineScope.launch {
+                                        try {
+                                            toastHostState.showToast(
+                                                "Product added to cart",
+                                                Icons.Default.Clear
+                                            )
+                                        } catch (e: Exception) {
+                                            Log.e("ToastError", "Error showing toast", e)
+                                        }
+                                    }
+                                } else if (productInfo?.sizes?.isNotEmpty() == true || selectedSize != null) {
+                                    coroutineScope.launch {
+                                        try {
+                                            toastHostState.showToast(
+                                                "Please select size",
+                                                Icons.Default.Clear
+                                            )
+                                        } catch (e: Exception) {
+                                            Log.e("ToastError", "Error showing toast", e)
+                                        }
+                                    }
                                 }
                             },
                             modifier = Modifier
@@ -442,6 +471,7 @@ fun ProductPage(
         }
 
     }
+    ToastHost(hostState = toastHostState)
 }
 
 @Composable

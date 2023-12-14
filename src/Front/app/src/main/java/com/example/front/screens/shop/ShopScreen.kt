@@ -1,5 +1,6 @@
 package com.example.front.screens.shop
 
+import ToastHost
 import android.content.Context
 import android.net.Uri
 import android.util.Log
@@ -35,6 +36,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Info
@@ -58,10 +60,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -103,17 +105,22 @@ import com.example.front.model.DTO.WorkingHoursDTO
 import com.example.front.navigation.Screen
 import com.example.front.viewmodels.oneshop.OneShopViewModel
 import kotlinx.coroutines.delay
-import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
-import java.text.DateFormat
+import kotlinx.coroutines.launch
+import rememberToastHostState
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ShopScreen(navController: NavHostController, shopViewModel: OneShopViewModel, shopId: Int, info :Int) {
-    var selectedColumnIndex by remember { mutableStateOf(true) }
+fun ShopScreen(
+    navController: NavHostController,
+    shopViewModel: OneShopViewModel,
+    shopId: Int,
+    info: Int
+) {
     var id by remember { mutableStateOf(0) }
+    val toastHostState = rememberToastHostState()
     LaunchedEffect(Unit) {
         shopViewModel.getUserId()
             ?.let {
@@ -147,9 +154,8 @@ fun ShopScreen(navController: NavHostController, shopViewModel: OneShopViewModel
     {
         shopViewModel.getShopDetails(id, shopId)
 
-        if(shopViewModel.state.value.shop != null)
-        {
-            if(shopViewModel.state.value.shop!!.productDisplayId != null){
+        if (shopViewModel.state.value.shop != null) {
+            if (shopViewModel.state.value.shop!!.productDisplayId != null) {
                 shopViewModel.state.value.shop!!.productDisplayId?.let {
                     shopViewModel.getProductDisplay(
                         it
@@ -167,9 +173,19 @@ fun ShopScreen(navController: NavHostController, shopViewModel: OneShopViewModel
         if (state?.success != null) {
             if (state.success!!.success != null) {
                 navController.navigate(route = Screen.Home.route)
-        }
+            }
+        } else if (state.error.contains("NotFound")) {
+            try {
+                toastHostState.showToast(state.error, Icons.Default.Clear)
+            } catch (e: Exception) {
+                Log.e("ToastError", "Error showing toast", e)
+            }
         } else if (state.error.contains("You cannot delete the store now! Try it later.")) {
-            Toast.makeText(context, state.error, Toast.LENGTH_SHORT).show()
+            try {
+                toastHostState.showToast(state.error, Icons.Default.Clear)
+            } catch (e: Exception) {
+                Log.e("ToastError", "Error showing toast", e)
+            }
         }
     }
 
@@ -201,8 +217,7 @@ fun ShopScreen(navController: NavHostController, shopViewModel: OneShopViewModel
                     }
                 }
             } else {
-                if(shopViewModel.state.value.shop!!.productDisplayId != null)
-                {
+                if (shopViewModel.state.value.shop!!.productDisplayId != null) {
                     shopViewModel.state.value.shop!!.productDisplayId?.let {
                         shopViewModel.getProductDisplay(
                             it
@@ -213,18 +228,25 @@ fun ShopScreen(navController: NavHostController, shopViewModel: OneShopViewModel
                     ProfilePic(shopViewModel, id, shopId)
                 }
                 item {
-                    ShopInfo(shopViewModel, shopId, id,navController, info)
+                    ShopInfo(shopViewModel, shopId, id, navController, info)
                 }
             }
 
         }
     }
+    ToastHost(hostState = toastHostState)
 }
 
 
 @Composable
-fun ShopInfo(shopViewModel: OneShopViewModel, shopId: Int, userID: Int,navController:NavHostController, info: Int) {
-    var isImageClicked by remember { mutableStateOf(if(info == 1) true else false) }
+fun ShopInfo(
+    shopViewModel: OneShopViewModel,
+    shopId: Int,
+    userID: Int,
+    navController: NavHostController,
+    info: Int
+) {
+    var isImageClicked by remember { mutableStateOf(if (info == 1) true else false) }
     var shopReviewsPage by remember { mutableStateOf(0f) }
 
     val scaleImage1 by animateDpAsState(
@@ -312,7 +334,7 @@ fun ShopInfo(shopViewModel: OneShopViewModel, shopId: Int, userID: Int,navContro
                 }
 
                 Info(isImageClicked, shopViewModel, shopId, userID, LocalContext.current)
-                Products(isImageClicked, shopViewModel, shopId,navController)
+                Products(isImageClicked, shopViewModel, shopId, navController)
 
             }
         }
@@ -320,7 +342,12 @@ fun ShopInfo(shopViewModel: OneShopViewModel, shopId: Int, userID: Int,navContro
 }
 
 @Composable
-fun Products(isImageClicked: Boolean, shopViewModel: OneShopViewModel, shopId: Int,navController: NavHostController) {
+fun Products(
+    isImageClicked: Boolean,
+    shopViewModel: OneShopViewModel,
+    shopId: Int,
+    navController: NavHostController
+) {
     var showElseText by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
     var showAddProduct by remember { mutableStateOf(false) }
@@ -479,6 +506,7 @@ fun AddProductDialog(onDismiss: () -> Unit, shopViewModel: OneShopViewModel, sho
                     0 -> {
                         contentOfAddNewProduct(shopViewModel, onNextClicked = { currentStep = 1 })
                     }
+
                     1 -> {
                         contentOfAddNewImage(shopViewModel, onNextClicked = { currentStep = 0 })
                     }
@@ -493,12 +521,13 @@ fun AddProductDialog(onDismiss: () -> Unit, shopViewModel: OneShopViewModel, sho
 fun contentOfAddNewImage(shopViewModel: OneShopViewModel, onNextClicked: () -> Unit) {
 
     var selectedImageUris by remember { mutableStateOf(emptyList<Uri>()) }
-    val imagePickerLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-        uri?.let {
-            selectedImageUris = selectedImageUris + it
-            Log.d("ImagePicker", "New image added: $it")
+    val imagePickerLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+            uri?.let {
+                selectedImageUris = selectedImageUris + it
+                Log.d("ImagePicker", "New image added: $it")
+            }
         }
-    }
 
     Column {
         Column(
@@ -557,7 +586,6 @@ fun contentOfAddNewImage(shopViewModel: OneShopViewModel, onNextClicked: () -> U
         }
     }
 }
-
 
 
 @Composable
@@ -801,6 +829,8 @@ fun Info(
     }
     var selectedRating by remember { mutableStateOf(0) }
     var toast by remember { mutableStateOf(false) }
+    val toastHostState = rememberToastHostState()
+    val coroutineScope = rememberCoroutineScope()
     var feedback by remember { mutableStateOf(false) }
 
 
@@ -936,8 +966,7 @@ fun Info(
                         style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onSurface)
                     )
                 }
-                if (!shopViewModel.state.value.shop!!.isOwner)
-                {
+                if (!shopViewModel.state.value.shop!!.isOwner) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
@@ -962,8 +991,7 @@ fun Info(
                         )
                     }
                     if (leaveAReview) {
-                        if(shopViewModel.state.value.shop!!.rated || feedback)
-                        {
+                        if (shopViewModel.state.value.shop!!.rated || feedback) {
                             Text(
                                 "A review from you has already been submitted.",
                                 style = MaterialTheme.typography.titleSmall,
@@ -971,8 +999,7 @@ fun Info(
                                     .align(Alignment.CenterHorizontally)
                                     .padding(top = 20.dp)
                             )
-                        }
-                        else{
+                        } else {
                             StarRating { rating ->
                                 selectedRating = rating
                             }
@@ -982,7 +1009,33 @@ fun Info(
                             )
                             CardButton(
                                 "Submit review", onClick = {
-                                    shopViewModel.leaveReview(shopId, userID, selectedRating, comment)
+                                    shopViewModel.leaveReview(
+                                        shopId,
+                                        userID,
+                                        selectedRating,
+                                        comment
+                                    )
+                                    toast = true
+                                }, 0.9f,
+                                Modifier
+                                    .align(Alignment.CenterHorizontally)
+                                    .height(50.dp), MaterialTheme.colorScheme.secondary
+                            )
+                            StarRating { rating ->
+                                selectedRating = rating
+                            }
+                            CommentsTextBox(
+                                onReviewTextChanged = { newText -> comment = newText },
+                                placeholder = "Leave a review"
+                            )
+                            CardButton(
+                                "Submit review", onClick = {
+                                    shopViewModel.leaveReview(
+                                        shopId,
+                                        userID,
+                                        selectedRating,
+                                        comment
+                                    )
                                     toast = true
                                 }, 0.9f,
                                 Modifier
@@ -990,96 +1043,109 @@ fun Info(
                                     .height(50.dp), MaterialTheme.colorScheme.secondary
                             )
                             if (!shopViewModel.statePostReview.value.isLoading && toast) {
-                                Toast.makeText(context, "Review successfully submitted", Toast.LENGTH_LONG)
-                                    .show()
+                                coroutineScope.launch {
+                                    try {
+                                        toastHostState.showToast(
+                                            "Review successfully submitted",
+                                            Icons.Default.Clear
+                                        )
+                                    } catch (e: Exception) {
+                                        Log.e("ToastError", "Error showing toast", e)
+                                    }
+                                }
                                 shopViewModel.getShopReview(
                                     shopId,
                                     reviewPage
                                 )
                                 toast = false
-                                feedback = true
                             } else if (shopViewModel.statePostReview.value.error.isNotEmpty() && toast) {
-                                Toast.makeText(context, "Error", Toast.LENGTH_LONG).show()
+                                coroutineScope.launch {
+                                    try {
+                                        toastHostState.showToast("Error", Icons.Default.Clear)
+                                    } catch (e: Exception) {
+                                        Log.e("ToastError", "Error showing toast", e)
+                                    }
+                                }
                                 toast = false
                             }
+
                         }
-
                     }
-                }
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                )
-                {
-                    Text(
-                        text = "View all reviews",
-                        modifier = Modifier.padding(top = 8.dp),
-                        style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onBackground)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     )
-                    Icon(
-                        imageVector = if (showReviews) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .clickable {
-                                showReviews = !showReviews
-                            }
-                            .padding(top = 8.dp)
-                            .size(30.dp),
-                        tint = MaterialTheme.colorScheme.onBackground
-                    )
-                }
-                if (showReviews) {
-                    val rev = shopViewModel.stateReview.value.reviews
-                    if (rev.isEmpty()) {
+                    {
                         Text(
-                            "No reviews found for this store.",
-                            style = MaterialTheme.typography.titleSmall,
-                            modifier = Modifier
-                                .align(Alignment.CenterHorizontally)
-                                .padding(top = 20.dp)
+                            text = "View all reviews",
+                            modifier = Modifier.padding(top = 8.dp),
+                            style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onBackground)
                         )
-                    }
-                    LazyColumn(
-                        modifier = Modifier.heightIn(100.dp, 1000.dp)
-                    ) {
-                        items(rev) { review ->
-                            ReviewCard(
-                                username = review.username,
-                                imageRes = review.image,
-                                comment = review.comment,
-                                rating = review.rating
-                            )
-                        }
-                    }
-                    if (!shopViewModel.stateReview.value.error.contains("NotFound")) {
-                        Text("See more",
-                            style = MaterialTheme.typography.titleSmall,
+                        Icon(
+                            imageVector = if (showReviews) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                            contentDescription = null,
                             modifier = Modifier
                                 .clickable {
-                                    reviewPage++; shopViewModel.getShopReview(
-                                    shopId,
-                                    reviewPage
-                                )
+                                    showReviews = !showReviews
                                 }
-                                .align(Alignment.CenterHorizontally))
+                                .padding(top = 8.dp)
+                                .size(30.dp),
+                            tint = MaterialTheme.colorScheme.onBackground
+                        )
                     }
-                }
+                    if (showReviews) {
+                        val rev = shopViewModel.stateReview.value.reviews
+                        if (rev.isEmpty()) {
+                            Text(
+                                "No reviews found for this store.",
+                                style = MaterialTheme.typography.titleSmall,
+                                modifier = Modifier
+                                    .align(Alignment.CenterHorizontally)
+                                    .padding(top = 20.dp)
+                            )
+                        }
+                        LazyColumn(
+                            modifier = Modifier.heightIn(100.dp, 1000.dp)
+                        ) {
+                            items(rev) { review ->
+                                ReviewCard(
+                                    username = review.username,
+                                    imageRes = review.image,
+                                    comment = review.comment,
+                                    rating = review.rating
+                                )
+                            }
+                        }
+                        if (!shopViewModel.stateReview.value.error.contains("NotFound")) {
+                            Text("See more",
+                                style = MaterialTheme.typography.titleSmall,
+                                modifier = Modifier
+                                    .clickable {
+                                        reviewPage++; shopViewModel.getShopReview(
+                                        shopId,
+                                        reviewPage
+                                    )
+                                    }
+                                    .align(Alignment.CenterHorizontally))
+                        }
+                    }
 
-                Spacer(modifier = Modifier.height(40.dp))
+                    Spacer(modifier = Modifier.height(40.dp))
+                }
             }
         }
     }
 }
 
 @Composable
-fun ProfilePic(shopViewModel: OneShopViewModel, id: Int, shopId:Int) {
+fun ProfilePic(shopViewModel: OneShopViewModel, id: Int, shopId: Int) {
     val state = shopViewModel.state.value
-    var showDialog by remember{
+    var showDialog by remember {
         mutableStateOf(false)
     }
-    var showDisplayProduct by remember{
+    var showDisplayProduct by remember {
         mutableStateOf(false)
     }
     var showProductDisplayNotificationDialog by remember {
@@ -1115,8 +1181,7 @@ fun ProfilePic(shopViewModel: OneShopViewModel, id: Int, shopId:Int) {
         }
 
 
-        if(shopViewModel.state.value.shop!!.isOwner)
-        {
+        if (shopViewModel.state.value.shop!!.isOwner) {
             Image(
                 painter = painterResource(id = R.drawable.addshop),
                 contentDescription = "Search icon",
@@ -1127,8 +1192,7 @@ fun ProfilePic(shopViewModel: OneShopViewModel, id: Int, shopId:Int) {
                         showDisplayProduct = true
                     },
             )
-        }
-        else{
+        } else {
             Image(
                 painter = painterResource(id = R.drawable.navbar_message),
                 contentDescription = "Search icon",
@@ -1145,8 +1209,8 @@ fun ProfilePic(shopViewModel: OneShopViewModel, id: Int, shopId:Int) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Box (
-            ){
+            Box(
+            ) {
                 if (shopViewModel.state.value.shop?.image == null) {
                     Image(
                         painter = painterResource(id = R.drawable.imageplaceholder),
@@ -1173,8 +1237,7 @@ fun ProfilePic(shopViewModel: OneShopViewModel, id: Int, shopId:Int) {
                     )
                 }
 
-                if(shopViewModel.stateProductDisplay.value.displayProduct != null)
-                {
+                if (shopViewModel.stateProductDisplay.value.displayProduct != null) {
                     Icon(
                         imageVector = Icons.Default.Info,
                         contentDescription = null,
@@ -1210,8 +1273,7 @@ fun ProfilePic(shopViewModel: OneShopViewModel, id: Int, shopId:Int) {
                         color = MaterialTheme.colorScheme.primary
                     )
                     RatingBar(rating = shopViewModel.state.value.shop!!.rating!!.toFloat())
-                    if(shopViewModel.state.value.shop!!.isOwner)
-                    {
+                    if (shopViewModel.state.value.shop!!.isOwner) {
                         CardButton(
                             text = "Delete this shop",
                             onClick = { showDeleteShopDialog = true },
@@ -1226,29 +1288,35 @@ fun ProfilePic(shopViewModel: OneShopViewModel, id: Int, shopId:Int) {
         }
     }
 
-    if(showDialog)
-    {
+    if (showDialog) {
         EditSellersDialog(onDismiss = { showDialog = false })
     }
 
-    if(showDisplayProduct)
-    {
+    if (showDisplayProduct) {
         shopViewModel.inicijalnoStanjeNewPD();
-        DisplayProductDialog(onDismiss = { showDisplayProduct = false}, shopViewModel, shopId, id)
+        DisplayProductDialog(
+            onDismiss = { showDisplayProduct = false },
+            shopViewModel,
+            shopId,
+            id
+        )
     }
 
-    if(showProductDisplayNotificationDialog)
-    {
-        ProductDisplayNotification (onDismiss = { showProductDisplayNotificationDialog = false },shopViewModel, id, shopId)
+    if (showProductDisplayNotificationDialog) {
+        ProductDisplayNotification(
+            onDismiss = { showProductDisplayNotificationDialog = false },
+            shopViewModel,
+            id,
+            shopId
+        )
     }
-    if(showDeleteShopDialog)
-    {
-        DeleteShopDialog(onDismiss = { showDeleteShopDialog = false}, shopViewModel, shopId)
+    if (showDeleteShopDialog) {
+        DeleteShopDialog(onDismiss = { showDeleteShopDialog = false }, shopViewModel, shopId)
     }
 }
 
 @Composable
-fun DeleteShopDialog(onDismiss: () -> Unit, shopViewModel : OneShopViewModel, shopId: Int) {
+fun DeleteShopDialog(onDismiss: () -> Unit, shopViewModel: OneShopViewModel, shopId: Int) {
     val overlayColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)
     var deletedialog by remember {
         mutableStateOf(false)
@@ -1280,8 +1348,13 @@ fun DeleteShopDialog(onDismiss: () -> Unit, shopViewModel : OneShopViewModel, sh
                     .align(Alignment.Center)
             ) {
                 Column {
-                    Text("Are you sure you want to delete your store?", style = MaterialTheme.typography.titleSmall, modifier = Modifier
-                        .padding(bottom = 25.dp), textAlign = TextAlign.Center)
+                    Text(
+                        "Are you sure you want to delete your store?",
+                        style = MaterialTheme.typography.titleSmall,
+                        modifier = Modifier
+                            .padding(bottom = 25.dp),
+                        textAlign = TextAlign.Center
+                    )
                     Row()
                     {
                         CardButton(
@@ -1310,7 +1383,12 @@ fun DeleteShopDialog(onDismiss: () -> Unit, shopViewModel : OneShopViewModel, sh
 }
 
 @Composable
-fun ProductDisplayNotification(onDismiss: () -> Unit, shopViewModel : OneShopViewModel, id: Int, shopId: Int) {
+fun ProductDisplayNotification(
+    onDismiss: () -> Unit,
+    shopViewModel: OneShopViewModel,
+    id: Int,
+    shopId: Int
+) {
     val overlayColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)
     var deletedialog by remember {
         mutableStateOf(false)
@@ -1342,15 +1420,14 @@ fun ProductDisplayNotification(onDismiss: () -> Unit, shopViewModel : OneShopVie
                     .padding(16.dp)
                     .align(Alignment.Center)
             ) {
-                if(shopViewModel.stateProductDisplay.value.isLoading)
-                {
+                if (shopViewModel.stateProductDisplay.value.isLoading) {
                     CircularProgressIndicator()
-                }
-                else{
+                } else {
                     val state = shopViewModel.stateProductDisplay.value
-                    Column(horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier.fillMaxSize()
-                        ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.fillMaxSize()
+                    ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.SpaceBetween,
@@ -1374,8 +1451,7 @@ fun ProductDisplayNotification(onDismiss: () -> Unit, shopViewModel : OneShopVie
                                 style = MaterialTheme.typography.titleMedium,
                                 modifier = Modifier//.padding(bottom = 25.dp)
                             )
-                            if(shopViewModel.state.value.shop!!.isOwner)
-                            {
+                            if (shopViewModel.state.value.shop!!.isOwner) {
                                 Icon(
                                     imageVector = Icons.Default.Delete,
                                     contentDescription = "Delete Icon",
@@ -1389,12 +1465,21 @@ fun ProductDisplayNotification(onDismiss: () -> Unit, shopViewModel : OneShopVie
                             }
 
                         }
-                        if(state != null)
-                        {
-                            Text(state.displayProduct!!.startDate+" - "+state.displayProduct!!.endDate, style = MaterialTheme.typography.titleSmall)
-                            Text(state.displayProduct!!.startTime+" - "+state.displayProduct!!.endTime,style = MaterialTheme.typography.titleSmall)
+                        if (state != null) {
+                            Text(
+                                state.displayProduct!!.startDate + " - " + state.displayProduct!!.endDate,
+                                style = MaterialTheme.typography.titleSmall
+                            )
+                            Text(
+                                state.displayProduct!!.startTime + " - " + state.displayProduct!!.endTime,
+                                style = MaterialTheme.typography.titleSmall
+                            )
                             Spacer(modifier = Modifier.height(20.dp))
-                            Text(state.displayProduct!!.address, style = MaterialTheme.typography.displaySmall,textAlign=TextAlign.Center)
+                            Text(
+                                state.displayProduct!!.address,
+                                style = MaterialTheme.typography.displaySmall,
+                                textAlign = TextAlign.Center
+                            )
                         }
                     }
                 }
@@ -1402,14 +1487,27 @@ fun ProductDisplayNotification(onDismiss: () -> Unit, shopViewModel : OneShopVie
         }
     }
 
-    if(deletedialog)
-    {
-        DeleteDialog(text = "Do you want to delete the product display?",onDismiss = { deletedialog = false },onYesClick = {deletedialog = false; onDismiss()}, shopViewModel = shopViewModel, id, shopId)
+    if (deletedialog) {
+        DeleteDialog(
+            text = "Do you want to delete the product display?",
+            onDismiss = { deletedialog = false },
+            onYesClick = { deletedialog = false; onDismiss() },
+            shopViewModel = shopViewModel,
+            id,
+            shopId
+        )
     }
 }
 
 @Composable
-fun DeleteDialog(text : String, onDismiss: () -> Unit, onYesClick: () -> Unit, shopViewModel: OneShopViewModel, id: Int, shopId: Int) {
+fun DeleteDialog(
+    text: String,
+    onDismiss: () -> Unit,
+    onYesClick: () -> Unit,
+    shopViewModel: OneShopViewModel,
+    id: Int,
+    shopId: Int
+) {
     val overlayColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)
 
     Dialog(
@@ -1439,8 +1537,10 @@ fun DeleteDialog(text : String, onDismiss: () -> Unit, onYesClick: () -> Unit, s
                     .align(Alignment.Center)
             ) {
                 Column {
-                    Text(text, style = MaterialTheme.typography.titleSmall, modifier = Modifier
-                        .padding(bottom = 25.dp), textAlign = TextAlign.Center)
+                    Text(
+                        text, style = MaterialTheme.typography.titleSmall, modifier = Modifier
+                            .padding(bottom = 25.dp), textAlign = TextAlign.Center
+                    )
                     Row()
                     {
                         CardButton(
@@ -1471,7 +1571,12 @@ fun DeleteDialog(text : String, onDismiss: () -> Unit, onYesClick: () -> Unit, s
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DisplayProductDialog(onDismiss: () -> Unit, shopViewModel: OneShopViewModel, shopId : Int, id: Int) {
+fun DisplayProductDialog(
+    onDismiss: () -> Unit,
+    shopViewModel: OneShopViewModel,
+    shopId: Int,
+    id: Int
+) {
     val overlayColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)
     val state = rememberDateRangePickerState()
     val timeStart = rememberTimePickerState()
@@ -1513,15 +1618,19 @@ fun DisplayProductDialog(onDismiss: () -> Unit, shopViewModel: OneShopViewModel,
                     .align(Alignment.Center)
             ) {
                 LazyColumn {
-                    item{
-                        Text("Add product display information", style = MaterialTheme.typography.titleMedium, modifier = Modifier
-                            .padding(bottom = 25.dp))
+                    item {
+                        Text(
+                            "Add product display information",
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier
+                                .padding(bottom = 25.dp)
+                        )
 
                         MyTextFieldWithoutIcon(
                             labelValue = "Address",
                             value = value,
-                            onValueChange = {value = it},
-                            modifier = Modifier.padding(bottom=16.dp)
+                            onValueChange = { value = it },
+                            modifier = Modifier.padding(bottom = 16.dp)
                         )
 
                         Card(
@@ -1536,37 +1645,75 @@ fun DisplayProductDialog(onDismiss: () -> Unit, shopViewModel: OneShopViewModel,
                                         RoundedCornerShape(10.dp)
                                     )
                                     .clip(RoundedCornerShape(10.dp))
-                            ){
-                                DateRangePicker(state = state,modifier = Modifier
-                                    .height(470.dp)
-                                    .background(color = MaterialTheme.colorScheme.background),headline = {
-                                    Text(text = "Select date!", modifier = Modifier.padding(start=10.dp),
-                                        style=MaterialTheme.typography.displaySmall.copy(fontSize = 23.sp)
-                                )}, title=null)
+                            ) {
+                                DateRangePicker(
+                                    state = state,
+                                    modifier = Modifier
+                                        .height(470.dp)
+                                        .background(color = MaterialTheme.colorScheme.background),
+                                    headline = {
+                                        Text(
+                                            text = "Select date!",
+                                            modifier = Modifier.padding(start = 10.dp),
+                                            style = MaterialTheme.typography.displaySmall.copy(
+                                                fontSize = 23.sp
+                                            )
+                                        )
+                                    },
+                                    title = null
+                                )
                             }
                         }
-                        Text(text = "Start time", modifier = Modifier.padding(top = 16.dp,start = 10.dp, bottom = 10.dp), style=MaterialTheme.typography.displaySmall)
+                        Text(
+                            text = "Start time",
+                            modifier = Modifier.padding(
+                                top = 16.dp,
+                                start = 10.dp,
+                                bottom = 10.dp
+                            ),
+                            style = MaterialTheme.typography.displaySmall
+                        )
                         TimeInput(state = timeStart)
-                        Text(text = "End time", modifier = Modifier.padding(top = 16.dp,start = 10.dp, bottom = 10.dp), style=MaterialTheme.typography.displaySmall)
+                        Text(
+                            text = "End time",
+                            modifier = Modifier.padding(
+                                top = 16.dp,
+                                start = 10.dp,
+                                bottom = 10.dp
+                            ),
+                            style = MaterialTheme.typography.displaySmall
+                        )
                         TimeInput(state = timeEnd)
                         CardButton(
                             text = "Add",
                             onClick = {
-                                if(shopViewModel.state.value.shop!!.productDisplayId != null && shopViewModel.state.value.shop!!.productDisplayId != 0)
-                                {
+                                if (shopViewModel.state.value.shop!!.productDisplayId != null && shopViewModel.state.value.shop!!.productDisplayId != 0) {
                                     showDeleteDialog = true;
-                                }
-                                else{
+                                } else {
                                     val newPD = NewProductDisplayDTO(
                                         shopId = shopId,
-                                        startDate = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+                                        startDate = SimpleDateFormat(
+                                            "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
+                                            Locale.getDefault()
+                                        )
                                             .format(state.selectedStartDateMillis?.let { Date(it) }),
-                                        endDate = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+                                        endDate = SimpleDateFormat(
+                                            "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
+                                            Locale.getDefault()
+                                        )
                                             .format(state.selectedEndDateMillis?.let { Date(it) }),
-                                        startTime = SimpleDateFormat("HH:mm", Locale.getDefault())
-                                            .format(Date().apply { hours = timeStart.hour; minutes = timeStart.minute }),
+                                        startTime = SimpleDateFormat(
+                                            "HH:mm",
+                                            Locale.getDefault()
+                                        )
+                                            .format(Date().apply {
+                                                hours = timeStart.hour; minutes =
+                                                timeStart.minute
+                                            }),
                                         endTime = SimpleDateFormat("HH:mm", Locale.getDefault())
-                                            .format(Date().apply { hours = timeEnd.hour; minutes = timeEnd.minute }),
+                                            .format(Date().apply {
+                                                hours = timeEnd.hour; minutes = timeEnd.minute
+                                            }),
                                         address = value
                                     )
                                     shopViewModel.newProductDisplay(newPD);
@@ -1578,12 +1725,14 @@ fun DisplayProductDialog(onDismiss: () -> Unit, shopViewModel: OneShopViewModel,
                             modifier = Modifier.height(50.dp),
                             color = MaterialTheme.colorScheme.secondary
                         )
-                        if(shopViewModel.stateNewProductDisplay.value.error.isNotEmpty())
-                        {
-                            Text("Please check all fields!", style = MaterialTheme.typography.displaySmall, modifier = Modifier)
+                        if (shopViewModel.stateNewProductDisplay.value.error.isNotEmpty()) {
+                            Text(
+                                "Please check all fields!",
+                                style = MaterialTheme.typography.displaySmall,
+                                modifier = Modifier
+                            )
                         }
-                        if(shopViewModel.stateNewProductDisplay.value.isLoading == false)
-                        {
+                        if (shopViewModel.stateNewProductDisplay.value.isLoading == false) {
                             shopViewModel.getShopDetails(id, shopId);
                             onDismiss();
                         }
@@ -1594,35 +1743,43 @@ fun DisplayProductDialog(onDismiss: () -> Unit, shopViewModel: OneShopViewModel,
         }
     }
 
-    if(showDeleteDialog)
-    {
+    if (showDeleteDialog) {
         DeleteDialog(
             text = "If you want to add a new product display, you will have to delete the old one. Do you want to delete the old one?",
             onDismiss = { showDeleteDialog = false; shopViewModel.getShopDetails(id, shopId); },
-            onYesClick = { showDeleteDialog = false;
+            onYesClick = {
+                showDeleteDialog = false;
                 val newPD = NewProductDisplayDTO(
                     shopId = shopId,
-                    startDate = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+                    startDate = SimpleDateFormat(
+                        "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
+                        Locale.getDefault()
+                    )
                         .format(state.selectedStartDateMillis?.let { Date(it) }),
-                    endDate = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+                    endDate = SimpleDateFormat(
+                        "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
+                        Locale.getDefault()
+                    )
                         .format(state.selectedEndDateMillis?.let { Date(it) }),
                     startTime = SimpleDateFormat("HH:mm", Locale.getDefault())
-                        .format(Date().apply { hours = timeStart.hour; minutes = timeStart.minute }),
+                        .format(Date().apply {
+                            hours = timeStart.hour; minutes = timeStart.minute
+                        }),
                     endTime = SimpleDateFormat("HH:mm", Locale.getDefault())
-                        .format(Date().apply { hours = timeEnd.hour; minutes = timeEnd.minute }),
+                        .format(Date().apply {
+                            hours = timeEnd.hour; minutes = timeEnd.minute
+                        }),
                     address = value
                 )
                 shopViewModel.newProductDisplay(newPD);
                 onDismiss()
-                         },
+            },
             shopViewModel = shopViewModel,
             id = id,
             shopId = shopId
         )
     }
 }
-
-
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -1642,7 +1799,7 @@ fun EditSellersDialog(onDismiss: () -> Unit) {
     }
     var categories = mutableListOf<Int>()
     var workingHour by remember {
-        mutableStateOf(WorkingHoursDTO(0,0,"00","00", "Shop"))
+        mutableStateOf(WorkingHoursDTO(0, 0, "00", "00", "Shop"))
     }
 
 
@@ -1675,16 +1832,20 @@ fun EditSellersDialog(onDismiss: () -> Unit) {
             ) {
                 LazyColumn()
                 {
-                    item{
+                    item {
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(16.dp)
                                 .align(Alignment.Center)
                         ) {
-                            Text("Edit shop", style = MaterialTheme.typography.titleMedium, modifier = Modifier
-                                .padding(bottom = 25.dp)
-                                .align(Alignment.CenterHorizontally))
+                            Text(
+                                "Edit shop",
+                                style = MaterialTheme.typography.titleMedium,
+                                modifier = Modifier
+                                    .padding(bottom = 25.dp)
+                                    .align(Alignment.CenterHorizontally)
+                            )
 
                             MyTextField(
                                 labelValue = "Name",
@@ -1704,16 +1865,21 @@ fun EditSellersDialog(onDismiss: () -> Unit) {
 
                             Spacer(modifier = Modifier.height(16.dp))
 
-                            Text("Working hours", style = MaterialTheme.typography.titleSmall, modifier = Modifier)
+                            Text(
+                                "Working hours",
+                                style = MaterialTheme.typography.titleSmall,
+                                modifier = Modifier
+                            )
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(top = 16.dp, bottom = 16.dp),
                                 horizontalArrangement = Arrangement.SpaceEvenly
                             ) {
-                                val daysOfWeek = listOf("Mon","Tue","Wed","Thu","Fri","Sat","Sun")
+                                val daysOfWeek =
+                                    listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
                                 for (day in daysOfWeek) {
-                                    DayOfWeek(day = day, onClick={})
+                                    DayOfWeek(day = day, onClick = {})
                                 }
                             }
                             Spacer(modifier = Modifier.height(16.dp))
@@ -1736,17 +1902,48 @@ fun EditSellersDialog(onDismiss: () -> Unit) {
                                     horizontalAlignment = Alignment.CenterHorizontally,
 
                                     ) {
-                                    androidx.compose.material3.Text(text="Pick up time", style=MaterialTheme.typography.bodyLarge)
-                                    androidx.compose.material3.Text(text = "Opening time", modifier = Modifier.padding(top = 16.dp,start = 10.dp, bottom = 10.dp), style=MaterialTheme.typography.displaySmall)
+                                    androidx.compose.material3.Text(
+                                        text = "Pick up time",
+                                        style = MaterialTheme.typography.bodyLarge
+                                    )
+                                    androidx.compose.material3.Text(
+                                        text = "Opening time",
+                                        modifier = Modifier.padding(
+                                            top = 16.dp,
+                                            start = 10.dp,
+                                            bottom = 10.dp
+                                        ),
+                                        style = MaterialTheme.typography.displaySmall
+                                    )
                                     TimeInput(state = state)
-                                    androidx.compose.material3.Text(text = "Closing time", modifier = Modifier.padding(top = 16.dp,start = 10.dp, bottom = 10.dp), style=MaterialTheme.typography.displaySmall)
+                                    androidx.compose.material3.Text(
+                                        text = "Closing time",
+                                        modifier = Modifier.padding(
+                                            top = 16.dp,
+                                            start = 10.dp,
+                                            bottom = 10.dp
+                                        ),
+                                        style = MaterialTheme.typography.displaySmall
+                                    )
                                     TimeInput(state = state)
-                                    CardButton(text = "Apply", onClick = {  }, width = 0.7f, modifier = Modifier, color = MaterialTheme.colorScheme.secondary)
+                                    CardButton(
+                                        text = "Apply",
+                                        onClick = { },
+                                        width = 0.7f,
+                                        modifier = Modifier,
+                                        color = MaterialTheme.colorScheme.secondary
+                                    )
                                 }
                             }
 
 
-                            CardButton(text = "Edit", onClick = { onDismiss() }, width = 1f, modifier = Modifier, color = MaterialTheme.colorScheme.primary)
+                            CardButton(
+                                text = "Edit",
+                                onClick = { onDismiss() },
+                                width = 1f,
+                                modifier = Modifier,
+                                color = MaterialTheme.colorScheme.primary
+                            )
 
                         }
                     }
@@ -1759,7 +1956,7 @@ fun EditSellersDialog(onDismiss: () -> Unit) {
 
 
 @Composable
-fun DayOfWeek(day: String, onClick: () -> Unit ) {
+fun DayOfWeek(day: String, onClick: () -> Unit) {
     Box(
         modifier = Modifier
             .background(color = MaterialTheme.colorScheme.primary, RoundedCornerShape(10.dp))

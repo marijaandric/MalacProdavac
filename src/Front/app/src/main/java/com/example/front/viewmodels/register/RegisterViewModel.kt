@@ -7,7 +7,7 @@ import com.example.front.helper.DataStore.DataStoreManager
 import com.example.front.model.request.RegistrationRequest
 import com.example.front.repository.Repository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.async
 import org.json.JSONException
 import org.json.JSONObject
 import javax.inject.Inject
@@ -16,12 +16,12 @@ import javax.inject.Inject
 class RegisterViewModel @Inject constructor(
     private val repository: Repository,
     private val dataStoreManager: DataStoreManager
-) : ViewModel(){
+) : ViewModel() {
     val jwtToken: MutableLiveData<String?> = MutableLiveData()
     val errorMessage: MutableLiveData<String> = MutableLiveData()
 
     suspend fun performRegistration(registrationRequest: RegistrationRequest): Boolean {
-        viewModelScope.launch {
+        val registrationJob = viewModelScope.async {
             try {
                 val response = repository.register(registrationRequest)
 
@@ -59,11 +59,12 @@ class RegisterViewModel @Inject constructor(
                 errorMessage.value = "An error occurred: ${e.message}"
             }
         }
+        registrationJob.await()
 
         try {
             val token = jwtToken.value
             val errMess = errorMessage.value
-            if (token != null && errMess == null) {
+            if (token != null && errMess.isNullOrEmpty()) {
                 dataStoreManager.storeToken(token)
                 return true
             }

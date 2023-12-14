@@ -1,6 +1,9 @@
 package com.example.front.screens.login
 
+import ToastHost
+import ToastHostState
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,6 +13,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,6 +28,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -38,6 +45,7 @@ import com.example.front.components.TitleTextComponent
 import com.example.front.navigation.Screen
 import com.example.front.viewmodels.login.LoginViewModel
 import kotlinx.coroutines.launch
+import rememberToastHostState
 
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -51,6 +59,8 @@ fun LoginScreen(
 
     var scaffoldState: ScaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
+
+    val toastHostState = rememberToastHostState()
 
     LaunchedEffect(key1 = true) {
         viewModel.setFirstTimeToFalse()
@@ -115,11 +125,13 @@ fun LoginScreen(
                                     if (!success) {
                                         val errorMess = viewModel.errorMessage.value
                                         if (errorMess != null) {
-                                            scaffoldState.snackbarHostState.showSnackbar(
-                                                message = errorMess.toString(),
-                                                actionLabel = "Try again",
-                                                duration = SnackbarDuration.Indefinite
-                                            )
+                                            coroutineScope.launch {
+                                                try {
+                                                    toastHostState.showToast(errorMess.toString(), Icons.Default.Clear)
+                                                } catch (e: Exception) {
+                                                    Log.e("ToastError", "Error showing toast", e)
+                                                }
+                                            }
                                         }
                                     }
                                 } catch (e: Exception) {
@@ -144,6 +156,7 @@ fun LoginScreen(
                     )
                 }
             }
+            ToastHost(hostState = toastHostState)
         })
     }
 }
