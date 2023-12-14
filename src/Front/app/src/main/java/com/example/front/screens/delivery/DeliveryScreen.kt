@@ -23,6 +23,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.front.components.Sidebar
 import com.example.front.components.SmallElipseAndTitle
+import com.example.front.model.DTO.Trip
 import com.example.front.navigation.Screen
 import com.example.front.viewmodels.delivery.DeliveryViewModel
 
@@ -42,19 +44,24 @@ fun DeliveryScreen(navHostController: NavHostController, deliveryViewModel: Deli
         navHostController,
         deliveryViewModel.dataStoreManager
     ) {
-        val deliveryRoutes = listOf(
-            DeliveryRoute("Kragujevac - Kraljevo", "26/11/2023", "09:00"),
-            DeliveryRoute("Kragujevac - Batočina", "28/11/2023", "11:00")
-        )
+        LaunchedEffect(Unit) {
+            deliveryViewModel.getRouteDetails(deliveryViewModel.dataStoreManager.getUserIdFromToken())
+        }
+        val trips = deliveryViewModel.state.value.details
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White) // Set the background color to white for the whole screen
+                .background(Color.White)
         ) {
             SmallElipseAndTitle("Deliveries", drawerState)
-            LazyColumn {
-                items(deliveryRoutes) { route ->
-                    DeliveryRouteCard(route, navHostController)
+
+            // Check if trips is not null before rendering LazyColumn
+            trips?.let {
+                LazyColumn {
+                    items(it) { trip ->
+                        DeliveryRouteCard(trip, navHostController)
+                    }
                 }
             }
         }
@@ -62,15 +69,16 @@ fun DeliveryScreen(navHostController: NavHostController, deliveryViewModel: Deli
 }
 
 @Composable
-fun DeliveryRouteCard(route: DeliveryRoute, navHostController: NavHostController) {
+fun DeliveryRouteCard(trip: Trip, navHostController: NavHostController) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .clickable { /* Handle click here */ },
-        colors = CardDefaults.cardColors(
-            containerColor = Color(0xF1F1F1)
-        ),
+            .clickable {
+                // Navigate to the detailed view of the route
+                navHostController.navigate("${Screen.Route.route}/${trip.id}")
+            },
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFF1F1F1))
     ) {
         Row(
             modifier = Modifier
@@ -86,32 +94,19 @@ fun DeliveryRouteCard(route: DeliveryRoute, navHostController: NavHostController
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = route.name,
+                    text = trip.startAddress + " - " + trip.endAddress,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(text = "Date: ${route.date}")
+                Text(text = "Date: ${trip.createdOn}")
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(text = "Start time: ${route.startTime}")
+                Text(text = "Start time: ${trip.startTime}")
             }
             Icon(
                 imageVector = Icons.Default.ArrowForward,
                 contentDescription = "Arrow Icon",
-                modifier = Modifier
-                    .size(24.dp)
-                    .clickable(onClick = {
-                        navHostController.navigate(
-                            Screen.Route.route
-                        )
-                    })
+                modifier = Modifier.size(24.dp)
             )
         }
     }
 }
-
-
-data class DeliveryRoute(
-    val name: String,
-    val date: String,
-    val startTime: String
-)

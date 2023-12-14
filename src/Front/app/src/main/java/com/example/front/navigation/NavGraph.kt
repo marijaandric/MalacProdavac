@@ -120,10 +120,14 @@ fun SetupNavGraph(
             Cart(cartViewModel, navController)
         }
         composable(
-            route = Screen.Route.route
-        )
-        {
-            RouteDetailsScreen(navController, routedetailsViewModel)
+            route = "${Screen.Route.route}/{routeID}",
+            arguments = listOf(navArgument("routeID") { type = NavType.IntType })
+        ) { navBackStackEntry ->
+
+            val arguments = requireNotNull(navBackStackEntry.arguments)
+            val routeID = arguments.getInt("routeID")
+
+            RouteDetailsScreen(navController, routedetailsViewModel, routeID)
         }
         composable(
             route = Screen.NewCreditCard.route

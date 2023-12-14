@@ -22,6 +22,7 @@ import com.example.front.model.DTO.ShopDetailsCheckoutDTO
 import com.example.front.model.DTO.ShopDetailsDTO
 import com.example.front.model.DTO.ShopPagesDTO
 import com.example.front.model.DTO.ToggleLikeDTO
+import com.example.front.model.DTO.Trip
 import com.example.front.model.product.ProductInfo
 import com.example.front.model.product.ProductReviewUserInfo
 import com.example.front.model.response.Id
@@ -92,13 +93,13 @@ interface Api {
 
     @PUT("back/Auth/Edit")
     suspend fun editUserProfile(
-        @Body data : UserEditDTO
-    ):Response<LoginResponse>
+        @Body data: UserEditDTO
+    ): Response<LoginResponse>
 
     @POST("back/Shop/ToggleLike")
     suspend fun toggleLike(
-        @Query("shopId") shopId : Int,
-        @Query("userId") userId : Int,
+        @Query("shopId") shopId: Int,
+        @Query("userId") userId: Int,
     ): Response<ToggleLikeDTO>
 
     @GET("/back/Product/ProductReviews")
@@ -121,7 +122,7 @@ interface Api {
         @Query("favorite") favorite: Boolean?,
         @Query("currLat") currLat: Float?,
         @Query("currLong") currLong: Float?
-    ):Response<List<ShopDTO>>
+    ): Response<List<ShopDTO>>
 
     @PUT("/back/Auth/FCMTokenSave")
     suspend fun saveFCMToken(
@@ -141,13 +142,13 @@ interface Api {
         @Query("favorite") favorite: Boolean?,
         @Query("currLat") currLat: Float?,
         @Query("currLong") currLong: Float?
-    ):Response<ShopPagesDTO>
+    ): Response<ShopPagesDTO>
 
     @GET("back/Shop/ShopDetails")
     suspend fun getShopDetails(
         @Query("shopId") shopId: Int,
         @Query("userId") userId: Int
-    ):Response<ShopDetailsDTO>
+    ): Response<ShopDetailsDTO>
 
     @GET("back/Product/GetProducts")
     suspend fun getProducts(
@@ -164,13 +165,13 @@ interface Api {
         @Query("favorite") favorite: Boolean?,
         @Query("currLat") currLat: Float?,
         @Query("currLong") currLong: Float?
-    ):Response<List<ProductDTO>>
+    ): Response<List<ProductDTO>>
 
     @GET("back/Shop/ShopReviews")
     suspend fun getShopReviews(
         @Query("shopId") shopId: Int,
         @Query("page") page: Int
-    ):Response<List<ReviewDTO>>
+    ): Response<List<ReviewDTO>>
 
     @POST("back/Shop/Review")
     suspend fun postShopReview(
@@ -179,7 +180,7 @@ interface Api {
 
     @GET("/back/Helper/Metrics")
     suspend fun getMetrics(
-    ):Response<List<MetricsDTO>>
+    ): Response<List<MetricsDTO>>
 
     @POST("/back/Product/AddProduct")
     suspend fun postNewProduct(
@@ -189,7 +190,7 @@ interface Api {
     @GET("back/Shop/GetShopid")
     suspend fun getShopId(
         @Query("userId") userId: Int,
-    ):Response<Id>
+    ): Response<Id>
 
     @POST("/back/Helper/UploadImage")
     @Multipart
@@ -207,12 +208,12 @@ interface Api {
     @DELETE("back/Shop/DeleteProductDisplay")
     suspend fun deleteProductDisplay(
         @Query("id") id: Int,
-    ):Response<SuccessBoolean>
+    ): Response<SuccessBoolean>
 
     @GET("back/Shop/GetShopsForCheckout")
     suspend fun getShopsForCheckout(
         @Query("shopIds") shopIds: List<Int>
-    ):Response<List<ShopDetailsCheckoutDTO>>
+    ): Response<List<ShopDetailsCheckoutDTO>>
 
     @GET("back/Order/GetOrders")
     suspend fun getOrders(
@@ -229,21 +230,26 @@ interface Api {
 
     @POST("back/Shop/NewProductDisplay")
     suspend fun newProductDisplay(
-        @Body data : NewProductDisplayDTO
-    ):Response<SuccessBoolean>
+        @Body data: NewProductDisplayDTO
+    ): Response<SuccessBoolean>
 
     @GET("back/Order/OrderDetails")
     suspend fun getOrderInfo(
         @Query("orderId") orderId: Int
-    ):Response<OrderInfoDTO>
+    ): Response<OrderInfoDTO>
 
     @GET("/back/Delivery/GetRouteDetails")
     suspend fun getRouteDetails(
         @Query("routeId") routeId: Int
-    ):Response<RouteDetails>
+    ): Response<RouteDetails>
 
     @DELETE("back/Shop/DeleteShop")
     suspend fun deleteShop(
         @Query("shopId") shopId: Int
-    ):Response<SuccessBoolean>
+    ): Response<SuccessBoolean>
+
+    @GET("/back/Delivery/GetRoutesForDeliveryPerson")
+    suspend fun GetRoutesForDeliveryPerson(
+        @Query("userId") userId: Int
+    ): Response<List<Trip>>
 }

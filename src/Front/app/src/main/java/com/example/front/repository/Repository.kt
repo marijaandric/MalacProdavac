@@ -24,6 +24,7 @@ import com.example.front.model.DTO.ShopDetailsCheckoutDTO
 import com.example.front.model.DTO.ShopDetailsDTO
 import com.example.front.model.DTO.ShopPagesDTO
 import com.example.front.model.DTO.ToggleLikeDTO
+import com.example.front.model.DTO.Trip
 import com.example.front.model.product.ProductInfo
 import com.example.front.model.product.ProductReviewUserInfo
 import com.example.front.model.response.Id
@@ -61,108 +62,195 @@ class Repository @Inject constructor(private val api: Api) {
         return api.getHomeShops(id)
     }
 
-    suspend fun getProductInfo(productId: Int, userId:Int): Response<ProductInfo> {
-        return api.getProductDetails(productId,userId)
+    suspend fun getProductInfo(productId: Int, userId: Int): Response<ProductInfo> {
+        return api.getProductDetails(productId, userId)
     }
 
-    suspend fun getMyProfileInfo(userId:Int): Response<MyProfileDTO>{
+    suspend fun getMyProfileInfo(userId: Int): Response<MyProfileDTO> {
         return api.getMyProfileInfo(userId)
     }
 
-    suspend fun editProfile(editDTO: UserEditDTO): Response<LoginResponse>{
+    suspend fun editProfile(editDTO: UserEditDTO): Response<LoginResponse> {
         return api.editUserProfile(editDTO)
     }
 
-    suspend fun toggleLike(shopId:Int, userId: Int): Response<ToggleLikeDTO>{
-        return api.toggleLike(shopId,userId)
+    suspend fun toggleLike(shopId: Int, userId: Int): Response<ToggleLikeDTO> {
+        return api.toggleLike(shopId, userId)
     }
 
-    suspend fun getReviewsForProduct(productId: Int, page: Int): Response<List<ProductReviewUserInfo>> {
-        return api.getReviewsForProduct(productId,page)
+    suspend fun getReviewsForProduct(
+        productId: Int,
+        page: Int
+    ): Response<List<ProductReviewUserInfo>> {
+        return api.getReviewsForProduct(productId, page)
     }
 
-    suspend fun getShops(userId: Int,categories:List<Int>?, rating:Int?,open:Boolean?,range:Int?, location:String?,sort:Int,search:String?,page:Int,favorite:Boolean, currLat: Float?, currLong: Float?): Response<List<ShopDTO>>{
-        return api.getShops(userId,categories,rating,open,range,location,sort,search,page,favorite, currLat, currLong)
+    suspend fun getShops(
+        userId: Int,
+        categories: List<Int>?,
+        rating: Int?,
+        open: Boolean?,
+        range: Int?,
+        location: String?,
+        sort: Int,
+        search: String?,
+        page: Int,
+        favorite: Boolean,
+        currLat: Float?,
+        currLong: Float?
+    ): Response<List<ShopDTO>> {
+        return api.getShops(
+            userId,
+            categories,
+            rating,
+            open,
+            range,
+            location,
+            sort,
+            search,
+            page,
+            favorite,
+            currLat,
+            currLong
+        )
     }
-    suspend fun saveFCMToken(userID:Int, token: String) : Response<Boolean>{
+
+    suspend fun saveFCMToken(userID: Int, token: String): Response<Boolean> {
         Log.d("Repository", "USAO")
-        val res = api.saveFCMToken(userID,token)
+        val res = api.saveFCMToken(userID, token)
         Log.d("Odgovor", res.toString())
         return res
     }
 
-    suspend fun getShopPages(userId: Int,categories:List<Int>?, rating:Int?,open:Boolean?,range:Int?, location:String?,search:String?,favorite:Boolean, currLat: Float?, currLong: Float?):Response<ShopPagesDTO>{
-        return api.getShopPages(userId,categories,rating,open,range,location,search,favorite, currLat, currLong)
+    suspend fun getShopPages(
+        userId: Int,
+        categories: List<Int>?,
+        rating: Int?,
+        open: Boolean?,
+        range: Int?,
+        location: String?,
+        search: String?,
+        favorite: Boolean,
+        currLat: Float?,
+        currLong: Float?
+    ): Response<ShopPagesDTO> {
+        return api.getShopPages(
+            userId,
+            categories,
+            rating,
+            open,
+            range,
+            location,
+            search,
+            favorite,
+            currLat,
+            currLong
+        )
     }
 
-    suspend fun getShopDetails(userId: Int, shopId: Int):Response<ShopDetailsDTO>{
-        return api.getShopDetails(shopId,userId)
+    suspend fun getShopDetails(userId: Int, shopId: Int): Response<ShopDetailsDTO> {
+        return api.getShopDetails(shopId, userId)
     }
 
-    suspend fun getProducts(userId: Int,categories:List<Int>?, rating:Int?,open:Boolean?,range:Int?, location:String?,sort:Int?,search:String?,page:Int?,specificShopId:Int?,favorite:Boolean?, currLat: Float?, currLong: Float?):Response<List<ProductDTO>>
-    {
-        return api.getProducts(userId,categories,rating,open,range,location,sort,search,page,specificShopId,favorite,currLat,currLong)
+    suspend fun getProducts(
+        userId: Int,
+        categories: List<Int>?,
+        rating: Int?,
+        open: Boolean?,
+        range: Int?,
+        location: String?,
+        sort: Int?,
+        search: String?,
+        page: Int?,
+        specificShopId: Int?,
+        favorite: Boolean?,
+        currLat: Float?,
+        currLong: Float?
+    ): Response<List<ProductDTO>> {
+        return api.getProducts(
+            userId,
+            categories,
+            rating,
+            open,
+            range,
+            location,
+            sort,
+            search,
+            page,
+            specificShopId,
+            favorite,
+            currLat,
+            currLong
+        )
     }
 
-    suspend fun getShopReviews(shopId: Int, page:Int): Response<List<ReviewDTO>>
-    {
-        return api.getShopReviews(shopId,page)
+    suspend fun getShopReviews(shopId: Int, page: Int): Response<List<ReviewDTO>> {
+        return api.getShopReviews(shopId, page)
     }
 
-    suspend fun postShopReview(id:Int, userId: Int, rating: Int?, comment: String): Response<Success>
-    {
-        return api.postShopReview(LeaveReviewDTO(id, userId,rating, comment))
+    suspend fun postShopReview(
+        id: Int,
+        userId: Int,
+        rating: Int?,
+        comment: String
+    ): Response<Success> {
+        return api.postShopReview(LeaveReviewDTO(id, userId, rating, comment))
     }
 
-    suspend fun getShopId(userId: Int):Response<Id>
-    {
+    suspend fun getShopId(userId: Int): Response<Id> {
         return api.getShopId(userId)
     }
+
     suspend fun getMetrics(): Response<List<MetricsDTO>> {
         return api.getMetrics()
     }
+
     suspend fun postNewProduct(product: NewProductDTO): Response<Int> {
         return api.postNewProduct(product)
     }
+
     suspend fun uploadImage(type: Int, id: Int, imagePart: MultipartBody.Part): Response<Success> {
         return api.uploadImage(type, id, imagePart)
     }
-    suspend fun getProductDisplay(id:Int):Response<ProductDisplayDTO>
-    {
+
+    suspend fun getProductDisplay(id: Int): Response<ProductDisplayDTO> {
         return api.getProductDisplay(id)
     }
-    suspend fun deleteProductDisplay(id:Int):Response<SuccessBoolean>
-    {
+
+    suspend fun deleteProductDisplay(id: Int): Response<SuccessBoolean> {
         return api.deleteProductDisplay(id)
     }
-    suspend fun getShopsForCheckout(shopIds: List<Int>): Response<List<ShopDetailsCheckoutDTO>>
-    {
+
+    suspend fun getShopsForCheckout(shopIds: List<Int>): Response<List<ShopDetailsCheckoutDTO>> {
         return api.getShopsForCheckout(shopIds)
     }
-    suspend fun getOrders(userId: Int, status: Int?, page:Int?): Response<List<OrdersDTO>>
-    {
-        return api.getOrders(userId,status,page)
-    }
-    suspend fun getOrdersPage(userId: Int, status: Int?): Response<OrdersPagesDTO>
-    {
-        return api.getOrdersPage(userId, status)
-    }
-    suspend fun newProductDisplay(newProductDisplayDTO: NewProductDisplayDTO): Response<SuccessBoolean>
-    {
-        return api.newProductDisplay(newProductDisplayDTO);
-    }
-    suspend fun getOrderInfo(orderId: Int): Response<OrderInfoDTO>
-    {
-        return  api.getOrderInfo(orderId)
+
+    suspend fun getOrders(userId: Int, status: Int?, page: Int?): Response<List<OrdersDTO>> {
+        return api.getOrders(userId, status, page)
     }
 
-    suspend fun getRouteDetails(routeId: Int): Response<RouteDetails>
-    {
+    suspend fun getOrdersPage(userId: Int, status: Int?): Response<OrdersPagesDTO> {
+        return api.getOrdersPage(userId, status)
+    }
+
+    suspend fun newProductDisplay(newProductDisplayDTO: NewProductDisplayDTO): Response<SuccessBoolean> {
+        return api.newProductDisplay(newProductDisplayDTO);
+    }
+
+    suspend fun getOrderInfo(orderId: Int): Response<OrderInfoDTO> {
+        return api.getOrderInfo(orderId)
+    }
+
+    suspend fun getRouteDetails(routeId: Int): Response<RouteDetails> {
         return api.getRouteDetails(routeId)
     }
-    suspend fun deleteShop(shopId: Int):Response<SuccessBoolean>
-    {
+
+    suspend fun deleteShop(shopId: Int): Response<SuccessBoolean> {
         return api.deleteShop(shopId)
+    }
+
+    suspend fun GetRoutesForDeliveryPerson(userId: Int): Response<List<Trip>> {
+        return api.GetRoutesForDeliveryPerson(userId)
     }
 
 }

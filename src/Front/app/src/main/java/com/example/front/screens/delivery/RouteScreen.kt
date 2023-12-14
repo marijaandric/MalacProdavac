@@ -64,11 +64,12 @@ import java.net.URL
 @Composable
 fun RouteDetailsScreen(
     navHostController: NavHostController,
-    routedetailsViewModel: RouteDetailsViewModel
+    routedetailsViewModel: RouteDetailsViewModel,
+    routeID: Int
 ) {
 
     LaunchedEffect(Unit) {
-        routedetailsViewModel.getRouteDetails(1)
+        routedetailsViewModel.getRouteDetails(routeID)
     }
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     Sidebar(
