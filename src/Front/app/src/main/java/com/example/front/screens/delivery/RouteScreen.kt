@@ -24,6 +24,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
@@ -44,6 +45,8 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavHostController
 import com.example.front.components.Sidebar
 import com.example.front.components.SmallElipseAndTitle
+import com.example.front.model.DTO.Item
+import com.example.front.model.DTO.RouteDetails
 import com.example.front.model.DTO.RouteStopsSection
 import com.example.front.model.DTO.Stop
 import com.example.front.viewmodels.delivery.RouteDetailsViewModel
@@ -129,12 +132,6 @@ fun RouteDetailsScreen(
                     }
 
                     Spacer(modifier = Modifier.height(24.dp))
-                    Text(
-                        text = "Route stops",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 18.sp
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
 
                     val routeStops =
                         createRouteStopsSection(routedetailsViewModel.state.value.details?.stops!!)
@@ -143,9 +140,10 @@ fun RouteDetailsScreen(
 
                     val additionalStops = routeStops.stops.drop(2)
 
-                    com.example.front.screens.delivery.RouteStopsSection(
+                    RouteStopsSection(
                         stops = mainStops,
-                        additionalStops = additionalStops
+                        additionalStops = additionalStops,
+                        routedetailsViewModel
                     )
 
                 }
@@ -319,7 +317,8 @@ private fun mapView(context: Context): org.osmdroid.views.MapView {
 @Composable
 fun RouteStopsSection(
     stops: List<Pair<String, String>>,
-    additionalStops: List<Pair<String, String>>
+    additionalStops: List<Pair<String, String>>,
+    viewModel: RouteDetailsViewModel
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -347,21 +346,33 @@ fun RouteStopsSection(
         )
 
         Divider(color = Color(0xFFDADADA), thickness = 1.dp)
+        var showRouteDetailCard by remember { mutableStateOf(false) }
+
         Text(
             text = "Delivery details >",
             fontSize = 14.sp,
             color = Color.Blue,
             modifier = Modifier
-                .clickable { /* Handle click here to navigate to delivery details */ }
+                .clickable { showRouteDetailCard = !showRouteDetailCard }
                 .padding(vertical = 8.dp)
         )
+
+        // Show or hide the RouteDetailCard based on the state
+        if (showRouteDetailCard) {
+            RouteDetailCard(viewModel.state.value.details!!)
+        }
     }
 }
 
 @Composable
-fun ExpandableText(additionalStops: List<Pair<String, String>>, expanded: Boolean, onToggleExpand: () -> Unit) {
+fun ExpandableText(
+    additionalStops: List<Pair<String, String>>,
+    expanded: Boolean,
+    onToggleExpand: () -> Unit
+) {
     if (additionalStops.isNotEmpty()) {
-        val text = if (expanded) "Less stops" else "${additionalStops.size} more stops - click to expand"
+        val text =
+            if (expanded) "Less stops" else "${additionalStops.size} more stops - click to expand"
 
         Text(
             text = text,
@@ -401,5 +412,31 @@ fun RouteStopItem(address: String, description: String) {
                 modifier = Modifier.padding(start = 8.dp)
             )
         }
+    }
+}
+
+@Composable
+fun RouteDetailCard(routeDetails: RouteDetails) {
+    Column {
+        routeDetails.stops?.drop(1)?.dropLast(1)?.forEach { stop ->
+            StopCard(stop)
+        }
+    }
+}
+
+@Composable
+fun StopCard(stop: Stop) {
+    Column(modifier = Modifier.padding(16.dp)) {
+        Text(text = stop.address, style = MaterialTheme.typography.bodyLarge)
+        stop.items?.forEach { item ->
+            ItemRow(item)
+        }
+    }
+}
+
+@Composable
+fun ItemRow(item: Item) {
+    Row(modifier = Modifier.padding(8.dp)) {
+        Text(text = "${item.name}: ${item.quantity}", style = MaterialTheme.typography.bodyMedium)
     }
 }

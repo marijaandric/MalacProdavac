@@ -30,7 +30,7 @@ data class Stop(
     val shopName: String?,
 
     @SerializedName("items")
-    val items: List<Item>
+    val items: List<Item>?
 )
 
 data class RouteStopsSection(
