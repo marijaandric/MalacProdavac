@@ -8,6 +8,7 @@ import com.example.front.model.DTO.LoginDTO
 import com.example.front.model.DTO.MetricsDTO
 import com.example.front.model.DTO.NewProductDTO
 import com.example.front.model.DTO.NewProductDisplayDTO
+import com.example.front.model.DTO.NewShopDTO
 import com.example.front.model.DTO.OrderInfoDTO
 import com.example.front.model.DTO.OrdersDTO
 import com.example.front.model.DTO.OrdersPagesDTO
@@ -28,6 +29,7 @@ import com.example.front.model.product.ProductReviewUserInfo
 import com.example.front.model.response.Id
 import com.example.front.model.response.Success
 import com.example.front.model.response.SuccessBoolean
+import com.example.front.model.response.SuccessInt
 import com.example.front.model.response.SuccessProductDisplay
 import com.example.front.model.user.MyProfileDTO
 import com.example.front.model.user.UserEditDTO
@@ -252,4 +254,17 @@ interface Api {
     suspend fun GetRoutesForDeliveryPerson(
         @Query("userId") userId: Int
     ): Response<List<Trip>>
+
+    @POST("/back/Shop/NewShop")
+    suspend fun newShop(
+        @Body data : NewShopDTO
+    ):Response<SuccessInt>
+
+    @POST("/back/Helper/UploadImage")
+    @Multipart
+    suspend fun uploadImage2(
+        @Query("type") shopId: Int,
+        @Query("id") page: Int,
+        @Part image: MultipartBody.Part
+    ): Response<SuccessBoolean>
 }

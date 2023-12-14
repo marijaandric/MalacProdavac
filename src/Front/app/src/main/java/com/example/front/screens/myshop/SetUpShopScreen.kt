@@ -1,7 +1,10 @@
 package com.example.front.screens.myshop
 
+import android.content.ContentResolver
 import android.content.Context
+import android.database.Cursor
 import android.net.Uri
+import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -69,6 +72,7 @@ import coil.compose.rememberImagePainter
 import com.example.front.R
 import com.example.front.components.BigBlueButton
 import com.example.front.components.CardButton
+import com.example.front.components.MyNumberField
 import com.example.front.components.MyTextField
 import com.example.front.components.MyTextFieldWithoutIcon
 import com.example.front.components.OpenNow
@@ -77,8 +81,18 @@ import com.example.front.components.SmallElipseAndTitle
 import com.example.front.screens.sellers.FilterCard
 import com.example.front.screens.sellers.ReviewStars
 import com.example.front.viewmodels.myshop.MyShopViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import java.io.BufferedInputStream
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
+import java.io.IOException
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -113,6 +127,7 @@ fun ProfilePhoto(context:Context) {
     var uri by remember {
         mutableStateOf<Uri?>(null)
     }
+    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
     var im by remember {
         mutableStateOf(false)
     }
@@ -122,13 +137,25 @@ fun ProfilePhoto(context:Context) {
     var address by remember {
         mutableStateOf("")
     }
+    var accountNumber by remember {
+        mutableStateOf("")
+    }
+    var pib by remember {
+        mutableStateOf("")
+    }
+
     val state = rememberTimePickerState()
 
-    var photoPicker = rememberLauncherForActivityResult(contract = ActivityResultContracts.PickVisualMedia(), onResult = {
+    val photoPicker = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri ->
         uri?.let {
-
+            selectedImageUri = uri
+            if( selectedImageUri != null)
+            {
+                val x = getMultipartBodyPart(context, selectedImageUri!!)
+                Log.d("SLIKA", x.toString())
+            }
         }
-    })
+    }
 
     val cardData = listOf(
         "Food", "Drink", "Footwear", "Clothes", "Jewerly", "Tools", "Furniture", "Pottery", "Beauty", "Health", "Decor", "Other"
@@ -152,32 +179,55 @@ fun ProfilePhoto(context:Context) {
                 .background(MaterialTheme.colorScheme.primary, CircleShape),
             contentAlignment = Alignment.Center
         ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-                modifier = Modifier.clickable {
-                    photoPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-
-                }
-            ) {
+            if (selectedImageUri != null) {
                 Image(
-                    painter = painterResource(id = R.drawable.plus),
+                    painter = rememberImagePainter(
+                        data = selectedImageUri,
+                        builder = {
+                            crossfade(true)
+                        }
+                    ),
                     contentDescription = null,
-                    modifier = Modifier.size(40.dp)
+                    modifier = Modifier
+                        .size(165.dp)
+                        .clip(CircleShape)
+                        .fillMaxSize()
+                        .clickable {
+                            photoPicker.launch("image/*")
+                        },
+                    contentScale = ContentScale.Crop
                 )
-                Text(
-                    text = "Upload shop profile photo",
-                    modifier = Modifier.padding(5.dp,top = 8.dp),
-                    style = MaterialTheme.typography.displaySmall.copy(color=MaterialTheme.colorScheme.background),
-                    textAlign = TextAlign.Center
-                )
-
+            } else {
+                // Show default content when no image is selected
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
+                    modifier = Modifier.clickable {
+                        photoPicker.launch("image/*")
+                    }
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.plus),
+                        contentDescription = null,
+                        modifier = Modifier.size(40.dp)
+                    )
+                    Text(
+                        text = "Upload shop profile photo",
+                        modifier = Modifier.padding(5.dp, top = 8.dp),
+                        style = MaterialTheme.typography.displaySmall.copy(color = MaterialTheme.colorScheme.background),
+                        textAlign = TextAlign.Center
+                    )
+                }
             }
         }
         Spacer(modifier = Modifier.height(16.dp))
         MyTextFieldWithoutIcon(labelValue = "Shop Name", value = name, onValueChange={ name=it }, modifier = Modifier.fillMaxWidth())
         Spacer(modifier = Modifier.height(16.dp))
         MyTextFieldWithoutIcon(labelValue = "Shop Address", value = address, onValueChange={ address=it }, modifier = Modifier.fillMaxWidth())
+        Spacer(modifier = Modifier.height(16.dp))
+        MyTextFieldWithoutIcon(labelValue = "Account Number", value = accountNumber, onValueChange={ accountNumber=it }, modifier = Modifier.fillMaxWidth())
+        Spacer(modifier = Modifier.height(16.dp))
+        MyNumberField(labelValue = "Pib", value = pib, onValueChange={ pib=it }, modifier = Modifier.fillMaxWidth())
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(text = "Shop Categories", modifier = Modifier.padding(top = 16.dp,bottom = 10.dp, start = 10.dp), style=MaterialTheme.typography.displaySmall)
@@ -249,4 +299,24 @@ fun DayOfWeekItem(day: String, onClick: () -> Unit ) {
             fontWeight = FontWeight.Bold
         )
     }
+}
+
+
+fun getRealPathFromURI(context: Context, uri: Uri): String {
+    var realPath: String? = null
+    val proj = arrayOf(MediaStore.Images.Media.DATA)
+    val cursor: Cursor? = context.contentResolver.query(uri, proj, null, null, null)
+    if (cursor != null) {
+        val columnIndex: Int = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
+        cursor.moveToFirst()
+        realPath = cursor.getString(columnIndex)
+        cursor.close()
+    }
+    return realPath ?: ""
+}
+
+fun getMultipartBodyPart(context: Context, uri: Uri): MultipartBody.Part {
+    val file = File(getRealPathFromURI(context, uri))
+    val requestFile = RequestBody.create("multipart/form-data".toMediaTypeOrNull(), file)
+    return MultipartBody.Part.createFormData("image", file.name, requestFile)
 }

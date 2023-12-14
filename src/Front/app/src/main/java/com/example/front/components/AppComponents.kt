@@ -134,6 +134,35 @@ fun MyTextField(
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MyNumberField(
+    labelValue: String,
+    value: String,
+    onValueChange: (String) -> Unit,
+    isPassword: Boolean = false,
+    isLast: Boolean = false,
+    modifier: Modifier
+) {
+    OutlinedTextField(
+        modifier = Modifier
+            .clip(RoundedCornerShape(5.dp))
+            .then(modifier),
+        label = { Text(text = labelValue) },
+        colors = TextFieldDefaults.outlinedTextFieldColors(
+            focusedBorderColor = LightBlue,
+            focusedLabelColor = LightBlue,
+            cursorColor = LightBlue
+        ),
+        value = value,
+        onValueChange = onValueChange,
+        visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+        shape = RoundedCornerShape(20.dp)
+    )
+}
+
+
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun MyDropdownCategories(

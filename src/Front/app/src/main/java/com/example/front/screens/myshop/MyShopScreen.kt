@@ -72,7 +72,7 @@ fun MyShopScreen(navController : NavHostController, myShopViewModel: MyShopViewM
         myShopViewModel.dataStoreManager
     ) {
         if (myShopViewModel.state.value.isLoading) {
-            CircularProgressIndicator()
+            //CircularProgressIndicator()
         } else {
             if (myShopViewModel.state.value.shopId!!.id == 0)//true
             {

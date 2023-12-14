@@ -10,6 +10,7 @@ import com.example.front.model.DTO.LoginDTO
 import com.example.front.model.DTO.MetricsDTO
 import com.example.front.model.DTO.NewProductDTO
 import com.example.front.model.DTO.NewProductDisplayDTO
+import com.example.front.model.DTO.NewShopDTO
 import com.example.front.model.DTO.OrderInfoDTO
 import com.example.front.model.DTO.OrdersDTO
 import com.example.front.model.DTO.OrdersPagesDTO
@@ -30,6 +31,7 @@ import com.example.front.model.product.ProductReviewUserInfo
 import com.example.front.model.response.Id
 import com.example.front.model.response.Success
 import com.example.front.model.response.SuccessBoolean
+import com.example.front.model.response.SuccessInt
 import com.example.front.model.response.SuccessProductDisplay
 import com.example.front.model.user.MyProfileDTO
 import com.example.front.model.user.UserEditDTO
@@ -251,6 +253,14 @@ class Repository @Inject constructor(private val api: Api) {
 
     suspend fun GetRoutesForDeliveryPerson(userId: Int): Response<List<Trip>> {
         return api.GetRoutesForDeliveryPerson(userId)
+    }
+
+    suspend fun newShop(data: NewShopDTO):Response<SuccessInt> {
+        return api.newShop(data)
+    }
+
+    suspend fun uploadImage2(type: Int, id: Int, imagePart: MultipartBody.Part): Response<SuccessBoolean> {
+        return api.uploadImage2(type, id, imagePart)
     }
 
 }
