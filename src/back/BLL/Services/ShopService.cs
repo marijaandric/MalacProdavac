@@ -73,7 +73,7 @@ namespace back.BLL.Services
             return reviews;
         }
 
-        public async Task<bool> InsertShop(ShopDto shop)
+        public async Task<int> InsertShop(ShopDto shop)
         {
             (double, double) coords = await HelperService.GetCoordinates(shop.Address);
             string? accNum = null;
@@ -103,7 +103,7 @@ namespace back.BLL.Services
                 throw new ArgumentException("Working hours could not be saved!");
             }
 
-            return true;
+            return s.Id;
         }
 
         public async Task<bool> EditShop(EditShopDto shop)
