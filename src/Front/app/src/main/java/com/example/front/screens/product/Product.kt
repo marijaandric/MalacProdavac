@@ -25,6 +25,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
@@ -260,7 +261,7 @@ fun ProductPage(
                     productInfo?.workingHours?.let { ExpandableRow(it) }
 
                     // velicine
-                    if (productInfo?.sizes != null) {
+                    if (productInfo?.sizes != null && productInfo.sizes[0].size != "None") {
                         LazyRow(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -324,7 +325,11 @@ fun ProductPage(
                                     productInfo?.shopName != null &&
                                     productInfo.images?.isNotEmpty() == true &&
                                     productInfo.metric != null &&
-                                    (productInfo.sizes?.isEmpty() == true || selectedSize != null)
+                                    (
+                                            productInfo.sizes?.isEmpty() == true ||
+                                            (productInfo.sizes != null && productInfo.sizes[0].size == "None") ||
+                                            selectedSize != null
+                                    )
                                 ) {
                                     productViewModel.addToCart(
                                         productID,
@@ -335,14 +340,14 @@ fun ProductPage(
                                         productInfo.shopName,
                                         productInfo.images[0].image,
                                         productInfo.metric,
-                                        selectedSize
+                                        selectedSize ?: "None"
                                     )
 
                                     coroutineScope.launch {
                                         try {
                                             toastHostState.showToast(
                                                 "Product added to cart",
-                                                Icons.Default.Clear
+                                                Icons.Default.Check
                                             )
                                         } catch (e: Exception) {
                                             Log.e("ToastError", "Error showing toast", e)

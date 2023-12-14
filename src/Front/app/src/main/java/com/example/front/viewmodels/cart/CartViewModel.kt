@@ -39,6 +39,13 @@ class CartViewModel @Inject constructor(
         mongoRepository.deleteProduct(id)
         getCartProducts()
     }
+
+//    fun isAvailable(cardProducts: List<ProductInCart>): Any {
+//        var lista = emptyList<ProductInCart>()
+//        cardProducts.forEach {
+//            var nesto = CheckAvailabilityReqDTO(it.id, it.size ?: "None", it.quantity)
+//        }
+//    }
 }
 
 data class CartState(
