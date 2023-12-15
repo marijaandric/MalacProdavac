@@ -250,7 +250,12 @@ namespace back.DAL.Repositories
 
         public async Task<CheckedStockDto> CheckStock(StockToCheckDto toCheck)
         {
-            int stock = (await _context.ProductSizes.Join(_context.Sizes, ps => ps.SizeId, s => s.Id, (ps, s) => new { ps, s }).FirstOrDefaultAsync(x => x.ps.ProductId == toCheck.Id && x.s.Name.Equals(toCheck.Size))).ps.Stock;
+            int stock;
+            var temp = (await _context.ProductSizes.Join(_context.Sizes, ps => ps.SizeId, s => s.Id, (ps, s) => new { ps, s }).FirstOrDefaultAsync(x => x.ps.ProductId == toCheck.Id && x.s.Name.Equals(toCheck.Size)));
+            
+            if (temp == null) stock = -1;
+            else stock = temp.ps.Stock;
+            
             return new CheckedStockDto
             {
                 Id = toCheck.Id,
