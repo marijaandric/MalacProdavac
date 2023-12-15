@@ -8,6 +8,7 @@ import com.example.front.model.DTO.CheckAvailabilityReqDTO
 import com.example.front.model.product.ProductInCart
 import com.example.front.repository.MongoRepository
 import com.example.front.repository.Repository
+import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -46,17 +47,33 @@ class CartViewModel @Inject constructor(
             CheckAvailabilityReqDTO(it.id, it.size, it.quantity)
         }
         println("LISTA: $products")
+////
+        val gson = Gson()
+        val jsonRequest = gson.toJson(products)
+        println("JSON zahteva: $jsonRequest")
 
         try {
             val response = repository.checkProductsAvailability(products)
             if (response.isSuccessful) {
-                _state.value.products.forEach { product ->
-                    val nesto = response.body()?.find {
-                        it.id == product.id
-                    }?.available
-                    product.available = nesto ?: product.available
-                }
+                println("RADIIII")
+//                _state.value.products.forEach { product ->
+//                    println("PROIZVOD: $product")
+//                    val nesto = response.body()?.find {
+//                        it.id == product.id
+//                    }?.available
+//                    println("PROSAO")
+//                    mongoRepository.updateProduct()
+//                    product.available = nesto ?: product.available
+//                }
+//                if (response.body() != null) {
+                    mongoRepository.updateProductsAvailability(response.body()!!)
+//                }
+            } else {
+                println(response.message())
+                println(response.code())
+                println(response.body())
             }
+            println(response.isSuccessful)
         } catch (e: Exception) {
             println("Exception in isAvailable(): $e")
         }

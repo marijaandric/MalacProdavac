@@ -1,8 +1,8 @@
 package com.example.front.repository
 
+import com.example.front.model.DTO.CheckAvailabilityResDTO
 import com.example.front.model.product.ProductInCart
 import kotlinx.coroutines.flow.Flow
-import org.mongodb.kbson.ObjectId
 
 interface MongoRepository {
     fun getCartProducts(): Flow<List<ProductInCart>>
@@ -10,4 +10,5 @@ interface MongoRepository {
     suspend fun updateProduct(product: ProductInCart)
     suspend fun deleteProduct(id: Int)
     fun getUniqueShops(): Flow<List<Int>>
+    suspend fun updateProductsAvailability(response: List<CheckAvailabilityResDTO>)
 }

@@ -170,7 +170,7 @@ fun Cart(
                                         )
                                         Row(modifier=Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                                             Text(
-                                                DecimalFormat("#.00").format(product.quantity) + " " + product.metric,
+                                                DecimalFormat("#").format(product.quantity) + " " + product.metric,
                                                 Modifier,
                                                 Color(0xFFE15F26)
                                             )

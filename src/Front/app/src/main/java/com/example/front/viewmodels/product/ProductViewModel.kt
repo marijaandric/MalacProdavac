@@ -94,14 +94,14 @@ class ProductViewModel @Inject constructor(
                 val productInCart = ProductInCart()
                 productInCart.id = productID
                 productInCart.name = name
-                productInCart.price = price
-                productInCart.quantity = quantity.toDouble()
+                productInCart.price = price.toDouble()
+                productInCart.quantity = quantity
                 productInCart.shopId = shopId
                 productInCart.shopName = shopName
                 productInCart.image = image
                 productInCart.metric = metric
                 productInCart.size = size
-                productInCart.available = quantity.toDouble()
+                productInCart.available = quantity
 
                 mongoRepository.updateProduct(productInCart)
             } catch (e: Exception) {

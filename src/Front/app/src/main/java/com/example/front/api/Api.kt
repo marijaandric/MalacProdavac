@@ -32,7 +32,6 @@ import com.example.front.model.response.LoginResponse
 import com.example.front.model.response.Success
 import com.example.front.model.response.SuccessBoolean
 import com.example.front.model.response.SuccessInt
-import com.example.front.model.response.SuccessProductDisplay
 import com.example.front.model.user.MyProfileDTO
 import com.example.front.model.user.UserEditDTO
 import okhttp3.MultipartBody
@@ -269,10 +268,9 @@ interface Api {
         @Part image: MultipartBody.Part
     ): Response<SuccessBoolean>
 
-    //// POPUNITI
-    @GET("back/Product/CheckAvailability")
+    @POST("back/Order/CheckStock")
     suspend fun checkProductsAvailability(
-        @Query("products") products: List<CheckAvailabilityReqDTO>
+        @Body products: List<CheckAvailabilityReqDTO>
     ): Response<List<CheckAvailabilityResDTO>>
 
 }

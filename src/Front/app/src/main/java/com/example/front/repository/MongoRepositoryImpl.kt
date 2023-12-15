@@ -1,6 +1,7 @@
 package com.example.front.repository
 
 import android.util.Log
+import com.example.front.model.DTO.CheckAvailabilityResDTO
 import com.example.front.model.product.ProductInCart
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.query
@@ -30,6 +31,7 @@ class MongoRepositoryImpl(val realm: Realm) : MongoRepository {
                 existingProduct.image = product.image
                 existingProduct.metric = product.metric
                 existingProduct.size = product.size
+                existingProduct.available = product.available
             } else {
                 copyToRealm(product)
             }
@@ -54,5 +56,19 @@ class MongoRepositoryImpl(val realm: Realm) : MongoRepository {
             .map { products ->
                 products.map { it.shopId }.distinct()
             }
+    }
+
+    override suspend fun updateProductsAvailability(response: List<CheckAvailabilityResDTO>) {
+        realm.write {
+            response.forEach { product ->
+                val existingProduct = query<ProductInCart>(
+                    query = "id == $0 AND size == $1", product.id, product.size
+                ).first().find()
+
+                if (existingProduct != null) {
+                    existingProduct.available = product.available
+                }
+            }
+        }
     }
 }
