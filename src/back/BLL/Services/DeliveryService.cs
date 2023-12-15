@@ -81,9 +81,11 @@ namespace back.BLL.Services
             DeliveryRoute route = await _repository.GetRoute(routeId);
             int userId = await _repository.GetCustomerIdForDelivery(requestId);
             string username = await _userRepository.GetUsername(route.DeliveryPersonId);
+            int orderId = (await _repository.GetBaseRequest(requestId)).OrderId;
+            float deliveryPrice = await _orderRepository.DeliveryPrice(orderId);
 
             if (!await _repository.AddToRoute(requestId, routeId)) return false;
-            if (await _notificationRepository.InsertNotification(userId, 0, "Delivery accepted!", "Delivery person " + username + " just added your delivery request to their route!\nYou can expect your order to arrive on " + route.StartDate.ToShortDateString() + ".", -1)) Console.WriteLine("Notification sent!");
+            if (await _notificationRepository.InsertNotification(userId, 0, "Delivery accepted!", "Delivery person " + username + " just added your delivery request to their route!\nYou can expect your order to arrive on " + route.StartDate.ToShortDateString() + ".\nThe delivery price is:" + deliveryPrice + ".", -1)) Console.WriteLine("Notification sent!");
 
             return true;
         }
