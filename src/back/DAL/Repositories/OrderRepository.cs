@@ -28,11 +28,50 @@ namespace back.DAL.Repositories
             return (int)Math.Ceiling((double)(await _context.Orders.Where(x => x.UserId == userId && x.StatusId == status).CountAsync()) / numberOfItems);
         }
 
+        public async Task<float> OrderMass(int orderId)
+        {
+            var orderItems = await _context.OrderItems.Where(x => x.OrderId == orderId).Join(_context.Products, oi => oi.ProductId, p => p.Id, (oi, p) => new { oi, p }).ToListAsync();
+            float mass = 0;
+            foreach(var item in orderItems)
+            {
+                if (item.p.MetricId == 2) mass += item.oi.Quantity;
+                else mass += (float)item.p.Mass * item.oi.Quantity;
+            }
+
+            return mass;
+        }
+
+        public async Task<float> DeliveryPrice(int orderId)
+        {
+            float price = 0;
+            var order = await GetOrder(orderId);
+            
+            if (order.DeliveryMethodId == 1) return price;
+
+            var routeId = (await _context.DeliveryRequests.FirstOrDefaultAsync(x => x.OrderId == orderId)).RouteId;
+            if (routeId == null) return price;
+
+            price = (await _context.DeliveryRoutes.FirstOrDefaultAsync(x => x.Id == routeId)).FixedCost;
+
+            var mass = await OrderMass(orderId);
+            float coeff = 1;
+
+            if (mass > 1 && mass <= 5) coeff = 550f / 350f;
+            else if (mass > 5 && mass <= 15) coeff = 1000f / 350f;
+            else if (mass > 15 && mass <= 30) coeff = 1500f / 350f;
+            else if (mass > 30 && mass <= 40) coeff = 2000f / 350f;
+            else if (mass > 40) coeff = 2500f / 350f;
+
+            return price * coeff;
+        }
+
         public async Task<List<OrderCard>> GetOrders(int userId, int? status, int page)
         {
+            List<OrderCard> orders = new List<OrderCard>();
+
             if (status == null)
             {
-                return await _context.Orders.Where(x => x.UserId == userId).Skip(page - 1 * numberOfItems).Take(numberOfItems).Select(x => new OrderCard
+                orders = await _context.Orders.Where(x => x.UserId == userId).Skip(page - 1 * numberOfItems).Take(numberOfItems).Select(x => new OrderCard
                 {
                     Id = x.Id,
                     Quantity = _context.OrderItems.Where(i => i.OrderId == x.Id).Count(),
@@ -42,16 +81,22 @@ namespace back.DAL.Repositories
                     
                 }).ToListAsync();
             }
-
-            return await _context.Orders.Where(x => x.UserId == userId && x.StatusId == status).Skip(page - 1 * numberOfItems).Take(numberOfItems).Select(x => new OrderCard
+            else
             {
-                Id = x.Id,
-                Quantity = _context.OrderItems.Where(i => i.OrderId == x.Id).Count(),
-                Amount = _context.OrderItems.Where(i => i.OrderId == x.Id).Sum(i => i.Price),
-                CreatedOn = x.CreatedOn.ToShortDateString(),
-                Status = _context.OrderStatuses.FirstOrDefault(s => s.Id == x.StatusId).Name
+                orders = await _context.Orders.Where(x => x.UserId == userId && x.StatusId == status).Skip(page - 1 * numberOfItems).Take(numberOfItems).Select(x => new OrderCard
+                {
+                    Id = x.Id,
+                    Quantity = _context.OrderItems.Where(i => i.OrderId == x.Id).Count(),
+                    Amount = _context.OrderItems.Where(i => i.OrderId == x.Id).Sum(i => i.Price),
+                    CreatedOn = x.CreatedOn.ToShortDateString(),
+                    Status = _context.OrderStatuses.FirstOrDefault(s => s.Id == x.StatusId).Name
 
-            }).ToListAsync();
+                }).ToListAsync();
+            }
+
+            foreach (var order in orders) order.Amount += await DeliveryPrice(order.Id);
+
+            return orders;
         }
 
         public async Task<OrderInfo> OrderDetails(int orderId)
@@ -80,6 +125,7 @@ namespace back.DAL.Repositories
 
             }).ToListAsync();
 
+            double delivery = await DeliveryPrice(order.Id);
             return new OrderInfo
             {
                 Id = order.Id,
@@ -90,7 +136,8 @@ namespace back.DAL.Repositories
                 Items = items,
                 DeliveryMethod = order.DeliveryMethod,
                 PaymentMethod = order.DeliveryMethod,
-                ShippingAddress = order.ShippingAddress 
+                ShippingAddress = order.ShippingAddress,
+                DeliveryPrice = (float)Math.Ceiling(delivery)
             };
         }
 

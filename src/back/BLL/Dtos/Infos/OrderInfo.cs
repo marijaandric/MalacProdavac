@@ -8,5 +8,6 @@ namespace back.BLL.Dtos.Infos
         public string ShippingAddress { get; set; }
         public string PaymentMethod { get; set; }
         public string DeliveryMethod { get; set; }
+        public float DeliveryPrice { get; set; }
     }
 }
