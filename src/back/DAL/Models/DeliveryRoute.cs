@@ -18,6 +18,7 @@ namespace back.Models
         public double EndLatitude { get; set; }
         public double EndLongitude { get; set; }
         public float FixedCost { get; set; }
+        public bool Finished { get; set; }
 
         public User DeliveryPerson { get; set; }
     }

@@ -9,16 +9,18 @@ namespace back.BLL.Services
     public class UserService : IUserService
     {
         IUserRepository _repository;
-        public UserService(IUserRepository userRepository)
+        IOrderRepository _orderRepository;
+        public UserService(IUserRepository userRepository, IOrderRepository orderRepository)
         {
             _repository = userRepository;
+            _orderRepository = orderRepository;
         }
 
         public async Task<MyProfileInfo> GetMyProfile(int id)
         {
             MyProfileInfo profile = await _repository.GetMyProfile(id);
             if (profile == null) throw new ArgumentException("No profile found!");
-
+            if (profile.RoleId == 3) profile.MoneyEarned = await _orderRepository.TotalProfit(id);
             return profile;
         }
 
