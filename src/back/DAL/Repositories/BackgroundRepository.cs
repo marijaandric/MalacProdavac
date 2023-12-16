@@ -41,9 +41,9 @@ namespace back.DAL.Repositories
 
         public async Task<List<PendingReview>> PendingShopReviews()
         {
-            List<PendingReview> userProductPairs = new List<PendingReview>();
+            List<PendingReview> userShopPairs = new List<PendingReview>();
 
-            userProductPairs.AddRange(await _context.DeliveryRequests.Where(x => ((DateTime)x.PickupDate).AddDays(1) <= DateTime.Now)
+            userShopPairs.AddRange(await _context.DeliveryRequests.Where(x => ((DateTime)x.PickupDate).AddDays(1) <= DateTime.Now)
             .Join(_context.Orders, dr => dr.OrderId, o => o.Id, (dr, o) => o)
             .Where(x => !_context.ShopReviews.Any(y => y.ReviewerId == x.UserId && y.ShopId == x.ShopId))
             .Select(x => new PendingReview
@@ -52,14 +52,14 @@ namespace back.DAL.Repositories
                 UserId = x.UserId
             }).ToListAsync());
 
-            userProductPairs.AddRange(await _context.Orders.Where(x => x.PickupTime <= DateTime.Now && !_context.ShopReviews.Any(y => y.ReviewerId == x.UserId && y.ShopId== x.ShopId))
+            userShopPairs.AddRange(await _context.Orders.Where(x => x.PickupTime <= DateTime.Now && !_context.ShopReviews.Any(y => y.ReviewerId == x.UserId && y.ShopId== x.ShopId))
             .Select(x => new PendingReview
             {
                 ItemId = x.ShopId,
                 UserId = x.UserId
             }).ToListAsync());
 
-            return userProductPairs.Distinct().ToList();
+            return userShopPairs.Distinct().ToList();
         }
 
         public async Task<List<PendingReview>> PendingDeliveryPersonReviews()
@@ -72,6 +72,45 @@ namespace back.DAL.Repositories
                 ItemId = (int)x.dr.ChosenPersonId,
                 UserId = x.o.UserId
             }).Distinct().ToListAsync();
+        }
+
+        public async Task<List<PendingReview>> PendingCustomerReviews()
+        {
+            List<PendingReview> pending = new List<PendingReview>();
+            
+            //za dostavljace
+            var deliveryPeople = await _context.DeliveryRequests.Where(x => ((DateTime)x.PickupDate).AddDays(1) <= DateTime.Now)
+            .Join(_context.Orders, dr => dr.OrderId, o => o.Id, (dr, o) => new { dr, o })
+            .Where(x => !_context.Ratings.Any(y => y.RaterId == x.dr.ChosenPersonId && y.RatedId == x.o.UserId))
+            .Select(x => new PendingReview
+            {
+                ItemId = x.o.UserId,
+                UserId = (int)x.dr.ChosenPersonId
+            }).Distinct().ToListAsync();
+
+            //za prodavce
+            var sellers = await _context.DeliveryRequests.Where(x => ((DateTime)x.PickupDate).AddDays(1) <= DateTime.Now)
+            .Join(_context.Orders, dr => dr.OrderId, o => o.Id, (dr, o) => o)
+            .Join(_context.Shop, o => o.ShopId, s => s.Id, (o, s) => new {o, s })
+            .Where(x => !_context.Ratings.Any(y => y.RaterId == x.s.OwnerId && y.RatedId == x.o.UserId))
+            .Select(x => new PendingReview
+            {
+                ItemId = x.o.UserId,
+                UserId = x.s.OwnerId
+            }).ToListAsync();
+
+            sellers.AddRange(await _context.Orders.Where(x => x.PickupTime <= DateTime.Now)
+            .Join(_context.Shop, o => o.ShopId, s => s.Id, (o, s) => new { o, s }).Where(x => !_context.Ratings.Any(y => y.RaterId == x.s.OwnerId && y.RatedId == x.o.UserId))
+            .Select(x => new PendingReview
+            {
+                ItemId = x.o.UserId,
+                UserId = x.s.OwnerId
+            }).ToListAsync());
+
+            pending.AddRange(deliveryPeople);
+            pending.AddRange(sellers);
+
+            return pending;
         }
 
         public async Task DeletePastProductDisplays()

@@ -28,6 +28,7 @@ namespace back.BLL.Services
                     var pendingProductReviews = (await _backgroundRepository.PendingProductReviews()).Where(x => !_notificationRepository.NotificationExists(x.UserId, 7, x.ItemId));
                     var pendingShopReviews = (await _backgroundRepository.PendingShopReviews()).Where(x => !_notificationRepository.NotificationExists(x.UserId, 8, x.ItemId));
                     var pendingDeliveryPersonReviews = (await _backgroundRepository.PendingDeliveryPersonReviews()).Where(x => !_notificationRepository.NotificationExists(x.UserId, 1, x.ItemId));
+                    var pendingCustomerReviews = (await _backgroundRepository.PendingCustomerReviews()).Where(x => !_notificationRepository.NotificationExists(x.UserId, 1, x.ItemId));
 
                     _logger.LogInformation("Pending product reviews");
 
@@ -53,6 +54,13 @@ namespace back.BLL.Services
                         _logger.LogInformation(dr.UserId + " " + dr.ItemId);
                         var user = await _userRepository.GetUsername(dr.ItemId);
                         if (await _notificationRepository.InsertNotification(dr.UserId, 1, "Delivery person review", "Would you like to review " + user + ", who recently delivered your order?", dr.ItemId)) _logger.LogInformation("Notification sent!");
+                    }
+
+                    foreach (var dr in pendingCustomerReviews)
+                    {
+                        _logger.LogInformation(dr.UserId + " " + dr.ItemId);
+                        var user = await _userRepository.GetUsername(dr.ItemId);
+                        if (await _notificationRepository.InsertNotification(dr.UserId, 1, "Customer review", "Would you like to review " + user + ", who you recently serviced?", dr.ItemId)) _logger.LogInformation("Notification sent!");
                     }
 
                     await _backgroundRepository.DeletePastProductDisplays();
