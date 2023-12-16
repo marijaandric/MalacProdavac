@@ -49,6 +49,7 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -78,6 +79,7 @@ import com.example.front.components.MyTextFieldWithoutIcon
 import com.example.front.components.OpenNow
 import com.example.front.components.Sidebar
 import com.example.front.components.SmallElipseAndTitle
+import com.example.front.model.DTO.WorkingHoursNewShopDTO
 import com.example.front.screens.sellers.FilterCard
 import com.example.front.screens.sellers.ReviewStars
 import com.example.front.viewmodels.myshop.MyShopViewModel
@@ -143,6 +145,7 @@ fun ProfilePhoto(context:Context) {
     var pib by remember {
         mutableStateOf("")
     }
+    var selectedDay by remember { mutableStateOf<String?>("Mon") }
 
     val state = rememberTimePickerState()
 
@@ -160,6 +163,8 @@ fun ProfilePhoto(context:Context) {
     val cardData = listOf(
         "Food", "Drink", "Footwear", "Clothes", "Jewerly", "Tools", "Furniture", "Pottery", "Beauty", "Health", "Decor", "Other"
     )
+
+    val workingHoursMap = remember { mutableStateMapOf<String, WorkingHoursNewShopDTO>() }
 
     var brojevi = (1..12).map { it }
     var kombinovanaLista = cardData.zip(brojevi)
@@ -198,7 +203,6 @@ fun ProfilePhoto(context:Context) {
                     contentScale = ContentScale.Crop
                 )
             } else {
-                // Show default content when no image is selected
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center,
@@ -251,7 +255,7 @@ fun ProfilePhoto(context:Context) {
         ) {
             val daysOfWeek = listOf("Mon","Tue","Wed","Thu","Fri","Sat","Sun")
             for (day in daysOfWeek) {
-                DayOfWeekItem(day = day, onClick={})
+                DayOfWeekItem(day = day,isSelected = day == selectedDay, onClick={selectedDay = day})
             }
         }
 
@@ -276,7 +280,12 @@ fun ProfilePhoto(context:Context) {
                 TimeInput(state = state)
                 Text(text = "Closing time", modifier = Modifier.padding(top = 16.dp,start = 10.dp, bottom = 10.dp), style=MaterialTheme.typography.displaySmall)
                 TimeInput(state = state)
-                CardButton(text = "Apply", onClick = {  }, width = 0.7f, modifier = Modifier, color = MaterialTheme.colorScheme.secondary)
+                Row()
+                {
+                    CardButton(text = "Apply", onClick = {  }, width = 0.5f, modifier = Modifier, color = MaterialTheme.colorScheme.secondary)
+                    Spacer(modifier = Modifier.width(5.dp))
+                    CardButton(text = "Reset", onClick = {  }, width = 0.95f, modifier = Modifier, color = MaterialTheme.colorScheme.secondary)
+                }
             }
         }
         BigBlueButton(text = "Proceed", onClick = {  }, width = 0.9f, modifier = Modifier)
@@ -285,12 +294,16 @@ fun ProfilePhoto(context:Context) {
 }
 
 @Composable
-fun DayOfWeekItem(day: String, onClick: () -> Unit ) {
+fun DayOfWeekItem(day: String, isSelected: Boolean, onClick: () -> Unit) {
     Box(
         modifier = Modifier
-            .background(color = MaterialTheme.colorScheme.primary, RoundedCornerShape(10.dp))
+            .background(
+                color = if (isSelected) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.primary,
+                shape = RoundedCornerShape(10.dp)
+            )
             .height(48.dp)
-            .width(48.dp),
+            .width(48.dp)
+            .clickable { onClick.invoke() },
         contentAlignment = Alignment.Center
     ) {
         Text(
@@ -300,7 +313,6 @@ fun DayOfWeekItem(day: String, onClick: () -> Unit ) {
         )
     }
 }
-
 
 fun getRealPathFromURI(context: Context, uri: Uri): String {
     var realPath: String? = null

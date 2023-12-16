@@ -61,7 +61,6 @@ class MyShopViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val response = repository.newShop(shop)
-                Log.d("ADD SHOP", response.toString())
 
                 if (response.isSuccessful) {
                     _stateNewShop.value = _stateNewShop.value.copy(
