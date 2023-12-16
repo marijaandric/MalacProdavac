@@ -151,5 +151,12 @@ namespace back.DAL.Repositories
         {
             return await _context.Users.Where(x => x.RoleId == 3).ToListAsync();
         }
+
+        public async Task<bool> RateUser(Rating rating)
+        {
+            await _context.Ratings.AddAsync(rating);
+            return await _context.SaveChangesAsync() > 0;
+        }
+
     }
 }

@@ -14,5 +14,6 @@ namespace back.DAL.Repositories
         public Task<List<ProductCard>> GetReviewedProductsOfAShop(int userId, int shopId, int page);
         public Task<string> GetUsername(int userId);
         public Task<List<User>> GetDeliveryPeople();
+        public Task<bool> RateUser(Rating rating);
     }
 }
