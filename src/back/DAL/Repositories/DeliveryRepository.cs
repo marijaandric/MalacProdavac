@@ -116,7 +116,7 @@ namespace back.DAL.Repositories
 
         public async Task<List<DeliveryRouteCard>> GetRoutesForDeliveryPerson(int userId)
         {
-            return await _context.DeliveryRoutes.Where(x => x.DeliveryPersonId == userId).Select(x => new DeliveryRouteCard
+            return await _context.DeliveryRoutes.Where(x => x.DeliveryPersonId == userId && !x.Finished).Select(x => new DeliveryRouteCard
             {
                 EndAddress = x.EndLocation,
                 StartAddress = x.StartLocation,

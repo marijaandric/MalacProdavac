@@ -202,5 +202,19 @@ namespace back.PL.Controllers
                 return BadRequest(new { Error = ex.Message });
             }
         }
+
+        [HttpPut("ConfirmRouteEnd")]
+        public async Task<IActionResult> ConfirmRouteEnd(int routeId)
+        {
+            try
+            {
+                return Ok(new { Success = await _service.ConfirmRouteEnd(routeId) });
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
     }
 }

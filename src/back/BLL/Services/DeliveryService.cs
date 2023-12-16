@@ -256,5 +256,13 @@ namespace back.BLL.Services
 
             return await _repository.EditRoute(route);
         }
+
+        public async Task<bool> ConfirmRouteEnd(int routeId)
+        {
+            var route = await _repository.GetRoute(routeId);
+            if (route.StartDate > DateTime.Now) throw new ArgumentException("You cannot end that route, the start date hasn't come yet.");
+            route.Finished = true;
+            return await _repository.EditRoute(route);
+        }
     }
 }

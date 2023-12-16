@@ -21,5 +21,6 @@ namespace back.BLL.Services
         public Task<bool> RemoveRequest(int requestId);
         public Task<bool> DeleteRoute(int routeId);
         public Task<bool> EditRoute(EditDeliveryRouteDto dto);
+        public Task<bool> ConfirmRouteEnd(int routeId);
     }
 }
