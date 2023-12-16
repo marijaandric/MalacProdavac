@@ -199,6 +199,7 @@ namespace back.DAL.Repositories
         {
             Order o = await _context.Orders.FirstOrDefaultAsync(x => x.Id == orderId);
             o.Accepted = resp;
+            if (resp != 0) o.StatusId = (await _context.OrderStatuses.FirstOrDefaultAsync(x => x.Name == "Processing")).Id;
 
             return await _context.SaveChangesAsync() > 0;
         }

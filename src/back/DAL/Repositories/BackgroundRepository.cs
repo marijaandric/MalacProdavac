@@ -80,5 +80,11 @@ namespace back.DAL.Repositories
             _context.ProductDisplays.RemoveRange(toDelete);
             await _context.SaveChangesAsync();
         }
+
+        public async Task ChangeDeliveryStatus()
+        {
+            var toChange = await _context.Orders.Where(x => x.DeliveryMethodId == 1 && x.PickupTime <= DateTime.Now).ToListAsync();
+            foreach (var ch in toChange) ch.StatusId = (await _context.OrderStatuses.FirstOrDefaultAsync(x => x.Name == "Delivered")).Id;
+        }
     }
 }

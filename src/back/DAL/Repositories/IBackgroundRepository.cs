@@ -8,5 +8,6 @@ namespace back.DAL.Repositories
         public Task<List<PendingReview>> PendingShopReviews();
         public Task<List<PendingReview>> PendingDeliveryPersonReviews();
         public Task DeletePastProductDisplays();
+        public Task ChangeDeliveryStatus();
     }
 }
