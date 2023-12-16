@@ -67,7 +67,7 @@ namespace back.BLL.Services
                     await _backgroundRepository.ChangeDeliveryStatus();
                 }
 
-                await Task.Delay(20000, stoppingToken);
+                await Task.Delay(3600000, stoppingToken);
             }
         }
     }
