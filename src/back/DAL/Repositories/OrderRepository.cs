@@ -62,7 +62,22 @@ namespace back.DAL.Repositories
             else if (mass > 30 && mass <= 40) coeff = 2000f / 350f;
             else if (mass > 40) coeff = 2500f / 350f;
 
-            return price * coeff;
+            return (float)Math.Round((double)price * coeff, 2);
+        }
+
+        public async Task<float> RouteProfit(int routeId)
+        {
+            var reqs = await _context.DeliveryRequests.Where(x => x.RouteId == routeId).ToListAsync();
+            float profit = reqs.Sum(x => DeliveryPrice(x.OrderId).Result);
+            return profit;
+        }
+
+        public async Task<float> TotalProfit(int userId)
+        {
+            var pastRoutes = await _context.DeliveryRoutes.Where(x => x.DeliveryPersonId == userId && x.Finished).ToListAsync();
+            float totalProfit = pastRoutes.Sum(x => RouteProfit(x.Id).Result);
+
+            return totalProfit;
         }
 
         public async Task<List<OrderCard>> GetOrders(int userId, int? status, int page)
@@ -199,6 +214,7 @@ namespace back.DAL.Repositories
         {
             Order o = await _context.Orders.FirstOrDefaultAsync(x => x.Id == orderId);
             o.Accepted = resp;
+            if (resp != 0) o.StatusId = (await _context.OrderStatuses.FirstOrDefaultAsync(x => x.Name == "Processing")).Id;
 
             return await _context.SaveChangesAsync() > 0;
         }

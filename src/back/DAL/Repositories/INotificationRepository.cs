@@ -6,5 +6,6 @@ namespace back.DAL.Repositories
     {
         public Task<List<NotificationCard>> GetNotifications(int userId, int? type, int page);
         public Task<bool> InsertNotification(int userId, int type, string title, string description, int referenceId);
+        public bool NotificationExists(int userId, int type, int referenceId);
     }
 }

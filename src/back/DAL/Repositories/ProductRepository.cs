@@ -1,5 +1,4 @@
-﻿using System.Runtime.InteropServices;
-using System;
+﻿using System;
 using back.BLL.Dtos;
 using back.BLL.Dtos.Cards;
 using back.BLL.Dtos.HelpModels;
@@ -156,7 +155,7 @@ namespace back.DAL.Repositories
             return (int)Math.Ceiling((double)(await GetUnsortedProducts(userId, categories, rating, open, range, location, search, specificShopId, favorite, currLat, currLong)).Count()/ numberOfItems);
         }
 
-        public async Task<ProductInfo> ProductDetails(int productId, int userId)
+        public async Task<ProductInfo> ProductDetails(int productId, int? userId)
         {
             Product product = await _context.Products.FirstOrDefaultAsync(x => x.Id == productId);
             if (product == null) return null;

@@ -62,7 +62,8 @@ namespace back.DAL.Repositories
             DeliveryRequest req = await _context.DeliveryRequests.FirstOrDefaultAsync(x => x.Id == requestId);
             req.RouteId = routeId;
             req.PickupDate = (await _context.DeliveryRoutes.FirstOrDefaultAsync(x => x.Id == routeId)).StartDate;
-
+            Order order = await _context.Orders.FirstOrDefaultAsync(x => x.Id == req.OrderId);
+            order.StatusId = (await _context.OrderStatuses.FirstOrDefaultAsync(x => x.Name == "Processing")).Id;
             return await _context.SaveChangesAsync() > 0;
         }
 
@@ -115,7 +116,7 @@ namespace back.DAL.Repositories
 
         public async Task<List<DeliveryRouteCard>> GetRoutesForDeliveryPerson(int userId)
         {
-            return await _context.DeliveryRoutes.Where(x => x.DeliveryPersonId == userId).Select(x => new DeliveryRouteCard
+            return await _context.DeliveryRoutes.Where(x => x.DeliveryPersonId == userId && !x.Finished).Select(x => new DeliveryRouteCard
             {
                 EndAddress = x.EndLocation,
                 StartAddress = x.StartLocation,
