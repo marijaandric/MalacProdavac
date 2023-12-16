@@ -61,5 +61,10 @@ namespace back.DAL.Repositories
 
             return await _context.SaveChangesAsync() > 0;
         }
+
+        public bool NotificationExists(int userId, int type, int referenceId)
+        {
+            return _context.Notifications.Any(x => x.UserId == userId && x.TypeId == type && x.ReferenceId == referenceId);
+        }
     }
 }
