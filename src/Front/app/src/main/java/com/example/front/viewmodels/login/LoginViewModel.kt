@@ -2,6 +2,7 @@ package com.example.front.viewmodels.login
 
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.MutableLiveData
@@ -16,6 +17,7 @@ import com.example.front.screens.login.state.LoginState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.json.JSONException
 import org.json.JSONObject
@@ -94,6 +96,10 @@ class LoginViewModel @Inject constructor(
                 _state.value = _state.value.copy(
                     loginState = true
                 )
+                dataStoreManager.getUserIdFromToken()
+                    ?.let { dataStoreManager.fcmFlow.first()
+                        ?.let { it1 -> repository.saveFCMToken(it, it1) } }
+                dataStoreManager.fcmFlow.first()?.let { Log.d("FCM", it) }
                 return true
             }
         } catch (e: Exception) {

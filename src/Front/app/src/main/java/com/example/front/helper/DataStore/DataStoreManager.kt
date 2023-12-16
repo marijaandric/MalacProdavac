@@ -18,6 +18,7 @@ class DataStoreManager @Inject constructor(@ApplicationContext context: Context)
     private val dataStore: DataStore<Preferences> = context.dataStore
 
     private val TOKEN_KEY = stringPreferencesKey("token")
+    private val FCM_KEY = stringPreferencesKey("fcm")
 
     suspend fun storeToken(token: String) {
         dataStore.edit { preferences ->
@@ -29,29 +30,18 @@ class DataStoreManager @Inject constructor(@ApplicationContext context: Context)
         preferences[TOKEN_KEY]
     }
 
+    suspend fun storeFCM(token: String) {
+        dataStore.edit { preferences ->
+            preferences[FCM_KEY] = token
+        }
+    }
+
+    val fcmFlow: Flow<String?> = dataStore.data.map { preferences ->
+        preferences[FCM_KEY]
+    }
+
     val JWT_SECRET = "10e13609875c047a26c74fcba54bde5b"
 
-    suspend fun getUsernameFromToken(): String? {
-        val token = this.tokenFlow.first()
-
-        return decodeTokenAndGetUsername(token)
-    }
-
-    fun decodeTokenAndGetUsername(token: String?): String? {
-        if (token.isNullOrBlank()) {
-            return "null"
-        }
-
-        try {
-            val signedJWT = SignedJWT.parse(token)
-            val claimsSet = signedJWT.jwtClaimsSet
-
-            return claimsSet.getClaim("name") as? String
-        } catch (e: Exception) {
-            e.printStackTrace()
-            return null
-        }
-    }
 
     suspend fun getUserIdFromToken(): Int? {
         val token = this.tokenFlow.first()
