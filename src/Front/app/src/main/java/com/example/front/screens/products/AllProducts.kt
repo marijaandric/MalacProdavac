@@ -1,5 +1,6 @@
 package com.example.front.screens.products
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -8,11 +9,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -30,6 +34,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,6 +47,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -59,6 +65,7 @@ import com.example.front.screens.sellers.CardGrid
 import com.example.front.screens.sellers.MapFilters
 import com.example.front.ui.theme.Typography
 import com.example.front.viewmodels.home.HomeViewModel
+import com.example.front.viewmodels.products.ProductsViewModel
 import com.example.front.viewmodels.shops.ShopsViewModel
 import kotlinx.coroutines.launch
 
@@ -66,289 +73,127 @@ import kotlinx.coroutines.launch
 @Composable
 fun AllProducts(
     navController: NavHostController,
-    homeViewModel: HomeViewModel,
+    productsViewModel: ProductsViewModel,
     shopsViewModel: ShopsViewModel
 ) {
+    var selectedColumnIndex by remember {
+        mutableStateOf(true)
+    }
+    var all by remember {
+        mutableStateOf(false)
+    }
+    var fav by remember {
+        mutableStateOf(false)
+    }
+    LaunchedEffect(Unit)
+    {
+        productsViewModel.getUserId()?.let { productsViewModel.getProducts(it, listOf(),null, null, null, null, 0, null, 1, false, null, null ) }
+        productsViewModel.getUserId()?.let { productsViewModel.getProducts(it, listOf(),null, null, null, null, 0, null, 1, true, null, null ) }
+    }
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     Sidebar(
         drawerState,
         navController,
-        homeViewModel.dataStoreManager
+        productsViewModel.dataStoreManager
     ) {
-        Surface(
-            modifier = Modifier
-                .fillMaxSize(),
-            color = Color.White
-        ) {
-            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+        LazyColumn(modifier = Modifier
+            .background(color = MaterialTheme.colorScheme.background)
+            .fillMaxSize()) {
+            item{
                 SmallElipseAndTitle("All products", drawerState)
-                Text(
-                    text = "Discover the Best Products",
-                    style = Typography.titleMedium,
-                    modifier = Modifier.padding(start = 30.dp, end = 30.dp)
+            }
+            item{
+                SearchAndFilters(productsViewModel = productsViewModel)
+            }
+            item{
+                Tabs(
+                    onShopsSelected = { selectedColumnIndex = true },
+                    onFavoritesSelected = { selectedColumnIndex = false },
+                    selectedColumnIndex = selectedColumnIndex,
+                    firstTab = "Products",
+                    secondTab = "Your Favorites",
+                    isFilters = false
                 )
-                Products(homeViewModel, navController)
+                Spacer(modifier = Modifier.height(10.dp))
+
+            }
+            item{
+                if(selectedColumnIndex)
+                {
+                    Image(
+                        painter = painterResource(id = R.drawable.products),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp, bottom = 0.dp)
+                    )
+                }
+            }
+            item{
+                if(selectedColumnIndex)
+                    Text("Explore the Finest Selection of Products!", style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold), modifier = Modifier.padding(20.dp,top=0.dp,bottom = 16.dp))
+                Products(productsViewModel, navController, selectedColumnIndex)
             }
         }
     }
 }
 
 @Composable
-fun SearchAndFilters(shopsViewModel: ShopsViewModel) {
+fun SearchAndFilters(productsViewModel: ProductsViewModel) {
     var value by remember { mutableStateOf("") }
     var showDialog by remember { mutableStateOf(false) }
     var isOverlayVisible by remember { mutableStateOf(false) }
 
-    Row(
+    Column(
         modifier = Modifier
-            .padding(16.dp)
             .fillMaxWidth(),
-        horizontalArrangement = Arrangement.Center
     )
     {
-        SearchTextField(
-            valuee = value,
-            placeh = "Search sellers",
-            onValueChangee = { value = it; shopsViewModel.Search(value) },
-            modifier = Modifier.fillMaxWidth(0.75f)
-        )
-        Image(
-            // ako budemo imali dark i light ovde mozda neki if i promena slike
-            painter = painterResource(id = R.drawable.filters),
-            contentDescription = "Search icon",
+        Row(
             modifier = Modifier
-                .padding(start = 10.dp)
-                .size(40.dp)
-                .align(Alignment.CenterVertically)
-                .clickable { showDialog = true },
+                .padding(16.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center
         )
-        Image(
-            // ako budemo imali dark i light ovde mozda neki if i promena slike
-            painter = painterResource(id = R.drawable.sort),
-            contentDescription = "Sort icon",
-            modifier = Modifier
-                .padding(start = 10.dp)
-                .size(50.dp, 40.dp)
-                .align(Alignment.CenterVertically)
-                .clickable { isOverlayVisible = true },
-        )
-    }
-
-    if (showDialog) {
-        FiltersDialog(onDismiss = { showDialog = false }, shopsViewModel)
-    }
-    if (isOverlayVisible) {
-        Overlay(onDismiss = { isOverlayVisible = false }, shopsViewModel)
-    }
-}
-
-@Composable
-fun Overlay(onDismiss: () -> Unit, shopsViewModel:ShopsViewModel) {
-    val overlayColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)
-
-    Dialog(
-        properties = DialogProperties(usePlatformDefaultWidth = false),
-        onDismissRequest = { onDismiss() }) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(overlayColor)
-                .pointerInput(Unit) {
-                    detectTapGestures { offset ->
-                        onDismiss()
-                    }
-                }
-        ) {
-            Box(
+        {
+            SearchTextField(
+                valuee = value,
+                placeh = "Search sellers",
+                onValueChangee = { value = it; },
+                modifier = Modifier.fillMaxWidth(0.75f)
+            )
+            Image(
+                // ako budemo imali dark i light ovde mozda neki if i promena slike
+                painter = painterResource(id = R.drawable.filters),
+                contentDescription = "Search icon",
                 modifier = Modifier
-                    .fillMaxWidth(0.8f)
-                    .clip(RoundedCornerShape(20.dp))
-                    .background(MaterialTheme.colorScheme.background)
-                    .pointerInput(Unit) {
-                        detectTapGestures { offset ->
-
-                        }
-                    }
-                    .padding(top = 5.dp)
-                    .align(Alignment.Center),
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                        .align(Alignment.Center)
-                ) {
-                    Text(
-                        "Sort", style = MaterialTheme.typography.titleMedium.copy(color = MaterialTheme.colorScheme.onBackground), modifier = Modifier
-                            .padding(bottom = 40.dp)
-                            .align(Alignment.CenterHorizontally)
-                    )
-
-                    Text(
-                        "Default", style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.primary), modifier = Modifier
-                            .padding(bottom = 16.dp)
-                            .clickable { shopsViewModel.Sort(0) }
-                    )
-                    Text(
-                        "Rating (lowest first)", style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.primary), modifier = Modifier
-                            .padding(bottom = 16.dp)
-                            .clickable { shopsViewModel.Sort(1) }
-                    )
-                    Text(
-                        "Rating (highest first)", style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.primary), modifier = Modifier
-                            .padding(bottom = 16.dp)
-                            .clickable { shopsViewModel.Sort(2) }
-                    )
-                    Text(
-                        "Alphabetically (ascending)", style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.primary), modifier = Modifier
-                            .padding(bottom = 16.dp)
-                            .clickable { shopsViewModel.Sort(3) }
-                    )
-                    Text(
-                        "Alphabetically (descending)", style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.primary), modifier = Modifier
-                            .padding(bottom = 16.dp)
-                            .clickable { shopsViewModel.Sort(4) }
-                    )
-
-                }
-            }
+                    .padding(start = 10.dp)
+                    .size(40.dp)
+                    .align(Alignment.CenterVertically)
+                    .clickable { showDialog = true },
+            )
+            Image(
+                // ako budemo imali dark i light ovde mozda neki if i promena slike
+                painter = painterResource(id = R.drawable.sort),
+                contentDescription = "Sort icon",
+                modifier = Modifier
+                    .padding(start = 10.dp)
+                    .size(50.dp, 40.dp)
+                    .align(Alignment.CenterVertically)
+                    .clickable { isOverlayVisible = true },
+            )
         }
     }
+
 }
 
 @Composable
-fun FiltersDialog(onDismiss: () -> Unit, shopsViewModel: ShopsViewModel) {
-    val overlayColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)
-    var selectedColumnIndex by remember { mutableStateOf(true) }
-
-    var selectedCategories by remember { mutableStateOf(shopsViewModel.filtersState.value.categories!!.toMutableList()) }
-    var review by remember { mutableStateOf(shopsViewModel.filtersState.value.rating) }
-    var open by remember { mutableStateOf(if (shopsViewModel.filtersState.value.open != null) shopsViewModel.filtersState.value.open else false) }
-    var location by remember { mutableStateOf(if (shopsViewModel.filtersState.value.location == null) "" else shopsViewModel.filtersState.value.location.toString()) }
-    var range by remember { mutableStateOf(if (shopsViewModel.filtersState.value.range != null) shopsViewModel.filtersState.value.range!!.toFloat() else 0f) }
-
-    Dialog(
-        properties = DialogProperties(usePlatformDefaultWidth = false),
-        onDismissRequest = { onDismiss() }) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(overlayColor)
-                .pointerInput(Unit) {
-                    detectTapGestures { offset ->
-                        shopsViewModel.changeCategories(selectedCategories)
-                        shopsViewModel.changeRating(review)
-                        shopsViewModel.changeOpen(open)
-                        shopsViewModel.changeLocation(location)
-                        shopsViewModel.changeRange(range.toInt())
-                        onDismiss()
-                    }
-                }
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth(0.8f)
-                    .clip(RoundedCornerShape(20.dp))
-                    .background(MaterialTheme.colorScheme.background)
-                    .pointerInput(Unit) {
-                        detectTapGestures { offset ->
-
-                        }
-                    }
-                    .padding(top = 5.dp)
-                    .align(Alignment.Center)
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                        .align(Alignment.Center)
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 20.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    )
-                    {
-                        Text(
-                            "Cancel",
-                            style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.primary),
-                            modifier = Modifier
-                                .padding(bottom = 20.dp)
-                                .clickable {
-                                    shopsViewModel.changeCategories(selectedCategories)
-                                    shopsViewModel.changeRating(review)
-                                    shopsViewModel.changeOpen(open)
-                                    shopsViewModel.changeLocation(location)
-                                    shopsViewModel.changeRange(range.toInt())
-                                    onDismiss()
-                                }
-                        )
-                        Text(
-                            "Filters",
-                            style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onBackground),
-                            modifier = Modifier
-                                .padding(bottom = 20.dp)
-                                .align(Alignment.CenterVertically)
-                        )
-                        Text(
-                            "Reset",
-                            style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.secondary),
-                            modifier = Modifier
-                                .padding(bottom = 20.dp)
-                                .clickable {
-                                    shopsViewModel.changeCategories(selectedCategories)
-                                    shopsViewModel.changeRating(review)
-                                    shopsViewModel.changeOpen(open)
-                                    shopsViewModel.changeLocation(location)
-                                    shopsViewModel.changeRange(range.toInt())
-                                    shopsViewModel.withoutFilters()
-                                }
-                        )
-                    }
-
-                    //tabs
-                    Tabs(
-                        onShopsSelected = { selectedColumnIndex = true },
-                        onFavoritesSelected = { selectedColumnIndex = false },
-                        selectedColumnIndex = selectedColumnIndex,
-                        "Details",
-                        "Location",
-                        true
-                    )
-
-                    if (selectedColumnIndex) {
-                        CardGrid(onCategorySelected = { selectedCategories = it },
-                            onReviewSelected = { review = it },
-                            onOpenChanged = { open = it }, shopsViewModel
-                        )
-                    } else {
-                        MapFilters(
-                            onSearchChange = { location = it },
-                            onSliderChange = { range = it },
-                            shopsViewModel
-                        )
-                    }
-                    BigBlueButton(text = "Show Results", onClick = {
-                        shopsViewModel.DialogFilters(
-                            selectedCategories,
-                            review,
-                            open,
-                            location,
-                            range.toInt()
-                        )
-                        onDismiss()
-                    }, width = 1f, modifier = Modifier)
-                }
-            }
-        }
+fun Products(viewModel: ProductsViewModel, navController: NavHostController, isFav:Boolean) {
+    var state = viewModel.state.value
+    if(!isFav)
+    {
+        state = viewModel.stateFav.value
     }
-}
-
-@Composable
-fun Products(viewModel: HomeViewModel, navController: NavHostController) {
-    val state = viewModel.state.value
 
     val products = state.products?.mapIndexed { index, productsState ->
         CardData(
@@ -364,9 +209,38 @@ fun Products(viewModel: HomeViewModel, navController: NavHostController) {
         modifier = Modifier
             .padding(16.dp, end = 0.dp, top = 20.dp)
     ) {
-        if (viewModel.state.value.isLoading) {
-            CircularProgressIndicator()
-        } else {
+        if (state.isLoading) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+        else if(state.error.isNotEmpty())
+        {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                contentAlignment = Alignment.Center
+            )
+            {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.nofound),
+                        contentDescription = "",
+                        modifier = Modifier
+                            .fillMaxWidth(0.5f)
+                            .padding(top = 55.dp, bottom = 16.dp),
+                        contentScale = ContentScale.FillWidth
+                    )
+                    Text("No products found", style = MaterialTheme.typography.titleSmall)
+                }
+            }
+        }
+        else {
             LazyColumn(
                 modifier = Modifier.heightIn(100.dp, 600.dp)
             ) {

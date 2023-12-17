@@ -838,7 +838,7 @@ fun ProductCard(
     Card(
         modifier = Modifier
             .clip(RoundedCornerShape(20.dp))
-            .fillMaxWidth(0.9f)
+            .fillMaxWidth()
             .padding(bottom = 15.dp, end = 16.dp)
             .clickable(onClick = onClick)
     ) {
