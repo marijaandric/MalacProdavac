@@ -265,6 +265,48 @@ fun MyDropdownMetrics(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
+@Composable
+fun MyDropdownWorkingHours(
+    labelValue: String,
+    workHours: List<String>,
+    modifier: Modifier
+) {
+    var isPressed by remember { mutableStateOf(false) }
+
+    OutlinedTextField(
+        modifier = modifier.pointerInteropFilter { event ->
+            isPressed = event.action == MotionEvent.ACTION_DOWN
+            false
+        },
+        readOnly = true,
+        value = labelValue,
+        onValueChange = { /* No action needed */ },
+        label = { Text(text = labelValue) },
+        colors = TextFieldDefaults.outlinedTextFieldColors(
+            focusedBorderColor = Color.Blue,
+            focusedLabelColor = Color.Blue,
+            cursorColor = Color.Blue
+        ),
+        keyboardOptions = KeyboardOptions.Default.copy(
+            keyboardType = KeyboardType.Text,
+            imeAction = ImeAction.Done
+        ),
+        shape = RoundedCornerShape(20.dp)
+    )
+
+    DropdownMenu(
+        expanded = isPressed,
+        onDismissRequest = { isPressed = false },
+        modifier = Modifier.background(MaterialTheme.colorScheme.surface)
+    ) {
+        workHours.forEach { metric ->
+            DropdownMenuItem(onClick = {}) {
+                Text(text = metric)
+            }
+        }
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
