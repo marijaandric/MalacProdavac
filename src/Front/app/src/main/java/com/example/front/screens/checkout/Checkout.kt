@@ -18,6 +18,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DrawerValue
@@ -36,6 +37,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -54,10 +56,13 @@ import com.example.front.R
 import com.example.front.components.ButtonWithIcon
 import com.example.front.components.Sidebar
 import com.example.front.components.SmallElipseAndTitle
+import com.example.front.model.DTO.NewOrder
+import com.example.front.model.product.ProductInOrder
 import com.example.front.navigation.Screen
 import com.example.front.screens.cart.CreditCard
 import com.example.front.viewmodels.checkout.CheckoutViewModel
 import com.google.gson.JsonParser
+import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -101,6 +106,7 @@ fun CheckoutScreen(
         viewModel.getCheckoutData(shopsTotals)
     }
 
+    val cartProducts = viewModel.stateProducts.value.products.groupBy { it.shopId }
     val date = remember { mutableStateOf(LocalDate.now()) }
     val isOpen = remember { mutableStateOf(false) }
 //    val isOpenMap = remember { mutableStateMapOf<Int, Boolean>() }
@@ -113,7 +119,7 @@ fun CheckoutScreen(
     val checkoutState = viewModel.state.value
     val shops = viewModel.shopsForCheckout.value
     val scrollState = rememberScrollState()
-
+    val coroutineScope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
     //sa listof unit pokrece samo jednom (kad se pokrene stranica prvi put)
@@ -391,6 +397,69 @@ fun CheckoutScreen(
                     }
                 }
 
+                Surface(
+                    color = Color.White,
+                    modifier = Modifier
+                ) {
+
+                    Column(
+                        Modifier
+                            .fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+//                        Text(
+//                            "Total: ${DecimalFormat("0.00").format(sum)} rsd",
+//                            modifier = Modifier
+//                                .padding(vertical = 14.dp),
+//                            fontSize = 20.sp,
+//                            fontWeight = FontWeight.Bold
+//                        )
+                        Button(
+                            onClick = {
+                                //// 1	On delivery, 2 Payment Slip, 3 Card
+                                //// id uzima pri ucitavanju stranice
+                                //// za svaki shop pravi: shopId, paymentMethod, deliveryMethod, shippingAddress, pickupTime, products [ id, sizeId, quantity ]
+                                // lista od NewOrderD
+//                                val groupedProducts = cartState.products.groupBy { it.shopName }
+                                var userId: Int? = null
+                                coroutineScope.launch {
+                                    userId = viewModel.dataStoreManager.getUserIdFromToken()
+                                    if (userId != null) {
+                                        //// izmeniti polja za newOrder
+                                        cartProducts.forEach { (shopId, products) ->
+                                            val shopsProducts = products.map {
+                                                ProductInOrder(it.id, it.sizeId, it.quantity)
+                                            }
+                                            val newOrder = NewOrder(
+                                                userId = userId!!,
+                                                shopId = shopId,
+                                                paymentMethod = 1,
+                                                deliveryMethod = 1,
+                                                shippingAddress = "address",
+                                                pickupTime = "",
+                                                products = shopsProducts
+                                            )
+                                        }
+                                    }
+                                }
+
+//
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF457FA8)),
+                            modifier = Modifier
+                                .padding(vertical = 14.dp),
+//                            enabled = cartProducts.isNotEmpty()
+                        ) {
+                            Text(
+                                text = "Checkout",
+                                fontSize = 20.sp,
+                                fontFamily = FontFamily(Font(R.font.lexend)),
+                                fontWeight = FontWeight(300),
+                                modifier = Modifier
+                            )
+                        }
+                    }
+                }
 
             }
 //            }
