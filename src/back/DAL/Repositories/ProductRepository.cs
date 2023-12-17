@@ -208,7 +208,7 @@ namespace back.DAL.Repositories
                 }).ToListAsync();
             }
            
-            List<Stock> sizes = await _context.ProductSizes.Where(x => x.ProductId == productId).Join(_context.Sizes, ps => ps.SizeId, s => s.Id, (ps, s) => new Stock{ Size = s.Name, Quantity = ps.Stock }).ToListAsync();
+            List<Stock> sizes = await _context.ProductSizes.Where(x => x.ProductId == productId).Join(_context.Sizes, ps => ps.SizeId, s => s.Id, (ps, s) => new Stock{ SizeId = s.Id, Size = s.Name, Quantity = ps.Stock }).ToListAsync();
             List<ImageData> images = await _context.ProductImages.Where(x => x.ProductId == productId).Select(x => new ImageData{Id = x.Id, Image = x.Image}).ToListAsync();
             float average = 0;
             if (_context.ProductReviews.Where(x => x.ProductId == productId).Count() > 0) average = _context.ProductReviews.Where(x => x.ProductId == productId).Select(x => x.Rating).Average();

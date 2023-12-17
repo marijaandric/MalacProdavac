@@ -61,7 +61,6 @@ class MyShopViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val response = repository.newShop(shop)
-                Log.d("RES FOR ADD SHOP", response.toString())
                 if (response.isSuccessful) {
                     _stateNewShop.value = _stateNewShop.value.copy(
                         isLoading = false,
@@ -87,7 +86,6 @@ class MyShopViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val response = repository.uploadImage2(type, id, imagePart)
-                Log.d("RES FOR ADD PIC", response.toString())
 
                 if (response.isSuccessful) {
                     _stateimage.value = _stateimage.value.copy(
