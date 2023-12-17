@@ -1,6 +1,7 @@
 ﻿using back.BLL.Dtos.Cards;
 using back.DAL.Contexts;
 using back.Models;
+using FirebaseAdmin.Messaging;
 using Microsoft.EntityFrameworkCore;
 
 namespace back.DAL.Repositories
@@ -46,7 +47,7 @@ namespace back.DAL.Repositories
 
         public async Task<bool> InsertNotification(int userId, int type, string title, string description, int referenceId)
         {
-            Notification notification = new Notification
+            back.Models.Notification notification = new back.Models.Notification
             {
                 UserId = userId,
                 CreatedOn = DateTime.Now,
@@ -59,7 +60,58 @@ namespace back.DAL.Repositories
 
             await _context.Notifications.AddAsync(notification);
 
-            return await _context.SaveChangesAsync() > 0;
+            if (await _context.SaveChangesAsync() > 0)
+            {
+                await SendNotificationAsync(title, description, userId);
+                return true;
+            }
+            else return false;
+        }
+
+        private async Task SendNotificationAsync(string title, string body, int userID)
+        {
+            try
+            {
+                var user = _context.Users.FirstOrDefault(u => u.Id == userID);
+
+                if (user == null)
+                {
+                    Console.WriteLine("User not found.");
+                    return;
+                }
+
+                var fcmToken = user.FCMToken;
+
+                if (string.IsNullOrEmpty(fcmToken))
+                {
+                    Console.WriteLine("FCM token not available for the user.");
+                    return;
+                }
+
+                var message = new Message()
+                {
+                    Notification = new FirebaseAdmin.Messaging.Notification
+                    {
+                        Title = title,
+                        Body = body
+                    },
+                    Token = fcmToken,
+                };
+
+                try
+                {
+                    var result = await FirebaseMessaging.DefaultInstance.SendAsync(message);
+                    Console.WriteLine($"Notification sent successfully: {result}");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error sending notification: {ex.Message}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+            }
         }
 
         public bool NotificationExists(int userId, int type, int referenceId)

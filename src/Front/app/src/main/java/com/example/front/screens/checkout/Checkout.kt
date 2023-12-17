@@ -34,10 +34,12 @@ import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -67,6 +69,7 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.util.Date
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -102,7 +105,6 @@ fun CheckoutScreen(
 ) {
 
     LaunchedEffect(key1 = true) {
-        viewModel.getCartProducts()
         val shopsTotals = parseTotalsByShop(totalsByShop ?: "")
         viewModel.getCheckoutData(shopsTotals)
     }
@@ -115,7 +117,7 @@ fun CheckoutScreen(
 //    val dateMap = remember { mutableStateMapOf<Int, MutableState<LocalDate>>() }
     val isOpenMap = remember { mutableStateMapOf<Int, Boolean>() }
     val dateMap = remember { mutableStateMapOf<Int, LocalDate>() }
-
+    var payUsingCard by remember { mutableStateOf(false) }
 
     val checkoutState = viewModel.state.value
     val shops = viewModel.shopsForCheckout.value
@@ -149,97 +151,84 @@ fun CheckoutScreen(
             ) {
                 SmallElipseAndTitle(title = "Checkout", drawerState)
 
-//                    Row(verticalAlignment = Alignment.CenterVertically) {
-//
-//                        OutlinedTextField(
-//                            readOnly = true,
-//                            value = date.value.format(DateTimeFormatter.ISO_DATE),
-//                            label = { Text("Date") },
-//                            onValueChange = {})
-//
-//                        IconButton(
-//                            onClick = { isOpen.value = true } // show de dialog
-//                        ) {
-//                            Icon(imageVector = Icons.Default.DateRange, contentDescription = "Calendar")
-//                        }
-//                    }
-//                    if (isOpen.value) {
-//                        ModalDatePicker(
-//                            onAccept = {
-//                                isOpen.value = false // close dialog
-//
-//                                if (it != null) { // Set the date
-//                                    date.value = Instant
-//                                        .ofEpochMilli(it)
-//                                        .atZone(ZoneId.of("UTC"))
-//                                        .toLocalDate()
-//                                }
-//                            },
-//                            onCancel = {
-//                                isOpen.value = false //close dialog
-//                            }
-//                        )
-//                    }
-//                    DatePicker(state = datePickerState, )
-
-                //kartice
-                LazyRow(
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(10.dp)
+//                        .padding(top=100.dp)
+                    ,
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceEvenly,
                 ) {
-                    item {
-                        CreditCard()
-                    }
-                    item {
-                        CreditCard()
-                    }
-                    item {
-                        CreditCard()
-                    }
-                    item {
-                        CreditCard()
-                    }
+
+                    Text(text = "On pickup")
+                    Switch(
+                        checked = payUsingCard,
+                        onCheckedChange = {
+                            payUsingCard = it
+                        }
+                    )
+                    Text(text = "Credit/Debit Card")
                 }
 
-                //dodavanje novih kartica
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp),
-                    verticalArrangement = Arrangement.SpaceBetween,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Row(
+                if (payUsingCard) {
+                    //kartice
+                    LazyRow(
                         modifier = Modifier
-                            .padding(15.dp)
+                            .fillMaxWidth()
+                            .padding(10.dp)
                     ) {
-                        ButtonWithIcon(
-                            text = "Add Credit/Debit Card",
-                            onClick = { navController.navigate(route = Screen.NewCreditCard.route) },
-                            width = 0.8f,
-                            modifier = Modifier.padding(10.dp),
-                            color = MaterialTheme.colorScheme.primary,
-                            imagePainter = painterResource(id = R.drawable.ion_card_outline),
-                            height = 50
-                        )
+                        item {
+                            CreditCard()
+                        }
+                        item {
+                            CreditCard()
+                        }
+                        item {
+                            CreditCard()
+                        }
+                        item {
+                            CreditCard()
+                        }
                     }
-                    Row(
+
+                    //dodavanje novih kartica
+                    Column(
                         modifier = Modifier
-                            .padding(15.dp)
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        verticalArrangement = Arrangement.SpaceBetween,
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        ButtonWithIcon(
-                            text = "Paypal",
-                            onClick = { /*navController.navigate()*/ },
-                            width = 0.8f,
-                            modifier = Modifier.padding(10.dp),
-                            color = MaterialTheme.colorScheme.primary,
-                            imagePainter = painterResource(id = R.drawable.logos_paypal),
-                            height = 50
-                        )
+                        Row(
+                            modifier = Modifier
+                                .padding(15.dp)
+                        ) {
+                            ButtonWithIcon(
+                                text = "Add Credit/Debit Card",
+                                onClick = { navController.navigate(route = Screen.NewCreditCard.route) },
+                                width = 0.8f,
+                                modifier = Modifier.padding(10.dp),
+                                color = MaterialTheme.colorScheme.primary,
+                                imagePainter = painterResource(id = R.drawable.ion_card_outline),
+                                height = 50
+                            )
+                        }
+                        Row(
+                            modifier = Modifier
+                                .padding(15.dp)
+                        ) {
+                            ButtonWithIcon(
+                                text = "Paypal",
+                                onClick = { /*navController.navigate()*/ },
+                                width = 0.8f,
+                                modifier = Modifier.padding(10.dp),
+                                color = MaterialTheme.colorScheme.primary,
+                                imagePainter = painterResource(id = R.drawable.logos_paypal),
+                                height = 50
+                            )
+                        }
                     }
                 }
-
 
                 //Spisak prodavnica
                 Column(
@@ -427,25 +416,24 @@ fun CheckoutScreen(
                                     userId = viewModel.dataStoreManager.getUserIdFromToken()
                                     if (userId != null) {
                                         //// izmeniti polja za newOrder
-                                        val orders = cartProducts.map { (shopId, products) ->
-                                            val shopsProducts = products.map {
-                                                ProductInOrder(it.id, it.sizeId, it.quantity)
-                                            }
-                                            val newOrder = NewOrder(
+                                        val orders: List<NewOrder> = shops.map { shop ->
+                                            NewOrder(
                                                 userId = userId!!,
-                                                shopId = shopId,
-                                                paymentMethod = 1,
-                                                deliveryMethod = 1,
-                                                shippingAddress = "address",
-                                                pickupTime = "",
-                                                products = shopsProducts
+                                                shopId = shop.id,
+                                                paymentMethod = if (payUsingCard) 3 else 1, // 3-kartica, 1-pouzecem
+                                                deliveryMethod = if (shop.selfpickup) 1 else 2, // 1-self, 2-delivery
+                                                shippingAddress = "////IZMENITI ADRESU",
+                                                pickupTime = if (shop.selfpickup) Date(shop.date ?: 0).toString() else "",
+                                                products = cartProducts[shop.id]!!.map {
+                                                    ProductInOrder(it.id, it.sizeId, it.quantity)
+                                                }
                                             )
                                         }
-                                        println("ORDERS: $orders")
+                                        println("ORDERS: ${orders[0]}")
+                                        println("ORDER: ${orders[0].products[0].id}")
                                     }
                                 }
 
-//
                             },
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF457FA8)),
                             modifier = Modifier

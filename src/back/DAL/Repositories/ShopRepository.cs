@@ -274,10 +274,20 @@ namespace back.DAL.Repositories
 
         public async Task<bool> EditWorkingHours(List<WorkingHoursDto> workingHours, int shopId)
         {
+            var current = await _context.WorkingHours.Where(x => x.ShopId == shopId).ToListAsync();
+            var toDelete = current.Where(x => !workingHours.Select(x => x.Day).Contains(x.Day));
+
+            _context.WorkingHours.RemoveRange(toDelete);
+
             foreach (var wh in workingHours)
             {
-                WorkingHours curr = await _context.WorkingHours.FirstOrDefaultAsync(x => x.ShopId == shopId && x.Day == wh.Day);
-               curr = new WorkingHours { Day = wh.Day, OpeningHours = TimeSpan.Parse(wh.OpeningHours), ClosingHours = TimeSpan.Parse(wh.ClosingHours), ShopId = shopId };
+                WorkingHours curr = current.FirstOrDefault(x => x.Day == wh.Day);
+                if (curr == null) await _context.WorkingHours.AddAsync(new WorkingHours { Day = wh.Day, OpeningHours = TimeSpan.Parse(wh.OpeningHours), ClosingHours = TimeSpan.Parse(wh.ClosingHours), ShopId = shopId });
+                else
+                {
+                    curr.OpeningHours = TimeSpan.Parse(wh.OpeningHours);
+                    curr.ClosingHours = TimeSpan.Parse(wh.ClosingHours);
+                }
             }
 
             return await _context.SaveChangesAsync() > 0;

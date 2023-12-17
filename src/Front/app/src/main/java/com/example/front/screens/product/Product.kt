@@ -40,10 +40,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -53,6 +53,7 @@ import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.example.front.R
 import com.example.front.components.GalleryComponent
+import com.example.front.components.MyDropdownWorkingHours
 import com.example.front.components.ProductImage
 import com.example.front.components.Sidebar
 import com.example.front.components.ToggleImageButton
@@ -60,7 +61,6 @@ import com.example.front.model.DTO.WorkingHoursDTO
 import com.example.front.model.product.ProductReviewUserInfo
 import com.example.front.navigation.Screen
 import com.example.front.ui.theme.DarkBlue
-import com.example.front.ui.theme.Orange
 import com.example.front.ui.theme.Typography
 import com.example.front.viewmodels.product.ProductViewModel
 import kotlinx.coroutines.GlobalScope
@@ -77,7 +77,6 @@ fun ProductPage(
 ) {
 
     var quantity by remember { mutableStateOf(1) }
-    val context = LocalContext.current
     val toastHostState = rememberToastHostState()
     val coroutineScope = rememberCoroutineScope()
     var selectedSize by remember { mutableStateOf<String?>(null) }
@@ -130,7 +129,7 @@ fun ProductPage(
                     if (productInfo != null) {
                         selectedImage?.let { image ->
                             if (image.image.isNotEmpty()) {
-                                ProductImage(image.image, modifier = Modifier)
+                                ProductImage(image.image, modifier = Modifier.scale(1.2f))
                             }
                         }
                     }
@@ -151,12 +150,13 @@ fun ProductPage(
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(3f)
+                        .background(Color.Transparent)
                         .border(
                             1.dp,
-                            Color.Black,
+                            Color.Transparent,
                             shape = RoundedCornerShape(
-                                topStart = 20.dp,
-                                topEnd = 20.dp,
+                                topStart = 30.dp,
+                                topEnd = 30.dp,
                                 bottomStart = 0.dp,
                                 bottomEnd = 0.dp
                             )
@@ -165,8 +165,8 @@ fun ProductPage(
                 ) {
                     Column(
                         modifier = Modifier
-                            .fillMaxSize()
                             .background(Color.White)
+                            .fillMaxSize()
                             .padding(
                                 top = 20.dp,
                                 start = 20.dp,
@@ -197,7 +197,7 @@ fun ProductPage(
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(16.dp),
+                                .padding(8.dp),
                             horizontalArrangement = Arrangement.Center
                         ) {
                             Row(modifier = Modifier.clickable {
@@ -209,15 +209,16 @@ fun ProductPage(
                                         modifier = Modifier
                                             .padding(5.dp),
                                         style = Typography.titleSmall,
-                                        textAlign = TextAlign.Center
+                                        textAlign = TextAlign.Center,
+                                        color = Color(0xFF457FA8)
                                     )
                                 }
 
                                 Image(
-                                    painter = painterResource(R.drawable.strelica),
+                                    painter = painterResource(R.drawable.strelicaproduct),
                                     contentDescription = "",
                                     modifier = Modifier
-                                        .size(29.dp)
+                                        .size(20.dp)
                                 )
                             }
                         }
@@ -238,7 +239,7 @@ fun ProductPage(
                                 modifier = Modifier.fillMaxWidth(),
                                 style = Typography.titleMedium,
                                 textAlign = TextAlign.Center,
-                                color = Orange
+                                color = Color(0xFFE15F26)
                             )
                         }
 
@@ -248,36 +249,24 @@ fun ProductPage(
                                 modifier = Modifier
                                     .padding(10.dp)
                                     .fillMaxWidth(),
-                                style = Typography.bodySmall,
+                                style = Typography.bodyLarge,
                                 textAlign = TextAlign.Center,
-                                color = Color.Black
+                                color = Color(0xFF2E2E2E)
                             )
                         }
 
-                        Divider(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(1.dp)
-                                .padding(horizontal = 16.dp),
-                            color = Color.Gray
-                        )
-
-                        productInfo?.workingHours?.let { ExpandableRow(it) }
-
-                        // velicine
                         if (productInfo?.sizes != null && productInfo.sizes[0].size != "None") {
                             LazyRow(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(horizontal = 22.dp)
+                                    .padding(20.dp),
+                                horizontalArrangement = Arrangement.Center
                             ) {
                                 productInfo.sizes.forEach {
                                     item {
                                         Box(
                                             modifier = Modifier
                                                 .border(1.dp, Color.Gray, RectangleShape)
-//                                            .height(32.dp)
-//                                            .width(32.dp)
                                                 .background(
                                                     color = if (it.size == selectedSize) Color.Gray else Color.White
                                                 )
@@ -299,6 +288,31 @@ fun ProductPage(
                             }
                         }
 
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(10.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "Pick up time:",
+                                style = Typography.titleSmall,
+                                color = Color.Black,
+                                modifier = Modifier.weight(1f)
+                            )
+                            val workingHoursStrings = productInfo?.workingHours?.map { workingHours ->
+                                "${getDayName(workingHours.day)} ${workingHours.openingHours} - ${workingHours.closingHours}"
+                            }
+                            MyDropdownWorkingHours(
+                                workingHoursStrings?.get(0) ?: "",
+                                workingHoursStrings ?: listOf(),
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+
+
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -309,12 +323,14 @@ fun ProductPage(
                             Text(
                                 text = "Quantity",
                                 style = Typography.titleSmall,
-                                color = Color.Black
+                                color = Color.Black,
+                                modifier = Modifier.weight(1f)
                             )
 
                             NumberPicker(
                                 value = quantity,
-                                onValueChange = { newValue -> quantity = newValue })
+                                onValueChange = { newValue -> quantity = newValue },
+                                modifier = Modifier.weight(1f))
                         }
 
                         Row(
@@ -331,10 +347,10 @@ fun ProductPage(
                                         productInfo.images?.isNotEmpty() == true &&
                                         productInfo.metric != null &&
                                         (
-                                            productInfo.sizes?.isEmpty() == true ||
-                                                    (productInfo.sizes != null && productInfo.sizes[0].size == "None") ||
-                                                    (selectedSize != null && selectedSizeId != null)
-                                            )
+                                                productInfo.sizes?.isEmpty() == true ||
+                                                        (productInfo.sizes != null && productInfo.sizes[0].size == "None") ||
+                                                        (selectedSize != null && selectedSizeId != null)
+                                                )
                                     ) {
                                         productViewModel.addToCart(
                                             productID,
@@ -373,11 +389,16 @@ fun ProductPage(
                                     }
                                 },
                                 modifier = Modifier
-                                    .height(80.dp)
-                                    .width(300.dp)
+                                    .height(100.dp)
+                                    .width(350.dp)
                                     .padding(20.dp),
+                                colors = ButtonDefaults.buttonColors(Color(0xFFE48359))
                             ) {
-                                Text(text = "Add To Cart", style = Typography.titleSmall)
+                                Text(
+                                    text = "Add To Cart",
+                                    style = Typography.titleSmall,
+                                    color = Color.White
+                                )
                             }
                         }
                         Divider(
@@ -422,7 +443,11 @@ fun ProductPage(
                                 val reviews = productViewModel.stateReview.value.reviews
 
                                 if (reviews.isNullOrEmpty()) {
-                                    Text("No reviews available", style = Typography.bodySmall)
+                                    Text(
+                                        "No reviews available",
+                                        style = Typography.bodyLarge,
+                                        modifier = Modifier.padding(10.dp)
+                                    )
                                 } else {
                                     Column {
                                         ReviewCard(productReviewUserInfo = reviews[0])
@@ -491,12 +516,13 @@ fun ProductPage(
 }
 
 @Composable
-fun NumberPicker(value: Int, onValueChange: (Int) -> Unit) {
+fun NumberPicker(value: Int, onValueChange: (Int) -> Unit, modifier: Modifier) {
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
+            .then(modifier)
     ) {
         Button(
             onClick = {
@@ -515,14 +541,13 @@ fun NumberPicker(value: Int, onValueChange: (Int) -> Unit) {
         BasicTextField(
             value = value.toString(),
             onValueChange = {
-                // Ensure the input is a valid integer and update the value accordingly
                 val newValue = it.toIntOrNull() ?: value
                 onValueChange(newValue)
             },
             keyboardOptions = KeyboardOptions.Default.copy(
                 keyboardType = KeyboardType.Number
             ),
-            textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center), // Center the text horizontally
+            textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
             modifier = Modifier
                 .padding(8.dp)
                 .weight(1f)
@@ -545,53 +570,6 @@ fun NumberPicker(value: Int, onValueChange: (Int) -> Unit) {
 }
 
 
-@Composable
-fun ExpandableRow(workingHoursList: List<WorkingHoursDTO>) {
-    var isExpanded by remember { mutableStateOf(false) }
-
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(20.dp)
-            .clickable { isExpanded = !isExpanded }
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center
-        ) {
-            Text(
-                text = "Click to see pick up times",
-                style = Typography.titleSmall,
-                color = Color.Black
-            )
-        }
-
-        if (isExpanded) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 20.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                workingHoursList.forEach { workingHours ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(5.dp),
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            text = "${getDayName(workingHours.day)}   " +
-                                    "${workingHours.openingHours} - ${workingHours.closingHours}",
-                            style = Typography.displaySmall,
-                            color = Color.Black
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
 
 fun getDayName(day: Int): String {
     return when (day) {
