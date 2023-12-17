@@ -337,10 +337,6 @@ namespace back.DAL.Repositories
                 await _context.ProductReviews.AddAsync(newReview);
                 await _context.SaveChangesAsync();
 
-                int ownerID = 1;
-
-                await SendNotificationAsync("New Review", "You have a new review to review!",ownerID);
-
                 return true;
             }
             catch (Exception)
@@ -348,54 +344,6 @@ namespace back.DAL.Repositories
                 return false;
             }
         }
-
-        private async Task SendNotificationAsync(string title, string body, int userID)
-{
-    try
-    {
-        var user = _context.Users.FirstOrDefault(u => u.Id == userID);
-
-        if (user == null)
-        {
-            Console.WriteLine("User not found.");
-            return;
-        }
-
-        var fcmToken = user.FCMToken;
-
-        if (string.IsNullOrEmpty(fcmToken))
-        {
-            Console.WriteLine("FCM token not available for the user.");
-            return;
-        }
-
-        var message = new Message()
-        {
-            Notification = new Notification
-            {
-                Title = title,
-                Body = body
-            },
-            Token = fcmToken,
-        };
-
-        try
-        {
-            var result = await FirebaseMessaging.DefaultInstance.SendAsync(message);
-            Console.WriteLine($"Notification sent successfully: {result}");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error sending notification: {ex.Message}");
-        }
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Error: {ex.Message}");
-    }
-}
-
-
 
 
         public async Task<bool> LeaveQuestion(QnADto question)
