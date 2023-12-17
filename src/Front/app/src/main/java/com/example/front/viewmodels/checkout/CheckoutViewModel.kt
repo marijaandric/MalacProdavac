@@ -8,6 +8,7 @@ import com.example.front.helper.DataStore.DataStoreManager
 import com.example.front.model.DTO.ShopDetailsCheckoutDTO
 import com.example.front.repository.MongoRepository
 import com.example.front.repository.Repository
+import com.example.front.viewmodels.cart.CartState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -23,6 +24,24 @@ class CheckoutViewModel @Inject constructor(
 
     private val _shopsForCheckout = mutableStateOf<List<ShopDetailsCheckoutDTO>>(emptyList())
     val shopsForCheckout: State<List<ShopDetailsCheckoutDTO>> = _shopsForCheckout
+
+    private val _stateProducts = mutableStateOf(CartState())
+    val stateProducts: State<CartState> = _stateProducts
+
+    suspend fun getCartProducts() {
+        try {
+            mongoRepository.getCartProducts().collect() {cartProducts ->
+                _stateProducts.value = _stateProducts.value.copy(
+                    isLoading = false,
+                    products = cartProducts
+                )
+            }
+        } catch (e: Exception) {
+            _stateProducts.value = _stateProducts.value.copy(
+                isLoading = false,
+            )
+        }
+    }
 
     suspend fun getCheckoutData(totalsByShop: Map<Int, Double>) {
         try {
