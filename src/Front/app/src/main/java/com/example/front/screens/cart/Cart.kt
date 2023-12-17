@@ -219,7 +219,11 @@ fun Cart(
                                             .padding(4.dp)
 //                                        .height(96.dp),
                                     ) {
-                                        Text(text = "Currently available: ${product.available}")
+                                        if(product.available < 1) {
+                                            Text(text = "This product is not available.", color = Color(0xFFAC1D1D))
+                                        } else {
+                                            Text(text = "Currently available: ${product.available}", color = Color(0xFFAC1D1D))
+                                        }
                                     }
                                 }
                             }
@@ -261,7 +265,7 @@ fun Cart(
                                         cartProducts.forEach {
                                             if (it.available < it.quantity){ br ++}
                                         }
-                                        if(br != 0)
+                                        if(br == 0)
                                         {
                                             val groupedProducts = cartState.products.groupBy { it.shopId }
                                             val totalsByShop = mutableMapOf<Int, Double>()
