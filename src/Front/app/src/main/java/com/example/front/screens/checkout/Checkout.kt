@@ -102,6 +102,7 @@ fun CheckoutScreen(
 ) {
 
     LaunchedEffect(key1 = true) {
+        viewModel.getCartProducts()
         val shopsTotals = parseTotalsByShop(totalsByShop ?: "")
         viewModel.getCheckoutData(shopsTotals)
     }
@@ -426,7 +427,7 @@ fun CheckoutScreen(
                                     userId = viewModel.dataStoreManager.getUserIdFromToken()
                                     if (userId != null) {
                                         //// izmeniti polja za newOrder
-                                        cartProducts.forEach { (shopId, products) ->
+                                        val orders = cartProducts.map { (shopId, products) ->
                                             val shopsProducts = products.map {
                                                 ProductInOrder(it.id, it.sizeId, it.quantity)
                                             }
@@ -440,6 +441,7 @@ fun CheckoutScreen(
                                                 products = shopsProducts
                                             )
                                         }
+                                        println("ORDERS: $orders")
                                     }
                                 }
 

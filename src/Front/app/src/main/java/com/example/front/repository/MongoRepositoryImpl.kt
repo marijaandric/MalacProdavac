@@ -31,6 +31,7 @@ class MongoRepositoryImpl(val realm: Realm) : MongoRepository {
                 existingProduct.image = product.image
                 existingProduct.metric = product.metric
                 existingProduct.size = product.size
+                existingProduct.sizeId = product.sizeId
                 existingProduct.available = product.available
             } else {
                 copyToRealm(product)

@@ -81,6 +81,7 @@ fun ProductPage(
     val toastHostState = rememberToastHostState()
     val coroutineScope = rememberCoroutineScope()
     var selectedSize by remember { mutableStateOf<String?>(null) }
+    var selectedSizeId by remember { mutableStateOf<Int?>(null) }
 
     LaunchedEffect(Unit) {
         productViewModel.getUserId()?.let { productViewModel.getProductInfo(productID, it) }
@@ -282,6 +283,7 @@ fun ProductPage(
                                                 )
                                                 .clickable {
                                                     selectedSize = it.size
+                                                    selectedSizeId = it.sizeId
                                                 }
                                                 .padding(4.dp)
                                         ) {
@@ -329,10 +331,10 @@ fun ProductPage(
                                         productInfo.images?.isNotEmpty() == true &&
                                         productInfo.metric != null &&
                                         (
-                                                productInfo.sizes?.isEmpty() == true ||
-                                                        (productInfo.sizes != null && productInfo.sizes[0].size == "None") ||
-                                                        selectedSize != null
-                                                )
+                                            productInfo.sizes?.isEmpty() == true ||
+                                                    (productInfo.sizes != null && productInfo.sizes[0].size == "None") ||
+                                                    (selectedSize != null && selectedSizeId != null)
+                                            )
                                     ) {
                                         productViewModel.addToCart(
                                             productID,
@@ -343,7 +345,8 @@ fun ProductPage(
                                             productInfo.shopName,
                                             productInfo.images[0].image,
                                             productInfo.metric,
-                                            selectedSize ?: "None"
+                                            selectedSize ?: "None",
+                                            selectedSizeId ?: 0
                                         )
 
                                         coroutineScope.launch {
