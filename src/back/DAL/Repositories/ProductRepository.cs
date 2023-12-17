@@ -181,7 +181,7 @@ namespace back.DAL.Repositories
 
             List<QuestionWithAnswer> qna;
 
-            if (product.ShopId == userId)
+            if (_context.Shop.FirstOrDefault(x => x.Id == product.ShopId).OwnerId == userId)
             {
                 List<ProductQuestion> questions = await _context.ProductQuestions.Where(x => x.ProductId == productId).ToListAsync();
                 List<ProductAnswer> answers = await _context.ProductAnswers.Where(x => questions.Select(x => x.Id).Contains(x.QuestionId)).ToListAsync();
@@ -229,7 +229,7 @@ namespace back.DAL.Repositories
                 Liked = _context.LikedProducts.Any(x => x.ProductId == productId && x.UserId == userId),
                 Bought = _context.Orders.Join(_context.OrderItems, o => o.Id, oi => oi.OrderId, (o, oi) => new { o, oi }).Any(x => x.oi.ProductId == productId && x.o.UserId == userId),
                 Rated = _context.ProductReviews.Any(x => x.ProductId == productId && x.ReviewerId == userId),
-                IsOwner = product.ShopId == userId,
+                IsOwner = _context.Shop.FirstOrDefault(x => x.Id == product.ShopId).OwnerId == userId,
                 Rating = average,
                 WorkingHours = workingHours,
                 QuestionsAndAnswers = qna,
