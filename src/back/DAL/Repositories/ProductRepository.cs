@@ -178,20 +178,36 @@ namespace back.DAL.Repositories
                                                     Image = _context.Users.FirstOrDefault(x => x.Id == pr.ReviewerId).Image,
                                                     Product = null 
                                                 }).ToListAsync();
-            List<ProductQuestion> questions = await _context.ProductQuestions.Where(x => x.ProductId == productId).ToListAsync();
-            List<ProductAnswer> answers = await _context.ProductAnswers.Where(x => questions.Select(x => x.Id).Contains(x.QuestionId)).ToListAsync();
-            List<QuestionWithAnswer> qna = questions.GroupJoin(answers, q => q.Id, a => a.QuestionId, (q, a) => (q, a))
-                                                        .SelectMany(
-                                                            q => q.a.DefaultIfEmpty(),
-                                                            (q, a) => (q.q, a)
-                                                        ).Select(x => new QuestionWithAnswer
-                                                        {
-                                                            QuestionId = x.q.Id,
-                                                            AnswerId = x.a != null ? x.a.Id : -1,
-                                                            QuestionText = x.q.QuestionText,
-                                                            AnswerText = x.a != null ? x.a.AnswerText : null
-                                                        }
-                                                            ).ToList(); 
+
+            List<QuestionWithAnswer> qna;
+
+            if (product.ShopId == userId)
+            {
+                List<ProductQuestion> questions = await _context.ProductQuestions.Where(x => x.ProductId == productId).ToListAsync();
+                List<ProductAnswer> answers = await _context.ProductAnswers.Where(x => questions.Select(x => x.Id).Contains(x.QuestionId)).ToListAsync();
+                qna = questions.GroupJoin(answers, q => q.Id, a => a.QuestionId, (q, a) => (q, a))
+                                                             .SelectMany(
+                                                                 q => q.a.DefaultIfEmpty(),
+                                                                 (q, a) => (q.q, a)
+                                                             ).Select(x => new QuestionWithAnswer
+                                                             {
+                                                                 QuestionId = x.q.Id,
+                                                                 AnswerId = x.a != null ? x.a.Id : -1,
+                                                                 QuestionText = x.q.QuestionText,
+                                                                 AnswerText = x.a != null ? x.a.AnswerText : null
+                                                             }).ToList();
+            }
+            else
+            {
+                qna = await _context.ProductQuestions.Where(x => x.ProductId == productId).Join(_context.ProductAnswers, q => q.Id, a => a.QuestionId, (q, a) => new { q, a }).Select(x => new QuestionWithAnswer
+                {
+                    QuestionId = x.q.Id,
+                    AnswerId = x.a.Id,
+                    QuestionText = x.q.QuestionText,
+                    AnswerText = x.a.AnswerText
+                }).ToListAsync();
+            }
+           
             List<Stock> sizes = await _context.ProductSizes.Where(x => x.ProductId == productId).Join(_context.Sizes, ps => ps.SizeId, s => s.Id, (ps, s) => new Stock{ Size = s.Name, Quantity = ps.Stock }).ToListAsync();
             List<ImageData> images = await _context.ProductImages.Where(x => x.ProductId == productId).Select(x => new ImageData{Id = x.Id, Image = x.Image}).ToListAsync();
             float average = 0;
