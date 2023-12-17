@@ -84,14 +84,16 @@ import com.example.front.screens.myshop.getMultipartBodyPart
 import com.example.front.viewmodels.myprofile.MyProfileViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import okhttp3.MultipartBody
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserProfileScreen(navController: NavHostController, myProfileViewModel: MyProfileViewModel) {
 
+    var userId by remember { mutableStateOf(0) }
     LaunchedEffect(Unit) {
-        myProfileViewModel.getUserId()?.let { myProfileViewModel.getMyProfileInfo(it) }
+        myProfileViewModel.getUserId()?.let { myProfileViewModel.getMyProfileInfo(it); userId = it }
     }
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     Sidebar(
@@ -114,7 +116,7 @@ fun UserProfileScreen(navController: NavHostController, myProfileViewModel: MyPr
             Column(
                 modifier = Modifier.background(MaterialTheme.colorScheme.background)
             ) {
-                TopCenterImages(myProfileViewModel, drawerState)
+                TopCenterImages(myProfileViewModel, drawerState, userId)
                 Info(myProfileViewModel)
             }
         }
@@ -435,7 +437,7 @@ fun Info(myProfileViewModel: MyProfileViewModel) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopCenterImages(myProfileViewModel: MyProfileViewModel, drawerState: DrawerState) {
+fun TopCenterImages(myProfileViewModel: MyProfileViewModel, drawerState: DrawerState, userId:Int) {
     val showDialog = remember { mutableStateOf(false) }
 
     //photo picker
@@ -447,8 +449,8 @@ fun TopCenterImages(myProfileViewModel: MyProfileViewModel, drawerState: DrawerS
     }
     val context = LocalContext.current
 
-    val bitmap = remember {
-        mutableStateOf<Bitmap?>(null)
+    var picture by remember {
+        mutableStateOf<MultipartBody.Part?>(null)
     }
 
     val photoPicker = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri ->
@@ -456,8 +458,8 @@ fun TopCenterImages(myProfileViewModel: MyProfileViewModel, drawerState: DrawerS
             selectedImageUri = uri
             if( selectedImageUri != null)
             {
-                val x = getMultipartBodyPart(context, selectedImageUri!!)
-                Log.d("SLIKA", x.toString())
+                picture = getMultipartBodyPart(context, selectedImageUri!!)
+                myProfileViewModel.uploadImage(0,userId, picture!!)
             }
         }
     }

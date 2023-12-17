@@ -10,12 +10,14 @@ import androidx.lifecycle.viewModelScope
 import com.example.front.helper.DataStore.DataStoreManager
 import com.example.front.model.user.UserEditDTO
 import com.example.front.repository.Repository
+import com.example.front.screens.myshop.state.ImageState
 import com.example.front.screens.userprofile.states.EditState
 import com.example.front.screens.userprofile.states.MyProfileState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import okhttp3.MultipartBody
 import javax.inject.Inject
 
 @HiltViewModel
@@ -29,6 +31,9 @@ class MyProfileViewModel @Inject constructor(
 
     private val _stateEdit = MutableLiveData(EditState())
     var stateEdit : LiveData<EditState> = _stateEdit;
+
+    private val _stateimage = mutableStateOf(ImageState())
+    var stateimage: State<ImageState> = _stateimage;
 
     private val _usernameFlow = MutableStateFlow("")
     val usernameFlow: Flow<String> = _usernameFlow
@@ -74,6 +79,33 @@ class MyProfileViewModel @Inject constructor(
             } catch (e: Exception) {
                 _stateEdit.value!!.error = e.message.toString()
                 Log.d("Error", _stateEdit.value!!.error)
+            }
+        }
+    }
+
+    fun uploadImage(type: Int, id: Int, imagePart : MultipartBody.Part) {
+        viewModelScope.launch {
+            try {
+                val response = repository.uploadImage2(type, id, imagePart)
+                Log.d("RES FOR ADD PIC", response.toString())
+
+                if (response.isSuccessful) {
+                    _stateimage.value = _stateimage.value.copy(
+                        isLoading = false,
+                        image = response.body(),
+                        error = "CantAdd"
+                    )
+                } else {
+                    _stateimage.value = _stateimage.value.copy(
+                        isLoading = false,
+                        image = null,
+                        error = ""
+                    )
+                }
+            } catch (e: Exception) {
+                _stateimage.value = _stateimage.value.copy(
+                    error = e.message.toString()
+                )
             }
         }
     }
