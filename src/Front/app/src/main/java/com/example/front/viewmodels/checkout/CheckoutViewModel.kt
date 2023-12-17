@@ -28,21 +28,6 @@ class CheckoutViewModel @Inject constructor(
     private val _stateProducts = mutableStateOf(CartState())
     val stateProducts: State<CartState> = _stateProducts
 
-    suspend fun getCartProducts() {
-        try {
-            mongoRepository.getCartProducts().collect() {cartProducts ->
-                _stateProducts.value = _stateProducts.value.copy(
-                    isLoading = false,
-                    products = cartProducts
-                )
-            }
-        } catch (e: Exception) {
-            _stateProducts.value = _stateProducts.value.copy(
-                isLoading = false,
-            )
-        }
-    }
-
     suspend fun getCheckoutData(totalsByShop: Map<Int, Double>) {
         try {
             mongoRepository.getUniqueShops().collect() { shops ->
@@ -62,11 +47,27 @@ class CheckoutViewModel @Inject constructor(
                 _shopsForCheckout.value.forEach { shop ->
                     shop.total = totalsByShop[shop.id] ?: 0.0
                 }
+                getCartProducts()
             } else {
                 Log.e("CheckoutViewModel", "Error fetching shop details checkout: ${response.message()}")
             }
         } catch (e: Exception) {
             Log.e("CheckoutViewModel", "Error fetching shop details checkout: ${e.message}")
+        }
+    }
+
+    private suspend fun getCartProducts() {
+        try {
+            mongoRepository.getCartProducts().collect() {cartProducts ->
+                _stateProducts.value = _stateProducts.value.copy(
+                    isLoading = false,
+                    products = cartProducts
+                )
+            }
+        } catch (e: Exception) {
+            _stateProducts.value = _stateProducts.value.copy(
+                isLoading = false,
+            )
         }
     }
 
