@@ -125,7 +125,7 @@ fun MyShopScreen(navController : NavHostController, myShopViewModel: MyShopViewM
                         Spacer(modifier = Modifier.height(30.dp))
                         BigBlueButton(
                             text = "Set up shop",
-                            onClick = { navController.navigate("setup_shop") },
+                            onClick = { navController.navigate("${Screen.SetUpShop.route}/$userId") },
                             width = 1f,
                             modifier = Modifier
                         )

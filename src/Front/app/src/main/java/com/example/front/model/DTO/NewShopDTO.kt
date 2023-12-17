@@ -8,6 +8,6 @@ data class NewShopDTO (
     @SerializedName("address") val address: String,
     @SerializedName("categories") val categories: List<Int>,
     @SerializedName("workingHours") val workingHours: List<WorkingHoursNewShopDTO>,
-    @SerializedName("pib") val pib: Long,
+    @SerializedName("pib") val pib: Int,
     @SerializedName("accountNumber") val accountNumber: String
 )

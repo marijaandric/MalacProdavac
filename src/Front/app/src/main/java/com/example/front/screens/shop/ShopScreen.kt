@@ -1,6 +1,7 @@
 package com.example.front.screens.shop
 
 import ToastHost
+import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
 import android.util.Log
@@ -810,6 +811,7 @@ fun contentOfAddNewProduct(shopViewModel: OneShopViewModel, onNextClicked: () ->
 }
 
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun Info(
     isImageClicked: Boolean,

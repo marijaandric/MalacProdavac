@@ -161,10 +161,13 @@ fun SetupNavGraph(
             MyShopScreen(navController = navController, myShopViewModel = myShopViewModel)
         }
         composable(
-            route = Screen.SetUpShop.route
+            route = "${Screen.SetUpShop.route}/{id}",
+            arguments = listOf(navArgument("id") { type = NavType.IntType })
         )
-        {
-            SetUpShopScreen(navController = navController, myShopViewModel)
+        {navBackStackEntry ->
+            val arguments = requireNotNull(navBackStackEntry.arguments)
+            val id = arguments.getInt("id")
+            SetUpShopScreen(navController = navController, myShopViewModel,id)
         }
         composable(route = Screen.Orders.route)
         {

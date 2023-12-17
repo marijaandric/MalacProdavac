@@ -1,5 +1,6 @@
 package com.example.front.screens.myshop
 
+import android.annotation.SuppressLint
 import android.content.ContentResolver
 import android.content.Context
 import android.database.Cursor
@@ -34,6 +35,8 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.Card
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.DropdownMenu
@@ -45,6 +48,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TimeInput
+import androidx.compose.material3.TimePickerState
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
@@ -52,6 +56,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -79,26 +84,31 @@ import com.example.front.components.MyTextFieldWithoutIcon
 import com.example.front.components.OpenNow
 import com.example.front.components.Sidebar
 import com.example.front.components.SmallElipseAndTitle
+import com.example.front.model.DTO.NewShopDTO
 import com.example.front.model.DTO.WorkingHoursNewShopDTO
+import com.example.front.navigation.Screen
 import com.example.front.screens.sellers.FilterCard
 import com.example.front.screens.sellers.ReviewStars
 import com.example.front.viewmodels.myshop.MyShopViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import rememberToastHostState
 import java.io.BufferedInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+import java.time.LocalTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SetUpShopScreen(navController : NavHostController, viewModel: MyShopViewModel) {
+fun SetUpShopScreen(navController : NavHostController, viewModel: MyShopViewModel, userId:Int) {
 
     val context = LocalContext.current
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -117,21 +127,22 @@ fun SetUpShopScreen(navController : NavHostController, viewModel: MyShopViewMode
                 SmallElipseAndTitle(title = "Shop Setup", drawerState)
             }
             item {
-                ProfilePhoto(context)
+                ProfilePhoto(context, userId,viewModel, navController)
             }
         }
     }
 }
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfilePhoto(context:Context) {
+fun ProfilePhoto(context:Context, userId:Int, viewModel: MyShopViewModel, navController: NavHostController) {
     var uri by remember {
         mutableStateOf<Uri?>(null)
     }
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
-    var im by remember {
-        mutableStateOf(false)
+    var day_index by remember {
+        mutableStateOf(0)
     }
     var name by remember {
         mutableStateOf("")
@@ -147,27 +158,67 @@ fun ProfilePhoto(context:Context) {
     }
     var selectedDay by remember { mutableStateOf<String?>("Mon") }
 
-    val state = rememberTimePickerState()
+
+    var stateMon = rememberTimePickerState()
+    var stateEndMon = rememberTimePickerState()
+
+    var stateTue = rememberTimePickerState()
+    var stateEndTue = rememberTimePickerState()
+
+    var stateWen = rememberTimePickerState()
+    var stateEndWen = rememberTimePickerState()
+
+    var stateFri = rememberTimePickerState()
+    var stateEndFri = rememberTimePickerState()
+
+    var stateThu = rememberTimePickerState()
+    var stateEndThu = rememberTimePickerState()
+
+    var stateSat = rememberTimePickerState()
+    var stateEndSat = rememberTimePickerState()
+
+    var stateSun = rememberTimePickerState()
+    var stateEndSun = rememberTimePickerState()
+
+    var workingHoursMap by remember {
+        mutableStateOf(
+            mutableMapOf<Int, WorkingHoursNewShopDTO?>().apply {
+                for (day in 1..7) {
+                    put(day, null)
+                }
+            }
+        )
+    }
+
+    var picture by remember {
+        mutableStateOf<MultipartBody.Part?>(null)
+    }
+
 
     val photoPicker = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri ->
         uri?.let {
             selectedImageUri = uri
             if( selectedImageUri != null)
             {
-                val x = getMultipartBodyPart(context, selectedImageUri!!)
-                Log.d("SLIKA", x.toString())
+                picture = getMultipartBodyPart(context, selectedImageUri!!)
             }
         }
     }
 
+    var clickedCards by remember {
+        mutableStateOf(emptyList<Int>())
+    }
+
+    val toastHostState = rememberToastHostState()
     val cardData = listOf(
         "Food", "Drink", "Footwear", "Clothes", "Jewerly", "Tools", "Furniture", "Pottery", "Beauty", "Health", "Decor", "Other"
     )
 
-    val workingHoursMap = remember { mutableStateMapOf<String, WorkingHoursNewShopDTO>() }
+    val timeValues = remember { mutableMapOf<String, LocalTime>() }
 
     var brojevi = (1..12).map { it }
     var kombinovanaLista = cardData.zip(brojevi)
+    val coroutineScope = rememberCoroutineScope()
 
     Column(
         modifier = Modifier
@@ -242,6 +293,11 @@ fun ProfilePhoto(context:Context) {
         ) {
             items(kombinovanaLista,key={(_, number) -> number }) { (cardText,number) ->
                 FilterCard(cardText = cardText, onClick = {
+                        if (clickedCards.contains(number)) {
+                            clickedCards = clickedCards - number
+                        } else {
+                            clickedCards = clickedCards + number
+                        }
                 }, false)
             }
         }
@@ -254,42 +310,137 @@ fun ProfilePhoto(context:Context) {
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             val daysOfWeek = listOf("Mon","Tue","Wed","Thu","Fri","Sat","Sun")
+            var x = 0
             for (day in daysOfWeek) {
-                DayOfWeekItem(day = day,isSelected = day == selectedDay, onClick={selectedDay = day})
+                x++
+                DayOfWeekItem(day = day,isSelected = day == selectedDay, onClick={selectedDay = day
+                    day_index = x
+                })
+            }
+        }
+        fun updateWorkingHours(day: Int, newWorkingHours: WorkingHoursNewShopDTO?) {
+            workingHoursMap = workingHoursMap.toMutableMap().apply {
+                put(day, newWorkingHours)
+            }
+        }
+        fun resetWorkingHours(day: Int) {
+            workingHoursMap = workingHoursMap.toMutableMap().apply {
+                put(day, null)
+            }
+        }
+        when (selectedDay) {
+            "Mon" -> {
+                ChangeTime(stateMon, stateEndMon, onClick = {
+                    updateWorkingHours(1, WorkingHoursNewShopDTO(day = 1, openingHours = stateMon.hour.toString()+":"+stateMon.minute.toString(), closingHours = stateEndMon.hour.toString()+":"+stateEndMon.minute.toString()))
+                }, onReset = {resetWorkingHours(1)})
+            }
+            "Tue" -> {
+                ChangeTime(stateTue, stateEndTue, onClick = {
+                    updateWorkingHours(2, WorkingHoursNewShopDTO(day = 2, openingHours = stateTue.hour.toString()+":"+stateTue.minute.toString(), closingHours = stateEndTue.hour.toString()+":"+stateEndTue.minute.toString()))
+                }, onReset = {resetWorkingHours(2)})
+            }
+            "Wen" -> {
+                ChangeTime(stateWen, stateEndWen, onClick = {
+                    updateWorkingHours(3, WorkingHoursNewShopDTO(day = 3, openingHours = stateWen.hour.toString()+":"+stateWen.minute.toString(), closingHours = stateEndWen.hour.toString()+":"+stateEndWen.minute.toString()))
+                }, onReset = {resetWorkingHours(3)})
+            }
+            "Thu" -> {
+                ChangeTime(stateThu, stateEndThu, onClick = {
+                    updateWorkingHours(4, WorkingHoursNewShopDTO(day = 4, openingHours = stateThu.hour.toString()+":"+stateThu.minute.toString(), closingHours = stateEndThu.hour.toString()+":"+stateEndThu.minute.toString()))
+                }, onReset = {resetWorkingHours(4)})
+            }
+            "Fri" -> {
+                ChangeTime(stateFri, stateEndFri, onClick = {
+                    updateWorkingHours(5, WorkingHoursNewShopDTO(day = 5, openingHours = stateFri.hour.toString()+":"+stateFri.minute.toString(), closingHours = stateEndFri.hour.toString()+":"+stateEndFri.minute.toString()))
+                }, onReset = {resetWorkingHours(5)})
+            }
+            "Sat" -> {
+                ChangeTime(stateSat, stateEndSat, onClick = {
+                    updateWorkingHours(6, WorkingHoursNewShopDTO(day = 6, openingHours = stateSat.hour.toString()+":"+stateSat.minute.toString(), closingHours = stateEndSat.hour.toString()+":"+stateEndSat.minute.toString()))
+                }, onReset = {resetWorkingHours(6)})
+            }
+            else -> {
+                ChangeTime(stateSun, stateEndSun, onClick = {
+                    updateWorkingHours(7, WorkingHoursNewShopDTO(day = 7, openingHours = stateSun.hour.toString()+":"+stateSun.minute.toString(), closingHours = stateEndSun.hour.toString()+":"+stateEndSun.minute.toString()))
+                }, onReset = {resetWorkingHours(7)})
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(20.dp))
-                .padding(10.dp)
-        )
-        {
-            Column(
-                modifier = Modifier
-                    .background(color = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.5f))
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
 
-            ) {
-                Text(text="Pick up time", style=MaterialTheme.typography.bodyLarge)
-                Text(text = "Opening time", modifier = Modifier.padding(top = 16.dp,start = 10.dp, bottom = 10.dp), style=MaterialTheme.typography.displaySmall)
-                TimeInput(state = state)
-                Text(text = "Closing time", modifier = Modifier.padding(top = 16.dp,start = 10.dp, bottom = 10.dp), style=MaterialTheme.typography.displaySmall)
-                TimeInput(state = state)
-                Row()
-                {
-                    CardButton(text = "Apply", onClick = {  }, width = 0.5f, modifier = Modifier, color = MaterialTheme.colorScheme.secondary)
-                    Spacer(modifier = Modifier.width(5.dp))
-                    CardButton(text = "Reset", onClick = {  }, width = 0.95f, modifier = Modifier, color = MaterialTheme.colorScheme.secondary)
+
+        BigBlueButton(text = "Proceed", onClick = {
+            val workingHoursList: List<WorkingHoursNewShopDTO> = workingHoursMap.values.filterNotNull()
+            val pibInt = pib.toIntOrNull()
+            if(pibInt != null)
+            {
+                val newShop = NewShopDTO(ownerId = userId, name= name, address = address, accountNumber = accountNumber, categories = clickedCards, pib = pib.toInt(), workingHours = workingHoursList)
+                picture?.let { viewModel.newShop(newShop, it) }
+                Log.d("NEW SHOP", newShop.toString())
+            }
+            else{
+                coroutineScope.launch {
+                    toastHostState.showToast(
+                        "Invalid pib",
+                        Icons.Default.Clear
+                    )
                 }
             }
-        }
-        BigBlueButton(text = "Proceed", onClick = {  }, width = 0.9f, modifier = Modifier)
 
+        }, width = 0.9f, modifier = Modifier)
+
+        if(!viewModel.stateNewShop.value.isLoading && viewModel.stateNewShop.value.error.isEmpty())
+        {
+            val shopId = viewModel.stateNewShop.value.newShop!!.success
+            val info = 1
+            navController.navigate("${Screen.Shop.route}/$shopId/$info")
+        }
+        else if(!viewModel.stateNewShop.value.isLoading && viewModel.stateNewShop.value.error.isNotEmpty())
+        {
+            coroutineScope.launch {
+                toastHostState.showToast(
+                    "Please check all fields",
+                    Icons.Default.Clear
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ChangeTime(state: TimePickerState, stateEnd : TimePickerState,onClick: () -> Unit, onReset: () -> Unit) {
+    Spacer(modifier = Modifier.height(16.dp))
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(20.dp))
+            .padding(10.dp)
+    )
+    {
+        Column(
+            modifier = Modifier
+                .background(color = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.5f))
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+
+            ) {
+            Text(text="Pick up time", style=MaterialTheme.typography.bodyLarge)
+            Text(text = "Opening time", modifier = Modifier.padding(top = 16.dp,start = 10.dp, bottom = 10.dp), style=MaterialTheme.typography.displaySmall)
+            TimeInput(state = state)
+            Text(text = "Closing time", modifier = Modifier.padding(top = 16.dp,start = 10.dp, bottom = 10.dp), style=MaterialTheme.typography.displaySmall)
+            TimeInput(state = stateEnd)
+            Row()
+            {
+                CardButton(
+                    text = "Apply",
+                    onClick = {
+                        onClick()
+                    }, width = 0.5f, modifier = Modifier, color = MaterialTheme.colorScheme.secondary)
+                Spacer(modifier = Modifier.width(5.dp))
+                CardButton(text = "Remove", onClick = { onReset() }, width = 0.95f, modifier = Modifier, color = MaterialTheme.colorScheme.secondary)
+            }
+        }
     }
 }
 
