@@ -87,7 +87,8 @@ class ProductViewModel @Inject constructor(
         shopName: String,
         image: String,
         metric: String,
-        size: String
+        size: String,
+        sizeId : Int
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -101,6 +102,7 @@ class ProductViewModel @Inject constructor(
                 productInCart.image = image
                 productInCart.metric = metric
                 productInCart.size = size
+                productInCart.sizeId = sizeId
                 productInCart.available = quantity
 
                 mongoRepository.updateProduct(productInCart)
