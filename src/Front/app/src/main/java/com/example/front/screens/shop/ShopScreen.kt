@@ -53,6 +53,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TimeInput
+import androidx.compose.material3.TimePickerState
 import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberTimePickerState
@@ -66,6 +67,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
@@ -89,6 +91,7 @@ import com.example.front.components.CommentsTextBox
 import com.example.front.components.FilterDialogProducts
 import com.example.front.components.MyDropdownCategories
 import com.example.front.components.MyDropdownMetrics
+import com.example.front.components.MyNumberField
 import com.example.front.components.MyTextField
 import com.example.front.components.MyTextFieldWithoutIcon
 import com.example.front.components.ReviewCard
@@ -103,12 +106,16 @@ import com.example.front.model.DTO.MetricsDTO
 import com.example.front.model.DTO.NewProductDTO
 import com.example.front.model.DTO.NewProductDisplayDTO
 import com.example.front.model.DTO.WorkingHoursDTO
+import com.example.front.model.DTO.WorkingHoursNewShopDTO
 import com.example.front.navigation.Screen
+import com.example.front.screens.myshop.ChangeTime
+import com.example.front.screens.myshop.DayOfWeekItem
 import com.example.front.viewmodels.oneshop.OneShopViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import rememberToastHostState
 import java.text.SimpleDateFormat
+import java.time.LocalTime
 import java.util.Date
 import java.util.Locale
 
@@ -1291,7 +1298,7 @@ fun ProfilePic(shopViewModel: OneShopViewModel, id: Int, shopId: Int) {
     }
 
     if (showDialog) {
-        EditSellersDialog(onDismiss = { showDialog = false })
+        EditSellersDialog(onDismiss = { showDialog = false },shopViewModel)
     }
 
     if (showDisplayProduct) {
@@ -1783,10 +1790,9 @@ fun DisplayProductDialog(
     }
 }
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditSellersDialog(onDismiss: () -> Unit) {
+fun EditSellersDialog(onDismiss: () -> Unit, shopViewModel: OneShopViewModel) {
     val overlayColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)
     val state = rememberTimePickerState()
 
@@ -1797,13 +1803,162 @@ fun EditSellersDialog(onDismiss: () -> Unit) {
         mutableStateOf("")
     }
     var pib by remember {
-        mutableStateOf(0)
+        mutableStateOf("")
+    }
+    var accountNumber by remember {
+        mutableStateOf("")
     }
     var categories = mutableListOf<Int>()
     var workingHour by remember {
         mutableStateOf(WorkingHoursDTO(0, 0, "00", "00", "Shop"))
     }
+    var selectedDay by remember { mutableStateOf<String?>("Mon") }
+    var workingHoursMap by remember {
+        mutableStateOf(
+            mutableMapOf<Int, WorkingHoursNewShopDTO?>().apply {
+                for (day in 1..7) {
+                    put(day, null)
+                }
+            }
+        )
+    }
 
+    fun updateWorkingHours(day: Int, newWorkingHours: WorkingHoursNewShopDTO?) {
+        workingHoursMap = workingHoursMap.toMutableMap().apply {
+            put(day, newWorkingHours)
+        }
+    }
+    fun resetWorkingHours(day: Int) {
+        workingHoursMap = workingHoursMap.toMutableMap().apply {
+            put(day, null)
+        }
+    }
+
+    if(shopViewModel.state.value.shop!!.workingHours != null)
+    {
+        for(wh in shopViewModel.state.value.shop!!.workingHours!!)
+        {
+            val new = WorkingHoursNewShopDTO(day=wh.day, openingHours = wh.openingHours, closingHours = wh.closingHours)
+            updateWorkingHours(wh.day, newWorkingHours = new)
+        }
+    }
+
+
+
+    var stateMon = rememberTimePickerState()
+    var stateEndMon = rememberTimePickerState()
+    if(workingHoursMap[1] != null)
+    {
+        var wh = workingHoursMap[1]!!.openingHours
+        var parts = wh.split(":")
+        var hourPart = parts[0]
+        var minutePart = parts[1]
+        stateMon = rememberTimePickerState(initialHour = hourPart.toInt(), initialMinute = minutePart.toInt())
+        wh = workingHoursMap[1]!!.closingHours
+        parts = wh.split(":")
+        hourPart = parts[0]
+        minutePart = parts[1]
+        stateEndMon = rememberTimePickerState(initialHour = hourPart.toInt(), initialMinute = minutePart.toInt())
+    }
+
+    var stateTue = rememberTimePickerState()
+    var stateEndTue = rememberTimePickerState()
+    if(workingHoursMap[2] != null)
+    {
+        var wh = workingHoursMap[2]!!.openingHours
+        var parts = wh.split(":")
+        var hourPart = parts[0]
+        var minutePart = parts[1]
+        stateTue = rememberTimePickerState(initialHour = hourPart.toInt(), initialMinute = minutePart.toInt())
+        wh = workingHoursMap[2]!!.closingHours
+        parts = wh.split(":")
+        hourPart = parts[0]
+        minutePart = parts[1]
+        stateEndTue = rememberTimePickerState(initialHour = hourPart.toInt(), initialMinute = minutePart.toInt())
+    }
+
+    var stateWen = rememberTimePickerState()
+    var stateEndWen = rememberTimePickerState()
+    if(workingHoursMap[3] != null)
+    {
+        var wh = workingHoursMap[3]!!.openingHours
+        var parts = wh.split(":")
+        var hourPart = parts[0]
+        var minutePart = parts[1]
+        stateWen = rememberTimePickerState(initialHour = hourPart.toInt(), initialMinute = minutePart.toInt())
+        wh = workingHoursMap[3]!!.closingHours
+        parts = wh.split(":")
+        hourPart = parts[0]
+        minutePart = parts[1]
+        stateEndWen = rememberTimePickerState(initialHour = hourPart.toInt(), initialMinute = minutePart.toInt())
+    }
+
+
+    var stateFri = rememberTimePickerState()
+    var stateEndFri = rememberTimePickerState()
+    if(workingHoursMap[5] != null)
+    {
+        var wh = workingHoursMap[5]!!.openingHours
+        var parts = wh.split(":")
+        var hourPart = parts[0]
+        var minutePart = parts[1]
+        stateFri = rememberTimePickerState(initialHour = hourPart.toInt(), initialMinute = minutePart.toInt())
+        wh = workingHoursMap[5]!!.closingHours
+        parts = wh.split(":")
+        hourPart = parts[0]
+        minutePart = parts[1]
+        stateEndFri = rememberTimePickerState(initialHour = hourPart.toInt(), initialMinute = minutePart.toInt())
+    }
+
+
+    var stateThu = rememberTimePickerState()
+    var stateEndThu = rememberTimePickerState()
+    if(workingHoursMap[4] != null)
+    {
+        var wh = workingHoursMap[4]!!.openingHours
+        var parts = wh.split(":")
+        var hourPart = parts[0]
+        var minutePart = parts[1]
+        stateThu = rememberTimePickerState(initialHour = hourPart.toInt(), initialMinute = minutePart.toInt())
+        wh = workingHoursMap[4]!!.closingHours
+        parts = wh.split(":")
+        hourPart = parts[0]
+        minutePart = parts[1]
+        stateEndThu = rememberTimePickerState(initialHour = hourPart.toInt(), initialMinute = minutePart.toInt())
+    }
+
+    var stateSat = rememberTimePickerState()
+    var stateEndSat = rememberTimePickerState()
+    if(workingHoursMap[6] != null)
+    {
+        var wh = workingHoursMap[6]!!.openingHours
+        var parts = wh.split(":")
+        var hourPart = parts[0]
+        var minutePart = parts[1]
+        stateSat = rememberTimePickerState(initialHour = hourPart.toInt(), initialMinute = minutePart.toInt())
+        wh = workingHoursMap[6]!!.closingHours
+        parts = wh.split(":")
+        hourPart = parts[0]
+        minutePart = parts[1]
+        stateEndSat = rememberTimePickerState(initialHour = hourPart.toInt(), initialMinute = minutePart.toInt())
+    }
+
+
+    var stateSun = rememberTimePickerState()
+    var stateEndSun = rememberTimePickerState()
+    if(workingHoursMap[7] != null)
+    {
+        var wh = workingHoursMap[7]!!.openingHours
+        var parts = wh.split(":")
+        var hourPart = parts[0]
+        var minutePart = parts[1]
+        stateSun = rememberTimePickerState(initialHour = hourPart.toInt(), initialMinute = minutePart.toInt())
+        wh = workingHoursMap[7]!!.closingHours
+        parts = wh.split(":")
+        hourPart = parts[0]
+        minutePart = parts[1]
+        stateEndSun = rememberTimePickerState(initialHour = hourPart.toInt(), initialMinute = minutePart.toInt())
+    }
 
     Dialog(
         properties = DialogProperties(usePlatformDefaultWidth = false),
@@ -1861,10 +2016,14 @@ fun EditSellersDialog(onDismiss: () -> Unit) {
                             MyTextField(
                                 labelValue = "Address",
                                 painterResource = painterResource(id = R.drawable.user),
-                                value = name,
-                                onValueChange = { name = it }
+                                value = address,
+                                onValueChange = { address = it }
                             )
 
+                            Spacer(modifier = Modifier.height(16.dp))
+                            MyTextFieldWithoutIcon(labelValue = "Account Number", value = accountNumber, onValueChange={ accountNumber=it }, modifier = Modifier.fillMaxWidth())
+                            Spacer(modifier = Modifier.height(16.dp))
+                            MyNumberField(labelValue = "Pib", value = pib, onValueChange={ pib=it }, modifier = Modifier.fillMaxWidth())
                             Spacer(modifier = Modifier.height(16.dp))
 
                             Text(
@@ -1880,64 +2039,52 @@ fun EditSellersDialog(onDismiss: () -> Unit) {
                             ) {
                                 val daysOfWeek =
                                     listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+                                var x = 0
                                 for (day in daysOfWeek) {
-                                    DayOfWeek(day = day, onClick = {})
+                                    x++
+                                    DayOfWeek(day = day,isSelected = day == selectedDay, onClick={selectedDay = day
+                                    })
                                 }
                             }
                             Spacer(modifier = Modifier.height(16.dp))
-                            Card(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clip(RoundedCornerShape(20.dp))
-                                    .padding(10.dp)
-                            )
-                            {
-                                Column(
-                                    modifier = Modifier
-                                        .background(
-                                            color = MaterialTheme.colorScheme.tertiary.copy(
-                                                alpha = 0.5f
-                                            )
-                                        )
-                                        .fillMaxWidth()
-                                        .padding(16.dp),
-                                    horizontalAlignment = Alignment.CenterHorizontally,
 
-                                    ) {
-                                    androidx.compose.material3.Text(
-                                        text = "Pick up time",
-                                        style = MaterialTheme.typography.bodyLarge
-                                    )
-                                    androidx.compose.material3.Text(
-                                        text = "Opening time",
-                                        modifier = Modifier.padding(
-                                            top = 16.dp,
-                                            start = 10.dp,
-                                            bottom = 10.dp
-                                        ),
-                                        style = MaterialTheme.typography.displaySmall
-                                    )
-                                    TimeInput(state = state)
-                                    androidx.compose.material3.Text(
-                                        text = "Closing time",
-                                        modifier = Modifier.padding(
-                                            top = 16.dp,
-                                            start = 10.dp,
-                                            bottom = 10.dp
-                                        ),
-                                        style = MaterialTheme.typography.displaySmall
-                                    )
-                                    TimeInput(state = state)
-                                    CardButton(
-                                        text = "Apply",
-                                        onClick = { },
-                                        width = 0.7f,
-                                        modifier = Modifier,
-                                        color = MaterialTheme.colorScheme.secondary
-                                    )
+                            when (selectedDay) {
+                                "Mon" -> {
+                                    EditTime(stateMon, stateEndMon, onClick = {
+                                        updateWorkingHours(1, WorkingHoursNewShopDTO(day = 1, openingHours = stateMon.hour.toString()+":"+stateMon.minute.toString(), closingHours = stateEndMon.hour.toString()+":"+stateEndMon.minute.toString()))
+                                    }, onReset = {resetWorkingHours(1)})
+                                }
+                                "Tue" -> {
+                                    EditTime(stateTue, stateEndTue, onClick = {
+                                        updateWorkingHours(2, WorkingHoursNewShopDTO(day = 2, openingHours = stateTue.hour.toString()+":"+stateTue.minute.toString(), closingHours = stateEndTue.hour.toString()+":"+stateEndTue.minute.toString()))
+                                    }, onReset = {resetWorkingHours(2)})
+                                }
+                                "Wen" -> {
+                                    ChangeTime(stateWen, stateEndWen, onClick = {
+                                        updateWorkingHours(3, WorkingHoursNewShopDTO(day = 3, openingHours = stateWen.hour.toString()+":"+stateWen.minute.toString(), closingHours = stateEndWen.hour.toString()+":"+stateEndWen.minute.toString()))
+                                    }, onReset = {resetWorkingHours(3)})
+                                }
+                                "Thu" -> {
+                                    EditTime(stateThu, stateEndThu, onClick = {
+                                        updateWorkingHours(4, WorkingHoursNewShopDTO(day = 4, openingHours = stateThu.hour.toString()+":"+stateThu.minute.toString(), closingHours = stateEndThu.hour.toString()+":"+stateEndThu.minute.toString()))
+                                    }, onReset = {resetWorkingHours(4)})
+                                }
+                                "Fri" -> {
+                                    ChangeTime(stateFri, stateEndFri, onClick = {
+                                        updateWorkingHours(5, WorkingHoursNewShopDTO(day = 5, openingHours = stateFri.hour.toString()+":"+stateFri.minute.toString(), closingHours = stateEndFri.hour.toString()+":"+stateEndFri.minute.toString()))
+                                    }, onReset = {resetWorkingHours(5)})
+                                }
+                                "Sat" -> {
+                                    EditTime(stateSat, stateEndSat, onClick = {
+                                        updateWorkingHours(6, WorkingHoursNewShopDTO(day = 6, openingHours = stateSat.hour.toString()+":"+stateSat.minute.toString(), closingHours = stateEndSat.hour.toString()+":"+stateEndSat.minute.toString()))
+                                    }, onReset = {resetWorkingHours(6)})
+                                }
+                                else -> {
+                                    EditTime(stateSun, stateEndSun, onClick = {
+                                        updateWorkingHours(7, WorkingHoursNewShopDTO(day = 7, openingHours = stateSun.hour.toString()+":"+stateSun.minute.toString(), closingHours = stateEndSun.hour.toString()+":"+stateEndSun.minute.toString()))
+                                    }, onReset = {resetWorkingHours(7)})
                                 }
                             }
-
 
                             CardButton(
                                 text = "Edit",
@@ -1956,14 +2103,83 @@ fun EditSellersDialog(onDismiss: () -> Unit) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun EditTime(state: TimePickerState, stateEnd : TimePickerState, onClick: () -> Unit, onReset: () -> Unit) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(20.dp))
+            .padding(0.dp)
+    )
+    {
+        Column(
+            modifier = Modifier
+                .background(
+                    color = MaterialTheme.colorScheme.tertiary.copy(
+                        alpha = 0.5f
+                    )
+                )
+                .fillMaxWidth()
+                .padding(top = 16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+
+            ) {
+            androidx.compose.material3.Text(
+                text = "Pick up time",
+                style = MaterialTheme.typography.bodyLarge
+            )
+            androidx.compose.material3.Text(
+                text = "Opening time",
+                modifier = Modifier.padding(
+                    top = 16.dp,
+                    start = 10.dp,
+                    bottom = 10.dp
+                ),
+                style = MaterialTheme.typography.displaySmall
+            )
+            TimeInput(state = state, modifier = Modifier
+                .scale(0.8f)
+                .fillMaxWidth())
+            androidx.compose.material3.Text(
+                text = "Closing time",
+                modifier = Modifier.padding(
+                    top = 16.dp,
+                    start = 10.dp,
+                    bottom = 10.dp
+                ),
+                style = MaterialTheme.typography.displaySmall
+            )
+            TimeInput(state = stateEnd, modifier = Modifier
+                .scale(0.8f)
+                .fillMaxWidth())
+            Row(
+                modifier=Modifier.padding(start=10.dp,end=10.dp,bottom=16.dp)
+            )
+            {
+                CardButton(
+                    text = "Apply",
+                    onClick = {
+                        //onClick()
+                    }, width = 0.5f, modifier = Modifier, color = MaterialTheme.colorScheme.secondary)
+                Spacer(modifier = Modifier.width(5.dp))
+                CardButton(text = "Remove", onClick = {  }, width = 0.95f, modifier = Modifier, color = MaterialTheme.colorScheme.secondary)
+            }
+        }
+    }
+}
 
 @Composable
-fun DayOfWeek(day: String, onClick: () -> Unit) {
+fun DayOfWeek(day: String, isSelected: Boolean, onClick: () -> Unit) {
     Box(
         modifier = Modifier
-            .background(color = MaterialTheme.colorScheme.primary, RoundedCornerShape(10.dp))
+            .background(
+                color = if (isSelected) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.primary,
+                shape = RoundedCornerShape(5.dp)
+            )
             .height(35.dp)
-            .width(35.dp),
+            .width(35.dp)
+            .clickable { onClick.invoke() },
         contentAlignment = Alignment.Center
     ) {
         Text(
