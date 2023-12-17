@@ -256,11 +256,10 @@ namespace back.DAL.Repositories
 
         public async Task<bool> EditShop(EditShopDto shop)
         {
-            if (shop.Image == null && shop.PIB == null && shop.Address == null && shop.Name == null && shop.AccountNumber == null) return true;
+            if (shop.PIB == null && shop.Address == null && shop.Name == null && shop.AccountNumber == null) return true;
 
             Shop s = await _context.Shop.FirstOrDefaultAsync(x => x.Id == shop.Id);
             if (shop.AccountNumber != null) s.AccountNumber = shop.AccountNumber;
-            if (shop.Image != null) s.Image = shop.Image;
             if (shop.PIB != null) s.PIB = (int)shop.PIB;
             if (shop.Address != null)
             {
