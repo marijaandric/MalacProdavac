@@ -37,7 +37,7 @@ namespace back.BLL.Services
         public async Task<List<int>> GetNearbySellers(int routeId, double range)
         {
             DeliveryRoute route = await _repository.GetRoute(routeId);
-            List<(double, double)> waypoints = await _helperService.GetWaypoints(route.StartLocation, route.EndLocation, await _repository.GetRequestCoordinates(routeId));
+            List<(double, double)> waypoints = await _helperService.GetWaypoints(route.StartLocation, route.EndLocation);
             var shops = await _shopRepository.GetAllShops();
             return shops.Where(x => _helperService.NearRoute(waypoints, (double)x.Latitude, (double)x.Longitude, range).Result).Select(x => x.OwnerId).ToList();
         }

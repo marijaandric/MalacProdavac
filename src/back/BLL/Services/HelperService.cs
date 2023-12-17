@@ -7,7 +7,7 @@ using iText.Kernel.Pdf;
 using iText.Layout;
 using iText.IO.Image;
 using back.Models;
-using System.Globalization;
+
 
 namespace back.BLL.Services
 {
@@ -253,35 +253,34 @@ namespace back.BLL.Services
             return await _productRepository.GetSizes();
         }
 
-        public async Task<List<(double, double)>> GetWaypoints(string startLocation, string endLocation, List<string>? waypoints)
+        public async Task<List<(double, double)>> GetWaypoints(string routeStart, string routeEnd)
         {
-            using (var httpClient = new HttpClient())
+            List<(double, double)> waypoints = new List<(double, double)>();
+
+            using (var client = new HttpClient())
             {
-                var apiUrl = $"https://dev.virtualearth.net/REST/v1/Routes/OptimizeItinerary?wp.0={startLocation}&wp.1={endLocation}&key={apiKey}&optimize=true";
+                string apiKey = "Aj_nYJhXf_C_QoPf7gOQch6KOhTJo2iX2VIyvOlwb7hDpGCtS8rOhyQYp5kAbR54";
 
-                for (var i = 2; i < waypoints.Count + 2; i++)
+                string apiUrl = $"https://dev.virtualearth.net/REST/v1/Routes/Driving?wp.0={routeStart}&wp.1={routeEnd}&key={apiKey}";
+
+                HttpResponseMessage response = await client.GetAsync(apiUrl);
+
+                if (response.IsSuccessStatusCode)
                 {
-                    apiUrl += $"&wp.{i}={waypoints[i - 2]}";
-                }
+                    string result = await response.Content.ReadAsStringAsync();
+                    JObject json = JObject.Parse(result);
 
-                var response = await httpClient.GetStringAsync(apiUrl);
-
-                var jsonResponse = JObject.Parse(response);
-
-                var coordinates = new List<(double, double)>();
-
-                if (jsonResponse["resourceSets"] is JArray resourceSets && resourceSets.Count > 0 && resourceSets[0]["resources"] is JArray resources && resources.Count > 0 && resources[0]["routeLegs"] is JArray routeLegs && routeLegs.Count > 0)
-                {
-                    foreach (var itineraryItem in routeLegs[0]["itineraryItems"])
+                    foreach (var item in json["resourceSets"][0]["resources"][0]["routeLegs"][0]["itineraryItems"])
                     {
-                        var latitude = (double)itineraryItem["maneuverPoint"]["coordinates"][0];
-                        var longitude = (double)itineraryItem["maneuverPoint"]["coordinates"][1];
-                        coordinates.Add((latitude, longitude));
+                        double xLat = (double)item["maneuverPoint"]["coordinates"][0];
+                        double xLong = (double)item["maneuverPoint"]["coordinates"][1];
+
+                        waypoints.Add((xLat, xLong));
                     }
                 }
-
-                return coordinates;
             }
+
+            return waypoints;
         }
 
         public async Task<bool> NearRoute(List<(double, double)> routeWaypoints, double shopLat, double shopLong, double range)
