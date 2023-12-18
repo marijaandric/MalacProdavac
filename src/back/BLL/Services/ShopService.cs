@@ -92,7 +92,7 @@ namespace back.BLL.Services
             };
 
             if (!await _repository.InsertShop(s)) throw new ArgumentException("Shop couldn't be saved!");
-            if (!await _repository.InsertShopCategories(shop.Categories, s.Id))
+            if (!await _repository.InsertShopCategories(shop.Categories.Select(x => new ShopCategory { CategoryId = x, ShopId = s.Id }).ToList(), s.Id))
             {
                 await _repository.DeleteShop(s.Id);
                 throw new ArgumentException("Categories could not be saved!");
@@ -108,20 +108,11 @@ namespace back.BLL.Services
 
         public async Task<bool> EditShop(EditShopDto shop)
         {
-
             if (!await _repository.EditShop(shop)) throw new ArgumentException("Could not change shop info!");
             
             if (shop.WorkingHours != null && !await _repository.EditWorkingHours(shop.WorkingHours, shop.Id)) throw new ArgumentException("Working hours could not be changed!");
 
-            if (shop.Categories != null)
-            {
-                List<int> existing = (await _repository.GetShopCategories(shop.Id)).Select(x => x.CategoryId).ToList();
-                List<int> newCategories = shop.Categories.Where(x => !existing.Contains(x)).ToList();
-                List<int> toDelete = existing.Where(x => !shop.Categories.Contains(x)).ToList();
-
-                if (toDelete.Count > 0 && !await _repository.DeleteShopCategories(toDelete, shop.Id)) throw new ArgumentException("Database error on deleting deselected categories!");
-                if (newCategories.Count > 0 && !await _repository.InsertShopCategories(newCategories, shop.Id)) throw new ArgumentException("Database error on inserting new categories!");
-            }
+            if (shop.Categories != null && !await _repository.EditShopCategories(shop.Id, shop.Categories.Select(x => new ShopCategory {  CategoryId = x, ShopId = shop.Id}).ToList())) throw new ArgumentException("Categories could not be changed!");
             
             return true;
         }

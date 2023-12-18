@@ -248,17 +248,17 @@ namespace back.DAL.Repositories
             return await _context.SaveChangesAsync() > 0;
         }
 
-        public async Task<bool> InsertShopCategories(List<int> shopCategories, int shopId)
+        public async Task<bool> InsertShopCategories(List<ShopCategory> shopCategories, int shopId)
         {
-            foreach (var sc in shopCategories) await _context.ShopCategories.AddAsync(new ShopCategory {  CategoryId = sc, ShopId = shopId});
+            _context.ShopCategories.RemoveRange(shopCategories);
             return await _context.SaveChangesAsync() > 0;
         }
 
         public async Task<bool> EditShop(EditShopDto shop)
         {
-            if (shop.PIB == null && shop.Address == null && shop.Name == null && shop.AccountNumber == null) return true;
-
             Shop s = await _context.Shop.FirstOrDefaultAsync(x => x.Id == shop.Id);
+            if ((shop.PIB == null && shop.Address == null && shop.Name == null && shop.AccountNumber == null) || (shop.PIB == s.PIB && shop.Address == s.Address && shop.Name == s.Name && shop.AccountNumber == s.AccountNumber)) return true;
+
             if (shop.AccountNumber != null) s.AccountNumber = shop.AccountNumber;
             if (shop.PIB != null) s.PIB = (int)shop.PIB;
             if (shop.Address != null)
@@ -276,19 +276,32 @@ namespace back.DAL.Repositories
         {
             var current = await _context.WorkingHours.Where(x => x.ShopId == shopId).ToListAsync();
             var toDelete = current.Where(x => !workingHours.Select(x => x.Day).Contains(x.Day));
+            if (toDelete.Count() > 0)
+            {
+                _context.WorkingHours.RemoveRange(toDelete);
+                if (!(await _context.SaveChangesAsync() > 0)) return false;
+            }
 
-            _context.WorkingHours.RemoveRange(toDelete);
-
+            int ind = 0;
             foreach (var wh in workingHours)
             {
                 WorkingHours curr = current.FirstOrDefault(x => x.Day == wh.Day);
-                if (curr == null) await _context.WorkingHours.AddAsync(new WorkingHours { Day = wh.Day, OpeningHours = TimeSpan.Parse(wh.OpeningHours), ClosingHours = TimeSpan.Parse(wh.ClosingHours), ShopId = shopId });
+                if (curr == null)
+                {
+                    await _context.WorkingHours.AddAsync(new WorkingHours { Day = wh.Day, OpeningHours = TimeSpan.Parse(wh.OpeningHours), ClosingHours = TimeSpan.Parse(wh.ClosingHours), ShopId = shopId });
+                }
                 else
                 {
-                    curr.OpeningHours = TimeSpan.Parse(wh.OpeningHours);
-                    curr.ClosingHours = TimeSpan.Parse(wh.ClosingHours);
+                    if (curr.ClosingHours == TimeSpan.Parse(wh.ClosingHours) && curr.OpeningHours == TimeSpan.Parse(wh.OpeningHours)) ind++;
+                    else
+                    {
+                        curr.OpeningHours = TimeSpan.Parse(wh.OpeningHours);
+                        curr.ClosingHours = TimeSpan.Parse(wh.ClosingHours);
+                    }
                 }
             }
+
+            if (ind == workingHours.Count()) return true;
 
             return await _context.SaveChangesAsync() > 0;
         }
@@ -297,10 +310,27 @@ namespace back.DAL.Repositories
         {
             return await _context.ShopCategories.Where(x => x.ShopId == shopId).ToListAsync();
         }
-        public async Task<bool> DeleteShopCategories(List<int> shopCategories, int shopId)
+
+        public async Task<bool> EditShopCategories(int shopId, List<ShopCategory> categories)
         {
-            foreach (var sc in shopCategories) _context.ShopCategories.Remove(new ShopCategory { CategoryId = sc, ShopId = shopId });
-            return await _context.SaveChangesAsync() > 0;
+            List<ShopCategory> existing = await GetShopCategories(shopId);
+            List<ShopCategory> newCategories = categories.Where(x => !existing.Contains(x)).ToList();
+            List<ShopCategory> toDelete = existing.Where(x => !categories.Contains(x)).ToList();
+
+            if (toDelete.Count() == 0 && newCategories.Count() == 0) return true;
+
+            if (toDelete.Count > 0)
+            {
+                _context.ShopCategories.RemoveRange(toDelete);
+                if (await _context.SaveChangesAsync() <= 0) return false;
+            }
+            if (newCategories.Count() > 0)
+            {
+                _context.ShopCategories.AddRange(newCategories);
+                if (await _context.SaveChangesAsync() <= 0) return false;
+            }
+
+            return true;
         }
 
         public async Task<bool> DeleteShop(int shopId)
