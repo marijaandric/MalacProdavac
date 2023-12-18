@@ -1,6 +1,5 @@
 ﻿using back.BLL.Dtos.Cards;
 using back.DAL.Contexts;
-using back.Models;
 using FirebaseAdmin.Messaging;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,9 +16,9 @@ namespace back.DAL.Repositories
 
         int numberOfItems = 3;
 
-        public async Task<List<NotificationCard>> GetNotifications(int userId, int? type, int page)
+        public async Task<List<NotificationCard>> GetNotifications(int userId, List<int>? types, int page)
         {
-            if (type == null)
+            if (types == null || types.Count == 0)
             {
                 return await _context.Notifications.Where(x => x.UserId == userId).Skip(page - 1 * numberOfItems).Take(numberOfItems).Select(x => new NotificationCard
                 {
@@ -33,13 +32,13 @@ namespace back.DAL.Repositories
                 }).ToListAsync();
             }
 
-            return await _context.Notifications.Where(x => x.UserId == userId && x.TypeId == type).Skip(page-1 * numberOfItems).Take(numberOfItems).Select(x => new NotificationCard
+            return await _context.Notifications.Where(x => x.UserId == userId && types.Contains(x.TypeId)).Skip(page-1 * numberOfItems).Take(numberOfItems).Select(x => new NotificationCard
             {
                 Id = x.Id,
                 Title = x.Title,
                 Text = x.Text,
                 CreatedOn = x.CreatedOn,
-                TypeId = (int)type,
+                TypeId = x.TypeId,
                 ReferenceId = x.ReferenceId,
                 Read = x.Read
             }).ToListAsync();

@@ -15,11 +15,11 @@ namespace back.PL.Controllers
         }
 
         [HttpGet("GetNotifications")]
-        public async Task<IActionResult> GetNotifications(int userId, int? type, int page)
+        public async Task<IActionResult> GetNotifications(int userId, [FromQuery]List<int>? types, int page)
         {
             try
             {
-                return Ok(await _service.GetNotifications(userId, type, page));
+                return Ok(await _service.GetNotifications(userId, types, page));
             }
             catch (Exception ex)
             {

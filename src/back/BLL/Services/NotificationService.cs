@@ -11,9 +11,9 @@ namespace back.BLL.Services
             _repository = repository;
         }
 
-        public async Task<List<NotificationCard>> GetNotifications(int userId, int? type, int page)
+        public async Task<List<NotificationCard>> GetNotifications(int userId, List<int>? types, int page)
         {
-            List<NotificationCard> notifications = await _repository.GetNotifications(userId, type, page);
+            List<NotificationCard> notifications = await _repository.GetNotifications(userId, types, page);
             if (notifications.Count == 0) throw new ArgumentException("No notifications!");
 
             return notifications;

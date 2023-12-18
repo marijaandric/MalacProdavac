@@ -4,6 +4,6 @@ namespace back.BLL.Services
 {
     public interface INotificationService
     {
-        public Task<List<NotificationCard>> GetNotifications(int userId, int? type, int page);
+        public Task<List<NotificationCard>> GetNotifications(int userId, List<int>? types, int page);
     }
 }
