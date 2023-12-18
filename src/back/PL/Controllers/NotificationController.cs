@@ -26,5 +26,44 @@ namespace back.PL.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpPut("MarkAsRead")]
+        public async Task<IActionResult> MarkAsRead(int notificationId)
+        {
+            try
+            {
+                return Ok(new { Success = await _service.MarkAsRead(notificationId)});
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpDelete("DeleteNotification")]
+        public async Task<IActionResult> DeleteNotification(int notificationId)
+        {
+            try
+            {
+                return Ok(new { Success = await _service.DeleteNotification(notificationId) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpDelete("DeleteAllNotifications")]
+        public async Task<IActionResult> DeleteAllNotifications(int userId)
+        {
+            try
+            {
+                return Ok(new { Success = await _service.DeleteAllNotifications(userId) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

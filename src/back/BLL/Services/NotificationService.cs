@@ -18,5 +18,21 @@ namespace back.BLL.Services
 
             return notifications;
         }
+
+        public async Task<bool> MarkAsRead(int notificationId)
+        {
+            return await _repository.MarkAsRead(notificationId);
+        }
+
+        public async Task<bool> DeleteNotification(int notificationId)
+        {
+            var not = await _repository.GetNotification(notificationId);
+            return await _repository.DeleteNotification(not);
+        }
+
+        public async Task<bool> DeleteAllNotifications(int userId)
+        {
+            return await _repository.DeleteAllNotifications(userId);
+        }
     }
 }

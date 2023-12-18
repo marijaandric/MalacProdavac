@@ -1,5 +1,6 @@
 ﻿using back.BLL.Dtos.Cards;
 using back.DAL.Contexts;
+using back.Models;
 using FirebaseAdmin.Messaging;
 using Microsoft.EntityFrameworkCore;
 
@@ -116,6 +117,33 @@ namespace back.DAL.Repositories
         public bool NotificationExists(int userId, int type, int referenceId)
         {
             return _context.Notifications.Any(x => x.UserId == userId && x.TypeId == type && x.ReferenceId == referenceId);
+        }
+
+        public async Task<bool> MarkAsRead(int notificationId)
+        {
+            var notification = await _context.Notifications.FirstOrDefaultAsync(x => x.Id == notificationId);
+            if (notification == null) return false;
+            notification.Read = true;
+            return await _context.SaveChangesAsync() > 0;
+        }
+
+        public async Task<bool> DeleteNotification(back.Models.Notification notification)
+        {
+            _context.Notifications.Remove(notification);
+            return await _context.SaveChangesAsync() > 0;
+        }
+
+        public async Task<bool> DeleteAllNotifications(int userId)
+        {
+            var toDelete = await _context.Notifications.Where(x => x.UserId == userId).ToListAsync();
+            _context.Notifications.RemoveRange(toDelete);
+
+            return await _context.SaveChangesAsync() > 0;
+        }
+
+        public async Task<back.Models.Notification> GetNotification(int notificationId)
+        {
+            return await _context.Notifications.FirstOrDefaultAsync(x => x.Id == notificationId);
         }
     }
 }
