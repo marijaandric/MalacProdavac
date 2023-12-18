@@ -39,7 +39,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.example.front.screens.sellers.FilterCard
+import com.example.front.screens.sellers.Osm
 import com.example.front.screens.sellers.ReviewStars
+import com.example.front.screens.shop.OsmProducts
 import com.example.front.viewmodels.oneshop.OneShopViewModel
 import com.example.front.viewmodels.products.ProductsViewModel
 import com.example.front.viewmodels.shops.ShopsViewModel
@@ -76,8 +78,8 @@ fun FilterDialogAllProducts(onDismiss: () -> Unit, shopsViewModel: ProductsViewM
                         shopsViewModel.changeCategories(selectedCategories)
                         shopsViewModel.changeRating(review)
                         shopsViewModel.changeOpen(open)
-//                        shopsViewModel.changeLocation(location)
-//                        shopsViewModel.changeRange(range.toInt())
+                        shopsViewModel.changeLocation(location)
+                        shopsViewModel.changeRange(range.toInt())
                         onDismiss()
                     }
                 }
@@ -115,8 +117,8 @@ fun FilterDialogAllProducts(onDismiss: () -> Unit, shopsViewModel: ProductsViewM
                                     shopsViewModel.changeCategories(selectedCategories)
                                     shopsViewModel.changeRating(review)
                                     shopsViewModel.changeOpen(open)
-//                                    shopsViewModel.changeLocation(location)
-//                                    shopsViewModel.changeRange(range.toInt())
+                                    shopsViewModel.changeLocation(location)
+                                    shopsViewModel.changeRange(range.toInt())
                                     onDismiss()
                                 }
                         )
@@ -132,8 +134,8 @@ fun FilterDialogAllProducts(onDismiss: () -> Unit, shopsViewModel: ProductsViewM
                                     shopsViewModel.changeCategories(selectedCategories)
                                     shopsViewModel.changeRating(review)
                                     shopsViewModel.changeOpen(open)
-//                                    shopsViewModel.changeLocation(location)
-//                                    shopsViewModel.changeRange(range.toInt())
+                                    shopsViewModel.changeLocation(location)
+                                    shopsViewModel.changeRange(range.toInt())
                                     shopsViewModel.withoutFilters()
                                 }
                         )
@@ -157,7 +159,7 @@ fun FilterDialogAllProducts(onDismiss: () -> Unit, shopsViewModel: ProductsViewM
                     }
                     else
                     {
-                        MapFiltersForAllProduct(onSearchChange={/*location=it*/},onSliderChange={/*range=it*/},shopsViewModel)
+                        MapFiltersForAllProduct(onSearchChange={location=it},onSliderChange={range=it},shopsViewModel)
                     }
                     BigBlueButton(text = "Show Results", onClick = {
                         shopsViewModel.DialogFilters(selectedCategories,review,open,location,range.toInt())
@@ -267,7 +269,7 @@ fun MapFiltersForAllProduct(
                 .padding(16.dp)
         ) {
 
-            //Osm(shopsViewModel)
+            OsmProducts(shopsViewModel)
         }
 
     }
@@ -337,7 +339,7 @@ fun CardGridForAllProduct(
         ReviewStars(brojZvezdica = 4, onClick={radiobutton1=true; radiobutton2=false; radiobutton3 =false; onReviewSelected(4)}, radiobutton1)
         ReviewStars(brojZvezdica = 3, onClick={radiobutton1=false; radiobutton2=true; radiobutton3 =false; onReviewSelected(3)}, radiobutton2)
         ReviewStars(brojZvezdica = 2, onClick={radiobutton1=false; radiobutton2=false; radiobutton3 =true;onReviewSelected(2)}, radiobutton3)
-        OpenNow(switchState!!, onCheckedChange={
+        OpenNowForAllProducts(switchState!!, onCheckedChange={
             switchState = !switchState!!
             onOpenChanged(switchState!!)
         })

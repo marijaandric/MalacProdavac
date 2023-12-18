@@ -59,7 +59,6 @@ class ProductsViewModel @Inject constructor(
                 )
                 Log.d("FILTERI", _filtersState.toString())
                 val response = repository.getProducts(userID,categories,rating,open,range,location,sort,search,page,null,favorite, currLat, currLong)
-                Log.d("PRODUCTS",response.toString())
                 if (response.isSuccessful) {
                     val products= response.body()
                     if(!favorite!!) {

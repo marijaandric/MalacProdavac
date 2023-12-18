@@ -161,8 +161,8 @@ fun SearchAndFilters(productsViewModel: ProductsViewModel) {
         {
             SearchTextField(
                 valuee = value,
-                placeh = "Search sellers",
-                onValueChangee = { value = it; },
+                placeh = "Search products",
+                onValueChangee = { value = it; productsViewModel.Search(it) },
                 modifier = Modifier.fillMaxWidth(0.75f)
             )
             Image(
@@ -213,7 +213,6 @@ fun Products(viewModel: ProductsViewModel, navController: NavHostController, isF
             isLiked = false
         )
     }?.toList() ?: emptyList()
-
     Column(
         modifier = Modifier
             .padding(16.dp, end = 0.dp, top = 20.dp)
@@ -251,21 +250,18 @@ fun Products(viewModel: ProductsViewModel, navController: NavHostController, isF
             }
         }
         else {
-            LazyColumn(
-                modifier = Modifier.heightIn(100.dp, 600.dp)
-            ) {
-                items(products) { cardData ->
-                    cardData.imageResource?.let {
-                        ProductCard(
-                            title = cardData.title,
-                            price = cardData.description,
-                            imageResource = it,
-                            navController,
-                            cardData.id
-                        )
-                    }
+            Column() {
+                for (cardData in products) {
+                    ProductCard(
+                        title = cardData.title,
+                        price = cardData.description,
+                        imageResource = cardData.imageResource,
+                        navController,
+                        cardData.id
+                    )
                 }
             }
+
         }
 
     }
