@@ -69,7 +69,6 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import java.util.Date
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -423,7 +422,7 @@ fun CheckoutScreen(
                                                 paymentMethod = if (payUsingCard) 3 else 1, // 3-kartica, 1-pouzecem
                                                 deliveryMethod = if (shop.selfpickup) 1 else 2, // 1-self, 2-delivery
                                                 shippingAddress = "////IZMENITI ADRESU",
-                                                pickupTime = if (shop.selfpickup) Date(shop.date ?: 0).toString() else "",
+                                                pickupTime = if (shop.selfpickup) dateMap[shop.id].toString()+"T10:00:00" else "",
                                                 products = cartProducts[shop.id]!!.map {
                                                     ProductInOrder(it.id, it.sizeId, it.quantity)
                                                 }
