@@ -283,7 +283,6 @@ fun MyDropdownWorkingHours(
         readOnly = true,
         value = labelValue,
         onValueChange = { /* No action needed */ },
-        label = { Text(text = labelValue) },
         colors = TextFieldDefaults.outlinedTextFieldColors(
             focusedBorderColor = Color.Blue,
             focusedLabelColor = Color.Blue,
@@ -304,8 +303,7 @@ fun MyDropdownWorkingHours(
         workHours.forEach { metric ->
             DropdownMenuItem(onClick = {}) {
                 Text(
-                    text = metric,
-                    style = TextStyle(fontSize = 12.sp) // Adjust the font size here
+                    text = metric
                 )
             }
         }
@@ -557,10 +555,18 @@ fun CardButton(text: String, onClick: () -> Unit, width: Float, modifier: Modifi
 }
 
 @Composable
-fun OrderCard(orderid:String, quantity: Int, amount: Float, date: String, status: String, navController: NavHostController, id: Int) {
-    Column (
+fun OrderCard(
+    orderid: String,
+    quantity: Int,
+    amount: Float,
+    date: String,
+    status: String,
+    navController: NavHostController,
+    id: Int
+) {
+    Column(
         modifier = Modifier.padding(16.dp)
-    ){
+    ) {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -578,23 +584,53 @@ fun OrderCard(orderid:String, quantity: Int, amount: Float, date: String, status
                     horizontalArrangement = Arrangement.SpaceBetween
                 )
                 {
-                    Text(orderid, style=MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),modifier = Modifier.weight(1f))
-                    Text(date, style=MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.ExtraLight, color=MaterialTheme.colorScheme.primary))
+                    Text(
+                        orderid,
+                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+                        modifier = Modifier.weight(1f)
+                    )
+                    Text(
+                        date,
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            fontWeight = FontWeight.ExtraLight,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    )
                 }
                 Spacer(modifier = Modifier.height(16.dp))
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 )
                 {
-                    Text("Quantity: ", style=MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.ExtraLight, color=MaterialTheme.colorScheme.primary))
-                    Text(quantity.toString(), style=MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),modifier = Modifier.weight(1f))
+                    Text(
+                        "Quantity: ",
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            fontWeight = FontWeight.ExtraLight,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    )
+                    Text(
+                        quantity.toString(),
+                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+                        modifier = Modifier.weight(1f)
+                    )
                 }
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 )
                 {
-                    Text("Total Amount: ", style=MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.ExtraLight, color=MaterialTheme.colorScheme.primary))
-                    Text(amount.toString()+" RSD", style=MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),modifier = Modifier.weight(1f))
+                    Text(
+                        "Total Amount: ",
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            fontWeight = FontWeight.ExtraLight,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    )
+                    Text(
+                        amount.toString() + " RSD",
+                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+                        modifier = Modifier.weight(1f)
+                    )
                 }
                 Spacer(modifier = Modifier.height(16.dp))
                 Row(
@@ -603,10 +639,22 @@ fun OrderCard(orderid:String, quantity: Int, amount: Float, date: String, status
                     horizontalArrangement = Arrangement.SpaceBetween
                 )
                 {
-                    CardButton(text = "Details", onClick = {
-                        navController.navigate("${Screen.Order.route}/$id")
-                    }, width = 0.5f, modifier = Modifier, color = MaterialTheme.colorScheme.secondary)
-                    Text(status, style=MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold, color=MaterialTheme.colorScheme.primary))
+                    CardButton(
+                        text = "Details",
+                        onClick = {
+                            navController.navigate("${Screen.Order.route}/$id")
+                        },
+                        width = 0.5f,
+                        modifier = Modifier,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                    Text(
+                        status,
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    )
                 }
 
             }
@@ -678,7 +726,6 @@ fun BigBlueButton(text: String, onClick: () -> Unit, width: Float, modifier: Mod
 }
 
 
-
 @Composable
 fun CardForOneOrderWithoutButton(
     title: String,
@@ -710,8 +757,7 @@ fun CardForOneOrderWithoutButton(
                 .fillMaxWidth()
                 .background(color = MaterialTheme.colorScheme.surface)
         ) {
-            if(imageResource != null)
-            {
+            if (imageResource != null) {
                 Image(
                     painter = painter,
                     contentDescription = null,
@@ -721,8 +767,7 @@ fun CardForOneOrderWithoutButton(
                         .padding(13.dp)
                         .clip(RoundedCornerShape(10.dp))
                 )
-            }
-            else{
+            } else {
                 Image(
                     painter = painterResource(id = R.drawable.imageplaceholder),
                     contentDescription = null,
@@ -829,12 +874,16 @@ fun SellerCard(
                     .fillMaxWidth()
                     .padding(start = 16.dp, bottom = 16.dp, end = 16.dp)
             ) {
-                Text(text = title, fontWeight = FontWeight.Bold, fontSize = 17.sp,
+                Text(
+                    text = title, fontWeight = FontWeight.Bold, fontSize = 17.sp,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis)
-                Text(text = author, fontSize = 14.sp,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    text = author, fontSize = 14.sp,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis)
+                    overflow = TextOverflow.Ellipsis
+                )
                 Row(
                     modifier = Modifier.padding(top = 10.dp)
                 )
@@ -890,15 +939,14 @@ fun ProductCard(
             .clickable(onClick = onClick)
     ) {
         val imageUrl = "http://softeng.pmf.kg.ac.rs:10015/images/${imageResource}"
-        
+
         val painter: Painter = rememberAsyncImagePainter(model = imageUrl)
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(color = MaterialTheme.colorScheme.surface)
         ) {
-            if(imageResource == null)
-            {
+            if (imageResource == null) {
                 Image(
                     painter = painterResource(id = R.drawable.imageplaceholder),
                     contentDescription = null,
@@ -908,8 +956,7 @@ fun ProductCard(
                         .padding(13.dp)
                         .clip(RoundedCornerShape(10.dp))
                 )
-            }
-            else{
+            } else {
                 Image(
                     painter = painter,
                     contentDescription = null,
@@ -920,13 +967,15 @@ fun ProductCard(
                         .clip(RoundedCornerShape(10.dp))
                 )
             }
-            
+
 
             Column(
                 modifier = Modifier.padding(10.dp)
             ) {
-                Text(text = title, fontWeight = FontWeight.Bold, fontSize = 17.sp,maxLines = 1,
-                    overflow = TextOverflow.Ellipsis)
+                Text(
+                    text = title, fontWeight = FontWeight.Bold, fontSize = 17.sp, maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
                 Text(
                     text = price,
                     fontWeight = FontWeight.Bold,
@@ -1058,9 +1107,11 @@ fun ShopCard(
             Column(
                 modifier = Modifier.padding(8.dp),
             ) {
-                Text(text = title, fontWeight = FontWeight.Bold, fontSize = 17.sp,
+                Text(
+                    text = title, fontWeight = FontWeight.Bold, fontSize = 17.sp,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis)
+                    overflow = TextOverflow.Ellipsis
+                )
                 Text(
                     text = price,
                     fontWeight = FontWeight.Bold,

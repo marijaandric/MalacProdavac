@@ -1,5 +1,4 @@
 package com.example.front.screens.product
-
 import ToastHost
 import android.annotation.SuppressLint
 import android.util.Log
@@ -21,16 +20,16 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -44,7 +43,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.painter.Painter
@@ -61,7 +59,6 @@ import com.example.front.components.GalleryComponent
 import com.example.front.components.MyDropdownWorkingHours
 import com.example.front.components.ProductImage
 import com.example.front.components.Sidebar
-import com.example.front.components.ToggleImageButton
 import com.example.front.model.DTO.ImageDataDTO
 import com.example.front.model.product.ProductReviewUserInfo
 import com.example.front.navigation.Screen
@@ -91,6 +88,7 @@ fun ProductPage(
     var selectedSize by remember { mutableStateOf<String?>(null) }
     var selectedSizeId by remember { mutableStateOf<Int?>(null) }
     val context = LocalContext.current
+    var isToggled by remember { mutableStateOf(false) }
 
     var selectedImage by remember {
         mutableStateOf(
@@ -180,7 +178,33 @@ fun ProductPage(
                         }
                     }
 
-                    ToggleImageButton(modifier = Modifier.align(Alignment.TopEnd))
+                    if(productInfo.isOwner != true) {
+                        val currentImage = if (isToggled) painterResource(id = R.drawable.srcefull)
+                        else painterResource(id = R.drawable.srce)
+
+                        Image(
+                            painter = currentImage,
+                            contentDescription = "",
+                            modifier = Modifier
+                                .size(50.dp)
+                                .padding(5.dp)
+                                .align(Alignment.TopEnd)
+                                .clickable {
+                                    isToggled = !isToggled
+                                }
+                        )
+                    }
+                    else
+                    {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = "",
+                            modifier = Modifier
+                                .size(50.dp)
+                                .padding(5.dp)
+                                .align(Alignment.TopEnd)
+                        )
+                    }
 
                     Image(
                         painter = painterResource(id = R.drawable.backarrow),
@@ -227,25 +251,6 @@ fun ProductPage(
                                 images = images,
                                 selectedImage = selectedImage
                             ) { selectedImage = it }
-                        }
-
-                        Box(
-                            modifier = Modifier
-                                .background(
-                                    MaterialTheme.colorScheme.onBackground,
-                                    shape = CircleShape
-                                )
-                                .padding(8.dp)
-                                .clickable {
-                                    photoPicker.launch("image/*")
-                                }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Add,
-                                contentDescription = "New Image",
-                                tint = Color.White,
-                                modifier = Modifier.size(24.dp)
-                            )
                         }
 
                         productInfo?.name?.let {
