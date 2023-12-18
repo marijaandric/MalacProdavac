@@ -55,16 +55,19 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
 import com.example.front.R
 import com.example.front.components.BigBlueButton
+import com.example.front.components.FilterDialogAllProducts
 import com.example.front.components.ProductCard
 import com.example.front.components.SearchTextField
 import com.example.front.components.Sidebar
 import com.example.front.components.SmallElipseAndTitle
+import com.example.front.components.SortDialogForAllProducts
 import com.example.front.components.Tabs
 import com.example.front.screens.home.CardData
 import com.example.front.screens.sellers.CardGrid
 import com.example.front.screens.sellers.MapFilters
 import com.example.front.ui.theme.Typography
 import com.example.front.viewmodels.home.HomeViewModel
+import com.example.front.viewmodels.oneshop.OneShopViewModel
 import com.example.front.viewmodels.products.ProductsViewModel
 import com.example.front.viewmodels.shops.ShopsViewModel
 import kotlinx.coroutines.launch
@@ -74,7 +77,7 @@ import kotlinx.coroutines.launch
 fun AllProducts(
     navController: NavHostController,
     productsViewModel: ProductsViewModel,
-    shopsViewModel: ShopsViewModel
+    oneShopViewModel: OneShopViewModel
 ) {
     var selectedColumnIndex by remember {
         mutableStateOf(true)
@@ -118,7 +121,7 @@ fun AllProducts(
 
             }
             item{
-                if(selectedColumnIndex)
+                if(selectedColumnIndex && productsViewModel.state.value.error.isEmpty())
                 {
                     Image(
                         painter = painterResource(id = R.drawable.products),
@@ -130,7 +133,7 @@ fun AllProducts(
                 }
             }
             item{
-                if(selectedColumnIndex)
+                if(selectedColumnIndex && productsViewModel.state.value.error.isEmpty())
                     Text("Explore the Finest Selection of Products!", style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold), modifier = Modifier.padding(20.dp,top=0.dp,bottom = 16.dp))
                 Products(productsViewModel, navController, selectedColumnIndex)
             }
@@ -185,6 +188,12 @@ fun SearchAndFilters(productsViewModel: ProductsViewModel) {
         }
     }
 
+    if (showDialog) {
+        FilterDialogAllProducts(onDismiss = { showDialog = false }, productsViewModel)
+    }
+    if (isOverlayVisible) {
+        SortDialogForAllProducts(onDismiss = { isOverlayVisible = false }, productsViewModel)
+    }
 }
 
 @Composable
@@ -211,6 +220,7 @@ fun Products(viewModel: ProductsViewModel, navController: NavHostController, isF
     ) {
         if (state.isLoading) {
             Column(
+                modifier = Modifier.fillMaxWidth().padding(top=30.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 CircularProgressIndicator()

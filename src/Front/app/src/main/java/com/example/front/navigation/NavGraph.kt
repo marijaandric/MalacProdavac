@@ -104,7 +104,7 @@ fun SetupNavGraph(
             route = Screen.AllProduct.route
         )
         {
-            AllProducts(navController = navController, productsViewModel, shopsViewModel)
+            AllProducts(navController = navController, productsViewModel, oneShopViewModel)
         }
         composable(route = Screen.Delivery.route) {
             DeliveryScreen(navController,deliveryViewModel)

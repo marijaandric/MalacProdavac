@@ -211,7 +211,6 @@ class OneShopViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val response = repository.postShopReview(shopId, userId, rating, comment)
-                Log.d("REVIEW RESPONSE", response.toString())
                 if (response.isSuccessful) {
                     val rev = response.body()
                     _statePostReview.value = _statePostReview.value.copy(
