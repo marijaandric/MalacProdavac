@@ -403,6 +403,11 @@ fun CheckoutScreen(
 //                            fontSize = 20.sp,
 //                            fontWeight = FontWeight.Bold
 //                        )
+                        var address by remember { mutableStateOf("") }
+                        OutlinedTextField(
+                            value = address,
+                            label = { Text("Shipping Address") },
+                            onValueChange = {address = it})
                         Button(
                             onClick = {
                                 //// 1	On delivery, 2 Payment Slip, 3 Card
@@ -421,8 +426,8 @@ fun CheckoutScreen(
                                                 shopId = shop.id,
                                                 paymentMethod = if (payUsingCard) 3 else 1, // 3-kartica, 1-pouzecem
                                                 deliveryMethod = if (shop.selfpickup) 1 else 2, // 1-self, 2-delivery
-                                                shippingAddress = "////IZMENITI ADRESU",
-                                                pickupTime = if (shop.selfpickup) dateMap[shop.id].toString()+"T10:00:00" else "",
+                                                shippingAddress = address,
+                                                pickupTime = if (shop.selfpickup) dateMap[shop.id].toString()+"T10:00:00" else null,
                                                 products = cartProducts[shop.id]!!.map {
                                                     ProductInOrder(it.id, it.sizeId, it.quantity)
                                                 }
@@ -430,6 +435,15 @@ fun CheckoutScreen(
                                         }
                                         println("ORDERS: ${orders[0]}")
                                         println("ORDER: ${orders[0].products[0].id}")
+
+                                        val successful = viewModel.insertOrders(orders)
+                                        if (successful) {
+                                            //// brise korpu vraca na pocetnu ili na orders
+                                            println("USPESNO SLANJE")
+                                        } else {
+                                            println("NEUSPESNO SLANJE")
+                                        }
+
                                     }
                                 }
 
