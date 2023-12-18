@@ -273,4 +273,6 @@ interface Api {
         @Body products: List<CheckAvailabilityReqDTO>
     ): Response<List<CheckAvailabilityResDTO>>
 
+
+
 }

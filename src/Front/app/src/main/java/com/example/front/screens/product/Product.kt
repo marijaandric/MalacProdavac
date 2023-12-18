@@ -3,6 +3,8 @@ package com.example.front.screens.product
 import ToastHost
 import android.annotation.SuppressLint
 import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -19,12 +21,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Star
@@ -44,6 +48,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -57,14 +62,18 @@ import com.example.front.components.MyDropdownWorkingHours
 import com.example.front.components.ProductImage
 import com.example.front.components.Sidebar
 import com.example.front.components.ToggleImageButton
-import com.example.front.model.DTO.WorkingHoursDTO
+import com.example.front.model.DTO.ImageDataDTO
 import com.example.front.model.product.ProductReviewUserInfo
 import com.example.front.navigation.Screen
+import com.example.front.screens.myshop.getMultipartBodyPart
 import com.example.front.ui.theme.DarkBlue
 import com.example.front.ui.theme.Typography
 import com.example.front.viewmodels.product.ProductViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import rememberToastHostState
 import java.lang.Integer.max
 
@@ -81,6 +90,35 @@ fun ProductPage(
     val coroutineScope = rememberCoroutineScope()
     var selectedSize by remember { mutableStateOf<String?>(null) }
     var selectedSizeId by remember { mutableStateOf<Int?>(null) }
+    val context = LocalContext.current
+
+    var selectedImage by remember {
+        mutableStateOf(
+            ImageDataDTO(0, "placeholder.png")
+        )
+    }
+
+    val photoPicker = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetMultipleContents()
+    ) { uris ->
+        uris?.let { selectedUris ->
+            CoroutineScope(Dispatchers.IO).launch {
+                val pictures = selectedUris.mapNotNull { uri ->
+                    try {
+                        getMultipartBodyPart(context, uri)
+                    } catch (e: Exception) {
+                        null
+                    }
+                }
+
+                withContext(Dispatchers.Main) {
+                    productViewModel.uploadImages(1, productID, pictures)
+                }
+            }
+        }
+    }
+
+
 
     LaunchedEffect(Unit) {
         productViewModel.getUserId()?.let { productViewModel.getProductInfo(productID, it) }
@@ -113,11 +151,19 @@ fun ProductPage(
                 }
             } else {
                 val productInfo = productViewModel.state.value.product
-                var selectedImage by remember { mutableStateOf(productInfo?.images?.get(0)) }
 
-                LaunchedEffect(productInfo) {
-                    selectedImage = productInfo?.images?.get(0)
+                if (productInfo?.images?.size != 0) {
+                    selectedImage = productInfo?.images?.get(0)!!
                 }
+
+
+                LaunchedEffect(productInfo)
+                {
+                    if (productInfo?.images?.size != 0) {
+                        selectedImage = productInfo.images[0];
+                    }
+                }
+
 
                 Box(
                     modifier = Modifier
@@ -126,10 +172,10 @@ fun ProductPage(
                         .align(Alignment.CenterHorizontally)
                         .background(Color.Transparent)
                 ) {
-                    if (productInfo != null) {
+                    if (productInfo != null && selectedImage != null) {
                         selectedImage?.let { image ->
                             if (image.image.isNotEmpty()) {
-                                ProductImage(image.image, modifier = Modifier.scale(1.2f))
+                                ProductImage(image.image, modifier = Modifier)
                             }
                         }
                     }
@@ -181,6 +227,25 @@ fun ProductPage(
                                 images = images,
                                 selectedImage = selectedImage
                             ) { selectedImage = it }
+                        }
+
+                        Box(
+                            modifier = Modifier
+                                .background(
+                                    MaterialTheme.colorScheme.onBackground,
+                                    shape = CircleShape
+                                )
+                                .padding(8.dp)
+                                .clickable {
+                                    photoPicker.launch("image/*")
+                                }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = "New Image",
+                                tint = Color.White,
+                                modifier = Modifier.size(24.dp)
+                            )
                         }
 
                         productInfo?.name?.let {
@@ -302,9 +367,10 @@ fun ProductPage(
                                 color = Color.Black,
                                 modifier = Modifier.weight(1f)
                             )
-                            val workingHoursStrings = productInfo?.workingHours?.map { workingHours ->
-                                "${getDayName(workingHours.day)} ${workingHours.openingHours} - ${workingHours.closingHours}"
-                            }
+                            val workingHoursStrings =
+                                productInfo?.workingHours?.map { workingHours ->
+                                    "${getDayName(workingHours.day)} ${workingHours.openingHours} - ${workingHours.closingHours}"
+                                }
                             MyDropdownWorkingHours(
                                 workingHoursStrings?.get(0) ?: "",
                                 workingHoursStrings ?: listOf(),
@@ -330,7 +396,8 @@ fun ProductPage(
                             NumberPicker(
                                 value = quantity,
                                 onValueChange = { newValue -> quantity = newValue },
-                                modifier = Modifier.weight(1f))
+                                modifier = Modifier.weight(1f)
+                            )
                         }
 
                         Row(
@@ -568,7 +635,6 @@ fun NumberPicker(value: Int, onValueChange: (Int) -> Unit, modifier: Modifier) {
         }
     }
 }
-
 
 
 fun getDayName(day: Int): String {

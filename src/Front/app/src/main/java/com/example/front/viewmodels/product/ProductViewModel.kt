@@ -9,11 +9,13 @@ import com.example.front.helper.DataStore.DataStoreManager
 import com.example.front.model.product.ProductInCart
 import com.example.front.repository.MongoRepository
 import com.example.front.repository.Repository
+import com.example.front.screens.myshop.state.ImageState
 import com.example.front.screens.product.ProductProductState
 import com.example.front.screens.product.ReviewProductState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import okhttp3.MultipartBody
 import javax.inject.Inject
 
 @HiltViewModel
@@ -28,6 +30,9 @@ class ProductViewModel @Inject constructor(
 
     private val _stateReview = mutableStateOf(ReviewProductState())
     var stateReview: State<ReviewProductState> = _stateReview;
+
+    private val _stateimage = mutableStateOf(ImageState())
+    var stateimage: State<ImageState> = _stateimage;
 
 
     suspend fun getProductInfo(productID: Int, userID: Int) {
@@ -111,4 +116,29 @@ class ProductViewModel @Inject constructor(
             }
         }
     }
+    fun uploadImages(type: Int, id: Int, imageParts: List<MultipartBody.Part>) {
+        viewModelScope.launch {
+            val uploadResults = imageParts.map { imagePart ->
+                try {
+                    val response = repository.uploadImage2(type, id, imagePart)
+                    if (response.isSuccessful) {
+                        Result.success(response.body())
+                    } else {
+                        Result.failure(Exception("Upload failed with error code: ${response.code()}"))
+                    }
+                } catch (e: Exception) {
+                    Result.failure(e)
+                }
+            }
+            val successfulUploads = uploadResults.count { it.isSuccess }
+            val failedUploads = uploadResults.size - successfulUploads
+
+            _stateimage.value = _stateimage.value.copy(
+                isLoading = false,
+                image = null,
+                error = if (failedUploads > 0) "Some uploads failed" else ""
+            )
+        }
+    }
+
 }

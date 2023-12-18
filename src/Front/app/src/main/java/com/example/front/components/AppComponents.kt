@@ -1,5 +1,6 @@
 package com.example.front.components
 
+import android.util.Log
 import android.view.MotionEvent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -302,11 +303,15 @@ fun MyDropdownWorkingHours(
     ) {
         workHours.forEach { metric ->
             DropdownMenuItem(onClick = {}) {
-                Text(text = metric)
+                Text(
+                    text = metric,
+                    style = TextStyle(fontSize = 12.sp) // Adjust the font size here
+                )
             }
         }
     }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -434,7 +439,7 @@ fun HeaderImage(painterResource: Painter) {
 @Composable
 fun ProductImage(image: String, modifier: Modifier) {
     val imageUrl = "http://softeng.pmf.kg.ac.rs:10015/images/${image}"
-
+    Log.d("SLIKA", imageUrl)
     val painter: Painter = rememberAsyncImagePainter(model = imageUrl)
     Image(
         painter = painter,

@@ -17,16 +17,19 @@ namespace back.BLL.Services
         IProductRepository _productRepository;
         IAuthRepository _authRepository;
         IOrderRepository _orderRepository;
-        
-        public string folderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..\\..\\..\\images");
+        private readonly IWebHostEnvironment _environment;
+
+        string folderName = "images";
+
         static string apiKey = "Aj_nYJhXf_C_QoPf7gOQch6KOhTJo2iX2VIyvOlwb7hDpGCtS8rOhyQYp5kAbR54";
 
-        public HelperService(IShopRepository shopRepository, IProductRepository productRepository, IAuthRepository authRepository, IOrderRepository orderRepository)
+        public HelperService(IWebHostEnvironment environment, IShopRepository shopRepository, IProductRepository productRepository, IAuthRepository authRepository, IOrderRepository orderRepository)
         {
             _shopRepository = shopRepository;
             _productRepository = productRepository;
             _authRepository = authRepository;
             _orderRepository = orderRepository;
+            _environment = environment;
         }
 
         public async Task<bool> UploadImage(IFormFile image, int type, int id)
@@ -37,15 +40,15 @@ namespace back.BLL.Services
             }
 
             string uniqueFileName = GetUniqueFileName(image.FileName);
+            string path = Path.Combine(_environment.ContentRootPath, folderName);
+            string fullFilePath = Path.Combine(path, uniqueFileName);
 
-            string path = Path.Combine(folderPath, uniqueFileName);
-
-            using (var stream = new FileStream(path, FileMode.Create))
+            using (var stream = new FileStream(fullFilePath, FileMode.Create))
             {
                 image.CopyTo(stream);
             }
 
-            if (!File.Exists(path))
+            if (!File.Exists(fullFilePath))
             {
                 throw new ArgumentException("Image could not be saved!");
             }
@@ -62,6 +65,7 @@ namespace back.BLL.Services
                     throw new ArgumentException("Invalid type!");
             }
         }
+
 
         private bool IsImageFile(string fileName)
         {
@@ -124,7 +128,7 @@ namespace back.BLL.Services
             PaymentSlipInfo info = await _orderRepository.GetPaymentSlipInfo(userId, shopId);
             if (info.AccountNumberRcv == null) throw new ArgumentException("Cannot generate payment slip. The shop owner did not specify their account number.");
 
-            string imagePath = Path.Combine(folderPath, "template.jpg");
+            string imagePath = Path.Combine(_environment.ContentRootPath, folderName,"template.jpg");
             string output, outputPath;
 
             using (Bitmap bitmap = new Bitmap(imagePath))
@@ -151,14 +155,14 @@ namespace back.BLL.Services
                     graphics.DrawString(rcvnum, font, brush, new PointF(400, 101));
 
                     output = GetUniqueFileName("payment_slip.png");
-                    outputPath = Path.Combine(folderPath, output);
+                    outputPath = Path.Combine(_environment.ContentRootPath, folderName, output);
                     bitmap.Save(outputPath, ImageFormat.Png);
                 }
             }
 
             string pdfOutput = output.Substring(0, output.LastIndexOf(".")) + ".pdf";
 
-            using (var pdfWriter = new PdfWriter(Path.Combine(folderPath, pdfOutput)))
+            using (var pdfWriter = new PdfWriter(Path.Combine(_environment.ContentRootPath, folderName, pdfOutput)))
             {
                 using (var pdfDocument = new PdfDocument(pdfWriter))
                 {

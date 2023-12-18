@@ -137,9 +137,6 @@ fun SetUpShopScreen(navController : NavHostController, viewModel: MyShopViewMode
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfilePhoto(context:Context, userId:Int, viewModel: MyShopViewModel, navController: NavHostController) {
-    var uri by remember {
-        mutableStateOf<Uri?>(null)
-    }
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
     var day_index by remember {
         mutableStateOf(0)
