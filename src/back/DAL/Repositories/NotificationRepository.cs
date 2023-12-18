@@ -15,7 +15,7 @@ namespace back.DAL.Repositories
             _context = context;
         }
 
-        int numberOfItems = 10;
+        int numberOfItems = 3;
 
         public async Task<List<NotificationCard>> GetNotifications(int userId, int? type, int page)
         {
