@@ -85,7 +85,7 @@ namespace back.BLL.Services
             float deliveryPrice = await _orderRepository.DeliveryPrice(orderId);
 
             if (!await _repository.AddToRoute(requestId, routeId)) return false;
-            if (await _notificationRepository.InsertNotification(userId, 0, "Delivery accepted!", "Delivery person " + username + " just added your delivery request to their route!\nYou can expect your order to arrive on " + route.StartDate.ToShortDateString() + ".\nThe delivery price is:" + deliveryPrice + ".", -1)) Console.WriteLine("Notification sent!");
+            if (await _notificationRepository.InsertNotification(userId, 6, "Delivery accepted!", "Delivery person " + username + " just added your delivery request to their route!\nYou can expect your order to arrive on " + route.StartDate.ToShortDateString() + ".\nThe delivery price is:" + deliveryPrice + "\nTap to view the order.", orderId)) Console.WriteLine("Notification sent!");
 
             return true;
         }
@@ -98,7 +98,7 @@ namespace back.BLL.Services
             string username = await _userRepository.GetUsername((int)req.ChosenPersonId);
 
             if (!await _repository.DeclineRequest(requestId)) return false;
-            if (await _notificationRepository.InsertNotification(userId, 0, "Delivery declined!", "Delivery person " + username + " declined the delivery request for order #!"+ order.Id +" \nPlease choose another delivery person.", -1)) Console.WriteLine("Notification sent!");
+            if (await _notificationRepository.InsertNotification(userId, 5, "Delivery declined!", "Delivery person " + username + " declined the delivery request for order #!"+ order.Id +" \nPlease choose another delivery person by clicking here.", requestId)) Console.WriteLine("Notification sent!");
 
             return true;
         }
