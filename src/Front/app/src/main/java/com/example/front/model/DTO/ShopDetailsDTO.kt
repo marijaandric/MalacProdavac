@@ -20,5 +20,6 @@ data class ShopDetailsDTO (
     @SerializedName("latitude") val latitude: Double?,
     @SerializedName("longitude") val longitude: Double?,
     @SerializedName("image") val image: String?,
-    @SerializedName("owner") val owner: Any?
+    @SerializedName("owner") val owner: Any?,
+    @SerializedName("accountNumber") val accountNumber: String?
 )

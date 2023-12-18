@@ -7,12 +7,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.front.helper.DataStore.DataStoreManager
+import com.example.front.model.DTO.EditShopDTO
 import com.example.front.model.DTO.FiltersDTO
 import com.example.front.model.DTO.NewProductDTO
 import com.example.front.model.DTO.NewProductDisplayDTO
 import com.example.front.repository.Repository
 import com.example.front.screens.shop.state.DeleteProductDisplayState
 import com.example.front.screens.shop.state.DeleteShopState
+import com.example.front.screens.shop.state.EditShopState
 import com.example.front.screens.shop.state.GetCategoriesState
 import com.example.front.screens.shop.state.GetMetricsState
 import com.example.front.screens.shop.state.NewDisplayState
@@ -92,6 +94,10 @@ class OneShopViewModel @Inject constructor(
     private val _stateDeleteShop = mutableStateOf(DeleteShopState())
     var statedeleteShop: State<DeleteShopState> = _stateDeleteShop;
 
+    //edit Shop
+    private val _stateEditShop = mutableStateOf(EditShopState())
+    var stateEditShop: State<EditShopState> = _stateEditShop;
+
 
     fun getShopDetails(userId: Int, shopId: Int) {
         viewModelScope.launch {
@@ -110,6 +116,33 @@ class OneShopViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 _state.value = _state.value.copy(
+                    error = e.message.toString()
+                )
+            }
+        }
+    }
+
+    fun editShop(editShop:EditShopDTO) {
+        viewModelScope.launch {
+            try {
+                val response = repository.editShop(editShop)
+                Log.d("EDIT", response.toString())
+                if (response.isSuccessful) {
+                    val shopp = response.body()
+                    _stateEditShop.value = _stateEditShop.value.copy(
+                        isLoading = false,
+                        success = shopp,
+                        error = ""
+                    )
+                } else {
+                    _stateEditShop.value = _stateEditShop.value.copy(
+                        isLoading = false,
+                        success = null,
+                        error = "NotFound"
+                    )
+                }
+            } catch (e: Exception) {
+                _stateEditShop.value = _stateEditShop.value.copy(
                     error = e.message.toString()
                 )
             }

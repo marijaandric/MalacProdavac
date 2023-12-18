@@ -4,6 +4,7 @@ import com.example.front.model.DTO.CategoriesDTO
 import com.example.front.model.DTO.CheckAvailabilityReqDTO
 import com.example.front.model.DTO.CheckAvailabilityResDTO
 import com.example.front.model.DTO.ChosenCategoriesDTO
+import com.example.front.model.DTO.EditShopDTO
 import com.example.front.model.DTO.HomeProductDTO
 import com.example.front.model.DTO.LeaveReviewDTO
 import com.example.front.model.DTO.LoginDTO
@@ -280,4 +281,9 @@ interface Api {
     suspend fun insertOrders(
         @Body orders: List<NewOrder>
     ): Response<Void>
+
+    @PUT("Shop/EditShop")
+    suspend fun editShop(
+        @Body edit : EditShopDTO
+    ): Response<SuccessBoolean>
 }

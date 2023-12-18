@@ -6,6 +6,7 @@ import com.example.front.model.DTO.CategoriesDTO
 import com.example.front.model.DTO.CheckAvailabilityReqDTO
 import com.example.front.model.DTO.CheckAvailabilityResDTO
 import com.example.front.model.DTO.ChosenCategoriesDTO
+import com.example.front.model.DTO.EditShopDTO
 import com.example.front.model.DTO.HomeProductDTO
 import com.example.front.model.DTO.LeaveReviewDTO
 import com.example.front.model.DTO.LoginDTO
@@ -273,4 +274,8 @@ class Repository @Inject constructor(private val api: Api) {
         return api.insertOrders(orders)
     }
 
+    suspend fun editShop(EditShop: EditShopDTO):Response<SuccessBoolean>
+    {
+        return api.editShop(EditShop)
+    }
 }

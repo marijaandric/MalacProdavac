@@ -1809,9 +1809,13 @@ fun EditSellersDialog(onDismiss: () -> Unit, shopViewModel: OneShopViewModel) {
         mutableStateOf("")
     }
     var categories = mutableListOf<Int>()
-    var workingHour by remember {
-        mutableStateOf(WorkingHoursDTO(0, 0, "00", "00", "Shop"))
-    }
+
+    name = shopViewModel.state.value.shop!!.name
+    address = shopViewModel.state.value.shop!!.address
+    pib = shopViewModel.state.value.shop!!.pib.toString()
+    accountNumber = shopViewModel.state.value.shop!!.accountNumber.toString()
+    //categories = shopViewModel.state.value.shop!!.categories.toMutableList()
+
     var selectedDay by remember { mutableStateOf<String?>("Mon") }
     var workingHoursMap by remember {
         mutableStateOf(
