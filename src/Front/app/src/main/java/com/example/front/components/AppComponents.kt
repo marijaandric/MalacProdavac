@@ -872,7 +872,7 @@ fun SellerCard(
 fun ProductCard(
     title: String,
     price: String,
-    imageResource: String,
+    imageResource: String?,
     navController: NavHostController,
     id: Int,
     onClick: () -> Unit = {}
@@ -885,27 +885,42 @@ fun ProductCard(
     Card(
         modifier = Modifier
             .clip(RoundedCornerShape(20.dp))
-            .fillMaxWidth(0.9f)
+            .fillMaxWidth()
             .padding(bottom = 15.dp, end = 16.dp)
             .clickable(onClick = onClick)
     ) {
         val imageUrl = "http://softeng.pmf.kg.ac.rs:10015/images/${imageResource}"
-
+        
         val painter: Painter = rememberAsyncImagePainter(model = imageUrl)
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(color = MaterialTheme.colorScheme.surface)
         ) {
-            Image(
-                painter = painter,
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(120.dp)
-                    .padding(13.dp)
-                    .clip(RoundedCornerShape(10.dp))
-            )
+            if(imageResource == null)
+            {
+                Image(
+                    painter = painterResource(id = R.drawable.imageplaceholder),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(120.dp)
+                        .padding(13.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                )
+            }
+            else{
+                Image(
+                    painter = painter,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(120.dp)
+                        .padding(13.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                )
+            }
+            
 
             Column(
                 modifier = Modifier.padding(10.dp)

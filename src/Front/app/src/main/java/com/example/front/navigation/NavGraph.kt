@@ -38,6 +38,7 @@ import com.example.front.viewmodels.oneshop.OneShopViewModel
 import com.example.front.viewmodels.orderinfo.OrderInfoViewModel
 import com.example.front.viewmodels.orders.OrdersViewModel
 import com.example.front.viewmodels.product.ProductViewModel
+import com.example.front.viewmodels.products.ProductsViewModel
 import com.example.front.viewmodels.register.RegisterViewModel
 import com.example.front.viewmodels.shops.ShopsViewModel
 import com.example.front.viewmodels.splasintro.SplashAndIntroViewModel
@@ -65,6 +66,7 @@ fun SetupNavGraph(
     val orderInfoViewModel : OrderInfoViewModel = hiltViewModel()
     val deliveryViewModel : DeliveryViewModel = hiltViewModel()
     val routedetailsViewModel : RouteDetailsViewModel = hiltViewModel()
+    val productsViewModel : ProductsViewModel = hiltViewModel()
 
     NavHost(
         navController = navController,
@@ -102,7 +104,7 @@ fun SetupNavGraph(
             route = Screen.AllProduct.route
         )
         {
-            AllProducts(navController = navController, homeViewModel, shopsViewModel)
+            AllProducts(navController = navController, productsViewModel, oneShopViewModel)
         }
         composable(route = Screen.Delivery.route) {
             DeliveryScreen(navController,deliveryViewModel)

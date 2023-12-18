@@ -2004,20 +2004,18 @@ fun EditSellersDialog(onDismiss: () -> Unit, shopViewModel: OneShopViewModel) {
                                     .align(Alignment.CenterHorizontally)
                             )
 
-                            MyTextField(
+                            MyTextFieldWithoutIcon(
                                 labelValue = "Name",
-                                painterResource = painterResource(id = R.drawable.user),
                                 value = name,
-                                onValueChange = { name = it }
+                                onValueChange = { name = it }, modifier = Modifier.fillMaxWidth()
                             )
 
                             Spacer(modifier = Modifier.height(16.dp))
 
-                            MyTextField(
+                            MyTextFieldWithoutIcon(
                                 labelValue = "Address",
-                                painterResource = painterResource(id = R.drawable.user),
                                 value = address,
-                                onValueChange = { address = it }
+                                onValueChange = { address = it }, modifier = Modifier.fillMaxWidth()
                             )
 
                             Spacer(modifier = Modifier.height(16.dp))

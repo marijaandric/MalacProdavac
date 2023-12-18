@@ -10,6 +10,7 @@ import com.example.front.model.DTO.HomeProductDTO
 import com.example.front.model.DTO.LeaveReviewDTO
 import com.example.front.model.DTO.LoginDTO
 import com.example.front.model.DTO.MetricsDTO
+import com.example.front.model.DTO.NewOrder
 import com.example.front.model.DTO.NewProductDTO
 import com.example.front.model.DTO.NewProductDisplayDTO
 import com.example.front.model.DTO.NewShopDTO
@@ -34,7 +35,6 @@ import com.example.front.model.response.LoginResponse
 import com.example.front.model.response.Success
 import com.example.front.model.response.SuccessBoolean
 import com.example.front.model.response.SuccessInt
-import com.example.front.model.response.SuccessProductDisplay
 import com.example.front.model.user.MyProfileDTO
 import com.example.front.model.user.UserEditDTO
 import okhttp3.MultipartBody
@@ -267,6 +267,10 @@ class Repository @Inject constructor(private val api: Api) {
 
     suspend fun uploadImage2(type: Int, id: Int, imagePart: MultipartBody.Part): Response<SuccessBoolean> {
         return api.uploadImage2(type, id, imagePart)
+    }
+
+    suspend fun insertOrders(orders: List<NewOrder>): Response<Void> {
+        return api.insertOrders(orders)
     }
 
 }

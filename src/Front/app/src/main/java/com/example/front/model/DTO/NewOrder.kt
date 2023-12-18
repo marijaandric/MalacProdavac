@@ -9,6 +9,6 @@ data class NewOrder (
     @SerializedName("paymentMethod") val paymentMethod: Int,
     @SerializedName("deliveryMethod") val deliveryMethod: Int,
     @SerializedName("shippingAddress") val shippingAddress: String,
-    @SerializedName("pickupTime") val pickupTime: String,
+    @SerializedName("pickupTime") val pickupTime: String? = null,
     @SerializedName("products") val products: List<ProductInOrder>,
 )

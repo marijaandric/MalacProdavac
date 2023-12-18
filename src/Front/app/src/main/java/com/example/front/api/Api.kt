@@ -8,6 +8,7 @@ import com.example.front.model.DTO.HomeProductDTO
 import com.example.front.model.DTO.LeaveReviewDTO
 import com.example.front.model.DTO.LoginDTO
 import com.example.front.model.DTO.MetricsDTO
+import com.example.front.model.DTO.NewOrder
 import com.example.front.model.DTO.NewProductDTO
 import com.example.front.model.DTO.NewProductDisplayDTO
 import com.example.front.model.DTO.NewShopDTO
@@ -275,4 +276,8 @@ interface Api {
 
 
 
+    @POST("back/Order/InsertOrder")
+    suspend fun insertOrders(
+        @Body orders: List<NewOrder>
+    ): Response<Void>
 }
