@@ -15,6 +15,7 @@ import com.example.front.model.DTO.NewOrder
 import com.example.front.model.DTO.NewProductDTO
 import com.example.front.model.DTO.NewProductDisplayDTO
 import com.example.front.model.DTO.NewShopDTO
+import com.example.front.model.DTO.NotificationDTO
 import com.example.front.model.DTO.OrderInfoDTO
 import com.example.front.model.DTO.OrdersDTO
 import com.example.front.model.DTO.OrdersPagesDTO
@@ -277,5 +278,8 @@ class Repository @Inject constructor(private val api: Api) {
     suspend fun editShop(EditShop: EditShopDTO):Response<SuccessBoolean>
     {
         return api.editShop(EditShop)
+    }
+    suspend fun getNotifications(userId: Int, type: List<Int>?,page: Int): Response<List<NotificationDTO>> {
+        return api.getNotifications(userId, type, page)
     }
 }

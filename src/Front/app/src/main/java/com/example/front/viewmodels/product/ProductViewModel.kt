@@ -49,7 +49,7 @@ class ProductViewModel @Inject constructor(
 
                 }
             } catch (e: Exception) {
-                Log.d("Eroorrrrr", e.message.toString())
+                Log.d("Error", e.message.toString())
             }
         }
     }
@@ -58,19 +58,24 @@ class ProductViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val response = repository.getReviewsForProduct(productID, pageNumber)
+                Log.d("Response", response.toString())
                 if (response.isSuccessful) {
                     val reviewsResponse = response.body()
                     _stateReview.value = _stateReview.value.copy(
                         isLoading = false,
-                        reviews = _stateReview.value.reviews.orEmpty() + (reviewsResponse
-                            ?: emptyList())
+                        reviews = reviewsResponse
                     )
                 } else {
-                    // Handle error if needed
                 }
             } catch (e: Exception) {
-                Log.d("Eroorrrrr", e.message.toString())
+                Log.d("Error", e.message.toString())
             }
+        }
+    }
+
+    fun ChangePage(currentPage: Int) {
+        viewModelScope.launch {
+            _state.value.product!!.productId?.let { getReviewsForProduct(it, currentPage) }
         }
     }
 

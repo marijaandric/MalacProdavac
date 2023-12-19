@@ -13,6 +13,7 @@ import com.example.front.model.DTO.NewOrder
 import com.example.front.model.DTO.NewProductDTO
 import com.example.front.model.DTO.NewProductDisplayDTO
 import com.example.front.model.DTO.NewShopDTO
+import com.example.front.model.DTO.NotificationDTO
 import com.example.front.model.DTO.OrderInfoDTO
 import com.example.front.model.DTO.OrdersDTO
 import com.example.front.model.DTO.OrdersPagesDTO
@@ -281,6 +282,13 @@ interface Api {
     suspend fun insertOrders(
         @Body orders: List<NewOrder>
     ): Response<Void>
+
+    @GET("/back/Notification/GetNotifications")
+    suspend fun getNotifications(
+        @Query("userId") userId: Int,
+        @Query("types") type: List<Int>?,
+        @Query("page") page: Int,
+    ): Response<List<NotificationDTO>>
 
     @PUT("Shop/EditShop")
     suspend fun editShop(

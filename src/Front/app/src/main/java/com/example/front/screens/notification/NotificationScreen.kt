@@ -1,5 +1,6 @@
 package com.example.front.screens.notification
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,12 +15,19 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,94 +35,129 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.front.R
+import com.example.front.components.Paginator
 import com.example.front.components.Sidebar
 import com.example.front.components.SmallElipseAndTitle
 import com.example.front.ui.theme.Typography
-import com.example.front.viewmodels.cart.CartViewModel
 import com.example.front.viewmodels.notification.NotificationViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NotificationScreen(navController: NavHostController, viewModel: NotificationViewModel) {
+
+    var currentPage by remember { mutableStateOf(1) }
+    var totalPages = 1
+
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+
+    LaunchedEffect(Unit) {
+        viewModel.dataStoreManager.getUserIdFromToken()
+            ?.let { viewModel.getNotifications(it, listOf(), currentPage) }
+    }
+
     Sidebar(
         drawerState,
         navController,
         viewModel.dataStoreManager
     ) {
-        SmallElipseAndTitle("Notifications", drawerState)
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
-            Spacer(modifier = Modifier.height(150.dp))
-            TypeOfNotifications()
-            Row(
+        if (viewModel.state.value.isLoading) {
+            CircularProgressIndicator()
+        } else {
+            totalPages = viewModel.statePageCount.value
+            SmallElipseAndTitle("Notifications", drawerState)
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(20.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
+                    .fillMaxSize()
             ) {
-                Text(
-                    text = "Today",
-                    style = Typography.bodyMedium,
+                Spacer(modifier = Modifier.height(150.dp))
+                TypeOfNotifications()
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(20.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = "Today",
+                        style = Typography.bodyMedium,
+                    )
+                    Text(text = "Clear all", style = Typography.bodyMedium)
+                }
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(450.dp)
+                ) {
+                    items(viewModel.state.value.notifications) { notification ->
+                        NotificationCard(title = notification.title, notification.text)
+                    }
+                }
+                Paginator(
+                    currentPage = currentPage,
+                    totalPages = totalPages,
+                    onPageSelected = { newPage ->
+                        if (newPage in 1..totalPages) {
+                            currentPage = newPage
+                        }
+                    }
                 )
-                Text(text = "Clear all", style = Typography.bodyMedium)
-            }
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxWidth()
-            ) {
-                item {
-                    NotificationCard()
-                }
-                item {
-                    NotificationCard()
-                }
-                item {
-                    NotificationCard()
-                }
             }
         }
     }
 }
+
+data class NotificationCategory(
+    val id: Int,
+    val text: String
+)
 
 @Composable
 fun TypeOfNotifications() {
-    // Sample data
-    val items = listOf("Item 1", "Item 2", "Item 3", "Item 4", "Item 5")
+    val items = listOf(
+        NotificationCategory(0, "Info"),
+        NotificationCategory(1, "Rate Person"),
+        NotificationCategory(2, "Product"),
+        NotificationCategory(3, "Shop"),
+        NotificationCategory(4, "Route"),
+        NotificationCategory(5, "Req"),
+        NotificationCategory(6, "Order"),
+        NotificationCategory(7, "Rate Product"),
+        NotificationCategory(8, "Rate Shop")
+    )
 
     LazyRow {
         items(items) { item ->
-            ItemType(text = item)
+            ItemType(item.id,text = item.text)
         }
     }
 }
 
 @Composable
-fun ItemType(text: String) {
+fun ItemType(id:Int,text: String) {
     Card(
         shape = RoundedCornerShape(10.dp), // Border radius
-        modifier = Modifier.padding(8.dp) // Spacing between items
+        modifier = Modifier.padding(8.dp), // Spacing between items
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFF1F1F1))
     ) {
         Text(text = text, modifier = Modifier.padding(16.dp))
     }
 }
 
 @Composable
-fun NotificationCard() {
+fun NotificationCard(title: String, body: String) {
     Card(
         modifier = Modifier
-            .padding(20.dp)
-            .fillMaxWidth(),
-        shape = RoundedCornerShape(10.dp)
+            .padding(10.dp)
+            .fillMaxWidth()
+            .height(130.dp),
+        shape = RoundedCornerShape(10.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFF1F1F1))
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            // First row with two icons and a text in the middle
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 8.dp), // Add padding at the bottom
+                    .padding(bottom = 8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -123,7 +166,7 @@ fun NotificationCard() {
                     contentDescription = "Left Icon",
                     modifier = Modifier.size(24.dp)
                 )
-                Text(text = "Appointment accepted")
+                Text(text = "$title")
                 Icon(
                     painter = painterResource(id = R.drawable.carbon_dot_mark), // Replace with your icon resource
                     contentDescription = "Right Icon",
@@ -131,19 +174,17 @@ fun NotificationCard() {
                 )
             }
 
-            // Second row with just text
             Text(
-                text = "User vinarija.vuković has accepted your appointment to pick up the product.",
+                text = "$body",
                 modifier = Modifier
-                    .padding(20.dp) // Padding around the text
+                    .padding(10.dp)
             )
 
-            // Third row with a 'View' text in a different color
             Text(
                 text = "View",
-                color = Color.Blue, // Replace with your preferred color
+                color = Color.Blue,
                 modifier = Modifier
-                    .padding(20.dp) // Padding around the text
+                    .padding(20.dp)
             )
         }
     }

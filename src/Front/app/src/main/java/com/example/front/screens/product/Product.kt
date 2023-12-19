@@ -57,6 +57,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.front.R
 import com.example.front.components.GalleryComponent
 import com.example.front.components.MyDropdownWorkingHours
+import com.example.front.components.Paginator
 import com.example.front.components.ProductImage
 import com.example.front.components.Sidebar
 import com.example.front.model.DTO.ImageDataDTO
@@ -90,6 +91,9 @@ fun ProductPage(
     val context = LocalContext.current
     var isToggled by remember { mutableStateOf(false) }
 
+    val reviews = productViewModel.stateReview.value.reviews
+    var currentPage = 1
+
     var selectedImage by remember {
         mutableStateOf(
             ImageDataDTO(0, "placeholder.png")
@@ -120,7 +124,7 @@ fun ProductPage(
 
     LaunchedEffect(Unit) {
         productViewModel.getUserId()?.let { productViewModel.getProductInfo(productID, it) }
-        productViewModel.getReviewsForProduct(productID, 0)
+        productViewModel.getReviewsForProduct(productID, currentPage)
     }
 
     DisposableEffect(productID) {
@@ -383,7 +387,6 @@ fun ProductPage(
                             )
                         }
 
-
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -397,12 +400,19 @@ fun ProductPage(
                                 color = Color.Black,
                                 modifier = Modifier.weight(1f)
                             )
-
-                            NumberPicker(
-                                value = quantity,
-                                onValueChange = { newValue -> quantity = newValue },
-                                modifier = Modifier.weight(1f)
-                            )
+                            if(productInfo.sizes?.all { it.quantity == 0 } != true)
+                                NumberPicker(
+                                    value = quantity,
+                                    onValueChange = { newValue -> quantity = newValue },
+                                    modifier = Modifier.weight(1f)
+                                )
+                            else
+                                Text(
+                                    text = "Out of stock",
+                                    style = Typography.titleSmall,
+                                    color = Color.Black,
+                                    modifier = Modifier.weight(1f)
+                                )
                         }
 
                         Row(
@@ -411,7 +421,6 @@ fun ProductPage(
                         ) {
                             Button(
                                 onClick = {
-                                    println("VELICINE   " + productInfo?.sizes)
                                     if (productInfo?.name != null &&
                                         productInfo?.price != null &&
                                         productInfo.shopId != null &&
@@ -512,7 +521,6 @@ fun ProductPage(
                                 color = Color.Gray
                             )
                             Row(modifier = Modifier.padding(10.dp)) {
-                                val reviews = productViewModel.stateReview.value.reviews
 
                                 if (reviews.isNullOrEmpty()) {
                                     Text(
@@ -521,53 +529,21 @@ fun ProductPage(
                                         modifier = Modifier.padding(10.dp)
                                     )
                                 } else {
-                                    Column {
-                                        ReviewCard(productReviewUserInfo = reviews[0])
-
-                                        var reviewCounter by remember { mutableStateOf(1) }
-                                        var showAllReviews by remember { mutableStateOf(false) }
-
-                                        if (showAllReviews) {
-                                            for (i in 1..reviewCounter) {
-                                                ReviewCard(productReviewUserInfo = reviews[i - 1])
-                                            }
-                                        }
-                                        Row(
-                                            modifier = Modifier.fillMaxWidth(),
-                                            Arrangement.Center
-                                        ) {
-
-                                            Button(
-                                                onClick = {
-                                                    showAllReviews = !showAllReviews
-
-                                                    if (showAllReviews) {
-                                                        GlobalScope.launch {
-                                                            productViewModel.getReviewsForProduct(
-                                                                productID,
-                                                                reviews.size
-                                                            )
-                                                        }
-                                                    }
-                                                }
-                                            ) {
-                                                Text(if (showAllReviews) "Show less reviews" else "Show all reviews")
-                                            }
-                                        }
-
-                                        DisposableEffect(reviewCounter) {
-                                            if (showAllReviews) {
-                                                GlobalScope.launch {
-                                                    productViewModel.getReviewsForProduct(
-                                                        productID,
-                                                        reviews.size
-                                                    )
-                                                }
-                                            }
-                                            onDispose {
-                                            }
+                                    Column(modifier = Modifier.fillMaxWidth().height(530.dp)) {
+                                        reviews.forEach { review ->
+                                            ReviewCard(productReviewUserInfo = review)
                                         }
                                     }
+                                    Paginator(
+                                        currentPage = currentPage,
+                                        totalPages = 2,
+                                        onPageSelected = { newPage ->
+                                            if (newPage in 1..2) {
+                                                currentPage = newPage
+                                                productViewModel.ChangePage(currentPage)
+                                            }
+                                        }
+                                    )
                                 }
                             }
                             Divider(
@@ -660,6 +636,7 @@ fun ReviewCard(productReviewUserInfo: ProductReviewUserInfo) {
             .width(350.dp)
             .clip(RoundedCornerShape(20.dp))
             .padding(5.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFF1F1F1))
     )
     {
         Row(
