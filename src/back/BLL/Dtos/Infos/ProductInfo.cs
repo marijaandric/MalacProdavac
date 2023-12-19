@@ -14,11 +14,11 @@ namespace back.BLL.Dtos.Infos
         public bool Bought { get; set; }
         public bool Rated { get; set; }
         public bool IsOwner { get; set; }
+        public bool Subscribed { get; set; }
         public float Rating { get; set; }
         public List<WorkingHours> WorkingHours { get; set; }
         public List<QuestionWithAnswer> QuestionsAndAnswers { get; set; }
         public List<Stock> Sizes { get; set; }
         public List<ImageData> Images { get; set; }
-        public List<ProductSubscription> Subscriptions { get; set; }
     }
 }
