@@ -1,6 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 using back.BLL.Dtos;
 using back.BLL.Services;
+using back.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace back.PL.Controllers
@@ -192,6 +193,19 @@ namespace back.PL.Controllers
             try
             {
                 return Ok(new { Success = await _service.DeleteProduct(productId) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
+
+        [HttpPost("Subscribe")]
+        public async Task<IActionResult> Subscribe(ProductSubscriptionDto dto)
+        {
+            try
+            {
+                return Ok(new { Success = await _service.Subscribe(dto) });
             }
             catch (Exception ex)
             {

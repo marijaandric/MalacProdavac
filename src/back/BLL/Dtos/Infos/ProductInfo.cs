@@ -19,5 +19,6 @@ namespace back.BLL.Dtos.Infos
         public List<QuestionWithAnswer> QuestionsAndAnswers { get; set; }
         public List<Stock> Sizes { get; set; }
         public List<ImageData> Images { get; set; }
+        public List<ProductSubscription> Subscriptions { get; set; }
     }
 }

@@ -35,5 +35,8 @@ namespace back.DAL.Repositories
         public Task<string> GetMetric(int metricId);
         public Task<List<Metric>> GetMetrics();
         public Task<List<Size>> GetSizes();
+        public Task<bool> Subscribe(ProductSubscription ps);
+        public Task<List<ProductSubscription>> GetSubscriptions(int productId);
+        public Task<bool> DeleteSubscriptions(List<ProductSubscription> subscriptions);
     }
 }

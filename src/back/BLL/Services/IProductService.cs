@@ -20,6 +20,7 @@ namespace back.BLL.Services
         public Task<int> AddProduct(ProductDto product);
         public Task<bool> EditProduct(EditProductDto productDto);
         public Task<bool> DeleteProduct(int productId);
+        public Task<bool> Subscribe(ProductSubscriptionDto dto);
 
     }
 }

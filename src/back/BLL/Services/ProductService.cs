@@ -2,6 +2,7 @@
 using back.BLL.Dtos.Cards;
 using back.BLL.Dtos.HelpModels;
 using back.BLL.Dtos.Infos;
+using back.DAL.Models;
 using back.DAL.Repositories;
 using back.Models;
 
@@ -201,12 +202,18 @@ namespace back.BLL.Services
             if (ind)
             {
                 List<int> usersToNotify = await _repository.GetShopFollowers(editedProduct.ShopId);
+                var subscribers = await _repository.GetSubscriptions(productDto.Id);
+                usersToNotify.AddRange(subscribers.Select(x => x.UserId));
+                usersToNotify = usersToNotify.Distinct().ToList();
+
 
                 foreach (int user in usersToNotify)
                 {
                     string shopName = (await _shopRepository.GetShop(editedProduct.ShopId)).Name;
                     if (await _notificationRepository.InsertNotification(user, 2, "Back in stock!", editedProduct.Name + " is back in stock in " + shopName + ".\nTap to learn more.", editedProduct.Id)) Console.WriteLine("Notification sent!");
                 }
+
+                await _repository.DeleteSubscriptions(subscribers);
             }
 
             return true;
@@ -216,6 +223,11 @@ namespace back.BLL.Services
         {
             if (!await _repository.DeleteProduct(productId)) throw new ArgumentException("Product could not be deleted!");
             return true;
+        }
+
+        public async Task<bool> Subscribe(ProductSubscriptionDto dto)
+        {
+            return await _repository.Subscribe(new ProductSubscription {  ProductId = dto.ProductId, UserId = dto.UserId });
         }
     }
 }
