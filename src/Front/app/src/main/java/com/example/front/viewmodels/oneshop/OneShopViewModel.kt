@@ -12,6 +12,7 @@ import com.example.front.model.DTO.FiltersDTO
 import com.example.front.model.DTO.NewProductDTO
 import com.example.front.model.DTO.NewProductDisplayDTO
 import com.example.front.repository.Repository
+import com.example.front.screens.myshop.state.ImageState
 import com.example.front.screens.shop.state.DeleteProductDisplayState
 import com.example.front.screens.shop.state.DeleteShopState
 import com.example.front.screens.shop.state.EditShopState
@@ -98,6 +99,9 @@ class OneShopViewModel @Inject constructor(
     private val _stateEditShop = mutableStateOf(EditShopState())
     var stateEditShop: State<EditShopState> = _stateEditShop;
 
+    //slika
+    private val _stateimage = mutableStateOf(ImageState())
+    var stateimage: State<ImageState> = _stateimage;
 
     fun getShopDetails(userId: Int, shopId: Int) {
         viewModelScope.launch {
@@ -598,6 +602,32 @@ class OneShopViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 _stateDeleteShop.value = _stateDeleteShop.value.copy(
+                    error = e.message.toString()
+                )
+            }
+        }
+    }
+
+    fun uploadImage(type: Int, id: Int, imagePart : MultipartBody.Part) {
+        viewModelScope.launch {
+            try {
+                val response = repository.uploadImage2(type, id, imagePart)
+
+                if (response.isSuccessful) {
+                    _stateimage.value = _stateimage.value.copy(
+                        isLoading = false,
+                        image = response.body(),
+                        error = "CantAdd"
+                    )
+                } else {
+                    _stateimage.value = _stateimage.value.copy(
+                        isLoading = false,
+                        image = null,
+                        error = ""
+                    )
+                }
+            } catch (e: Exception) {
+                _stateimage.value = _stateimage.value.copy(
                     error = e.message.toString()
                 )
             }

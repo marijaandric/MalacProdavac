@@ -2236,11 +2236,7 @@ fun EditSellersDialog(onDismiss: () -> Unit, shopViewModel: OneShopViewModel) {
                                 onClick = {
                                     val workingHoursList: List<WorkingHoursNewShopDTO> = workingHoursMap.values.filterNotNull()
                                     val pibInt = pib.toIntOrNull()
-                                    if(pibInt == null)
-                                    {
-
-                                    }
-                                    else{
+                                    if(pibInt != null){
                                         val editShop = EditShopDTO(
                                             id = shopViewModel.state.value.shop!!.id,
                                             name = name,
@@ -2251,6 +2247,11 @@ fun EditSellersDialog(onDismiss: () -> Unit, shopViewModel: OneShopViewModel) {
                                             accountNumber = accountNumber
                                         )
                                         shopViewModel.editShop(editShop)
+                                        picture?.let {
+                                            shopViewModel.uploadImage(2,shopViewModel.state.value.shop!!.id,
+                                                it
+                                            )
+                                        }
                                     }
 
                                     onDismiss() },

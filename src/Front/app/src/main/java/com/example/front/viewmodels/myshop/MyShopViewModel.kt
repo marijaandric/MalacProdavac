@@ -44,7 +44,6 @@ class MyShopViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val response = repository.getShopId(i)
-                Log.d("RESPONSE",response.toString())
                 if (response.isSuccessful) {
                     _state.value = _state.value.copy(
                         isLoading = false,
