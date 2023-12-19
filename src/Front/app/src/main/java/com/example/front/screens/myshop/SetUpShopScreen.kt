@@ -208,10 +208,8 @@ fun ProfilePhoto(context:Context, userId:Int, viewModel: MyShopViewModel, navCon
 
     val toastHostState = rememberToastHostState()
     val cardData = listOf(
-        "Food", "Drink", "Footwear", "Clothes", "Jewerly", "Tools", "Furniture", "Pottery", "Beauty", "Health", "Decor", "Other"
+        "Food", "Drink", "Tools", "Clothes", "Jewerly", "Footwear", "Furniture", "Pottery", "Beauty", "Decor", "Health", "Other"
     )
-
-    val timeValues = remember { mutableMapOf<String, LocalTime>() }
 
     var brojevi = (1..12).map { it }
     var kombinovanaLista = cardData.zip(brojevi)

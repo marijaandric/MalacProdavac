@@ -125,6 +125,7 @@ class OneShopViewModel @Inject constructor(
     fun editShop(editShop:EditShopDTO) {
         viewModelScope.launch {
             try {
+                Log.d("EDITSHOPDTO", editShop.toString())
                 val response = repository.editShop(editShop)
                 Log.d("EDIT", response.toString())
                 if (response.isSuccessful) {

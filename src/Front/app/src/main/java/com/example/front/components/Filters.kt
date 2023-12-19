@@ -288,7 +288,7 @@ fun CardGridForProduct(
     var switchState by remember { mutableStateOf(if(shopsViewModel.filtersState.value.open != null)shopsViewModel.filtersState.value.open else false ) }
 
     val cardData = listOf(
-        "Food", "Drink", "Footwear", "Clothes", "Jewerly", "Tools", "Furniture", "Pottery", "Beauty", "Health", "Decor", "Other"
+        "Food", "Drink", "Tools", "Clothes", "Jewerly", "Footwear", "Furniture", "Pottery", "Beauty", "Decor", "Health", "Other"
     )
 
     var brojevi = (1..12).map { it }

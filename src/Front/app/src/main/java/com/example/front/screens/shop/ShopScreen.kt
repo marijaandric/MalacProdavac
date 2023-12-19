@@ -18,6 +18,7 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -84,11 +85,13 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
+import coil.compose.rememberImagePainter
 import com.example.front.R
 import com.example.front.components.ButtonWithIcon
 import com.example.front.components.CardButton
 import com.example.front.components.CommentsTextBox
 import com.example.front.components.FilterDialogProducts
+import com.example.front.components.ImageItemForProfilePic
 import com.example.front.components.MyDropdownCategories
 import com.example.front.components.MyDropdownMetrics
 import com.example.front.components.MyNumberField
@@ -102,6 +105,7 @@ import com.example.front.components.SmallElipseAndTitle
 import com.example.front.components.SortDialog
 import com.example.front.components.ToggleImageButtonFunction
 import com.example.front.model.DTO.CategoriesDTO
+import com.example.front.model.DTO.EditShopDTO
 import com.example.front.model.DTO.MetricsDTO
 import com.example.front.model.DTO.NewProductDTO
 import com.example.front.model.DTO.NewProductDisplayDTO
@@ -110,9 +114,12 @@ import com.example.front.model.DTO.WorkingHoursNewShopDTO
 import com.example.front.navigation.Screen
 import com.example.front.screens.myshop.ChangeTime
 import com.example.front.screens.myshop.DayOfWeekItem
+import com.example.front.screens.myshop.getMultipartBodyPart
+import com.example.front.screens.sellers.FilterCard
 import com.example.front.viewmodels.oneshop.OneShopViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import okhttp3.MultipartBody
 import rememberToastHostState
 import java.text.SimpleDateFormat
 import java.time.LocalTime
@@ -171,6 +178,25 @@ fun ShopScreen(
                 }
             }
 
+        }
+    }
+    LaunchedEffect(shopViewModel.stateEditShop.value)
+    {
+        Log.d("PROMENA",shopViewModel.stateEditShop.value.toString())
+        if(shopViewModel.stateEditShop.value.error.isNotEmpty())
+        {
+            toastHostState.showToast(
+                "Error. Please, check all fields!",
+                Icons.Default.Clear
+            )
+        }
+        else if(shopViewModel.stateEditShop.value.success != null)
+        {
+            shopViewModel.getUserId()
+                ?.let {
+                    shopViewModel.getShopDetails(it, shopId)
+                    id = it
+                }
         }
     }
     val context = LocalContext.current
@@ -1809,12 +1835,19 @@ fun EditSellersDialog(onDismiss: () -> Unit, shopViewModel: OneShopViewModel) {
         mutableStateOf("")
     }
     var categories = mutableListOf<Int>()
-
+    val cardData = listOf(
+        "Food", "Drink", "Tools", "Clothes", "Jewerly", "Footwear", "Furniture", "Pottery", "Beauty", "Decor", "Health", "Other"
+    )
     name = shopViewModel.state.value.shop!!.name
     address = shopViewModel.state.value.shop!!.address
     pib = shopViewModel.state.value.shop!!.pib.toString()
-    accountNumber = shopViewModel.state.value.shop!!.accountNumber.toString()
-    //categories = shopViewModel.state.value.shop!!.categories.toMutableList()
+    accountNumber = if(shopViewModel.state.value.shop!!.accountNumber.toString() != null)shopViewModel.state.value.shop!!.accountNumber.toString() else ""
+    var brojevi = (1..12).map { it }
+    var clickedCards by remember {
+        mutableStateOf(emptyList<Int>())
+    }
+    val cat = shopViewModel.state.value.shop!!.categories
+    var kombinovanaLista = cardData.zip(brojevi)
 
     var selectedDay by remember { mutableStateOf<String?>("Mon") }
     var workingHoursMap by remember {
@@ -1964,6 +1997,27 @@ fun EditSellersDialog(onDismiss: () -> Unit, shopViewModel: OneShopViewModel) {
         stateEndSun = rememberTimePickerState(initialHour = hourPart.toInt(), initialMinute = minutePart.toInt())
     }
 
+    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
+    var picture by remember {
+        mutableStateOf<MultipartBody.Part?>(null)
+    }
+    val toastHostState = rememberToastHostState()
+
+    val context = LocalContext.current
+    var firstTime by remember{
+        mutableStateOf(true)
+    }
+
+    val photoPicker = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri ->
+        uri?.let {
+            selectedImageUri = uri
+            if( selectedImageUri != null)
+            {
+                picture = getMultipartBodyPart(context, selectedImageUri!!)
+            }
+        }
+    }
+
     Dialog(
         properties = DialogProperties(usePlatformDefaultWidth = false),
         onDismissRequest = { onDismiss() }) {
@@ -1993,12 +2047,12 @@ fun EditSellersDialog(onDismiss: () -> Unit, shopViewModel: OneShopViewModel) {
             ) {
                 LazyColumn()
                 {
-                    item {
+                    item{
                         Column(
-                            modifier = Modifier
+                            modifier  = Modifier
                                 .fillMaxWidth()
-                                .padding(16.dp)
-                                .align(Alignment.Center)
+                                .padding(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text(
                                 "Edit shop",
@@ -2007,6 +2061,66 @@ fun EditSellersDialog(onDismiss: () -> Unit, shopViewModel: OneShopViewModel) {
                                     .padding(bottom = 25.dp)
                                     .align(Alignment.CenterHorizontally)
                             )
+                            Box(
+                                modifier = Modifier
+                                    .size(165.dp)
+                                    .padding(16.dp)
+                                    .background(MaterialTheme.colorScheme.primary, CircleShape),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                if (selectedImageUri != null) {
+                                    Image(
+                                        painter = rememberImagePainter(
+                                            data = selectedImageUri,
+                                            builder = {
+                                                crossfade(true)
+                                            }
+                                        ),
+                                        contentDescription = null,
+                                        modifier = Modifier
+                                            .size(165.dp)
+                                            .clip(CircleShape)
+                                            .fillMaxSize()
+                                            .clickable {
+                                                photoPicker.launch("image/*")
+                                            },
+                                        contentScale = ContentScale.Crop
+                                    )
+                                }
+                                else if(shopViewModel.state.value.shop!!.image != null) {
+                                    shopViewModel.state.value.shop!!.image?.let {
+                                        Column(
+                                            horizontalAlignment = Alignment.CenterHorizontally,
+                                            verticalArrangement = Arrangement.Center,
+                                            modifier = Modifier.size(165.dp)
+                                        ) {
+                                            ImageItemForProfilePic(image = it, onEditClick = {photoPicker.launch("image/*")})
+                                        }
+                                    }
+                                }
+                                else{
+                                    Column(
+                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                        verticalArrangement = Arrangement.Center,
+                                        modifier = Modifier.size(165.dp)
+                                    ) {
+                                        Image(
+                                            painter = painterResource(id = R.drawable.imageplaceholder),
+                                            contentDescription = null,
+                                            modifier = Modifier.fillMaxSize()
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    item {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp)
+                                .align(Alignment.Center)
+                        ) {
 
                             MyTextFieldWithoutIcon(
                                 labelValue = "Name",
@@ -2023,15 +2137,44 @@ fun EditSellersDialog(onDismiss: () -> Unit, shopViewModel: OneShopViewModel) {
                             )
 
                             Spacer(modifier = Modifier.height(16.dp))
-                            MyTextFieldWithoutIcon(labelValue = "Account Number", value = accountNumber, onValueChange={ accountNumber=it }, modifier = Modifier.fillMaxWidth())
+                            MyNumberField(labelValue = "Account Number", value = accountNumber, onValueChange={ accountNumber=it }, modifier = Modifier.fillMaxWidth())
                             Spacer(modifier = Modifier.height(16.dp))
                             MyNumberField(labelValue = "Pib", value = pib, onValueChange={ pib=it }, modifier = Modifier.fillMaxWidth())
                             Spacer(modifier = Modifier.height(16.dp))
 
                             Text(
-                                "Working hours",
+                                "Shop Categories",
                                 style = MaterialTheme.typography.titleSmall,
                                 modifier = Modifier
+                            )
+                            LazyVerticalGrid(
+                                modifier = Modifier.heightIn(30.dp,500.dp),
+                                columns = GridCells.Fixed(3),
+                                contentPadding = PaddingValues(0.dp)
+                            ) {
+                                items(kombinovanaLista,key={(_, number) -> number }) { (cardText,number) ->
+                                    val sadrziElement = cat.any { element ->
+                                        element.contains(cardText)
+                                    }
+                                    if(sadrziElement && !clickedCards.contains(number) && firstTime)
+                                    {
+                                        clickedCards = clickedCards + number
+                                    }
+                                    FilterCard(cardText = cardText, onClick = {
+                                        if (clickedCards.contains(number)) {
+                                            clickedCards = clickedCards - number
+                                        } else {
+                                            clickedCards = clickedCards + number
+                                        }
+                                    }, sadrziElement)
+                                }
+                                firstTime = false
+                            }
+
+                            Text(
+                                "Working hours",
+                                style = MaterialTheme.typography.titleSmall,
+                                modifier = Modifier.padding(top=10.dp)
                             )
                             Row(
                                 modifier = Modifier
@@ -2090,7 +2233,27 @@ fun EditSellersDialog(onDismiss: () -> Unit, shopViewModel: OneShopViewModel) {
 
                             CardButton(
                                 text = "Edit",
-                                onClick = { onDismiss() },
+                                onClick = {
+                                    val workingHoursList: List<WorkingHoursNewShopDTO> = workingHoursMap.values.filterNotNull()
+                                    val pibInt = pib.toIntOrNull()
+                                    if(pibInt == null)
+                                    {
+
+                                    }
+                                    else{
+                                        val editShop = EditShopDTO(
+                                            id = shopViewModel.state.value.shop!!.id,
+                                            name = name,
+                                            address = address,
+                                            categories = clickedCards,
+                                            workingHours = workingHoursList,
+                                            pib = pibInt,
+                                            accountNumber = accountNumber
+                                        )
+                                        shopViewModel.editShop(editShop)
+                                    }
+
+                                    onDismiss() },
                                 width = 1f,
                                 modifier = Modifier,
                                 color = MaterialTheme.colorScheme.primary

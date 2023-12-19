@@ -290,7 +290,7 @@ interface Api {
         @Query("page") page: Int,
     ): Response<List<NotificationDTO>>
 
-    @PUT("Shop/EditShop")
+    @PUT("back/Shop/EditShop")
     suspend fun editShop(
         @Body edit : EditShopDTO
     ): Response<SuccessBoolean>
