@@ -1,6 +1,7 @@
 package com.example.front.screens.sellers
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
@@ -9,6 +10,7 @@ import android.graphics.BitmapFactory
 import android.graphics.drawable.BitmapDrawable
 import android.location.LocationManager
 import android.util.Log
+import android.view.MotionEvent
 import android.view.ViewGroup
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -24,7 +26,7 @@ import org.osmdroid.views.overlay.Marker
 
 
 @Composable
-fun Osm(shopsViewModel: ShopsViewModel): GeoPoint {
+fun Osm(shopsViewModel: ShopsViewModel, isTrue:Boolean?): GeoPoint {
     val context = LocalContext.current
     val yourUserAgent = "YourUserAgentName"
     Configuration.getInstance().userAgentValue = yourUserAgent
@@ -32,12 +34,15 @@ fun Osm(shopsViewModel: ShopsViewModel): GeoPoint {
 
     AndroidView(
         modifier = Modifier,
-        factory = { mapView(context, shopsViewModel) },
+        factory = { mapView(context, shopsViewModel, isTrue) },
     )
     return getCurrentLocation(context)
 }
 
-private fun mapView(context: Context, shopsViewModel: ShopsViewModel): MapView {
+@SuppressLint("ClickableViewAccessibility")
+private fun mapView(context: Context, shopsViewModel: ShopsViewModel, isTrue: Boolean?): MapView {
+    val shopIdToMarkerMap = mutableMapOf<Int, Marker>()
+    shopsViewModel.handleShopClick(0)
     val mapView = MapView(context)
     val geoPoint = getCurrentLocation(context)
     mapView.controller.setZoom(18.0)
@@ -59,9 +64,31 @@ private fun mapView(context: Context, shopsViewModel: ShopsViewModel): MapView {
             marker.title = title
             val address = geoPoint.address
             marker.snippet = address
+            shopIdToMarkerMap[geoPoint.id] = marker
             mapView.overlays.add(marker)
+            if(isTrue != null)
+            {
+                marker.setOnMarkerClickListener { marker, mapView ->
+                    val shopId = geoPoint.id
+                    shopsViewModel.handleShopClick(shopId)
+                    true
+                }
+            }
         }
     }
+
+//    mapView.setOnTouchListener { _, event ->
+//        if (event.action == MotionEvent.ACTION_UP) {
+//            val touchGeoPoint = mapView.projection.fromPixels(event.x.toInt(), event.y.toInt())
+//            for ((shopId, marker) in shopIdToMarkerMap) {
+//                if (marker.position.distanceToAsDouble(touchGeoPoint) < 200) {
+//                    shopsViewModel.handleShopClick(shopId)
+//                    return@setOnTouchListener true
+//                }
+//            }
+//        }
+//        false
+//    }
 
     val marker = Marker(mapView)
     val originalBitmap = BitmapFactory.decodeResource(context.resources, R.drawable.currentlocation)

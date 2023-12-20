@@ -196,7 +196,15 @@ fun MapFiltersForAllProduct(
 
     Column {
         Spacer(modifier = Modifier.height(16.dp))
-        SearchTextField(valuee = value, placeh = "Search sellers", onValueChangee = { value = it; onSearchChange(value) }, modifier = Modifier.fillMaxWidth(1f))
+        if(!switchState) {
+            var sliderValue by remember { mutableStateOf(0f) }
+            SearchTextField(
+                valuee = value,
+                placeh = "Search sellers",
+                onValueChangee = { value = it; onSearchChange(value) },
+                modifier = Modifier.fillMaxWidth(1f)
+            )
+        }
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -248,6 +256,7 @@ fun MapFiltersForAllProduct(
                     onValueChange = { newValue ->
                         sliderValue = newValue
                         onSliderChange(sliderValue)
+                        value = ""
                     },
                     valueRange = 10f..100f,
                     steps = 9,

@@ -819,7 +819,7 @@ fun CardForOneOrderWithoutButton(
 fun SellerCard(
     title: String,
     author: String,
-    imageResource: String,
+    imageResource: String?,
     isLiked: Boolean,
     onClick: () -> Unit,
     navController: NavHostController,
@@ -843,16 +843,32 @@ fun SellerCard(
                 val imageUrl = "http://softeng.pmf.kg.ac.rs:10015/images/${imageResource}"
 
                 val painter: Painter = rememberAsyncImagePainter(model = imageUrl)
-                Image(
-                    painter = painter,
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(120.dp)
-                        .padding(13.dp)
-                        .clip(RoundedCornerShape(10.dp))
-                )
+                if(imageUrl == null)
+                {
+                    Image(
+                        painter = painterResource(id = R.drawable.imageplaceholder),
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(120.dp)
+                            .padding(13.dp)
+                            .clip(RoundedCornerShape(10.dp))
+                    )
+                }
+                else{
+                    Image(
+                        painter = painter,
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(120.dp)
+                            .padding(13.dp)
+                            .clip(RoundedCornerShape(10.dp))
+                    )
+                }
+                
 
                 Image(
                     painter = painterResource(if (isLiked) R.drawable.srcefull else R.drawable.srce),

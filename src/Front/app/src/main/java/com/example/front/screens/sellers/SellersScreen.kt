@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -66,6 +67,7 @@ import com.example.front.R
 import com.example.front.components.BigBlueButton
 import com.example.front.components.Paginator
 import com.example.front.components.SearchTextField
+import com.example.front.components.SellerCard
 import com.example.front.components.ShopCard
 import com.example.front.components.Sidebar
 import com.example.front.components.SmallElipseAndTitle
@@ -261,7 +263,9 @@ fun FavItems(navController: NavHostController, shopsViewModel: ShopsViewModel) {
 
 @Composable
 fun AllSellers(navController: NavHostController, shopsViewModel: ShopsViewModel) {
-
+    var mapD by remember {
+        mutableStateOf(false)
+    }
     val state = shopsViewModel.state.value
     val shops = state.shops?.mapIndexed { index, productsState ->
         DataCard(
@@ -287,16 +291,103 @@ fun AllSellers(navController: NavHostController, shopsViewModel: ShopsViewModel)
             .padding(top = 20.dp)
     ) {
         Text("Explore Seller Locations", style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold), modifier = Modifier.padding(start=20.dp))
+
         Card(
             modifier = Modifier
-                .height(250.dp)
-                .padding(20.dp)
+                .height(200.dp)
+                .padding(16.dp)
         ) {
-
-            Osm(shopsViewModel)
+            Box(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Osm(shopsViewModel,null)
+                Icon(
+                    painter = painterResource(id = R.drawable.strelicaproduct),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(8.dp)
+                        .size(20.dp)
+                        .clickable {
+                            mapD = true
+                        }
+                )
+            }
         }
         Text("Uncover Sellers Around You!", style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold), modifier = Modifier.padding(20.dp,top=0.dp,bottom = 0.dp))
         ShopsComponent(shops,navController)
+    }
+    if(mapD)
+    {
+        BiggerMapDialog(onDismiss = {mapD = false; shopsViewModel.resetShopId()}, shopsViewModel, navController)
+    }
+}
+
+@Composable
+fun BiggerMapDialog(onDismiss: () -> Unit, shopsViewModel:ShopsViewModel, navController: NavHostController) {
+    val overlayColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)
+
+    Dialog(
+        properties = DialogProperties(usePlatformDefaultWidth = false),
+        onDismissRequest = { onDismiss() }) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(overlayColor)
+                .pointerInput(Unit) {
+                    detectTapGestures { offset ->
+                        onDismiss()
+                    }
+                }
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.8f)
+                    .fillMaxHeight(0.85f)
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(MaterialTheme.colorScheme.background)
+                    .pointerInput(Unit) {
+                        detectTapGestures { offset ->
+
+                        }
+                    }
+                    .padding(top = 5.dp)
+                    .align(Alignment.Center),
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                        .align(Alignment.Center)
+                ) {
+                    Osm(shopsViewModel, true)
+                    if(shopsViewModel.selectedShopId.value != 0)
+                    {
+                        Log.d("TU SAM",shopsViewModel.stateOneShop.value.shop.toString())
+                        if(shopsViewModel.stateOneShop.value.shop != null)
+                        {
+                            Log.d("TU SAM","DAP")
+                            Box(
+                                modifier = Modifier.align(Alignment.BottomCenter)
+                                    .padding(bottom=45.dp)
+                            )
+                            {
+                                SellerCard(
+                                    title = shopsViewModel.stateOneShop.value.shop!!.name,
+                                    author = shopsViewModel.stateOneShop.value.shop!!.address,
+                                    imageResource = shopsViewModel.stateOneShop.value.shop!!.image,
+                                    isLiked = shopsViewModel.stateOneShop.value.shop!!.liked,
+                                    onClick = { },
+                                    navController = navController,
+                                    id =shopsViewModel.stateOneShop.value.shop!!.id
+                                )
+                            }
+                        }
+
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -598,7 +689,11 @@ fun MapFilters(
 
     Column {
         Spacer(modifier = Modifier.height(16.dp))
-        SearchTextField(valuee = value, placeh = "Search sellers", onValueChangee = { value = it; onSearchChange(value) }, modifier = Modifier.fillMaxWidth(1f))
+        if(!switchState)
+        {
+            var sliderValue by remember { mutableStateOf(0f) }
+            SearchTextField(valuee = value, placeh = "Search sellers", onValueChangee = { value = it; onSearchChange(value) }, modifier = Modifier.fillMaxWidth(1f))
+        }
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -650,6 +745,7 @@ fun MapFilters(
                     onValueChange = { newValue ->
                         sliderValue = newValue
                         onSliderChange(sliderValue)
+                        value = ""
                     },
                     steps = 9,
                     valueRange = 5f..100f,
@@ -671,9 +767,8 @@ fun MapFilters(
                 .padding(16.dp)
         ) {
 
-            Osm(shopsViewModel)
+            Osm(shopsViewModel,null)
         }
-
     }
 }
 

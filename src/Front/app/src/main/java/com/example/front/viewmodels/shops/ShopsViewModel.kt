@@ -6,6 +6,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.front.helper.DataStore.DataStoreManager
@@ -13,6 +15,7 @@ import com.example.front.model.DTO.FiltersDTO
 import com.example.front.model.DTO.ShopDTO
 import com.example.front.repository.Repository
 import com.example.front.screens.sellers.states.ShopsState
+import com.example.front.screens.shop.state.ShopState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -45,6 +48,46 @@ class ShopsViewModel @Inject constructor(
     private val _filtersState = mutableStateOf(FiltersDTO(0,null, null, null,null, null, 0, null, 1, null, null, null))
     var filtersState: State<FiltersDTO> = _filtersState;
 
+    private val _selectedShopId = mutableStateOf(0)
+    val selectedShopId: State<Int> = _selectedShopId
+
+    private val _stateOneShop = mutableStateOf(ShopState())
+    var stateOneShop: State<ShopState> = _stateOneShop;
+
+    fun handleShopClick(shopId: Int) {
+        _selectedShopId.value = shopId
+        getShopDetails(0, shopId)
+    }
+
+    fun resetShopId()
+    {
+        _selectedShopId.value = 0
+    }
+    fun getShopDetails(userId: Int, shopId: Int) {
+        viewModelScope.launch {
+            try {
+                val response = repository.getShopDetails(userId, shopId)
+                if (response.isSuccessful) {
+                    val shopp = response.body()
+                    _stateOneShop.value = _stateOneShop.value.copy(
+                        isLoading = false,
+                        shop = shopp,
+                        error = ""
+                    )
+                } else {
+                    _stateOneShop.value = _stateOneShop.value.copy(
+                        isLoading = false,
+                        shop = null,
+                        error = "NotFound"
+                    )
+                }
+            } catch (e: Exception) {
+                _stateOneShop.value = _stateOneShop.value.copy(
+                    error = e.message.toString()
+                )
+            }
+        }
+    }
 
     fun getShops(userId: Int,categories:List<Int>?, rating:Int?,open:Boolean?,range:Int?, location:String?,sort:Int,search:String?,page:Int,favorite:Boolean,currLat:Float?, currLong:Float?) {
         inicijalnoStanje()
