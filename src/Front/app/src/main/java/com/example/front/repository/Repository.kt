@@ -271,7 +271,7 @@ class Repository @Inject constructor(private val api: Api) {
         return api.uploadImage2(type, id, imagePart)
     }
 
-    suspend fun insertOrders(orders: List<NewOrder>): Response<Void> {
+    suspend fun insertOrders(orders: List<NewOrder>): Response<Unit> {
         return api.insertOrders(orders)
     }
 

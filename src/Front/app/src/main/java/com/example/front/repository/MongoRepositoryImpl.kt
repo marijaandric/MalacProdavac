@@ -72,4 +72,10 @@ class MongoRepositoryImpl(val realm: Realm) : MongoRepository {
             }
         }
     }
+
+    override suspend fun clearAllData() {
+        realm.write {
+            deleteAll()
+        }
+    }
 }

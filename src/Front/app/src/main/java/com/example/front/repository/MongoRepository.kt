@@ -11,4 +11,5 @@ interface MongoRepository {
     suspend fun deleteProduct(id: Int)
     fun getUniqueShops(): Flow<List<Int>>
     suspend fun updateProductsAvailability(response: List<CheckAvailabilityResDTO>)
+    suspend fun clearAllData()
 }

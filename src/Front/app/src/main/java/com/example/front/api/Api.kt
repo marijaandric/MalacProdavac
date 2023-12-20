@@ -278,10 +278,10 @@ interface Api {
 
 
 
-    @POST("back/Order/InsertOrder")
+    @POST("back/Order/InsertOrders")
     suspend fun insertOrders(
         @Body orders: List<NewOrder>
-    ): Response<Void>
+    ): Response<Unit>
 
     @GET("/back/Notification/GetNotifications")
     suspend fun getNotifications(

@@ -1,5 +1,7 @@
 package com.example.front.screens.checkout
 
+import ToastHost
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -14,8 +16,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -50,6 +55,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -65,6 +71,7 @@ import com.example.front.screens.cart.CreditCard
 import com.example.front.viewmodels.checkout.CheckoutViewModel
 import com.google.gson.JsonParser
 import kotlinx.coroutines.launch
+import rememberToastHostState
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -107,6 +114,8 @@ fun CheckoutScreen(
         val shopsTotals = parseTotalsByShop(totalsByShop ?: "")
         viewModel.getCheckoutData(shopsTotals)
     }
+
+    val toastHostState = rememberToastHostState()
 
     val cartProducts = viewModel.stateProducts.value.products.groupBy { it.shopId }
     val date = remember { mutableStateOf(LocalDate.now()) }
@@ -396,26 +405,30 @@ fun CheckoutScreen(
                             .fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-//                        Text(
-//                            "Total: ${DecimalFormat("0.00").format(sum)} rsd",
-//                            modifier = Modifier
-//                                .padding(vertical = 14.dp),
-//                            fontSize = 20.sp,
-//                            fontWeight = FontWeight.Bold
-//                        )
                         var address by remember { mutableStateOf("") }
+                        var city by remember { mutableStateOf("") }
+
                         OutlinedTextField(
                             value = address,
                             label = { Text("Shipping Address") },
-                            onValueChange = {address = it})
+                            onValueChange = {address = it},
+                            keyboardOptions = KeyboardOptions.Default.copy(
+                                imeAction = ImeAction.Next
+                            )
+                        )
+                        OutlinedTextField(
+                            value = city,
+                            label = { Text("City") },
+                            onValueChange = {city = it},
+                            keyboardOptions = KeyboardOptions.Default.copy(
+                                imeAction = ImeAction.Done
+                            )
+                        )
+
                         Button(
+                            enabled = address.isNotEmpty() && city.isNotEmpty(),
                             onClick = {
-                                //// 1	On delivery, 2 Payment Slip, 3 Card
-                                //// id uzima pri ucitavanju stranice
-                                //// za svaki shop pravi: shopId, paymentMethod, deliveryMethod, shippingAddress, pickupTime, products [ id, sizeId, quantity ]
-                                // lista od NewOrderD
-//                                val groupedProducts = cartState.products.groupBy { it.shopName }
-                                var userId: Int? = null
+                                var userId: Int?
                                 coroutineScope.launch {
                                     userId = viewModel.dataStoreManager.getUserIdFromToken()
                                     if (userId != null) {
@@ -426,7 +439,7 @@ fun CheckoutScreen(
                                                 shopId = shop.id,
                                                 paymentMethod = if (payUsingCard) 3 else 1, // 3-kartica, 1-pouzecem
                                                 deliveryMethod = if (shop.selfpickup) 1 else 2, // 1-self, 2-delivery
-                                                shippingAddress = address,
+                                                shippingAddress = "$address, $city, Srbija",
                                                 pickupTime = if (shop.selfpickup) dateMap[shop.id].toString()+"T10:00:00" else null,
                                                 products = cartProducts[shop.id]!!.map {
                                                     ProductInOrder(it.id, it.sizeId, it.quantity)
@@ -440,8 +453,24 @@ fun CheckoutScreen(
                                         if (successful) {
                                             //// brise korpu vraca na pocetnu ili na orders
                                             println("USPESNO SLANJE")
+                                            coroutineScope.launch {
+                                                try {
+                                                    toastHostState.showToast("Orders placed successfully", Icons.Default.Check)
+                                                } catch (e: Exception) {
+                                                    Log.e("ToastError", "Error showing toast", e)
+                                                }
+                                            }
+                                            ////navController na orders ili home
                                         } else {
                                             println("NEUSPESNO SLANJE")
+                                            coroutineScope.launch {
+                                                try {
+                                                    toastHostState.showToast("Please check all fields", Icons.Default.Clear)
+                                                } catch (e: Exception) {
+                                                    Log.e("ToastError", "Error showing toast", e)
+                                                }
+                                            }
+
                                         }
 
                                     }
@@ -468,6 +497,7 @@ fun CheckoutScreen(
 //            }
         }
     }
+    ToastHost(hostState = toastHostState)
 }
 
 private fun parseTotalsByShop(totalsByShop: String): Map<Int, Double> {

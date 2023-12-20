@@ -91,8 +91,13 @@ class CheckoutViewModel @Inject constructor(
         println("JSON zahtev: $jsonRequest")
 
 
-        println("RESPONSE:  BODY: ${response.body()}")
+        println("RESPONSE:  BODY: ${response.body().toString()}")
         println("RESPONSE:  MESSAGE: ${response.message()}")
+
+        if (response.isSuccessful) {
+            ////brisanje korpe
+//            mongoRepository.clearAllData()
+        }
         return response.isSuccessful
     }
 }
