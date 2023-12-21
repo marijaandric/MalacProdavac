@@ -22,6 +22,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.FractionalThreshold
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.rememberSwipeableState
 import androidx.compose.material.swipeable
 import androidx.compose.material3.Card
@@ -38,6 +40,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,25 +57,60 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
 import com.example.front.R
+import com.example.front.components.CardButton
 import com.example.front.components.Paginator
 import com.example.front.components.Sidebar
 import com.example.front.components.SmallElipseAndTitle
 import com.example.front.screens.sellers.BiggerMapDialog
+import com.example.front.screens.shop.StarRating
 import com.example.front.ui.theme.Typography
 import com.example.front.viewmodels.notification.NotificationViewModel
+import kotlinx.coroutines.launch
+import rememberToastHostState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NotificationScreen(navController: NavHostController, viewModel: NotificationViewModel) {
 
-    var currentPage by remember { mutableStateOf(1) }
+    var userId by remember { mutableStateOf(0) }
+    var currentPage by remember { mutableStateOf(9) }
     var totalPages = 1
-
+    val toastHostState = rememberToastHostState()
+    val coroutineScope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
     LaunchedEffect(Unit) {
         viewModel.dataStoreManager.getUserIdFromToken()
-            ?.let { viewModel.getNotifications(it, listOf(), currentPage) }
+            ?.let { viewModel.getNotifications(it, listOf(), currentPage);userId = it }
+    }
+
+    if(viewModel.stateUserRate.value.userRate != null)
+    {
+        Log.d("USAO","1")
+        coroutineScope.launch {
+            try {
+                viewModel.inicijalnoStanje()
+
+                viewModel.dataStoreManager.getUserIdFromToken()
+                    ?.let { viewModel.getNotifications(it, listOf(), currentPage) }
+
+                toastHostState.showToast("You have successfully rated a person!")
+
+            } catch (e: Exception) {
+
+                Log.e("ToastError", "Error showing toast", e)
+            }
+        }
+    }
+    else if(viewModel.stateUserRate.value.error.isNotEmpty()){
+        coroutineScope.launch {
+            try {
+                toastHostState.showToast("Oops! Fill in all fields!")
+            } catch (e: Exception) {
+                Log.e("ToastError", "Error showing toast", e)
+            }
+            viewModel.inicijalnoStanje()
+        }
     }
 
     Sidebar(
@@ -110,7 +148,7 @@ fun NotificationScreen(navController: NavHostController, viewModel: Notification
                             .fillMaxWidth()
                     ) {
                         viewModel.state.value.notifications.forEach { notification ->
-                            NotificationCard(title = notification.title, body = notification.text)
+                            NotificationCard(title = notification.title, body = notification.text, type = notification.typeId, refId = notification.referenceId, viewModel = viewModel, userId = userId, notId = notification.id)
                             {
                                 viewModel.deleteNotification(notification.id)
                             }
@@ -171,19 +209,21 @@ fun ItemType(id:Int,text: String) {
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun NotificationCard(title: String, body: String,onDismissed: () -> Unit) {
+fun NotificationCard(title: String, body: String, type: Int,refId: Int, viewModel: NotificationViewModel,userId:Int,notId:Int,onDismissed: () -> Unit) {
     var showViewDialog by remember {
         mutableStateOf(false)
     }
+    var showRateUserDialog by remember {
+        mutableStateOf(false)
+    }
     val swipeableState = rememberSwipeableState(initialValue = 0)
-    val sizePx = with(LocalDensity.current) { 300.dp.toPx() } // Adjust the size according to your UI
-    val anchors = mapOf(0f to 0, sizePx to 1) // Defines the anchors for the swipeable (start and end points)
+    val sizePx = with(LocalDensity.current) { 300.dp.toPx() }
+    val anchors = mapOf(0f to 0, sizePx to 1)
     if (swipeableState.currentValue == 0) {
         Card(
             modifier = Modifier
                 .padding(10.dp)
                 .fillMaxWidth()
-                .height(130.dp)
                 .swipeable(
                     state = swipeableState,
                     anchors = anchors,
@@ -191,7 +231,7 @@ fun NotificationCard(title: String, body: String,onDismissed: () -> Unit) {
                     orientation = Orientation.Horizontal
                 ),
             shape = RoundedCornerShape(10.dp),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFFF1F1F1))
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
         ) {
             Column(
                 modifier = Modifier
@@ -228,16 +268,35 @@ fun NotificationCard(title: String, body: String,onDismissed: () -> Unit) {
                     overflow = TextOverflow.Ellipsis
                 )
 
-                Text(
-                    text = "View",
-                    modifier = Modifier
-                        .padding(0.dp, top = 16.dp, bottom = 5.dp)
-                        .clickable { showViewDialog = true },
-                    style = MaterialTheme.typography.displaySmall.copy(
-                        color = MaterialTheme.colorScheme.secondary,
-                        fontSize = 16.sp
-                    )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
                 )
+                {
+                    Text(
+                        text = "View",
+                        modifier = Modifier
+                            .padding(0.dp, top = 16.dp, bottom = 5.dp)
+                            .clickable { showViewDialog = true },
+                        style = MaterialTheme.typography.displaySmall.copy(
+                            color = MaterialTheme.colorScheme.secondary,
+                            fontSize = 16.sp
+                        )
+                    )
+                    if(type == 1)
+                    {
+                        Text(
+                            text = "Rate",
+                            modifier = Modifier
+                                .padding(0.dp, top = 16.dp, bottom = 5.dp)
+                                .clickable { showRateUserDialog = true },
+                            style = MaterialTheme.typography.displaySmall.copy(
+                                color = MaterialTheme.colorScheme.secondary,
+                                fontSize = 16.sp
+                            )
+                        )
+                    }
+                }
             }
         }
     }
@@ -246,14 +305,112 @@ fun NotificationCard(title: String, body: String,onDismissed: () -> Unit) {
     }
     if(showViewDialog)
     {
-        ViewDialog(onDismiss = {showViewDialog = false;}, title, body)
+        ViewDialog(onDismiss = {showViewDialog = false;}, title, body, type, refId, viewModel, userId, notId)
+    }
+    if(showRateUserDialog)
+    {
+        RateUserDialog(onDismiss = {showRateUserDialog = false;},body, refId, viewModel,userId, notId)
     }
 }
 
 @Composable
-fun ViewDialog(onDismiss: () -> Unit,title: String, body: String) {
+fun RateUserDialog(onDismiss: () -> Unit,body:String,refId: Int,viewModel:NotificationViewModel, userId:Int, notId:Int) {
     val overlayColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)
+    var selectedRatingC by remember { mutableStateOf(0) }
+    var selectedRatingR by remember { mutableStateOf(0) }
+    var selectedRatingO by remember { mutableStateOf(0) }
 
+    Dialog(
+        properties = DialogProperties(usePlatformDefaultWidth = false),
+        onDismissRequest = { onDismiss() }) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(overlayColor)
+                .pointerInput(Unit) {
+                    detectTapGestures { offset ->
+                        onDismiss()
+                    }
+                }
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.8f)
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(MaterialTheme.colorScheme.background)
+                    .pointerInput(Unit) {
+                        detectTapGestures { offset ->
+
+                        }
+                    }
+                    .padding(top = 5.dp)
+                    .align(Alignment.Center),
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                        .align(Alignment.Center)
+                ) {
+                    Column(
+
+                    )
+                    {
+                        Text(
+                            text = "$body",
+                            modifier = Modifier
+                                .padding(10.dp),
+                            style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onBackground)
+                        )
+                        Text(
+                            text = "Communication",
+                            modifier = Modifier
+                                .padding(10.dp,bottom = 0.dp),
+                            style = MaterialTheme.typography.titleSmall.copy(fontSize = 12.sp)
+                        )
+                        StarRating { rating ->
+                            selectedRatingC = rating
+                        }
+                        Text(
+                            text = "Reliability",
+                            modifier = Modifier
+                                .padding(10.dp,bottom = 0.dp,top=10.dp),
+                            style = MaterialTheme.typography.titleSmall.copy(fontSize = 12.sp)
+                        )
+                        StarRating { rating ->
+                            selectedRatingR = rating
+                        }
+                        Text(
+                            text = "Overall Experience",
+                            modifier = Modifier
+                                .padding(10.dp,bottom = 0.dp,top=10.dp),
+                            style = MaterialTheme.typography.titleSmall.copy(fontSize = 12.sp)
+                        )
+                        StarRating { rating ->
+                            selectedRatingO = rating
+                        }
+                        Spacer(modifier = Modifier.height(16.dp))
+                        CardButton(
+                            text = "Rate",
+                            onClick = { viewModel.rateUser(userId, refId,selectedRatingC, selectedRatingR,selectedRatingO, notId); onDismiss() },
+                            width = 1f,
+                            modifier = Modifier.height(50.dp),
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+}
+
+@Composable
+fun ViewDialog(onDismiss: () -> Unit,title: String, body: String, type: Int, refId:Int, viewModel: NotificationViewModel, userId: Int, notId:Int) {
+    val overlayColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)
+    var showRateUserDialog by remember {
+        mutableStateOf(false)
+    }
     Dialog(
         properties = DialogProperties(usePlatformDefaultWidth = false),
         onDismissRequest = { onDismiss() }) {
@@ -298,10 +455,21 @@ fun ViewDialog(onDismiss: () -> Unit,title: String, body: String) {
                             modifier = Modifier
                                 .padding(10.dp)
                         )
+                        Text(
+                            text = "Rate",
+                            modifier = Modifier
+                                .padding(10.dp)
+                                .clickable { showRateUserDialog = true },
+                            style = MaterialTheme.typography.bodyLarge.copy(color=MaterialTheme.colorScheme.secondary)
+                        )
                     }
                 }
             }
         }
+    }
+    if(showRateUserDialog)
+    {
+        RateUserDialog(onDismiss = {showRateUserDialog = false;onDismiss()},body, refId, viewModel, userId, notId)
     }
 }
 
