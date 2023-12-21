@@ -182,7 +182,7 @@ interface Api {
     @POST("back/Shop/Review")
     suspend fun postShopReview(
         @Body data: LeaveReviewDTO,
-    ): Response<Success>
+    ): Response<SuccessBoolean>
 
     @GET("/back/Helper/Metrics")
     suspend fun getMetrics(

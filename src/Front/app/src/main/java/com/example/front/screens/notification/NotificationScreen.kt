@@ -75,7 +75,7 @@ import rememberToastHostState
 fun NotificationScreen(navController: NavHostController, viewModel: NotificationViewModel) {
 
     var userId by remember { mutableStateOf(0) }
-    var currentPage by remember { mutableStateOf(8) }
+    var currentPage by remember { mutableStateOf(7) }
     var totalPages = 1
     val toastHostState = rememberToastHostState()
     val coroutineScope = rememberCoroutineScope()
@@ -130,6 +130,29 @@ fun NotificationScreen(navController: NavHostController, viewModel: Notification
         }
     }
     else if(viewModel.stateProductReview.value.error.isNotEmpty()){
+        coroutineScope.launch {
+            try {
+                toastHostState.showToast("Oops! Fill in all fields!")
+            } catch (e: Exception) {
+                Log.e("ToastError", "Error showing toast", e)
+            }
+        }
+    }
+    if(viewModel.statePostReview.value.review != null)
+    {
+        coroutineScope.launch {
+            try {
+                viewModel.dataStoreManager.getUserIdFromToken()
+                    ?.let { viewModel.getNotifications(it, listOf(), currentPage) }
+
+                toastHostState.showToast("You have successfully rated a person!")
+
+            } catch (e: Exception) {
+                Log.e("ToastError", "Error showing toast", e)
+            }
+        }
+    }
+    else if(viewModel.statePostReview.value.error.isNotEmpty()){
         coroutineScope.launch {
             try {
                 toastHostState.showToast("Oops! Fill in all fields!")
@@ -309,7 +332,7 @@ fun NotificationCard(title: String, body: String, type: Int,refId: Int, viewMode
                             fontSize = 16.sp
                         )
                     )
-                    if(type == 1 || type == 7)
+                    if(type == 1 || type == 7 || type == 8)
                     {
                         Text(
                             text = "Rate",
@@ -421,8 +444,8 @@ fun RateUserDialog(onDismiss: () -> Unit,body:String,refId: Int,viewModel:Notifi
                             }
                             Spacer(modifier = Modifier.height(16.dp))
                         }
-                        // -- PRODUCT REVIEW --
-                        if(type == 7)
+                        // -- PRODUCT & SHOP REVIEW --
+                        if(type == 7 || type == 8)
                         {
                             Column(
                                 modifier = Modifier.heightIn(200.dp, 230.dp)
@@ -446,6 +469,10 @@ fun RateUserDialog(onDismiss: () -> Unit,body:String,refId: Int,viewModel:Notifi
                                 else if( type== 7)
                                 {
                                     viewModel.rateProduct(refId, userId, selectedRatingC, comment, notId)
+                                }
+                                else if( type == 8)
+                                {
+                                    viewModel.leaveShopReview(refId, userId, selectedRatingC, comment, notId)
                                 }
                                 onDismiss()
                                       },

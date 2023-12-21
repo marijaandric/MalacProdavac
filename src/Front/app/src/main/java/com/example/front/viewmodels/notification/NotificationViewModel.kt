@@ -12,6 +12,7 @@ import com.example.front.model.DTO.UserRateDTO
 import com.example.front.repository.Repository
 import com.example.front.screens.notification.state.ProductReviewState
 import com.example.front.screens.notification.state.UserRateState
+import com.example.front.screens.shop.state.PostReviewState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -31,6 +32,9 @@ class NotificationViewModel @Inject constructor(
     private val _stateProductReview = mutableStateOf(ProductReviewState())
     var stateProductReview: State<ProductReviewState> = _stateProductReview;
 
+    private val _statePostReview = mutableStateOf(PostReviewState())
+    var statePostReview: State<PostReviewState> = _statePostReview;
+
     private val _statePageCount = mutableStateOf(1)
     var statePageCount: State<Int> = _statePageCount;
 
@@ -43,12 +47,39 @@ class NotificationViewModel @Inject constructor(
         )
     }
 
+    fun leaveShopReview(shopId: Int, userId: Int, rating: Int?, comment: String, notId: Int) {
+        viewModelScope.launch {
+            try {
+                val response = repository.postShopReview(shopId, userId, rating, comment)
+                Log.d("PRODAVNICA", response.toString())
+                if (response.isSuccessful) {
+                    val rev = response.body()
+                    _statePostReview.value = _statePostReview.value.copy(
+                        isLoading = false,
+                        review = response.body(),
+                        error = ""
+                    )
+                    deleteNotification(notId)
+                } else {
+                    _statePostReview.value = _statePostReview.value.copy(
+                        isLoading = false,
+                        review = null,
+                        error = "NotFound"
+                    )
+                }
+            } catch (e: Exception) {
+                _statePostReview.value = _statePostReview.value.copy(
+                    error = e.message.toString()
+                )
+            }
+        }
+    }
+
     fun rateProduct(id: Int, userId: Int, rating:Int, comment: String, notId: Int){
         viewModelScope.launch {
             try {
                 val review = LeaveReviewDTO(id, userId,rating, comment)
                 val response = repository.productReview(review)
-                Log.d("REVIEW USER", response.toString())
 
                 if (response.isSuccessful) {
                     _stateProductReview.value = _stateProductReview.value.copy(
@@ -76,7 +107,6 @@ class NotificationViewModel @Inject constructor(
             try {
                 val rateUser = UserRateDTO(raterId,ratedId,communication,reliability,overallExperience)
                 val response = repository.userRate(rateUser)
-                Log.d("REVIEW USER", response.toString())
 
                 if (response.isSuccessful) {
                     _stateUserRate.value = _stateUserRate.value.copy(

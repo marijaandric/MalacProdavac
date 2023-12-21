@@ -258,6 +258,8 @@ class OneShopViewModel @Inject constructor(
                     )
                 } else {
                     _statePostReview.value = _statePostReview.value.copy(
+                        isLoading = false,
+                        review = null,
                         error = "NotFound"
                     )
                 }

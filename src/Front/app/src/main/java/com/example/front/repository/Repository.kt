@@ -200,7 +200,7 @@ class Repository @Inject constructor(private val api: Api) {
         userId: Int,
         rating: Int?,
         comment: String
-    ): Response<Success> {
+    ): Response<SuccessBoolean> {
         return api.postShopReview(LeaveReviewDTO(id, userId, rating, comment))
     }
 
