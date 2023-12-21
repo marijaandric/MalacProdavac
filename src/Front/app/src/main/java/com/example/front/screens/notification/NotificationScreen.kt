@@ -2,6 +2,7 @@ package com.example.front.screens.notification
 
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,6 +16,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.FractionalThreshold
+import androidx.compose.material.rememberSwipeableState
+import androidx.compose.material.swipeable
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -33,6 +38,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -85,7 +91,10 @@ fun NotificationScreen(navController: NavHostController, viewModel: Notification
                         text = "Today",
                         style = Typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
                     )
-                    Text(text = "Clear all", style = Typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold))
+                    Text(
+                        text = "Clear all",
+                        style = Typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold)
+                    )
                 }
                 LazyColumn(
                     modifier = Modifier
@@ -93,7 +102,9 @@ fun NotificationScreen(navController: NavHostController, viewModel: Notification
                         .height(450.dp)
                 ) {
                     items(viewModel.state.value.notifications) { notification ->
-                        NotificationCard(title = notification.title, notification.text)
+                        NotificationCard(title = notification.title, notification.text) {
+
+                        }
                     }
                 }
                 Paginator(
@@ -131,13 +142,13 @@ fun TypeOfNotifications() {
 
     LazyRow {
         items(items) { item ->
-            ItemType(item.id,text = item.text)
+            ItemType(item.id, text = item.text)
         }
     }
 }
 
 @Composable
-fun ItemType(id:Int,text: String) {
+fun ItemType(id: Int, text: String) {
     Card(
         shape = RoundedCornerShape(10.dp),
         modifier = Modifier.padding(8.dp),
@@ -147,54 +158,73 @@ fun ItemType(id:Int,text: String) {
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun NotificationCard(title: String, body: String) {
-    Card(
-        modifier = Modifier
-            .padding(10.dp)
-            .fillMaxWidth()
-            .height(130.dp),
-        shape = RoundedCornerShape(10.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-    ) {
-        Column(modifier = Modifier.padding(16.dp).background(color = MaterialTheme.colorScheme.surface)) {
-            Row(
+fun NotificationCard(title: String, body: String, onDismissed: () -> Unit) {
+    val swipeableState = rememberSwipeableState(initialValue = 0)
+    val sizePx = with(LocalDensity.current) { 300.dp.toPx() }
+    val anchors = mapOf(0f to 0, sizePx to 1)
+
+    if (swipeableState.currentValue == 0) {
+        Card(
+            modifier = Modifier
+                .padding(10.dp)
+                .fillMaxWidth()
+                .height(130.dp)
+                .swipeable(
+                    state = swipeableState,
+                    anchors = anchors,
+                    thresholds = { _, _ -> FractionalThreshold(0.3f) },
+                    orientation = Orientation.Horizontal
+                ),
+            shape = RoundedCornerShape(10.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFFF1F1F1))
+        ) {
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                    .padding(16.dp)
+                    .background(color = MaterialTheme.colorScheme.surface)
             ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_baseline_people),
-                    contentDescription = "Left Icon",
-                    modifier = Modifier.size(24.dp),
-                    tint = MaterialTheme.colorScheme.primary
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_baseline_people),
+                        contentDescription = "Left Icon",
+                        modifier = Modifier.size(24.dp),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                    Text(text = "$title")
+                    Icon(
+                        painter = painterResource(id = R.drawable.carbon_dot_mark),
+                        contentDescription = "Right Icon",
+                        modifier = Modifier.size(24.dp),
+                        tint = MaterialTheme.colorScheme.secondary
+                    )
+                }
+
+                Text(
+                    text = "$body",
+                    modifier = Modifier
+                        .padding(10.dp)
                 )
-                Text(text = "$title")
-                Icon(
-                    painter = painterResource(id = R.drawable.carbon_dot_mark),
-                    contentDescription = "Right Icon",
-                    modifier = Modifier.size(24.dp),
-                    tint = MaterialTheme.colorScheme.secondary
+
+                Text(
+                    text = "View",
+                    color = Color.Blue,
+                    modifier = Modifier
+                        .padding(20.dp)
                 )
             }
-
-            Text(
-                text = "$body",
-                modifier = Modifier
-                    .padding(10.dp)
-            )
-
-            Text(
-                text = "View",
-                color = Color.Blue,
-                modifier = Modifier
-                    .padding(20.dp)
-            )
+        }
+        if (swipeableState.currentValue == 1) {
+            onDismissed()
         }
     }
 }
-
 
 
