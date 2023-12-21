@@ -1035,17 +1035,17 @@ fun Info(
                                     .padding(top = 20.dp)
                             )
                         }
-//                        else if(shopViewModel.state.value.shop!!.boughtFrom == false)
-//                        {
-//                            Text(
-//                                "You must buy something in order to leave a review!",
-//                                style = MaterialTheme.typography.titleSmall,
-//                                modifier = Modifier
-//                                    .align(Alignment.CenterHorizontally)
-//                                    .padding(top = 20.dp),
-//                                textAlign = TextAlign.Center
-//                            )
-//                        }
+                        else if(shopViewModel.state.value.shop!!.boughtFrom == false)
+                        {
+                            Text(
+                                "You must buy something in order to leave a review!",
+                                style = MaterialTheme.typography.titleSmall,
+                                modifier = Modifier
+                                    .align(Alignment.CenterHorizontally)
+                                    .padding(top = 20.dp),
+                                textAlign = TextAlign.Center
+                            )
+                        }
                         else {
                             StarRating { rating ->
                                 selectedRating = rating
