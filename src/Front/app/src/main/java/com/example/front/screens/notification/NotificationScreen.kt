@@ -3,6 +3,7 @@ package com.example.front.screens.notification
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,6 +20,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.FractionalThreshold
+import androidx.compose.material.rememberSwipeableState
+import androidx.compose.material.swipeable
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -39,6 +44,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -77,7 +83,7 @@ fun NotificationScreen(navController: NavHostController, viewModel: Notification
         if (viewModel.state.value.isLoading) {
             CircularProgressIndicator()
         } else {
-            totalPages = viewModel.statePageCount.value
+            totalPages = viewModel.statePageCount.value/3
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
@@ -105,6 +111,9 @@ fun NotificationScreen(navController: NavHostController, viewModel: Notification
                     ) {
                         viewModel.state.value.notifications.forEach { notification ->
                             NotificationCard(title = notification.title, body = notification.text)
+                            {
+                                viewModel.deleteNotification(notification.id)
+                            }
                         }
                     }
 
@@ -160,59 +169,80 @@ fun ItemType(id:Int,text: String) {
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun NotificationCard(title: String, body: String) {
+fun NotificationCard(title: String, body: String,onDismissed: () -> Unit) {
     var showViewDialog by remember {
         mutableStateOf(false)
     }
-    Card(
-        modifier = Modifier
-            .padding(10.dp)
-            .fillMaxWidth(),
-        shape = RoundedCornerShape(10.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-    ) {
-        Column(modifier = Modifier
-            .padding(16.dp)
-            .background(color = MaterialTheme.colorScheme.surface)) {
-            Row(
+    val swipeableState = rememberSwipeableState(initialValue = 0)
+    val sizePx = with(LocalDensity.current) { 300.dp.toPx() } // Adjust the size according to your UI
+    val anchors = mapOf(0f to 0, sizePx to 1) // Defines the anchors for the swipeable (start and end points)
+    if (swipeableState.currentValue == 0) {
+        Card(
+            modifier = Modifier
+                .padding(10.dp)
+                .fillMaxWidth()
+                .height(130.dp)
+                .swipeable(
+                    state = swipeableState,
+                    anchors = anchors,
+                    thresholds = { _, _ -> FractionalThreshold(0.3f) },
+                    orientation = Orientation.Horizontal
+                ),
+            shape = RoundedCornerShape(10.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFFF1F1F1))
+        ) {
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                    .padding(16.dp)
+                    .background(color = MaterialTheme.colorScheme.surface)
             ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_baseline_people),
-                    contentDescription = "Left Icon",
-                    modifier = Modifier.size(24.dp),
-                    tint = MaterialTheme.colorScheme.primary
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_baseline_people),
+                        contentDescription = "Left Icon",
+                        modifier = Modifier.size(24.dp),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                    Text(text = "$title")
+                    Icon(
+                        painter = painterResource(id = R.drawable.carbon_dot_mark),
+                        contentDescription = "Right Icon",
+                        modifier = Modifier.size(24.dp),
+                        tint = MaterialTheme.colorScheme.secondary
+                    )
+                }
+
+                Text(
+                    text = "$body",
+                    modifier = Modifier
+                        .padding(10.dp),
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
                 )
-                Text(text = "$title")
-                Icon(
-                    painter = painterResource(id = R.drawable.carbon_dot_mark),
-                    contentDescription = "Right Icon",
-                    modifier = Modifier.size(24.dp),
-                    tint = MaterialTheme.colorScheme.secondary
+
+                Text(
+                    text = "View",
+                    modifier = Modifier
+                        .padding(0.dp, top = 16.dp, bottom = 5.dp)
+                        .clickable { showViewDialog = true },
+                    style = MaterialTheme.typography.displaySmall.copy(
+                        color = MaterialTheme.colorScheme.secondary,
+                        fontSize = 16.sp
+                    )
                 )
             }
-
-            Text(
-                text = "$body",
-                modifier = Modifier
-                    .padding(10.dp),
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis
-            )
-
-            Text(
-                text = "View",
-                modifier = Modifier
-                    .padding(0.dp, top = 16.dp, bottom = 5.dp)
-                    .clickable { showViewDialog = true },
-                style=MaterialTheme.typography.displaySmall.copy(color = MaterialTheme.colorScheme.secondary, fontSize = 16.sp)
-            )
         }
+    }
+    if (swipeableState.currentValue == 1) {
+        onDismissed()
     }
     if(showViewDialog)
     {

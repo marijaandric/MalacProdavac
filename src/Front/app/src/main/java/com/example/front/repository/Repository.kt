@@ -291,4 +291,8 @@ class Repository @Inject constructor(private val api: Api) {
     suspend fun submitReview(productID: Int, userID: Int, rating: Int, comment: String): Response<Boolean> {
         return api.submitReview(productID, userID, rating, comment)
     }
+    suspend fun deleteNotification(notificationId: Int):Response<SuccessBoolean>
+    {
+        return api.deleteNotification(notificationId)
+    }
 }

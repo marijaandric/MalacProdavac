@@ -45,6 +45,15 @@ class NotificationViewModel @Inject constructor(
             }
         }
     }
+    fun deleteNotification(id: Int){
+        viewModelScope.launch {
+            try {
+                val response = repository.deleteNotification(id)
+            } catch (e: Exception) {
+                Log.d("NotificationViewModel", e.message.toString())
+            }
+        }
+    }
 }
 
 data class NotificationState (

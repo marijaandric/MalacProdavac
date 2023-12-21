@@ -308,5 +308,8 @@ interface Api {
         @Query("rating") rating : Int,
         @Query("comment") comment : String,
     ): Response<Boolean>
-
+    @DELETE("/back/Notification/DeleteNotification")
+    suspend fun deleteNotification(
+        @Query("notificationId") notificationId: Int
+    ): Response<SuccessBoolean>
 }
