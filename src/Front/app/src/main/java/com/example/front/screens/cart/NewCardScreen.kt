@@ -1,6 +1,5 @@
 package com.example.front.screens.cart
 
-import android.widget.Space
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -14,7 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -28,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,24 +38,26 @@ import androidx.navigation.NavHostController
 import com.example.front.R
 import com.example.front.components.Sidebar
 import com.example.front.components.SmallElipseAndTitle
-import com.example.front.viewmodels.cart.CartViewModel
+import com.example.front.model.user.CreditCardModel
+import com.example.front.viewmodels.checkout.CheckoutViewModel
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NewCreditCartScreen(navController: NavHostController, viewModel: CartViewModel) {
+fun NewCreditCartScreen(navController: NavHostController, viewModel: CheckoutViewModel) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     Sidebar(
         drawerState,
         navController,
         viewModel.dataStoreManager
     ) {
-        CardList(drawerState)
+        CardList(drawerState, viewModel, navController)
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CardList(drawerState: DrawerState) {
+fun CardList(drawerState: DrawerState, viewModel: CheckoutViewModel, navController: NavHostController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -78,13 +79,13 @@ fun CardList(drawerState: DrawerState) {
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    CreditCard()
+//                    CreditCard()
                 }
             }
             item {
                 Spacer(modifier = Modifier.height(100.dp))
                 Row(modifier = Modifier.fillMaxWidth()) {
-                    CreditCardInput()
+                    CreditCardInput(viewModel,navController)
                 }
             }
         }
@@ -97,7 +98,7 @@ val gradientColors = listOf(
 )
 
 @Composable
-fun CreditCard() {
+fun CreditCard(creditCard: CreditCardModel) {
     Card(
         shape = RoundedCornerShape(10.dp),
         modifier = Modifier
@@ -141,11 +142,10 @@ fun CreditCard() {
                             )
                         }
                     }
-                    Text("Banka Inteza")
                 }
                 Spacer(modifier = Modifier.height(40.dp))
                 Row {
-                    Text("**** **** **** 68789")
+                    Text("**** **** **** ${creditCard.cardNumber.takeLast(4)}")
                 }
                 Row(
                     modifier = Modifier
@@ -153,8 +153,8 @@ fun CreditCard() {
                         .padding(top = 10.dp), // Add space above the row
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text("Milovan Samardzic")
-                    Text("05/24")
+                    Text(creditCard.nameOnCard)
+                    Text(creditCard.expDate)
                 }
             }
         }
@@ -163,11 +163,12 @@ fun CreditCard() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CreditCardInput() {
+fun CreditCardInput(viewModel: CheckoutViewModel, navController: NavHostController) {
     var cardNumber by remember { mutableStateOf("") }
     var nameOnCard by remember { mutableStateOf("") }
     var expDate by remember { mutableStateOf("") }
     var cvv by remember { mutableStateOf("") }
+    val coroutineScope = rememberCoroutineScope()
 
     Column(
         modifier = Modifier
@@ -213,7 +214,25 @@ fun CreditCardInput() {
             )
         }
         Row(modifier = Modifier.fillMaxWidth()){
-            Button(onClick = { /*TODO*/ }, modifier = Modifier.weight(0.5f)) {
+            Button(onClick = {
+                // Validacija i ubacivanje kartice u bazu
+                if (cardNumber.isNotBlank() && nameOnCard.isNotBlank() && expDate.isNotBlank() && cvv.isNotBlank()) {
+                    val creditCard = CreditCardModel()
+                    creditCard.cardNumber = cardNumber
+                    creditCard.nameOnCard = nameOnCard
+                    creditCard.expDate = expDate
+                    creditCard.cvv = cvv
+
+                    // Ubacivanje kartice u Realm bazu
+                    coroutineScope.launch {
+                        viewModel.insertCreditCard(creditCard)
+                        //// navigira na checkout
+                        navController.popBackStack()
+                    }
+                } else {
+                    // Implementirajte odgovarajuću logiku za slučaj kada neka od vrednosti nije uneta
+                }
+            }, modifier = Modifier.weight(0.5f)) {
                 Text("Add Card")
             }
         }

@@ -4,6 +4,7 @@ import ToastHost
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,9 +14,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -47,6 +50,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
@@ -66,6 +70,7 @@ import com.example.front.components.Sidebar
 import com.example.front.components.SmallElipseAndTitle
 import com.example.front.model.DTO.NewOrder
 import com.example.front.model.product.ProductInOrder
+import com.example.front.model.user.CreditCardModel
 import com.example.front.navigation.Screen
 import com.example.front.screens.cart.CreditCard
 import com.example.front.viewmodels.checkout.CheckoutViewModel
@@ -113,6 +118,7 @@ fun CheckoutScreen(
     LaunchedEffect(key1 = true) {
         val shopsTotals = parseTotalsByShop(totalsByShop ?: "")
         viewModel.getCheckoutData(shopsTotals)
+//        viewModel.getAllCreditCards()
     }
 
     val toastHostState = rememberToastHostState()
@@ -132,6 +138,8 @@ fun CheckoutScreen(
     val scrollState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+
+    val creditCards: List<CreditCardModel> = viewModel.creditCards.value
 
     //sa listof unit pokrece samo jednom (kad se pokrene stranica prvi put)
     LaunchedEffect(key1 = listOf<Unit>()) {
@@ -180,22 +188,45 @@ fun CheckoutScreen(
 
                 if (payUsingCard) {
                     //kartice
+
+                    coroutineScope.launch {
+                        viewModel.getAllCreditCards()
+                    }
+                    var selectedCardIndex by remember { mutableStateOf(0) }
+
                     LazyRow(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(10.dp)
                     ) {
-                        item {
-                            CreditCard()
-                        }
-                        item {
-                            CreditCard()
-                        }
-                        item {
-                            CreditCard()
-                        }
-                        item {
-                            CreditCard()
+
+                        creditCards.forEachIndexed { index, creditCard ->
+                            println("Credit Card: $creditCard")
+                            item {
+
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable {
+                                            selectedCardIndex = index
+                                        }
+                                ) {
+                                    CreditCard(creditCard = creditCard)
+
+                                    if (index == selectedCardIndex) {
+                                        Icon(
+                                            imageVector = Icons.Default.Check,
+                                            contentDescription = null,
+                                            tint = Color(0xFF043A64), // Boja ikone
+                                            modifier = Modifier
+                                                .align(Alignment.TopEnd)
+                                                .padding(4.dp)
+                                                .padding(top = 12.dp, end = 12.dp)
+                                                .size(24.dp)
+                                        )
+                                    }
+                                }
+                            }
                         }
                     }
 
@@ -203,7 +234,9 @@ fun CheckoutScreen(
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(8.dp),
+                            .padding(8.dp)
+//                            .weight(1f)
+                        ,
                         verticalArrangement = Arrangement.SpaceBetween,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
@@ -221,20 +254,20 @@ fun CheckoutScreen(
                                 height = 50
                             )
                         }
-                        Row(
-                            modifier = Modifier
-                                .padding(15.dp)
-                        ) {
-                            ButtonWithIcon(
-                                text = "Paypal",
-                                onClick = { /*navController.navigate()*/ },
-                                width = 0.8f,
-                                modifier = Modifier.padding(10.dp),
-                                color = MaterialTheme.colorScheme.primary,
-                                imagePainter = painterResource(id = R.drawable.logos_paypal),
-                                height = 50
-                            )
-                        }
+//                        Row(
+//                            modifier = Modifier
+//                                .padding(15.dp)
+//                        ) {
+//                            ButtonWithIcon(
+//                                text = "Paypal",
+//                                onClick = { /*navController.navigate()*/ },
+//                                width = 0.8f,
+//                                modifier = Modifier.padding(10.dp),
+//                                color = MaterialTheme.colorScheme.primary,
+//                                imagePainter = painterResource(id = R.drawable.logos_paypal),
+//                                height = 50
+//                            )
+//                        }
                     }
                 }
 
@@ -243,6 +276,7 @@ fun CheckoutScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(horizontal = 16.dp, vertical = 0.dp)
+                        .padding(all = 16.dp)
 //                                .weight(1f)
                 ) {
                     shops.forEach { shop ->
@@ -253,7 +287,8 @@ fun CheckoutScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(8.dp)
-                                .shadow(4.dp),
+                                .shadow(4.dp)
+                                .clip(RoundedCornerShape(5.dp)),
                         ) {
                             Box(
                                 modifier = Modifier
@@ -318,7 +353,7 @@ fun CheckoutScreen(
 
                                     )
                                     Text(
-                                        text = "Ukupno: ${shop.total} rsd",
+                                        text = "Total: ${shop.total} rsd",
                                         modifier = Modifier.padding(bottom = 20.dp)
                                     )
                                 }
@@ -359,7 +394,8 @@ fun CheckoutScreen(
                                         value = dateMap[shop.id]?.format(DateTimeFormatter.ISO_DATE)
                                             ?: "",
                                         label = { Text("Date") },
-                                        onValueChange = {})
+                                        onValueChange = {},
+                                        shape = RoundedCornerShape(20.dp))
 
                                     IconButton(
                                         onClick = { isOpenMap[shop.id] = true }
@@ -409,20 +445,32 @@ fun CheckoutScreen(
                         var city by remember { mutableStateOf("") }
 
                         OutlinedTextField(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(5.dp))
+                                .padding(horizontal = 16.dp, vertical = 0.dp)
+                            ,
                             value = address,
                             label = { Text("Shipping Address") },
                             onValueChange = {address = it},
                             keyboardOptions = KeyboardOptions.Default.copy(
                                 imeAction = ImeAction.Next
-                            )
+                            ),
+                            shape = RoundedCornerShape(20.dp)
                         )
                         OutlinedTextField(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(5.dp))
+                                .padding(horizontal = 16.dp, vertical = 0.dp)
+                            ,
                             value = city,
                             label = { Text("City") },
                             onValueChange = {city = it},
                             keyboardOptions = KeyboardOptions.Default.copy(
                                 imeAction = ImeAction.Done
-                            )
+                            ),
+                            shape = RoundedCornerShape(20.dp)
                         )
 
                         Button(

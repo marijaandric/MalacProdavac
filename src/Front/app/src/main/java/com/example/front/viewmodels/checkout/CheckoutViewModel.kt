@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import com.example.front.helper.DataStore.DataStoreManager
 import com.example.front.model.DTO.NewOrder
 import com.example.front.model.DTO.ShopDetailsCheckoutDTO
+import com.example.front.model.user.CreditCardModel
 import com.example.front.repository.MongoRepository
 import com.example.front.repository.Repository
 import com.example.front.viewmodels.cart.CartState
@@ -29,6 +30,9 @@ class CheckoutViewModel @Inject constructor(
 
     private val _stateProducts = mutableStateOf(CartState())
     val stateProducts: State<CartState> = _stateProducts
+
+    private val _creditCards = mutableStateOf<List<CreditCardModel>>(emptyList())
+    val creditCards: State<List<CreditCardModel>> = _creditCards
 
     suspend fun getCheckoutData(totalsByShop: Map<Int, Double>) {
         try {
@@ -99,5 +103,24 @@ class CheckoutViewModel @Inject constructor(
 //            mongoRepository.clearAllData()
         }
         return response.isSuccessful
+    }
+
+    suspend fun insertCreditCard(card: CreditCardModel) {
+        try {
+            mongoRepository.insertCreditCard(card)
+        } catch (e: Exception) {
+            Log.e("CheckoutViewModel", "Error inserting credit card: ${e.message}")
+        }
+    }
+    suspend fun getAllCreditCards() {
+        println("ALOOOOOOOOOOOOOOOOOOOOOOOOOOO")
+        try {
+            mongoRepository.getAllCreditCards().collect() {creditCards ->
+                _creditCards.value = creditCards
+                println("CREDITNE KARTICE: ${this.creditCards.value}")
+            }
+        } catch (e: Exception) {
+            Log.e("CheckoutViewModel", "Error fetching credit cards: ${e.message}")
+        }
     }
 }

@@ -1,6 +1,7 @@
 package com.example.front.helper.mongo
 
 import com.example.front.model.product.ProductInCart
+import com.example.front.model.user.CreditCardModel
 import com.example.front.repository.MongoRepository
 import com.example.front.repository.MongoRepositoryImpl
 import dagger.Module
@@ -20,10 +21,11 @@ object DatabaseModule {
     fun provideRealm(): Realm {
         val config = RealmConfiguration.Builder(
             schema = setOf(
-                ProductInCart::class
+                ProductInCart::class,
+                CreditCardModel::class
             )
         )
-            .schemaVersion(1)
+            .schemaVersion(2)
             //// obrisati
             .deleteRealmIfMigrationNeeded()
             .compactOnLaunch()

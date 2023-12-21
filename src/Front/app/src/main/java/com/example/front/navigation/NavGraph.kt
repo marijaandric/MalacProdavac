@@ -8,10 +8,10 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.example.front.screens.delivery.DeliveryScreen
 import com.example.front.screens.cart.Cart
 import com.example.front.screens.cart.NewCreditCartScreen
 import com.example.front.screens.categories.RegistrationCategories
+import com.example.front.screens.delivery.DeliveryScreen
 import com.example.front.screens.delivery.RouteDetailsScreen
 import com.example.front.screens.home.HomePage
 import com.example.front.screens.myshop.MyShopScreen
@@ -135,7 +135,7 @@ fun SetupNavGraph(
             route = Screen.NewCreditCard.route
         )
         {
-            NewCreditCartScreen(navController, cartViewModel)
+            NewCreditCartScreen(navController, checkoutViewModel)
         }
         composable(
             route = "${Screen.Shop.route}/{id}/{info}",

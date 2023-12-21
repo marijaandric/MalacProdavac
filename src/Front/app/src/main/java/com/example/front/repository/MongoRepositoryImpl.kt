@@ -3,6 +3,7 @@ package com.example.front.repository
 import android.util.Log
 import com.example.front.model.DTO.CheckAvailabilityResDTO
 import com.example.front.model.product.ProductInCart
+import com.example.front.model.user.CreditCardModel
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.query
 import kotlinx.coroutines.flow.Flow
@@ -77,5 +78,13 @@ class MongoRepositoryImpl(val realm: Realm) : MongoRepository {
         realm.write {
             deleteAll()
         }
+    }
+
+    override suspend fun insertCreditCard(creditCard: CreditCardModel) {
+        realm.write { copyToRealm(creditCard) }
+    }
+
+    override suspend fun getAllCreditCards(): Flow<List<CreditCardModel>> {
+        return realm.query<CreditCardModel>().asFlow().map { it.list }
     }
 }
