@@ -146,4 +146,14 @@ class ProductViewModel @Inject constructor(
         }
     }
 
+    fun submitReview(productID: Int,  rating: Int, comment: String) {
+        viewModelScope.launch {
+            try {
+                val response = repository.submitReview(productID, dataStoreManager.getUserIdFromToken()!!, rating, comment)
+            } catch (e: Exception) {
+                Log.d("Error", e.message.toString())
+            }
+        }
+    }
+
 }

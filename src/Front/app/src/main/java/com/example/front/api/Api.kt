@@ -294,4 +294,13 @@ interface Api {
     suspend fun editShop(
         @Body edit : EditShopDTO
     ): Response<SuccessBoolean>
+
+    @POST("/back/Product/Review")
+    suspend fun submitReview(
+        @Query("id") id : Int,
+        @Query("userId") userId : Int,
+        @Query("rating") rating : Int,
+        @Query("comment") comment : String,
+    ): Response<Boolean>
+
 }

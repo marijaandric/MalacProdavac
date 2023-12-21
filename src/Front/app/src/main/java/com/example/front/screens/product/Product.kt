@@ -1,4 +1,5 @@
 package com.example.front.screens.product
+
 import ToastHost
 import android.annotation.SuppressLint
 import android.util.Log
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -31,6 +33,7 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -182,7 +185,7 @@ fun ProductPage(
                         }
                     }
 
-                    if(productInfo.isOwner != true) {
+                    if (productInfo.isOwner != true) {
                         val currentImage = if (isToggled) painterResource(id = R.drawable.srcefull)
                         else painterResource(id = R.drawable.srce)
 
@@ -197,9 +200,7 @@ fun ProductPage(
                                     isToggled = !isToggled
                                 }
                         )
-                    }
-                    else
-                    {
+                    } else {
                         Icon(
                             imageVector = Icons.Default.Edit,
                             contentDescription = "",
@@ -400,7 +401,7 @@ fun ProductPage(
                                 color = Color.Black,
                                 modifier = Modifier.weight(1f)
                             )
-                            if(productInfo.sizes?.all { it.quantity == 0 } != true)
+                            if (productInfo.sizes?.all { it.quantity == 0 } != true)
                                 NumberPicker(
                                     value = quantity,
                                     onValueChange = { newValue -> quantity = newValue },
@@ -493,24 +494,26 @@ fun ProductPage(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(30.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text(text = "Product reviews", style = Typography.bodyLarge)
-                                Row {
-                                    if (productInfo != null) {
-                                        Text(
-                                            text = "${productInfo.rating}",
-                                            style = Typography.bodyLarge
+                            if (productInfo.rating != 0f) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(30.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Text(text = "Product reviews", style = Typography.bodyLarge)
+                                    Row {
+                                        if (productInfo != null) {
+                                            Text(
+                                                text = "${productInfo.rating}",
+                                                style = Typography.bodyLarge
+                                            )
+                                        }
+                                        Icon(
+                                            imageVector = Icons.Default.Star,
+                                            contentDescription = "Star icon"
                                         )
                                     }
-                                    Icon(
-                                        imageVector = Icons.Default.Star,
-                                        contentDescription = "Star icon"
-                                    )
                                 }
                             }
                             Divider(
@@ -520,16 +523,73 @@ fun ProductPage(
                                     .padding(horizontal = 16.dp),
                                 color = Color.Gray
                             )
+
+                            if (!productInfo.isOwner!!) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(30.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Text(text = "Leave a review", style = Typography.bodyLarge)
+                                    Icon(
+                                        imageVector = Icons.Default.Star,
+                                        contentDescription = "Star icon"
+                                    )
+                                }
+                                var reviewText by remember { mutableStateOf("") }
+
+                                Column {
+                                    OutlinedTextField(
+                                        value = reviewText,
+                                        onValueChange = { reviewText = it },
+                                        label = { Text("Leave a review") },
+                                        placeholder = { Text("Type your review here...") },
+                                        modifier = Modifier.fillMaxWidth()
+                                    )
+
+                                    Spacer(modifier = Modifier.height(16.dp))
+                                    var rating by remember { mutableStateOf(0) }
+
+                                    Row {
+                                        for (i in 1..5) {
+                                            Icon(
+                                                imageVector = if (i <= rating) Icons.Filled.Star else Icons.Outlined.Star,
+                                                contentDescription = "Star $i",
+                                                tint = if (i <= rating) Color.Yellow else Color.Gray,
+                                                modifier = Modifier
+                                                    .width(32.dp)
+                                                    .clickable {
+                                                        rating = i
+                                                    }
+                                            )
+                                            Spacer(modifier = Modifier.width(4.dp))
+                                        }
+                                    }
+
+                                    Button(
+                                        onClick = {
+                                            productViewModel.submitReview(productID, 3, reviewText)
+                                        },
+                                        enabled = reviewText.isNotBlank()
+                                    ) {
+                                        Text("Submit Review")
+                                    }
+                                }
+                            }
+
                             Row(modifier = Modifier.padding(10.dp)) {
 
                                 if (reviews.isNullOrEmpty()) {
                                     Text(
-                                        "No reviews available",
+                                        "Be first to leave a review!",
                                         style = Typography.bodyLarge,
                                         modifier = Modifier.padding(10.dp)
                                     )
                                 } else {
-                                    Column(modifier = Modifier.fillMaxWidth().height(530.dp)) {
+                                    Column(modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(530.dp)) {
                                         reviews.forEach { review ->
                                             ReviewCard(productReviewUserInfo = review)
                                         }

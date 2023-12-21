@@ -282,4 +282,8 @@ class Repository @Inject constructor(private val api: Api) {
     suspend fun getNotifications(userId: Int, type: List<Int>?,page: Int): Response<List<NotificationDTO>> {
         return api.getNotifications(userId, type, page)
     }
+
+    suspend fun submitReview(productID: Int, userID: Int, rating: Int, comment: String): Response<Boolean> {
+        return api.submitReview(productID, userID, rating, comment)
+    }
 }
