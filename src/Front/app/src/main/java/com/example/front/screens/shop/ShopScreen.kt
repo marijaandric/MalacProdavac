@@ -1035,16 +1035,17 @@ fun Info(
                                     .padding(top = 20.dp)
                             )
                         }
-                        else if(shopViewModel.state.value.shop!!.boughtFrom == true)
-                        {
-                            Text(
-                                "You must buy something in order to leave a review!",
-                                style = MaterialTheme.typography.titleSmall,
-                                modifier = Modifier
-                                    .align(Alignment.CenterHorizontally)
-                                    .padding(top = 20.dp)
-                            )
-                        }
+//                        else if(shopViewModel.state.value.shop!!.boughtFrom == false)
+//                        {
+//                            Text(
+//                                "You must buy something in order to leave a review!",
+//                                style = MaterialTheme.typography.titleSmall,
+//                                modifier = Modifier
+//                                    .align(Alignment.CenterHorizontally)
+//                                    .padding(top = 20.dp),
+//                                textAlign = TextAlign.Center
+//                            )
+//                        }
                         else {
                             StarRating { rating ->
                                 selectedRating = rating
@@ -1067,30 +1068,11 @@ fun Info(
                                     .align(Alignment.CenterHorizontally)
                                     .height(50.dp), MaterialTheme.colorScheme.secondary
                             )
-                            StarRating { rating ->
-                                selectedRating = rating
-                            }
-                            CommentsTextBox(
-                                onReviewTextChanged = { newText -> comment = newText },
-                                placeholder = "Leave a review"
-                            )
-                            CardButton(
-                                "Submit review", onClick = {
-                                    shopViewModel.leaveReview(
-                                        shopId,
-                                        userID,
-                                        selectedRating,
-                                        comment
-                                    )
-                                    toast = true
-                                }, 0.9f,
-                                Modifier
-                                    .align(Alignment.CenterHorizontally)
-                                    .height(50.dp), MaterialTheme.colorScheme.secondary
-                            )
+
                             if (!shopViewModel.statePostReview.value.isLoading && toast) {
                                 coroutineScope.launch {
                                     try {
+                                        feedback = true
                                         toastHostState.showToast(
                                             "Review successfully submitted",
                                             Icons.Default.Clear
