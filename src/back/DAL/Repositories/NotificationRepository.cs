@@ -21,7 +21,7 @@ namespace back.DAL.Repositories
         {
             if (types == null || types.Count == 0)
             {
-                return await _context.Notifications.Where(x => x.UserId == userId).Skip(page - 1 * numberOfItems).Take(numberOfItems).Select(x => new NotificationCard
+                return await _context.Notifications.Where(x => x.UserId == userId).Skip((page - 1) * numberOfItems).Take(numberOfItems).Select(x => new NotificationCard
                 {
                     Id = x.Id,
                     Title = x.Title,
@@ -33,7 +33,7 @@ namespace back.DAL.Repositories
                 }).ToListAsync();
             }
 
-            return await _context.Notifications.Where(x => x.UserId == userId && types.Contains(x.TypeId)).Skip(page-1 * numberOfItems).Take(numberOfItems).Select(x => new NotificationCard
+            return await _context.Notifications.Where(x => x.UserId == userId && types.Contains(x.TypeId)).Skip((page-1) * numberOfItems).Take(numberOfItems).Select(x => new NotificationCard
             {
                 Id = x.Id,
                 Title = x.Title,
@@ -43,6 +43,18 @@ namespace back.DAL.Repositories
                 ReferenceId = x.ReferenceId,
                 Read = x.Read
             }).ToListAsync();
+        }
+
+        public int PageCount(int userId, List<int>? types)
+        {
+            int count = 0;
+            if (types == null || types.Count == 0) count = _context.Notifications.Where(x => x.UserId == userId).Count();
+            else count = _context.Notifications.Where(x => x.UserId == userId && types.Contains(x.TypeId)).Count();
+
+            Console.WriteLine(count.ToString());
+            Console.WriteLine((double)count / numberOfItems);
+            Console.WriteLine(Math.Ceiling((double)(count / numberOfItems)));
+            return (int)Math.Ceiling((double)count / numberOfItems);
         }
 
         public async Task<bool> InsertNotification(int userId, int type, string title, string description, int referenceId)

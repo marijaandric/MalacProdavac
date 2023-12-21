@@ -15,11 +15,24 @@ namespace back.PL.Controllers
         }
 
         [HttpGet("GetNotifications")]
-        public async Task<IActionResult> GetNotifications(int userId, [FromQuery]List<int>? types, int page)
+        public async Task<IActionResult> GetNotifications(int userId, [FromQuery] List<int>? types, int page)
         {
             try
             {
                 return Ok(await _service.GetNotifications(userId, types, page));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("PageCount")]
+        public IActionResult PageCount(int userId, [FromQuery] List<int>? types)
+        {
+            try
+            {
+                return Ok(new { Count = _service.PageCount(userId, types) });
             }
             catch (Exception ex)
             {

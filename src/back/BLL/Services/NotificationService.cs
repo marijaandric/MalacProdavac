@@ -19,6 +19,11 @@ namespace back.BLL.Services
             return notifications;
         }
 
+        public int PageCount(int userId, List<int>? types)
+        {
+            return _repository.PageCount(userId, types);
+        }
+
         public async Task<bool> MarkAsRead(int notificationId)
         {
             return await _repository.MarkAsRead(notificationId);
