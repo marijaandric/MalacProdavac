@@ -1034,7 +1034,18 @@ fun Info(
                                     .align(Alignment.CenterHorizontally)
                                     .padding(top = 20.dp)
                             )
-                        } else {
+                        }
+                        else if(shopViewModel.state.value.shop!!.boughtFrom == true)
+                        {
+                            Text(
+                                "You must buy something in order to leave a review!",
+                                style = MaterialTheme.typography.titleSmall,
+                                modifier = Modifier
+                                    .align(Alignment.CenterHorizontally)
+                                    .padding(top = 20.dp)
+                            )
+                        }
+                        else {
                             StarRating { rating ->
                                 selectedRating = rating
                             }

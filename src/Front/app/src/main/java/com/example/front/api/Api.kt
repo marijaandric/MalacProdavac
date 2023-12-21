@@ -27,6 +27,7 @@ import com.example.front.model.DTO.ShopDetailsDTO
 import com.example.front.model.DTO.ShopPagesDTO
 import com.example.front.model.DTO.ToggleLikeDTO
 import com.example.front.model.DTO.Trip
+import com.example.front.model.DTO.UserRateDTO
 import com.example.front.model.product.ProductInfo
 import com.example.front.model.product.ProductReviewUserInfo
 import com.example.front.model.request.RegistrationRequest
@@ -294,4 +295,9 @@ interface Api {
     suspend fun editShop(
         @Body edit : EditShopDTO
     ): Response<SuccessBoolean>
+
+    @POST("back/User/Rate")
+    suspend fun userRate(
+        @Body userRate: UserRateDTO
+    ):Response<SuccessBoolean>
 }

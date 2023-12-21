@@ -1,6 +1,7 @@
 package com.example.front.screens.notification
 
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,6 +21,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
@@ -32,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.front.R
@@ -64,12 +67,13 @@ fun NotificationScreen(navController: NavHostController, viewModel: Notification
             CircularProgressIndicator()
         } else {
             totalPages = viewModel.statePageCount.value
-            SmallElipseAndTitle("Notifications", drawerState)
             Column(
                 modifier = Modifier
                     .fillMaxSize()
+                    .background(color = MaterialTheme.colorScheme.background)
             ) {
-                Spacer(modifier = Modifier.height(150.dp))
+                SmallElipseAndTitle("Notifications", drawerState)
+                //Spacer(modifier = Modifier.height(150.dp))
                 TypeOfNotifications()
                 Row(
                     modifier = Modifier
@@ -79,9 +83,9 @@ fun NotificationScreen(navController: NavHostController, viewModel: Notification
                 ) {
                     Text(
                         text = "Today",
-                        style = Typography.bodyMedium,
+                        style = Typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
                     )
-                    Text(text = "Clear all", style = Typography.bodyMedium)
+                    Text(text = "Clear all", style = Typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold))
                 }
                 LazyColumn(
                     modifier = Modifier
@@ -135,8 +139,8 @@ fun TypeOfNotifications() {
 @Composable
 fun ItemType(id:Int,text: String) {
     Card(
-        shape = RoundedCornerShape(10.dp), // Border radius
-        modifier = Modifier.padding(8.dp), // Spacing between items
+        shape = RoundedCornerShape(10.dp),
+        modifier = Modifier.padding(8.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0xFFF1F1F1))
     ) {
         Text(text = text, modifier = Modifier.padding(16.dp))
@@ -151,9 +155,9 @@ fun NotificationCard(title: String, body: String) {
             .fillMaxWidth()
             .height(130.dp),
         shape = RoundedCornerShape(10.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFF1F1F1))
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(16.dp).background(color = MaterialTheme.colorScheme.surface)) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -162,15 +166,17 @@ fun NotificationCard(title: String, body: String) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_baseline_people), // Replace with your icon resource
+                    painter = painterResource(id = R.drawable.ic_baseline_people),
                     contentDescription = "Left Icon",
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(24.dp),
+                    tint = MaterialTheme.colorScheme.primary
                 )
                 Text(text = "$title")
                 Icon(
-                    painter = painterResource(id = R.drawable.carbon_dot_mark), // Replace with your icon resource
+                    painter = painterResource(id = R.drawable.carbon_dot_mark),
                     contentDescription = "Right Icon",
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(24.dp),
+                    tint = MaterialTheme.colorScheme.secondary
                 )
             }
 

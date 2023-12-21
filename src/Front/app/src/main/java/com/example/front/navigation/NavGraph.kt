@@ -71,7 +71,7 @@ fun SetupNavGraph(
     NavHost(
         navController = navController,
         //startDestination = "intro"
-        startDestination = "sellers"
+        startDestination = "notification"
     ) {
         composable(
             route = Screen.Home.route
