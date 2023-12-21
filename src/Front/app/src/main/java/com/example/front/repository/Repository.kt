@@ -287,6 +287,10 @@ class Repository @Inject constructor(private val api: Api) {
     {
         return api.userRate(userRate)
     }
+    suspend fun productReview(productReview: LeaveReviewDTO):Response<SuccessBoolean>
+    {
+        return api.productReview(productReview)
+    }
 
     suspend fun submitReview(productID: Int, userID: Int, rating: Int, comment: String): Response<Boolean> {
         return api.submitReview(productID, userID, rating, comment)

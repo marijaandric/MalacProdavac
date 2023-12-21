@@ -1010,7 +1010,9 @@ fun Info(
                     {
                         Text(
                             text = "Leave a review",
-                            modifier = Modifier.padding(top = 8.dp),
+                            modifier = Modifier.padding(top = 8.dp).clickable {
+                                leaveAReview = !leaveAReview
+                            },
                             style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onBackground)
                         )
                         Icon(

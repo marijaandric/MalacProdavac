@@ -312,4 +312,8 @@ interface Api {
     suspend fun deleteNotification(
         @Query("notificationId") notificationId: Int
     ): Response<SuccessBoolean>
+    @POST("/back/Product/Review")
+    suspend fun productReview(
+        @Body data : LeaveReviewDTO
+    ): Response<SuccessBoolean>
 }

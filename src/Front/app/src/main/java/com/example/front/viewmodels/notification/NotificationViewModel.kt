@@ -6,9 +6,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.front.helper.DataStore.DataStoreManager
+import com.example.front.model.DTO.LeaveReviewDTO
 import com.example.front.model.DTO.NotificationDTO
 import com.example.front.model.DTO.UserRateDTO
 import com.example.front.repository.Repository
+import com.example.front.screens.notification.state.ProductReviewState
 import com.example.front.screens.notification.state.UserRateState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -26,6 +28,9 @@ class NotificationViewModel @Inject constructor(
     private val _stateUserRate = mutableStateOf(UserRateState())
     var stateUserRate: State<UserRateState> = _stateUserRate;
 
+    private val _stateProductReview = mutableStateOf(ProductReviewState())
+    var stateProductReview: State<ProductReviewState> = _stateProductReview;
+
     private val _statePageCount = mutableStateOf(1)
     var statePageCount: State<Int> = _statePageCount;
 
@@ -36,6 +41,34 @@ class NotificationViewModel @Inject constructor(
             userRate = null,
             error = ""
         )
+    }
+
+    fun rateProduct(id: Int, userId: Int, rating:Int, comment: String, notId: Int){
+        viewModelScope.launch {
+            try {
+                val review = LeaveReviewDTO(id, userId,rating, comment)
+                val response = repository.productReview(review)
+                Log.d("REVIEW USER", response.toString())
+
+                if (response.isSuccessful) {
+                    _stateProductReview.value = _stateProductReview.value.copy(
+                        isLoading = false,
+                        productReview = response.body(),
+                        error = ""
+                    )
+                    deleteNotification(notId)
+                }
+                else{
+                    _stateProductReview.value = _stateProductReview.value.copy(
+                        isLoading = false,
+                        productReview = null,
+                        error = "NotFound"
+                    )
+                }
+            } catch (e: Exception) {
+                _stateProductReview.value.error = e.message.toString()
+            }
+        }
     }
 
     fun rateUser(raterId: Int, ratedId: Int,communication:Int, reliability:Int,overallExperience:Int, notId:Int ){

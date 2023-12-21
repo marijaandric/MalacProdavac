@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -58,6 +59,7 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
 import com.example.front.R
 import com.example.front.components.CardButton
+import com.example.front.components.CommentsTextBox
 import com.example.front.components.Paginator
 import com.example.front.components.Sidebar
 import com.example.front.components.SmallElipseAndTitle
@@ -73,7 +75,7 @@ import rememberToastHostState
 fun NotificationScreen(navController: NavHostController, viewModel: NotificationViewModel) {
 
     var userId by remember { mutableStateOf(0) }
-    var currentPage by remember { mutableStateOf(9) }
+    var currentPage by remember { mutableStateOf(8) }
     var totalPages = 1
     val toastHostState = rememberToastHostState()
     val coroutineScope = rememberCoroutineScope()
@@ -110,6 +112,30 @@ fun NotificationScreen(navController: NavHostController, viewModel: Notification
                 Log.e("ToastError", "Error showing toast", e)
             }
             viewModel.inicijalnoStanje()
+        }
+    }
+
+    if(viewModel.stateProductReview.value.productReview != null)
+    {
+        coroutineScope.launch {
+            try {
+                viewModel.dataStoreManager.getUserIdFromToken()
+                    ?.let { viewModel.getNotifications(it, listOf(), currentPage) }
+
+                toastHostState.showToast("You have successfully rated a person!")
+
+            } catch (e: Exception) {
+                Log.e("ToastError", "Error showing toast", e)
+            }
+        }
+    }
+    else if(viewModel.stateProductReview.value.error.isNotEmpty()){
+        coroutineScope.launch {
+            try {
+                toastHostState.showToast("Oops! Fill in all fields!")
+            } catch (e: Exception) {
+                Log.e("ToastError", "Error showing toast", e)
+            }
         }
     }
 
@@ -283,7 +309,7 @@ fun NotificationCard(title: String, body: String, type: Int,refId: Int, viewMode
                             fontSize = 16.sp
                         )
                     )
-                    if(type == 1)
+                    if(type == 1 || type == 7)
                     {
                         Text(
                             text = "Rate",
@@ -309,16 +335,17 @@ fun NotificationCard(title: String, body: String, type: Int,refId: Int, viewMode
     }
     if(showRateUserDialog)
     {
-        RateUserDialog(onDismiss = {showRateUserDialog = false;},body, refId, viewModel,userId, notId)
+        RateUserDialog(onDismiss = {showRateUserDialog = false;},body, refId, viewModel,userId, notId, type)
     }
 }
 
 @Composable
-fun RateUserDialog(onDismiss: () -> Unit,body:String,refId: Int,viewModel:NotificationViewModel, userId:Int, notId:Int) {
+fun RateUserDialog(onDismiss: () -> Unit,body:String,refId: Int,viewModel:NotificationViewModel, userId:Int, notId:Int, type :Int) {
     val overlayColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)
     var selectedRatingC by remember { mutableStateOf(0) }
     var selectedRatingR by remember { mutableStateOf(0) }
     var selectedRatingO by remember { mutableStateOf(0) }
+    var comment by remember { mutableStateOf("") }
 
     Dialog(
         properties = DialogProperties(usePlatformDefaultWidth = false),
@@ -362,37 +389,66 @@ fun RateUserDialog(onDismiss: () -> Unit,body:String,refId: Int,viewModel:Notifi
                                 .padding(10.dp),
                             style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onBackground)
                         )
-                        Text(
-                            text = "Communication",
-                            modifier = Modifier
-                                .padding(10.dp,bottom = 0.dp),
-                            style = MaterialTheme.typography.titleSmall.copy(fontSize = 12.sp)
-                        )
-                        StarRating { rating ->
-                            selectedRatingC = rating
+                        // -- USER RATE --
+                        if(type==1)
+                        {
+                            Text(
+                                text = "Communication",
+                                modifier = Modifier
+                                    .padding(10.dp,bottom = 0.dp),
+                                style = MaterialTheme.typography.titleSmall.copy(fontSize = 12.sp)
+                            )
+                            StarRating { rating ->
+                                selectedRatingC = rating
+                            }
+                            Text(
+                                text = "Reliability",
+                                modifier = Modifier
+                                    .padding(10.dp,bottom = 0.dp,top=10.dp),
+                                style = MaterialTheme.typography.titleSmall.copy(fontSize = 12.sp)
+                            )
+                            StarRating { rating ->
+                                selectedRatingR = rating
+                            }
+                            Text(
+                                text = "Overall Experience",
+                                modifier = Modifier
+                                    .padding(10.dp,bottom = 0.dp,top=10.dp),
+                                style = MaterialTheme.typography.titleSmall.copy(fontSize = 12.sp)
+                            )
+                            StarRating { rating ->
+                                selectedRatingO = rating
+                            }
+                            Spacer(modifier = Modifier.height(16.dp))
                         }
-                        Text(
-                            text = "Reliability",
-                            modifier = Modifier
-                                .padding(10.dp,bottom = 0.dp,top=10.dp),
-                            style = MaterialTheme.typography.titleSmall.copy(fontSize = 12.sp)
-                        )
-                        StarRating { rating ->
-                            selectedRatingR = rating
+                        // -- PRODUCT REVIEW --
+                        if(type == 7)
+                        {
+                            Column(
+                                modifier = Modifier.heightIn(200.dp, 230.dp)
+                            ) {
+                                StarRating { rating ->
+                                    selectedRatingC = rating
+                                }
+                                CommentsTextBox(
+                                    onReviewTextChanged = { newText -> comment = newText },
+                                    placeholder = "Leave a review"
+                                )
+                            }
                         }
-                        Text(
-                            text = "Overall Experience",
-                            modifier = Modifier
-                                .padding(10.dp,bottom = 0.dp,top=10.dp),
-                            style = MaterialTheme.typography.titleSmall.copy(fontSize = 12.sp)
-                        )
-                        StarRating { rating ->
-                            selectedRatingO = rating
-                        }
-                        Spacer(modifier = Modifier.height(16.dp))
                         CardButton(
                             text = "Rate",
-                            onClick = { viewModel.rateUser(userId, refId,selectedRatingC, selectedRatingR,selectedRatingO, notId); onDismiss() },
+                            onClick = {
+                                if(type == 1)
+                                {
+                                    viewModel.rateUser(userId, refId,selectedRatingC, selectedRatingR,selectedRatingO, notId)
+                                }
+                                else if( type== 7)
+                                {
+                                    viewModel.rateProduct(refId, userId, selectedRatingC, comment, notId)
+                                }
+                                onDismiss()
+                                      },
                             width = 1f,
                             modifier = Modifier.height(50.dp),
                             color = MaterialTheme.colorScheme.primary
@@ -469,7 +525,7 @@ fun ViewDialog(onDismiss: () -> Unit,title: String, body: String, type: Int, ref
     }
     if(showRateUserDialog)
     {
-        RateUserDialog(onDismiss = {showRateUserDialog = false;onDismiss()},body, refId, viewModel, userId, notId)
+        RateUserDialog(onDismiss = {showRateUserDialog = false;onDismiss()},body, refId, viewModel, userId, notId, type)
     }
 }
 
