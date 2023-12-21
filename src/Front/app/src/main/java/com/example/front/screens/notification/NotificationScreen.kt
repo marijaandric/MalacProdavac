@@ -2,10 +2,14 @@ package com.example.front.screens.notification
 
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -32,15 +36,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
 import com.example.front.R
 import com.example.front.components.Paginator
 import com.example.front.components.Sidebar
 import com.example.front.components.SmallElipseAndTitle
+import com.example.front.screens.sellers.BiggerMapDialog
 import com.example.front.ui.theme.Typography
 import com.example.front.viewmodels.notification.NotificationViewModel
 
@@ -67,44 +78,46 @@ fun NotificationScreen(navController: NavHostController, viewModel: Notification
             CircularProgressIndicator()
         } else {
             totalPages = viewModel.statePageCount.value
-            Column(
+            LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(color = MaterialTheme.colorScheme.background)
             ) {
-                SmallElipseAndTitle("Notifications", drawerState)
-                //Spacer(modifier = Modifier.height(150.dp))
-                TypeOfNotifications()
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(20.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = "Today",
-                        style = Typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
-                    )
-                    Text(text = "Clear all", style = Typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold))
-                }
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(450.dp)
-                ) {
-                    items(viewModel.state.value.notifications) { notification ->
-                        NotificationCard(title = notification.title, notification.text)
+                item{
+                    SmallElipseAndTitle("Notifications", drawerState)
+
+                    TypeOfNotifications()
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(20.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = "Today",
+                            style = Typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
+                        )
+                        Text(text = "Clear all", style = Typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold))
                     }
-                }
-                Paginator(
-                    currentPage = currentPage,
-                    totalPages = totalPages,
-                    onPageSelected = { newPage ->
-                        if (newPage in 1..totalPages) {
-                            currentPage = newPage
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    ) {
+                        viewModel.state.value.notifications.forEach { notification ->
+                            NotificationCard(title = notification.title, body = notification.text)
                         }
                     }
-                )
+
+                    Paginator(
+                        currentPage = currentPage,
+                        totalPages = totalPages,
+                        onPageSelected = { newPage ->
+                            if (newPage in 1..totalPages) {
+                                currentPage = newPage
+                            }
+                        }
+                    )
+                }
             }
         }
     }
@@ -149,15 +162,19 @@ fun ItemType(id:Int,text: String) {
 
 @Composable
 fun NotificationCard(title: String, body: String) {
+    var showViewDialog by remember {
+        mutableStateOf(false)
+    }
     Card(
         modifier = Modifier
             .padding(10.dp)
-            .fillMaxWidth()
-            .height(130.dp),
+            .fillMaxWidth(),
         shape = RoundedCornerShape(10.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
-        Column(modifier = Modifier.padding(16.dp).background(color = MaterialTheme.colorScheme.surface)) {
+        Column(modifier = Modifier
+            .padding(16.dp)
+            .background(color = MaterialTheme.colorScheme.surface)) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -183,15 +200,77 @@ fun NotificationCard(title: String, body: String) {
             Text(
                 text = "$body",
                 modifier = Modifier
-                    .padding(10.dp)
+                    .padding(10.dp),
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
             )
 
             Text(
                 text = "View",
-                color = Color.Blue,
                 modifier = Modifier
-                    .padding(20.dp)
+                    .padding(0.dp, top = 16.dp, bottom = 5.dp)
+                    .clickable { showViewDialog = true },
+                style=MaterialTheme.typography.displaySmall.copy(color = MaterialTheme.colorScheme.secondary, fontSize = 16.sp)
             )
+        }
+    }
+    if(showViewDialog)
+    {
+        ViewDialog(onDismiss = {showViewDialog = false;}, title, body)
+    }
+}
+
+@Composable
+fun ViewDialog(onDismiss: () -> Unit,title: String, body: String) {
+    val overlayColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)
+
+    Dialog(
+        properties = DialogProperties(usePlatformDefaultWidth = false),
+        onDismissRequest = { onDismiss() }) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(overlayColor)
+                .pointerInput(Unit) {
+                    detectTapGestures { offset ->
+                        onDismiss()
+                    }
+                }
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.8f)
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(MaterialTheme.colorScheme.background)
+                    .pointerInput(Unit) {
+                        detectTapGestures { offset ->
+
+                        }
+                    }
+                    .padding(top = 5.dp)
+                    .align(Alignment.Center),
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                        .align(Alignment.Center)
+                ) {
+                    Column( horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = "$title",
+                            modifier = Modifier
+                                .padding(10.dp),
+                            style = MaterialTheme.typography.titleMedium.copy(color=MaterialTheme.colorScheme.primary)
+                        )
+                        Text(
+                            text = "$body",
+                            modifier = Modifier
+                                .padding(10.dp)
+                        )
+                    }
+                }
+            }
         }
     }
 }
