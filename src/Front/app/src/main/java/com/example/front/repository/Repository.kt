@@ -29,6 +29,7 @@ import com.example.front.model.DTO.ShopDetailsDTO
 import com.example.front.model.DTO.ShopPagesDTO
 import com.example.front.model.DTO.ToggleLikeDTO
 import com.example.front.model.DTO.Trip
+import com.example.front.model.DTO.UserRateDTO
 import com.example.front.model.product.ProductInfo
 import com.example.front.model.product.ProductReviewUserInfo
 import com.example.front.model.request.RegistrationRequest
@@ -281,6 +282,10 @@ class Repository @Inject constructor(private val api: Api) {
     }
     suspend fun getNotifications(userId: Int, type: List<Int>?,page: Int): Response<List<NotificationDTO>> {
         return api.getNotifications(userId, type, page)
+    }
+    suspend fun userRate(userRate: UserRateDTO):Response<SuccessBoolean>
+    {
+        return api.userRate(userRate)
     }
 
     suspend fun submitReview(productID: Int, userID: Int, rating: Int, comment: String): Response<Boolean> {
