@@ -17,6 +17,7 @@ import com.example.front.model.DTO.NotificationDTO
 import com.example.front.model.DTO.OrderInfoDTO
 import com.example.front.model.DTO.OrdersDTO
 import com.example.front.model.DTO.OrdersPagesDTO
+import com.example.front.model.DTO.PageCountDTO
 import com.example.front.model.DTO.ProductDTO
 import com.example.front.model.DTO.ProductDisplayDTO
 import com.example.front.model.DTO.ReviewDTO
@@ -316,4 +317,10 @@ interface Api {
     suspend fun productReview(
         @Body data : LeaveReviewDTO
     ): Response<SuccessBoolean>
+
+    @GET("/back/Notification/PageCount")
+    suspend fun getNotificationPageCount(
+        @Query("userId") userId: Int,
+        @Query("types") type: List<Int>?
+    ): Response<PageCountDTO>
 }

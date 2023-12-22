@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.front.helper.DataStore.DataStoreManager
 import com.example.front.model.DTO.LeaveReviewDTO
 import com.example.front.model.DTO.NotificationDTO
+import com.example.front.model.DTO.PageCountDTO
 import com.example.front.model.DTO.UserRateDTO
 import com.example.front.repository.Repository
 import com.example.front.screens.notification.state.ProductReviewState
@@ -35,8 +36,11 @@ class NotificationViewModel @Inject constructor(
     private val _statePostReview = mutableStateOf(PostReviewState())
     var statePostReview: State<PostReviewState> = _statePostReview;
 
-    private val _statePageCount = mutableStateOf(1)
-    var statePageCount: State<Int> = _statePageCount;
+    private val _statePageCount = mutableStateOf(NotificationPageCountState())
+    var statePageCount: State<NotificationPageCountState> = _statePageCount;
+
+    private val _stateCurrentPage = mutableStateOf(1)
+    var stateCurrentPage: State<Int> = _stateCurrentPage;
 
     fun inicijalnoStanje()
     {
@@ -133,7 +137,6 @@ class NotificationViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val response = repository.getNotifications(userId, type, page)
-                Log.d("USAO ZA RES", response.toString())
                 if (response != null) {
                     if (response.isSuccessful) {
                         _state.value = response.body()?.let {
@@ -142,7 +145,8 @@ class NotificationViewModel @Inject constructor(
                                 notifications = it
                             )
                         }!!
-                        _statePageCount.value = (response.body()!!.size)/3
+                        getNotificationPages(userId, type)
+                        _stateCurrentPage.value = 1
                     }
                 }
             } catch (e: Exception) {
@@ -153,11 +157,27 @@ class NotificationViewModel @Inject constructor(
     fun deleteNotification(id: Int){
         viewModelScope.launch {
             try {
-                val response = repository.deleteNotification(id)
+                repository.deleteNotification(id)
             } catch (e: Exception) {
                 Log.d("NotificationViewModel", e.message.toString())
             }
         }
+    }
+    fun getNotificationPages(userId: Int,type: List<Int>?){
+        viewModelScope.launch {
+            try {
+                val response = repository.getNotificationPageCount(userId, type)
+                _statePageCount.value = _statePageCount.value.copy(
+                    isLoading = false,
+                    pageCount = response.body()
+                )
+            } catch (e: Exception) {
+                _statePageCount.value.error = e.message.toString()
+            }
+        }
+    }
+    fun ChangePage(userId: Int,page: Int){
+        getNotifications(userId, listOf(), page)
     }
 }
 
@@ -165,4 +185,10 @@ data class NotificationState (
     var isLoading : Boolean = true,
     var notifications : List<NotificationDTO> = listOf(),
     var error : String = ""
+)
+
+data class NotificationPageCountState(
+    var isLoading: Boolean = true,
+    var pageCount: PageCountDTO? = null,
+    var error: String = ""
 )

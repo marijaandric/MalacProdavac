@@ -19,6 +19,7 @@ import com.example.front.model.DTO.NotificationDTO
 import com.example.front.model.DTO.OrderInfoDTO
 import com.example.front.model.DTO.OrdersDTO
 import com.example.front.model.DTO.OrdersPagesDTO
+import com.example.front.model.DTO.PageCountDTO
 import com.example.front.model.DTO.ProductDTO
 import com.example.front.model.DTO.ProductDisplayDTO
 import com.example.front.model.DTO.ReviewDTO
@@ -298,5 +299,9 @@ class Repository @Inject constructor(private val api: Api) {
     suspend fun deleteNotification(notificationId: Int):Response<SuccessBoolean>
     {
         return api.deleteNotification(notificationId)
+    }
+
+    suspend fun getNotificationPageCount(userId: Int, type: List<Int>?): Response<PageCountDTO> {
+        return api.getNotificationPageCount(userId, type)
     }
 }

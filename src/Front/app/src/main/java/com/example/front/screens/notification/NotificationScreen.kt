@@ -38,6 +38,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -70,25 +71,22 @@ import com.example.front.viewmodels.notification.NotificationViewModel
 import kotlinx.coroutines.launch
 import rememberToastHostState
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NotificationScreen(navController: NavHostController, viewModel: NotificationViewModel) {
 
     var userId by remember { mutableStateOf(0) }
-    var currentPage by remember { mutableStateOf(7) }
-    var totalPages = 1
+    val currentPage by remember { derivedStateOf { viewModel.stateCurrentPage.value } }
+    val totalPages by remember { derivedStateOf { viewModel.statePageCount.value.pageCount?.count ?:0 } }
     val toastHostState = rememberToastHostState()
     val coroutineScope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
     LaunchedEffect(Unit) {
-        viewModel.dataStoreManager.getUserIdFromToken()
-            ?.let { viewModel.getNotifications(it, listOf(), currentPage);userId = it }
+        userId = viewModel.dataStoreManager.getUserIdFromToken()!!
+        viewModel.getNotifications(userId, listOf(), currentPage)
     }
 
-    if(viewModel.stateUserRate.value.userRate != null)
-    {
-        Log.d("USAO","1")
+    if (viewModel.stateUserRate.value.userRate != null) {
         coroutineScope.launch {
             try {
                 viewModel.inicijalnoStanje()
@@ -103,8 +101,7 @@ fun NotificationScreen(navController: NavHostController, viewModel: Notification
                 Log.e("ToastError", "Error showing toast", e)
             }
         }
-    }
-    else if(viewModel.stateUserRate.value.error.isNotEmpty()){
+    } else if (viewModel.stateUserRate.value.error.isNotEmpty()) {
         coroutineScope.launch {
             try {
                 toastHostState.showToast("Oops! Fill in all fields!")
@@ -115,8 +112,7 @@ fun NotificationScreen(navController: NavHostController, viewModel: Notification
         }
     }
 
-    if(viewModel.stateProductReview.value.productReview != null)
-    {
+    if (viewModel.stateProductReview.value.productReview != null) {
         coroutineScope.launch {
             try {
                 viewModel.dataStoreManager.getUserIdFromToken()
@@ -128,8 +124,7 @@ fun NotificationScreen(navController: NavHostController, viewModel: Notification
                 Log.e("ToastError", "Error showing toast", e)
             }
         }
-    }
-    else if(viewModel.stateProductReview.value.error.isNotEmpty()){
+    } else if (viewModel.stateProductReview.value.error.isNotEmpty()) {
         coroutineScope.launch {
             try {
                 toastHostState.showToast("Oops! Fill in all fields!")
@@ -138,8 +133,7 @@ fun NotificationScreen(navController: NavHostController, viewModel: Notification
             }
         }
     }
-    if(viewModel.statePostReview.value.review != null)
-    {
+    if (viewModel.statePostReview.value.review != null) {
         coroutineScope.launch {
             try {
                 viewModel.dataStoreManager.getUserIdFromToken()
@@ -151,8 +145,7 @@ fun NotificationScreen(navController: NavHostController, viewModel: Notification
                 Log.e("ToastError", "Error showing toast", e)
             }
         }
-    }
-    else if(viewModel.statePostReview.value.error.isNotEmpty()){
+    } else if (viewModel.statePostReview.value.error.isNotEmpty()) {
         coroutineScope.launch {
             try {
                 toastHostState.showToast("Oops! Fill in all fields!")
@@ -167,19 +160,18 @@ fun NotificationScreen(navController: NavHostController, viewModel: Notification
         navController,
         viewModel.dataStoreManager
     ) {
-        if (viewModel.state.value.isLoading) {
+        if (viewModel.state.value.isLoading && viewModel.statePageCount.value.isLoading) {
             CircularProgressIndicator()
         } else {
-            totalPages = viewModel.statePageCount.value/3
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(color = MaterialTheme.colorScheme.background)
             ) {
-                item{
+                item {
                     SmallElipseAndTitle("Notifications", drawerState)
 
-                    TypeOfNotifications()
+                    TypeOfNotifications(viewModel, userId)
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -190,14 +182,33 @@ fun NotificationScreen(navController: NavHostController, viewModel: Notification
                             text = "Today",
                             style = Typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
                         )
-                        Text(text = "Clear all", style = Typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold))
+                        Text(
+                            text = "Clear all",
+                            style = Typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold)
+                        )
                     }
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
                     ) {
+                        if (viewModel.state.value.notifications.isEmpty()) {
+                            Text(
+                                text = "No notifications",
+                                modifier = Modifier
+                                    .padding(20.dp),
+                                style = Typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
+                            )
+                        }
                         viewModel.state.value.notifications.forEach { notification ->
-                            NotificationCard(title = notification.title, body = notification.text, type = notification.typeId, refId = notification.referenceId, viewModel = viewModel, userId = userId, notId = notification.id)
+                            NotificationCard(
+                                title = notification.title,
+                                body = notification.text,
+                                type = notification.typeId,
+                                refId = notification.referenceId,
+                                viewModel = viewModel,
+                                userId = userId,
+                                notId = notification.id
+                            )
                             {
                                 viewModel.deleteNotification(notification.id)
                             }
@@ -208,8 +219,8 @@ fun NotificationScreen(navController: NavHostController, viewModel: Notification
                         currentPage = currentPage,
                         totalPages = totalPages,
                         onPageSelected = { newPage ->
-                            if (newPage in 1..totalPages) {
-                                currentPage = newPage
+                            if (newPage in 1..totalPages!!) {
+                                viewModel.ChangePage(userId, newPage)
                             }
                         }
                     )
@@ -220,36 +231,35 @@ fun NotificationScreen(navController: NavHostController, viewModel: Notification
 }
 
 data class NotificationCategory(
-    val id: Int,
+    val ids: List<Int>,
     val text: String
 )
 
 @Composable
-fun TypeOfNotifications() {
+fun TypeOfNotifications(viewModel: NotificationViewModel, userId: Int) {
     val items = listOf(
-        NotificationCategory(0, "Info"),
-        NotificationCategory(1, "Rate Person"),
-        NotificationCategory(2, "Product"),
-        NotificationCategory(3, "Shop"),
-        NotificationCategory(4, "Route"),
-        NotificationCategory(5, "Req"),
-        NotificationCategory(6, "Order"),
-        NotificationCategory(7, "Rate Product"),
-        NotificationCategory(8, "Rate Shop")
+        NotificationCategory(listOf(), "All"),
+        NotificationCategory(listOf(0, 2, 3), "Info"),
+        NotificationCategory(listOf(1, 7, 8), "Reviews"),
+        NotificationCategory(listOf(5, 6), "Deals/Deliveries/Orders"),
     )
 
     LazyRow {
         items(items) { item ->
-            ItemType(item.id,text = item.text)
+            ItemType(item.ids, item.text, viewModel, userId)
         }
     }
 }
 
 @Composable
-fun ItemType(id:Int,text: String) {
+fun ItemType(listOfIds: List<Int>, text: String, viewModel: NotificationViewModel, userId: Int) {
     Card(
         shape = RoundedCornerShape(10.dp),
-        modifier = Modifier.padding(8.dp),
+        modifier = Modifier
+            .padding(8.dp)
+            .clickable {
+                viewModel.getNotifications(userId, listOfIds, 1)
+            },
         colors = CardDefaults.cardColors(containerColor = Color(0xFFF1F1F1))
     ) {
         Text(text = text, modifier = Modifier.padding(16.dp))
@@ -258,7 +268,16 @@ fun ItemType(id:Int,text: String) {
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun NotificationCard(title: String, body: String, type: Int,refId: Int, viewModel: NotificationViewModel,userId:Int,notId:Int,onDismissed: () -> Unit) {
+fun NotificationCard(
+    title: String,
+    body: String,
+    type: Int,
+    refId: Int,
+    viewModel: NotificationViewModel,
+    userId: Int,
+    notId: Int,
+    onDismissed: () -> Unit
+) {
     var showViewDialog by remember {
         mutableStateOf(false)
     }
@@ -332,8 +351,7 @@ fun NotificationCard(title: String, body: String, type: Int,refId: Int, viewMode
                             fontSize = 16.sp
                         )
                     )
-                    if(type == 1 || type == 7 || type == 8)
-                    {
+                    if (type == 1 || type == 7 || type == 8) {
                         Text(
                             text = "Rate",
                             modifier = Modifier
@@ -352,18 +370,41 @@ fun NotificationCard(title: String, body: String, type: Int,refId: Int, viewMode
     if (swipeableState.currentValue == 1) {
         onDismissed()
     }
-    if(showViewDialog)
-    {
-        ViewDialog(onDismiss = {showViewDialog = false;}, title, body, type, refId, viewModel, userId, notId)
+    if (showViewDialog) {
+        ViewDialog(
+            onDismiss = { showViewDialog = false; },
+            title,
+            body,
+            type,
+            refId,
+            viewModel,
+            userId,
+            notId
+        )
     }
-    if(showRateUserDialog)
-    {
-        RateUserDialog(onDismiss = {showRateUserDialog = false;},body, refId, viewModel,userId, notId, type)
+    if (showRateUserDialog) {
+        RateUserDialog(
+            onDismiss = { showRateUserDialog = false; },
+            body,
+            refId,
+            viewModel,
+            userId,
+            notId,
+            type
+        )
     }
 }
 
 @Composable
-fun RateUserDialog(onDismiss: () -> Unit,body:String,refId: Int,viewModel:NotificationViewModel, userId:Int, notId:Int, type :Int) {
+fun RateUserDialog(
+    onDismiss: () -> Unit,
+    body: String,
+    refId: Int,
+    viewModel: NotificationViewModel,
+    userId: Int,
+    notId: Int,
+    type: Int
+) {
     val overlayColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)
     var selectedRatingC by remember { mutableStateOf(0) }
     var selectedRatingR by remember { mutableStateOf(0) }
@@ -413,12 +454,11 @@ fun RateUserDialog(onDismiss: () -> Unit,body:String,refId: Int,viewModel:Notifi
                             style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onBackground)
                         )
                         // -- USER RATE --
-                        if(type==1)
-                        {
+                        if (type == 1) {
                             Text(
                                 text = "Communication",
                                 modifier = Modifier
-                                    .padding(10.dp,bottom = 0.dp),
+                                    .padding(10.dp, bottom = 0.dp),
                                 style = MaterialTheme.typography.titleSmall.copy(fontSize = 12.sp)
                             )
                             StarRating { rating ->
@@ -427,7 +467,7 @@ fun RateUserDialog(onDismiss: () -> Unit,body:String,refId: Int,viewModel:Notifi
                             Text(
                                 text = "Reliability",
                                 modifier = Modifier
-                                    .padding(10.dp,bottom = 0.dp,top=10.dp),
+                                    .padding(10.dp, bottom = 0.dp, top = 10.dp),
                                 style = MaterialTheme.typography.titleSmall.copy(fontSize = 12.sp)
                             )
                             StarRating { rating ->
@@ -436,7 +476,7 @@ fun RateUserDialog(onDismiss: () -> Unit,body:String,refId: Int,viewModel:Notifi
                             Text(
                                 text = "Overall Experience",
                                 modifier = Modifier
-                                    .padding(10.dp,bottom = 0.dp,top=10.dp),
+                                    .padding(10.dp, bottom = 0.dp, top = 10.dp),
                                 style = MaterialTheme.typography.titleSmall.copy(fontSize = 12.sp)
                             )
                             StarRating { rating ->
@@ -445,8 +485,7 @@ fun RateUserDialog(onDismiss: () -> Unit,body:String,refId: Int,viewModel:Notifi
                             Spacer(modifier = Modifier.height(16.dp))
                         }
                         // -- PRODUCT & SHOP REVIEW --
-                        if(type == 7 || type == 8)
-                        {
+                        if (type == 7 || type == 8) {
                             Column(
                                 modifier = Modifier.heightIn(200.dp, 230.dp)
                             ) {
@@ -462,20 +501,34 @@ fun RateUserDialog(onDismiss: () -> Unit,body:String,refId: Int,viewModel:Notifi
                         CardButton(
                             text = "Rate",
                             onClick = {
-                                if(type == 1)
-                                {
-                                    viewModel.rateUser(userId, refId,selectedRatingC, selectedRatingR,selectedRatingO, notId)
-                                }
-                                else if( type== 7)
-                                {
-                                    viewModel.rateProduct(refId, userId, selectedRatingC, comment, notId)
-                                }
-                                else if( type == 8)
-                                {
-                                    viewModel.leaveShopReview(refId, userId, selectedRatingC, comment, notId)
+                                if (type == 1) {
+                                    viewModel.rateUser(
+                                        userId,
+                                        refId,
+                                        selectedRatingC,
+                                        selectedRatingR,
+                                        selectedRatingO,
+                                        notId
+                                    )
+                                } else if (type == 7) {
+                                    viewModel.rateProduct(
+                                        refId,
+                                        userId,
+                                        selectedRatingC,
+                                        comment,
+                                        notId
+                                    )
+                                } else if (type == 8) {
+                                    viewModel.leaveShopReview(
+                                        refId,
+                                        userId,
+                                        selectedRatingC,
+                                        comment,
+                                        notId
+                                    )
                                 }
                                 onDismiss()
-                                      },
+                            },
                             width = 1f,
                             modifier = Modifier.height(50.dp),
                             color = MaterialTheme.colorScheme.primary
@@ -489,7 +542,16 @@ fun RateUserDialog(onDismiss: () -> Unit,body:String,refId: Int,viewModel:Notifi
 }
 
 @Composable
-fun ViewDialog(onDismiss: () -> Unit,title: String, body: String, type: Int, refId:Int, viewModel: NotificationViewModel, userId: Int, notId:Int) {
+fun ViewDialog(
+    onDismiss: () -> Unit,
+    title: String,
+    body: String,
+    type: Int,
+    refId: Int,
+    viewModel: NotificationViewModel,
+    userId: Int,
+    notId: Int
+) {
     val overlayColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)
     var showRateUserDialog by remember {
         mutableStateOf(false)
@@ -526,12 +588,12 @@ fun ViewDialog(onDismiss: () -> Unit,title: String, body: String, type: Int, ref
                         .padding(16.dp)
                         .align(Alignment.Center)
                 ) {
-                    Column( horizontalAlignment = Alignment.CenterHorizontally) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
                             text = "$title",
                             modifier = Modifier
                                 .padding(10.dp),
-                            style = MaterialTheme.typography.titleMedium.copy(color=MaterialTheme.colorScheme.primary)
+                            style = MaterialTheme.typography.titleMedium.copy(color = MaterialTheme.colorScheme.primary)
                         )
                         Text(
                             text = "$body",
@@ -543,16 +605,23 @@ fun ViewDialog(onDismiss: () -> Unit,title: String, body: String, type: Int, ref
                             modifier = Modifier
                                 .padding(10.dp)
                                 .clickable { showRateUserDialog = true },
-                            style = MaterialTheme.typography.bodyLarge.copy(color=MaterialTheme.colorScheme.secondary)
+                            style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.secondary)
                         )
                     }
                 }
             }
         }
     }
-    if(showRateUserDialog)
-    {
-        RateUserDialog(onDismiss = {showRateUserDialog = false;onDismiss()},body, refId, viewModel, userId, notId, type)
+    if (showRateUserDialog) {
+        RateUserDialog(
+            onDismiss = { showRateUserDialog = false;onDismiss() },
+            body,
+            refId,
+            viewModel,
+            userId,
+            notId,
+            type
+        )
     }
 }
 
