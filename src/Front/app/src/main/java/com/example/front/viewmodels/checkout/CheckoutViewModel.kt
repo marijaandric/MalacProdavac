@@ -100,7 +100,7 @@ class CheckoutViewModel @Inject constructor(
 
         if (response.isSuccessful) {
             ////brisanje korpe
-//            mongoRepository.clearAllData()
+            mongoRepository.clearAllData()
         }
         return response.isSuccessful
     }
@@ -113,7 +113,6 @@ class CheckoutViewModel @Inject constructor(
         }
     }
     suspend fun getAllCreditCards() {
-        println("ALOOOOOOOOOOOOOOOOOOOOOOOOOOO")
         try {
             mongoRepository.getAllCreditCards().collect() {creditCards ->
                 _creditCards.value = creditCards
