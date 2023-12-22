@@ -2,8 +2,7 @@ package com.example.front.screens.checkout
 
 import ToastHost
 import android.util.Log
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,7 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -53,8 +52,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -254,20 +251,6 @@ fun CheckoutScreen(
                                 height = 50
                             )
                         }
-//                        Row(
-//                            modifier = Modifier
-//                                .padding(15.dp)
-//                        ) {
-//                            ButtonWithIcon(
-//                                text = "Paypal",
-//                                onClick = { /*navController.navigate()*/ },
-//                                width = 0.8f,
-//                                modifier = Modifier.padding(10.dp),
-//                                color = MaterialTheme.colorScheme.primary,
-//                                imagePainter = painterResource(id = R.drawable.logos_paypal),
-//                                height = 50
-//                            )
-//                        }
                     }
                 }
 
@@ -275,37 +258,29 @@ fun CheckoutScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(horizontal = 16.dp, vertical = 0.dp)
                         .padding(all = 16.dp)
 //                                .weight(1f)
                 ) {
                     shops.forEach { shop ->
-//                                item {
-
                         //slika, mapa, adresa, ukupno?, deliveri-pickup,
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(8.dp)
                                 .shadow(4.dp)
-                                .clip(RoundedCornerShape(5.dp)),
+                                .clip(RoundedCornerShape(5.dp))
+                            ,
                         ) {
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(50.dp)
 //                                        .border(1.dp, Color.Red, RectangleShape)
+                                    .padding(horizontal = 4.dp, vertical = 0.dp)
+                                    .background(Color(0xff4a7da5))
                             ) {
-                                Image(
-                                    painter = painterResource(id = R.drawable.ellipsebrojdva),
-                                    contentDescription = "",
-                                    modifier = Modifier
-                                        .height(50.dp)
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 4.dp),
-                                    contentScale = ContentScale.FillBounds
-                                )
-                                Column {
+                                Column(modifier =Modifier
+                                    ) {
                                     Spacer(Modifier.weight(1f))
                                     Text(
                                         text = shop.name,
@@ -321,42 +296,30 @@ fun CheckoutScreen(
                                 }
                             }
 
-                            Row(
+                            // adresa
+                            Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
-//                                        .border(1.dp, Color.Blue, RectangleShape)
-                            ) {
-                                // mapa
-                                Box(
-                                    modifier = Modifier
-                                        .height(130.dp)
-                                        .width(130.dp)
-                                        .padding(8.dp)
-                                        .border(1.dp, Color.Red, RectangleShape)
-                                ) {}
-                                // adresa
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(146.dp)
+//                                        .height(80.dp)
+                                    .wrapContentSize()
 //                                            .border(1.dp, Color.Blue, RectangleShape)
-                                    ,
-                                    verticalArrangement = Arrangement.SpaceBetween,
-                                    horizontalAlignment = Alignment.CenterHorizontally
-                                ) {
-                                    Text(
-                                        text = shop.address.substring(
-                                            0,
-                                            shop.address.length - 8
-                                        ),
-                                        modifier = Modifier.padding(top = 20.dp)
+                                    .padding(horizontal = 4.dp, vertical = 0.dp)
+                                ,
+                                verticalArrangement = Arrangement.SpaceEvenly,
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    text = shop.address.substring(
+                                        0,
+                                        shop.address.length - 8
+                                    ),
+                                    modifier = Modifier.padding(top = 14.dp, start = 4.dp, end = 4.dp)
 
-                                    )
-                                    Text(
-                                        text = "Total: ${shop.total} rsd",
-                                        modifier = Modifier.padding(bottom = 20.dp)
-                                    )
-                                }
+                                )
+                                Text(
+                                    text = "Total: ${shop.total} rsd",
+                                    modifier = Modifier.padding(top = 10.dp, bottom = 14.dp, start = 4.dp, end = 4.dp)
+                                )
                             }
 
 
@@ -509,6 +472,11 @@ fun CheckoutScreen(
                                                 }
                                             }
                                             ////navController na orders ili home
+                                            navController.navigate(Screen.Home.route) {
+                                                popUpTo(route = "ordering"){
+                                                    inclusive = true
+                                                }
+                                            }
                                         } else {
                                             println("NEUSPESNO SLANJE")
                                             coroutineScope.launch {
@@ -531,7 +499,7 @@ fun CheckoutScreen(
 //                            enabled = cartProducts.isNotEmpty()
                         ) {
                             Text(
-                                text = "Checkout",
+                                text = "Order",
                                 fontSize = 20.sp,
                                 fontFamily = FontFamily(Font(R.font.lexend)),
                                 fontWeight = FontWeight(300),

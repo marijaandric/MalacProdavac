@@ -8,7 +8,6 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.example.front.screens.cart.Cart
 import com.example.front.screens.cart.NewCreditCartScreen
 import com.example.front.screens.categories.RegistrationCategories
 import com.example.front.screens.delivery.DeliveryScreen
@@ -114,12 +113,6 @@ fun SetupNavGraph(
         )
         {
             SellersScreen(navController = navController, shopsViewModel)
-        }
-        composable(
-            route = Screen.Cart.route
-        )
-        {
-            Cart(cartViewModel, navController)
         }
         composable(
             route = "${Screen.Route.route}/{routeID}",
