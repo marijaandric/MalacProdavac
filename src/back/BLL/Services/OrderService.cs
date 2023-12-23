@@ -35,9 +35,30 @@ namespace back.BLL.Services
             return orders;
         }
 
+        public async Task<int> GetShopOrdersPageCount(int ownerId, int? status)
+        {
+            return await _repository.GetShopOrdersPageCount(ownerId, status);
+        }
+
+        public async Task<List<OrderCard>> GetShopOrders(int ownerId, int? status, int page)
+        {
+            List<OrderCard> orders = await _repository.GetShopOrders(ownerId, status, page);
+            if (orders.Count == 0) throw new ArgumentException("No orders!");
+
+            return orders;
+        }
+
         public async Task<OrderInfo> OrderDetails(int orderId)
         {
             OrderInfo info = await _repository.OrderDetails(orderId);
+            if (info == null) throw new ArgumentException("No order found!");
+
+            return info;
+        }
+
+        public async Task<OrderInfo> ShopOrderDetails(int orderId)
+        {
+            OrderInfo info = await _repository.ShopOrderDetails(orderId);
             if (info == null) throw new ArgumentException("No order found!");
 
             return info;

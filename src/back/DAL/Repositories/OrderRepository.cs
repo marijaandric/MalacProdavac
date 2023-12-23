@@ -48,8 +48,9 @@ namespace back.DAL.Repositories
             
             if (order.DeliveryMethodId == 1) return price;
 
-            var routeId = (await _context.DeliveryRequests.FirstOrDefaultAsync(x => x.OrderId == orderId)).RouteId;
-            if (routeId == null) return price;
+            var req = (await _context.DeliveryRequests.FirstOrDefaultAsync(x => x.OrderId == orderId));
+            if (req == null || req.RouteId == null) return price;
+            int routeId = (int)req.RouteId;
 
             price = (await _context.DeliveryRoutes.FirstOrDefaultAsync(x => x.Id == routeId)).FixedCost;
 
@@ -114,6 +115,47 @@ namespace back.DAL.Repositories
             return orders;
         }
 
+        public async Task<int> GetShopOrdersPageCount(int ownerId, int? status)
+        {
+            int shopId = (await _context.Shop.FirstOrDefaultAsync(x => x.OwnerId == ownerId)).Id;
+
+            if (status == null) return (int)Math.Ceiling((double)(await _context.Orders.Where(x => x.ShopId == shopId).CountAsync()) / numberOfItems);
+            return (int)Math.Ceiling((double)(await _context.Orders.Where(x => x.ShopId == shopId && x.StatusId == status).CountAsync()) / numberOfItems);
+        }
+
+        public async Task<List<OrderCard>> GetShopOrders(int ownerId, int? status, int page)
+        {
+            List<OrderCard> orders = new List<OrderCard>();
+            int shopId = (await _context.Shop.FirstOrDefaultAsync(x => x.OwnerId == ownerId)).Id;
+
+            if (status == null)
+            {
+                orders = await _context.Orders.Where(x => x.ShopId == shopId).Skip(page - 1 * numberOfItems).Take(numberOfItems).Select(x => new OrderCard
+                {
+                    Id = x.Id,
+                    Quantity = _context.OrderItems.Where(i => i.OrderId == x.Id).Count(),
+                    Amount = _context.OrderItems.Where(i => i.OrderId == x.Id).Sum(i => i.Price),
+                    CreatedOn = x.CreatedOn.ToShortDateString(),
+                    Status = _context.OrderStatuses.FirstOrDefault(s => s.Id == x.StatusId).Name
+
+                }).ToListAsync();
+            }
+            else
+            {
+                orders = await _context.Orders.Where(x => x.ShopId == shopId && x.StatusId == status).Skip(page - 1 * numberOfItems).Take(numberOfItems).Select(x => new OrderCard
+                {
+                    Id = x.Id,
+                    Quantity = _context.OrderItems.Where(i => i.OrderId == x.Id).Count(),
+                    Amount = _context.OrderItems.Where(i => i.OrderId == x.Id).Sum(i => i.Price),
+                    CreatedOn = x.CreatedOn.ToShortDateString(),
+                    Status = _context.OrderStatuses.FirstOrDefault(s => s.Id == x.StatusId).Name
+
+                }).ToListAsync();
+            }
+
+            return orders;
+        }
+
         public async Task<OrderInfo> OrderDetails(int orderId)
         {
             OrderInfo order = await _context.Orders.Select(x => new OrderInfo
@@ -153,6 +195,45 @@ namespace back.DAL.Repositories
                 PaymentMethod = order.DeliveryMethod,
                 ShippingAddress = order.ShippingAddress,
                 DeliveryPrice = (float)Math.Ceiling(delivery)
+            };
+        }
+
+        public async Task<OrderInfo> ShopOrderDetails(int orderId)
+        {
+            OrderInfo order = await _context.Orders.Select(x => new OrderInfo
+            {
+                Id = x.Id,
+                Quantity = _context.OrderItems.Where(i => i.OrderId == x.Id).Count(),
+                Amount = _context.OrderItems.Where(i => i.OrderId == x.Id).Sum(i => i.Price),
+                CreatedOn = x.CreatedOn.ToShortDateString(),
+                Status = _context.OrderStatuses.FirstOrDefault(s => s.Id == x.StatusId).Name,
+                DeliveryMethod = _context.DeliveryMethods.FirstOrDefault(dm => dm.Id == x.DeliveryMethodId).Name,
+                ShippingAddress = x.ShippingAddress
+
+            }).FirstOrDefaultAsync(x => x.Id == orderId);
+
+            List<OrderItemCard> items = await _context.OrderItems.Where(x => x.OrderId == orderId).Select(x => new OrderItemCard
+            {
+                Name = _context.Products.FirstOrDefault(p => p.Id == x.ProductId) != null ? _context.Products.FirstOrDefault(p => p.Id == x.ProductId).Name : _context.ArchivedProducts.FirstOrDefault(p => p.Id == x.ProductId).Name,
+                Shop = _context.Products.FirstOrDefault(p => p.Id == x.ProductId) != null ? _context.Shop.FirstOrDefault(s => s.Id == _context.Products.FirstOrDefault(p => p.Id == x.ProductId).ShopId).Name : _context.Shop.FirstOrDefault(s => s.Id == _context.ArchivedProducts.FirstOrDefault(p => p.Id == x.ProductId).ShopId).Name,
+                Price = x.Price,
+                Metric = _context.Products.FirstOrDefault(p => p.Id == x.ProductId) != null ? _context.Metrics.FirstOrDefault(m => m.Id == _context.Products.FirstOrDefault(p => p.Id == x.ProductId).MetricId).Name : _context.Metrics.FirstOrDefault(m => m.Id == _context.ArchivedProducts.FirstOrDefault(p => p.Id == x.ProductId).MetricId).Name,
+                Quantity = x.Quantity,
+                Image = _context.ProductImages.FirstOrDefault(pi => pi.ProductId == x.ProductId).Image
+
+            }).ToListAsync();
+
+            double delivery = await DeliveryPrice(order.Id);
+            return new OrderInfo
+            {
+                Id = order.Id,
+                Quantity = order.Quantity,
+                Amount = order.Amount,
+                CreatedOn = order.CreatedOn,
+                Status = order.Status,
+                Items = items,
+                DeliveryMethod = order.DeliveryMethod,
+                ShippingAddress = order.ShippingAddress
             };
         }
 
