@@ -36,6 +36,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberDrawerState
@@ -178,7 +179,10 @@ fun CheckoutScreen(
                         checked = payUsingCard,
                         onCheckedChange = {
                             payUsingCard = it
-                        }
+                        },
+                        colors = SwitchDefaults.colors(
+                            uncheckedTrackColor = Color.White,
+                        )
                     )
                     Text(text = "Credit/Debit Card")
                 }
@@ -275,13 +279,12 @@ fun CheckoutScreen(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(50.dp)
-//                                        .border(1.dp, Color.Red, RectangleShape)
                                     .padding(horizontal = 4.dp, vertical = 0.dp)
                                     .background(Color(0xff4a7da5))
                             ) {
                                 Column(modifier =Modifier
                                     ) {
-                                    Spacer(Modifier.weight(1f))
+//                                    Spacer(Modifier.weight(1f))
                                     Text(
                                         text = shop.name,
                                         fontSize = 24.sp,
@@ -302,7 +305,6 @@ fun CheckoutScreen(
                                     .fillMaxWidth()
 //                                        .height(80.dp)
                                     .wrapContentSize()
-//                                            .border(1.dp, Color.Blue, RectangleShape)
                                     .padding(horizontal = 4.dp, vertical = 0.dp)
                                 ,
                                 verticalArrangement = Arrangement.SpaceEvenly,
@@ -339,7 +341,10 @@ fun CheckoutScreen(
                                     onCheckedChange = {
                                         viewModel.updateSelfPickup(shop.id, it)
                                         println(shop.selfpickup)
-                                    }
+                                    },
+                                    colors = SwitchDefaults.colors(
+                                        uncheckedTrackColor = Color.White,
+                                    )
                                 )
                                 Text(text = "Self pickup")
                             }
