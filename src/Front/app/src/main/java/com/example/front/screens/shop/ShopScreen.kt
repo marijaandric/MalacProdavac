@@ -1101,69 +1101,68 @@ fun Info(
 
                         }
                     }
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                )
+                {
+                    Text(
+                        text = "View all reviews",
+                        modifier = Modifier.padding(top = 8.dp),
+                        style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onBackground)
                     )
-                    {
+                    Icon(
+                        imageVector = if (showReviews) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .clickable {
+                                showReviews = !showReviews
+                            }
+                            .padding(top = 8.dp)
+                            .size(30.dp),
+                        tint = MaterialTheme.colorScheme.onBackground
+                    )
+                }
+                if (showReviews) {
+                    val rev = shopViewModel.stateReview.value.reviews
+                    if (rev.isEmpty()) {
                         Text(
-                            text = "View all reviews",
-                            modifier = Modifier.padding(top = 8.dp),
-                            style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onBackground)
-                        )
-                        Icon(
-                            imageVector = if (showReviews) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                            contentDescription = null,
+                            "No reviews found for this store.",
+                            style = MaterialTheme.typography.titleSmall,
                             modifier = Modifier
-                                .clickable {
-                                    showReviews = !showReviews
-                                }
-                                .padding(top = 8.dp)
-                                .size(30.dp),
-                            tint = MaterialTheme.colorScheme.onBackground
+                                .align(Alignment.CenterHorizontally)
+                                .padding(top = 20.dp)
                         )
                     }
-                    if (showReviews) {
-                        val rev = shopViewModel.stateReview.value.reviews
-                        if (rev.isEmpty()) {
-                            Text(
-                                "No reviews found for this store.",
-                                style = MaterialTheme.typography.titleSmall,
-                                modifier = Modifier
-                                    .align(Alignment.CenterHorizontally)
-                                    .padding(top = 20.dp)
+                    LazyColumn(
+                        modifier = Modifier.heightIn(100.dp, 1000.dp)
+                    ) {
+                        items(rev) { review ->
+                            ReviewCard(
+                                username = review.username,
+                                imageRes = review.image,
+                                comment = review.comment,
+                                rating = review.rating
                             )
                         }
-                        LazyColumn(
-                            modifier = Modifier.heightIn(100.dp, 1000.dp)
-                        ) {
-                            items(rev) { review ->
-                                ReviewCard(
-                                    username = review.username,
-                                    imageRes = review.image,
-                                    comment = review.comment,
-                                    rating = review.rating
-                                )
-                            }
-                        }
-                        if (!shopViewModel.stateReview.value.error.contains("NotFound")) {
-                            Text("See more",
-                                style = MaterialTheme.typography.titleSmall,
-                                modifier = Modifier
-                                    .clickable {
-                                        reviewPage++; shopViewModel.getShopReview(
-                                        shopId,
-                                        reviewPage
-                                    )
-                                    }
-                                    .align(Alignment.CenterHorizontally))
-                        }
                     }
-
-                    Spacer(modifier = Modifier.height(40.dp))
+                    if (!shopViewModel.stateReview.value.error.contains("NotFound")) {
+                        Text("See more",
+                            style = MaterialTheme.typography.titleSmall,
+                            modifier = Modifier
+                                .clickable {
+                                    reviewPage++; shopViewModel.getShopReview(
+                                    shopId,
+                                    reviewPage
+                                )
+                                }
+                                .align(Alignment.CenterHorizontally))
+                    }
                 }
+
+                Spacer(modifier = Modifier.height(40.dp))
             }
         }
     }
