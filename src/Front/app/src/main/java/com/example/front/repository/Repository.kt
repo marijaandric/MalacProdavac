@@ -6,6 +6,7 @@ import com.example.front.model.DTO.CategoriesDTO
 import com.example.front.model.DTO.CheckAvailabilityReqDTO
 import com.example.front.model.DTO.CheckAvailabilityResDTO
 import com.example.front.model.DTO.ChosenCategoriesDTO
+import com.example.front.model.DTO.DeliveryPersonDTO
 import com.example.front.model.DTO.EditShopDTO
 import com.example.front.model.DTO.HomeProductDTO
 import com.example.front.model.DTO.LeaveReviewDTO
@@ -308,5 +309,14 @@ class Repository @Inject constructor(private val api: Api) {
     suspend fun getRequestsForShopDTO(shopId: Int):Response<List<RequestsForShopDTO>>
     {
         return api.getRequestsForShopDTO(shopId)
+    }
+
+    suspend fun getDeliveriesPersonForRequest(requestId: Int):Response<List<DeliveryPersonDTO>>
+    {
+        return api.getDeliveriesPersonForRequest(requestId)
+    }
+    suspend fun chooseDeliveryPerson(requestId: Int,deliveryPersonId: Int):Response<Boolean>
+    {
+        return api.chooseDeliveryPerson(requestId,deliveryPersonId)
     }
 }

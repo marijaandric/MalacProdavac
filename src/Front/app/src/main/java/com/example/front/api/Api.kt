@@ -4,6 +4,7 @@ import com.example.front.model.DTO.CategoriesDTO
 import com.example.front.model.DTO.CheckAvailabilityReqDTO
 import com.example.front.model.DTO.CheckAvailabilityResDTO
 import com.example.front.model.DTO.ChosenCategoriesDTO
+import com.example.front.model.DTO.DeliveryPersonDTO
 import com.example.front.model.DTO.EditShopDTO
 import com.example.front.model.DTO.HomeProductDTO
 import com.example.front.model.DTO.LeaveReviewDTO
@@ -329,4 +330,14 @@ interface Api {
     suspend fun getRequestsForShopDTO(
         @Query("userId") userId: Int
     ): Response<List<RequestsForShopDTO>>
+    @GET("/back/Delivery/GetDeliveryPeopleForRequest")
+    suspend fun getDeliveriesPersonForRequest(
+        @Query("requestId") requestId: Int
+    ): Response<List<DeliveryPersonDTO>>
+
+    @PUT("/back/Delivery/ChooseDeliveryPerson")
+    suspend fun chooseDeliveryPerson(
+        @Query("requestId") requestId: Int,
+        @Query("chosenPersonId") chosenPersonId: Int
+    ): Response<Boolean>
 }
