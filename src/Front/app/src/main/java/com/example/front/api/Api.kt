@@ -20,6 +20,7 @@ import com.example.front.model.DTO.OrdersPagesDTO
 import com.example.front.model.DTO.PageCountDTO
 import com.example.front.model.DTO.ProductDTO
 import com.example.front.model.DTO.ProductDisplayDTO
+import com.example.front.model.DTO.RequestsForShopDTO
 import com.example.front.model.DTO.ReviewDTO
 import com.example.front.model.DTO.RouteDetails
 import com.example.front.model.DTO.ShopDTO
@@ -323,4 +324,9 @@ interface Api {
         @Query("userId") userId: Int,
         @Query("types") type: List<Int>?
     ): Response<PageCountDTO>
+
+    @GET("/back/Delivery/GetRequestsForShop")
+    suspend fun getRequestsForShopDTO(
+        @Query("userId") userId: Int
+    ): Response<List<RequestsForShopDTO>>
 }

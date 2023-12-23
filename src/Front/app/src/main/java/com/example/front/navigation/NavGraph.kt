@@ -8,8 +8,10 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.example.front.screens.RequestsForShopScreen.RequestsForShopScreen
 import com.example.front.screens.cart.NewCreditCartScreen
 import com.example.front.screens.categories.RegistrationCategories
+import com.example.front.screens.chat.ChatPage
 import com.example.front.screens.delivery.DeliveryScreen
 import com.example.front.screens.delivery.RouteDetailsScreen
 import com.example.front.screens.home.HomePage
@@ -25,6 +27,7 @@ import com.example.front.screens.shop.ShopScreen
 import com.example.front.screens.userprofile.UserProfileScreen
 import com.example.front.viewmodels.cart.CartViewModel
 import com.example.front.viewmodels.categories.CategoriesViewModel
+import com.example.front.viewmodels.chat.ChatViewModel
 import com.example.front.viewmodels.checkout.CheckoutViewModel
 import com.example.front.viewmodels.delivery.DeliveryViewModel
 import com.example.front.viewmodels.delivery.RouteDetailsViewModel
@@ -39,6 +42,7 @@ import com.example.front.viewmodels.orders.OrdersViewModel
 import com.example.front.viewmodels.product.ProductViewModel
 import com.example.front.viewmodels.products.ProductsViewModel
 import com.example.front.viewmodels.register.RegisterViewModel
+import com.example.front.viewmodels.requestsshop.RequestsForShopViewModel
 import com.example.front.viewmodels.shops.ShopsViewModel
 import com.example.front.viewmodels.splasintro.SplashAndIntroViewModel
 
@@ -62,15 +66,16 @@ fun SetupNavGraph(
     val checkoutViewModel: CheckoutViewModel = hiltViewModel()
     val notificationViewModel: NotificationViewModel = hiltViewModel()
     val ordersViewModel: OrdersViewModel = hiltViewModel()
-    val orderInfoViewModel : OrderInfoViewModel = hiltViewModel()
-    val deliveryViewModel : DeliveryViewModel = hiltViewModel()
-    val routedetailsViewModel : RouteDetailsViewModel = hiltViewModel()
-    val productsViewModel : ProductsViewModel = hiltViewModel()
+    val orderInfoViewModel: OrderInfoViewModel = hiltViewModel()
+    val deliveryViewModel: DeliveryViewModel = hiltViewModel()
+    val routedetailsViewModel: RouteDetailsViewModel = hiltViewModel()
+    val productsViewModel: ProductsViewModel = hiltViewModel()
+    val chatViewModel: ChatViewModel = hiltViewModel()
+    val requestsViewModel: RequestsForShopViewModel = hiltViewModel()
 
     NavHost(
         navController = navController,
         startDestination = "intro"
-        //startDestination = "notification"
     ) {
         composable(
             route = Screen.Home.route
@@ -93,6 +98,13 @@ fun SetupNavGraph(
         }
 
         composable(
+            route = Screen.RequestsForShop.route
+        )
+        {
+            RequestsForShopScreen(requestsViewModel,navController)
+        }
+
+        composable(
             route = Screen.MyProfile.route
         )
         {
@@ -106,7 +118,7 @@ fun SetupNavGraph(
             AllProducts(navController = navController, productsViewModel, oneShopViewModel)
         }
         composable(route = Screen.Delivery.route) {
-            DeliveryScreen(navController,deliveryViewModel)
+            DeliveryScreen(navController, deliveryViewModel)
         }
         composable(
             route = Screen.AllSellers.route
@@ -159,19 +171,23 @@ fun SetupNavGraph(
             route = "${Screen.SetUpShop.route}/{id}",
             arguments = listOf(navArgument("id") { type = NavType.IntType })
         )
-        {navBackStackEntry ->
+        { navBackStackEntry ->
             val arguments = requireNotNull(navBackStackEntry.arguments)
             val id = arguments.getInt("id")
-            SetUpShopScreen(navController = navController, myShopViewModel,id)
+            SetUpShopScreen(navController = navController, myShopViewModel, id)
+        }
+        composable(route = Screen.Chat.route) {
+            ChatPage(chatViewModel)
         }
         composable(route = Screen.Orders.route)
         {
             OrdersScreen(navController = navController, ordersViewModel)
         }
-        composable(route = "${Screen.Order.route}/{orderId}",
+        composable(
+            route = "${Screen.Order.route}/{orderId}",
             arguments = listOf(navArgument("orderId") { type = NavType.IntType })
-            )
-        {navBackStackEntry ->
+        )
+        { navBackStackEntry ->
             val arguments = requireNotNull(navBackStackEntry.arguments)
             val orderId = arguments.getInt("orderId")
             OrderScreen(navController = navController, orderId, orderInfoViewModel)

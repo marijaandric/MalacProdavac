@@ -25,4 +25,6 @@ sealed class Screen(val route:String){
     object Order:Screen(route="order")
     object Delivery: Screen(route="delivery")
     object Route: Screen(route="route")
+    object Chat: Screen(route="chat")
+    object RequestsForShop: Screen(route="requests_for_shop")
 }

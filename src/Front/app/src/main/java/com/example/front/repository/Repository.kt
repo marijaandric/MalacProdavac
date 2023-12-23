@@ -22,6 +22,7 @@ import com.example.front.model.DTO.OrdersPagesDTO
 import com.example.front.model.DTO.PageCountDTO
 import com.example.front.model.DTO.ProductDTO
 import com.example.front.model.DTO.ProductDisplayDTO
+import com.example.front.model.DTO.RequestsForShopDTO
 import com.example.front.model.DTO.ReviewDTO
 import com.example.front.model.DTO.RouteDetails
 import com.example.front.model.DTO.ShopDTO
@@ -303,5 +304,9 @@ class Repository @Inject constructor(private val api: Api) {
 
     suspend fun getNotificationPageCount(userId: Int, type: List<Int>?): Response<PageCountDTO> {
         return api.getNotificationPageCount(userId, type)
+    }
+    suspend fun getRequestsForShopDTO(shopId: Int):Response<List<RequestsForShopDTO>>
+    {
+        return api.getRequestsForShopDTO(shopId)
     }
 }

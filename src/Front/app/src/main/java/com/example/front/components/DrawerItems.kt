@@ -11,6 +11,7 @@ val DrawerItems = listOf(
     DrawerItem(icon = R.drawable.navbar_package, label = "Products", route = Screen.AllProduct.route, secondaryLabel = "",roleId=1),
     DrawerItem(icon = R.drawable.navbar_shop1, label = "Shops", route = Screen.AllSellers.route, secondaryLabel = "",roleId=1),
     DrawerItem(icon = R.drawable.navbar_bell, label = "Notifications", route = Screen.Notification.route, secondaryLabel = "",roleId=1),
+    DrawerItem(icon = R.drawable.order, label = "Orders/Order requests", route = Screen.RequestsForShop.route, secondaryLabel = "",roleId=2),
     DrawerItem(icon = R.drawable.navbar_shop2, label = "My shop", route = Screen.MyShop.route, secondaryLabel = "",roleId=2),
     DrawerItem(icon = R.drawable.navbar_message, label = "Messages", route = Screen.Home.route, secondaryLabel = "",roleId=1),
     DrawerItem(icon = R.drawable.navbar_profile, label = "Delivery profile", route = Screen.Home.route, secondaryLabel = "",roleId=3),
