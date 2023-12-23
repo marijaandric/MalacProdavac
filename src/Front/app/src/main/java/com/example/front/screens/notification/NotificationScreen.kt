@@ -600,13 +600,16 @@ fun ViewDialog(
                             modifier = Modifier
                                 .padding(10.dp)
                         )
-                        Text(
-                            text = "Rate",
-                            modifier = Modifier
-                                .padding(10.dp)
-                                .clickable { showRateUserDialog = true },
-                            style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.secondary)
-                        )
+                        if(type==1 || type==7 || type==8)
+                        {
+                            Text(
+                                text = "Rate",
+                                modifier = Modifier
+                                    .padding(10.dp)
+                                    .clickable { showRateUserDialog = true },
+                                style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.secondary)
+                            )
+                        }
                     }
                 }
             }
