@@ -7,6 +7,6 @@ data class RegistrationRequest(
     @SerializedName("lastName") val lastName: String,
     @SerializedName("email") val email: String,
     @SerializedName("password") val password: String,
-    @SerializedName("address") val address: String,
+    @SerializedName("address") val address: String?,
     @SerializedName("roleId") val roleId: Int
 )

@@ -1,11 +1,8 @@
 package com.example.front.screens.userprofile
 
 import android.annotation.SuppressLint
-import android.graphics.Bitmap
 import android.net.Uri
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateDpAsState
@@ -56,9 +53,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asAndroidBitmap
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.pointer.pointerInput
@@ -85,6 +79,7 @@ import com.example.front.viewmodels.myprofile.MyProfileViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import okhttp3.MultipartBody
+import java.text.DecimalFormat
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -397,7 +392,8 @@ fun Info(myProfileViewModel: MyProfileViewModel) {
                                     )
                                 }
                                 Text(
-                                    text = myProfileViewModel.state.value.info!!.moneySpent.toString()+ " din",
+//                                    DecimalFormat("#.00").format(
+                                    text = DecimalFormat("0.00").format(myProfileViewModel.state.value.info!!.moneySpent)+ " din",
                                     modifier = Modifier.padding(start = 8.dp),
                                     style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold, fontSize = 15.sp)
                                 )
@@ -422,7 +418,7 @@ fun Info(myProfileViewModel: MyProfileViewModel) {
                                     )
                                 }
                                 Text(
-                                    text = myProfileViewModel.state.value.info!!.moneyEarned.toString() + " din",
+                                    text = DecimalFormat("0.00").format(myProfileViewModel.state.value.info!!.moneyEarned) + " din",
                                     modifier = Modifier.padding(start = 8.dp),
                                     style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold, fontSize = 15.sp)
                                 )

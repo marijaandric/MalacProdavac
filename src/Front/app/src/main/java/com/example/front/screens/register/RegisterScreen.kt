@@ -13,18 +13,18 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -68,6 +68,7 @@ fun RegisterScreen(navController: NavHostController, registerViewModel: Register
     var passwordConfirm by remember { mutableStateOf("") }
     var address by remember { mutableStateOf("") }
     var city by remember { mutableStateOf("") }
+    var a = remember  { mutableStateOf<String?>(null) }
 
     // greske pri unosu
     var nameError by remember { mutableStateOf("") }
@@ -119,7 +120,7 @@ fun RegisterScreen(navController: NavHostController, registerViewModel: Register
 //                    .align(Alignment.Center)
 //                    .verticalScroll(state = scrollState)
             ){
-                TitleTextComponent("Registracija")
+                TitleTextComponent("Register")
 
                 MyTextField(
                     labelValue = "First name",
@@ -173,6 +174,11 @@ fun RegisterScreen(navController: NavHostController, registerViewModel: Register
                     ErrorTextComponent(confirmPasswordError)
                 }
 
+                Text(
+                    text = "Optional:",
+                    modifier = Modifier
+                        .padding(top = 10.dp, bottom = 0.dp)
+                )
                 MyTextField(
                     labelValue = "Address",
                     painterResource = painterResource(id = R.drawable.home),
@@ -267,10 +273,10 @@ fun RegisterScreen(navController: NavHostController, registerViewModel: Register
                         if(password != passwordConfirm) {
                             confirmPasswordError = "Passwords don't match"
                         }
-                        if (address.isEmpty()) {
-                            addressError = "Address is required"
-                        }
-                        if (city.isEmpty()) {
+//                        if (address.isEmpty()) {
+//                            addressError = "Address is required"
+//                        }
+                        if (address.isNotEmpty() && city.isEmpty()) {
                             cityError = "City is required"
                         }
 
@@ -279,7 +285,7 @@ fun RegisterScreen(navController: NavHostController, registerViewModel: Register
                             emailError.isEmpty() &&
                             passwordError.isEmpty() &&
                             confirmPasswordError.isEmpty() &&
-                            addressError.isEmpty() &&
+//                            addressError.isEmpty() &&
                             cityError.isEmpty()
                         ) {
                             coroutineScope.launch {
@@ -292,7 +298,13 @@ fun RegisterScreen(navController: NavHostController, registerViewModel: Register
                                             roleId = 3
                                         }
                                     }
-                                    val data = RegistrationRequest(name, lastName, email, password, address + ", " + city + ", Srbija", roleId)
+
+                                    if (address.isNotEmpty()){
+                                        a.value = address + ", " + city + ", Srbija"
+                                    } else {
+                                        a.value = null
+                                    }
+                                    val data = RegistrationRequest(name, lastName, email, password, a.value, roleId)
                                     val success = registerViewModel.performRegistration(data)
                                     if (success) {
                                         navController.navigate(route = Screen.Categories.route) {
@@ -323,7 +335,7 @@ fun RegisterScreen(navController: NavHostController, registerViewModel: Register
                         ),
                 ) {
                     Text(
-                        text = "Registruj se",
+                        text = "Register",
                         modifier = Modifier
                             .height(25.dp),
                         style = TextStyle(
