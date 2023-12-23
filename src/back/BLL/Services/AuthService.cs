@@ -132,7 +132,7 @@ namespace back.BLL.Services
 
             if (!checkEmail.Equals("")) throw new ArgumentException(checkEmail);
             if (!checkPassword.Equals("")) throw new ArgumentException(checkPassword);
-            if (!CheckAddress(userDto.Address)) throw new ArgumentException("Invalid form. \nRequired form: Street, City, Country");
+            if (userDto.Address != null && !CheckAddress(userDto.Address)) throw new ArgumentException("Invalid form. \nRequired form: Street, City, Country");
             #endregion
 
             TextInfo textInfo = CultureInfo.CurrentCulture.TextInfo;
@@ -143,7 +143,7 @@ namespace back.BLL.Services
             user.Lastname = textInfo.ToTitleCase(userDto.Lastname);
             user.Username = CreateUsername(user.Name, user.Lastname);
             user.Email = userDto.Email.ToLower();
-            if (userDto.Address.Length > 0) user.Address = userDto.Address;
+            if (userDto.Address != null && userDto.Address.Length > 0) user.Address = userDto.Address;
             user.RoleId = userDto.RoleId;
             user.LoggedIn = true;
             user.LightTheme = true;
@@ -163,10 +163,13 @@ namespace back.BLL.Services
 
             if (File.Exists(defaultImagePath)) user.Image = "default.png";
 
-            var coordinates = await GetCoordinates(userDto.Address);
-            user.Latitude = (float)coordinates.Item1;
-            user.Longitude = (float)coordinates.Item2;
-
+            if (user.Address != null)
+            {
+                var coordinates = await GetCoordinates(userDto.Address);
+                user.Latitude = (float)coordinates.Item1;
+                user.Longitude = (float)coordinates.Item2;
+            }
+            
             if (await _authRepository.InsertUser(user)) return await CreateToken(user);
             return "";
         }

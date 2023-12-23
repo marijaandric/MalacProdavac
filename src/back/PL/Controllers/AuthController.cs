@@ -1,7 +1,6 @@
 ﻿using back.BLL.Dtos;
 using back.BLL.Services;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
 
 namespace back.PL.Controllers
 {
