@@ -44,12 +44,51 @@ namespace back.PL.Controllers
             }
         }
 
+        [HttpGet("GetShopOrdersPageCount")]
+        public async Task<IActionResult> GetShopOrdersPageCount(int ownerId, int? status)
+        {
+            try
+            {
+                return Ok(new { Count = await _service.GetShopOrdersPageCount(ownerId, status) });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("GetShopOrders")]
+        public async Task<IActionResult> GetShopOrders(int ownerId, int? status, int page)
+        {
+            try
+            {
+                return Ok(await _service.GetShopOrders(ownerId, status, page));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         [HttpGet("OrderDetails")]
         public async Task<IActionResult> OrderDetails(int orderId)
         {
             try
             {
                 return Ok(await _service.OrderDetails(orderId));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("ShopOrderDetails")]
+        public async Task<IActionResult> ShopOrderDetails(int orderId)
+        {
+            try
+            {
+                return Ok(await _service.ShopOrderDetails(orderId));
             }
             catch (Exception ex)
             {
