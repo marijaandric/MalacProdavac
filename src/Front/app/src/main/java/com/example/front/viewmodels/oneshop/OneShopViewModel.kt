@@ -1,5 +1,6 @@
 package com.example.front.viewmodels.oneshop
 
+import android.content.Context
 import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.State
@@ -12,6 +13,7 @@ import com.example.front.model.DTO.FiltersDTO
 import com.example.front.model.DTO.NewProductDTO
 import com.example.front.model.DTO.NewProductDisplayDTO
 import com.example.front.repository.Repository
+import com.example.front.screens.myshop.getMultipartBodyPart
 import com.example.front.screens.myshop.state.ImageState
 import com.example.front.screens.shop.state.DeleteProductDisplayState
 import com.example.front.screens.shop.state.DeleteShopState
@@ -25,10 +27,11 @@ import com.example.front.screens.shop.state.ProductState
 import com.example.front.screens.shop.state.ShopReviewState
 import com.example.front.screens.shop.state.ShopState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import kotlinx.coroutines.withContext
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import org.osmdroid.util.GeoPoint
@@ -124,6 +127,21 @@ class OneShopViewModel @Inject constructor(
         viewModelScope.launch {
             pictures.value.forEach { picture ->
                 uploadImage(1, productId, picture)
+            }
+        }
+    }
+
+    fun processSelectedImages(uris: List<Uri>, context: Context) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val pictures = uris.mapNotNull { uri ->
+                try {
+                    getMultipartBodyPart(context, uri)
+                } catch (e: Exception) {
+                    null
+                }
+            }
+            withContext(Dispatchers.Main) {
+                setPictures(pictures)
             }
         }
     }
