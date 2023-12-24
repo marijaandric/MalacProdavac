@@ -560,11 +560,39 @@ fun TopCenterImages(myProfileViewModel: MyProfileViewModel, drawerState: DrawerS
                     }
                 }
                 else{
-                    if(myProfileViewModel.state.value.info!!.image.isNotEmpty())
+                    if(myProfileViewModel.state.value.info!!.image != null)
                     {
-                        ImageItemForProfilePic(image = myProfileViewModel.state.value!!.info!!.image, onEditClick = {
-                            photoPicker.launch("image/*")
-                        })
+                        if(myProfileViewModel.state.value.info != null)
+                        {
+                            if(myProfileViewModel.state.value.info!!.image.isNotEmpty())
+                            {
+                                ImageItemForProfilePic(image = myProfileViewModel.state.value!!.info!!.image, onEditClick = {
+                                    photoPicker.launch("image/*")
+                                })
+                            }
+                            else{
+                                Image(
+                                    painter = painterResource(id = R.drawable.imageplaceholder),
+                                    contentDescription = "Placeholder",
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier//.fillMaxWidth(0.3f)
+                                        .size(140.dp)
+                                        .clip(CircleShape)
+                                        .border(4.dp, Color.White, CircleShape)
+                                )
+                            }
+                        }
+                        else{
+                            Image(
+                                painter = painterResource(id = R.drawable.imageplaceholder),
+                                contentDescription = "Placeholder",
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier//.fillMaxWidth(0.3f)
+                                    .size(140.dp)
+                                    .clip(CircleShape)
+                                    .border(4.dp, Color.White, CircleShape)
+                            )
+                        }
                     }
                 }
 
