@@ -1,12 +1,10 @@
-﻿using System;
-using back.BLL.Dtos;
+﻿using back.BLL.Dtos;
 using back.BLL.Dtos.Cards;
 using back.BLL.Dtos.HelpModels;
 using back.BLL.Dtos.Infos;
 using back.DAL.Contexts;
 using back.DAL.Models;
 using back.Models;
-using FirebaseAdmin.Messaging;
 using Microsoft.EntityFrameworkCore;
 
 namespace back.DAL.Repositories
@@ -382,9 +380,9 @@ namespace back.DAL.Repositories
             return  id;
         }
 
-        public async Task<bool> AddProductSize(int id, int sizeId, int quantity)
+        public async Task<bool> AddProductSize(ProductSize ps)
         {
-            await _context.ProductSizes.AddAsync(new ProductSize { ProductId = id, SizeId = sizeId, Stock = quantity });
+            await _context.ProductSizes.AddAsync(ps);
             return await _context.SaveChangesAsync() > 0;
         }
 
@@ -416,10 +414,25 @@ namespace back.DAL.Repositories
             return await _context.SaveChangesAsync() > 0;
         }
 
-        public async Task<bool> EditProductSize(int id, int sizeId, int quantity)
+        public async Task<bool> EditProductSize(ProductSize ps)
         {
-            ProductSize ps = await _context.ProductSizes.FirstOrDefaultAsync(x => x.ProductId == id && x.SizeId == sizeId);
-            ps.Stock = quantity;
+            ProductSize existing = await _context.ProductSizes.FirstOrDefaultAsync(x => x.ProductId == ps.ProductId && x.SizeId == ps.SizeId);
+            existing = ps;
+            return await _context.SaveChangesAsync() > 0;
+        }
+
+        public async Task<bool> EditProductSizes(int productId, List<ProductSize> sizes)
+        {
+            List<ProductSize> existing = await GetProductSizes(productId);
+            _context.ProductSizes.RemoveRange(existing);
+            _context.ProductSizes.AddRangeAsync(sizes);
+
+            return await _context.SaveChangesAsync() > 0;
+        }
+
+        public async Task<bool> AddProductSizes(List<ProductSize> ps)
+        {
+            await _context.AddRangeAsync(ps);
             return await _context.SaveChangesAsync() > 0;
         }
 
