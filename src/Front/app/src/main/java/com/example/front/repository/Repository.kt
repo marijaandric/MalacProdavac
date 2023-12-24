@@ -24,6 +24,7 @@ import com.example.front.model.DTO.OrdersPagesDTO
 import com.example.front.model.DTO.PageCountDTO
 import com.example.front.model.DTO.ProductDTO
 import com.example.front.model.DTO.ProductDisplayDTO
+import com.example.front.model.DTO.ReqForDeliveryPersonDTO
 import com.example.front.model.DTO.RequestsForShopDTO
 import com.example.front.model.DTO.ReviewDTO
 import com.example.front.model.DTO.RouteDetails
@@ -335,5 +336,10 @@ class Repository @Inject constructor(private val api: Api) {
     suspend fun getShopOrders(ownerId: Int, status:Int?, page:Int):Response<List<OrdersDTO>>
     {
         return api.getShopOrders(ownerId,status,page)
+    }
+
+    suspend fun getReqForDelivery(deliveryPersonId: Int): Response<List<ReqForDeliveryPersonDTO>>
+    {
+        return api.getReqForDelivery(deliveryPersonId)
     }
 }

@@ -184,7 +184,6 @@ fun ShopScreen(
     }
     LaunchedEffect(shopViewModel.stateEditShop.value)
     {
-        Log.d("PROMENA",shopViewModel.stateEditShop.value.toString())
         if(shopViewModel.stateEditShop.value.error.isNotEmpty())
         {
             toastHostState.showToast(

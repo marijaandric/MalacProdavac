@@ -22,6 +22,7 @@ import com.example.front.model.DTO.OrdersPagesDTO
 import com.example.front.model.DTO.PageCountDTO
 import com.example.front.model.DTO.ProductDTO
 import com.example.front.model.DTO.ProductDisplayDTO
+import com.example.front.model.DTO.ReqForDeliveryPersonDTO
 import com.example.front.model.DTO.RequestsForShopDTO
 import com.example.front.model.DTO.ReviewDTO
 import com.example.front.model.DTO.RouteDetails
@@ -357,4 +358,10 @@ interface Api {
         @Query("status") status: Int?,
         @Query("page") page: Int,
     ):Response<List<OrdersDTO>>
+
+    //ReqForDeliveryPersonDTO
+    @GET("back/Delivery/GetRequestsForDeliveryPerson")
+    suspend fun getReqForDelivery(
+        @Query("deliveryPerson") deliveryPerson: Int,
+    ):Response<List<ReqForDeliveryPersonDTO>>
 }

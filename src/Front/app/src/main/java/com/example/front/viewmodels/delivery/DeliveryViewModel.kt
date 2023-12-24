@@ -8,6 +8,7 @@ import com.example.front.helper.DataStore.DataStoreManager
 import com.example.front.model.DTO.RouteDetails
 import com.example.front.model.DTO.Trip
 import com.example.front.repository.Repository
+import com.example.front.screens.delivery.state.ReqForDeliveryState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -19,6 +20,31 @@ class DeliveryViewModel @Inject constructor(
 {
     private val _state = mutableStateOf(DeliveryRoutes())
     var state: State<DeliveryRoutes> = _state;
+
+    private val _stateReq = mutableStateOf(ReqForDeliveryState())
+    var stateReq: State<ReqForDeliveryState> = _stateReq;
+
+    suspend fun getReqForDelivery(userId: Int) {
+        try {
+            val response = repository.getReqForDelivery(userId)
+            Log.d("RES DEL", response.body().toString())
+            if (response.isSuccessful) {
+                _stateReq.value = _stateReq.value.copy(
+                    isLoading = false,
+                    req = response.body(),
+                    error=""
+                )
+            } else {
+                _stateReq.value = _stateReq.value.copy(
+                    isLoading = false,
+                    req = null,
+                    error="Error"
+                )
+            }
+        } catch (e: Exception) {
+            _state.value.error = e.message.toString()
+        }
+    }
 
     suspend fun getRouteDetails(userId: Int?) {
         try {

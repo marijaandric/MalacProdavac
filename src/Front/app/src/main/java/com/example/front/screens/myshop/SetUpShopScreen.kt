@@ -154,7 +154,9 @@ fun ProfilePhoto(context:Context, userId:Int, viewModel: MyShopViewModel, navCon
         mutableStateOf("")
     }
     var selectedDay by remember { mutableStateOf<String?>("Mon") }
-
+    var firstTime by remember {
+        mutableStateOf(true)
+    }
 
     var stateMon = rememberTimePickerState()
     var stateEndMon = rememberTimePickerState()
@@ -366,10 +368,11 @@ fun ProfilePhoto(context:Context, userId:Int, viewModel: MyShopViewModel, navCon
         BigBlueButton(text = "Proceed", onClick = {
             val workingHoursList: List<WorkingHoursNewShopDTO> = workingHoursMap.values.filterNotNull()
             val pibInt = pib.toIntOrNull()
-            if(pibInt != null)
+            if(pibInt != null || name != "" || address != "")
             {
                 val newShop = NewShopDTO(ownerId = userId, name= name, address = address, accountNumber = accountNumber, categories = clickedCards, pib = pib.toInt(), workingHours = workingHoursList)
-                picture?.let { viewModel.newShop(newShop, it) }
+                viewModel.newShop(newShop, picture)
+                navController.navigate("${Screen.MyShop.route}")
                 Log.d("NEW SHOP", newShop.toString())
             }
             else{
@@ -382,14 +385,15 @@ fun ProfilePhoto(context:Context, userId:Int, viewModel: MyShopViewModel, navCon
             }
 
         }, width = 0.9f, modifier = Modifier)
-
-        if(!viewModel.stateNewShop.value.isLoading && viewModel.stateNewShop.value.error.isEmpty())
-        {
-            val shopId = viewModel.stateNewShop.value.newShop!!.success
-            val info = 1
-            navController.navigate("${Screen.Shop.route}/$shopId/$info")
-        }
-        else if(!viewModel.stateNewShop.value.isLoading && viewModel.stateNewShop.value.error.isNotEmpty())
+//
+//        if(!viewModel.stateNewShop.value.isLoading && viewModel.stateNewShop.value.error.isEmpty() && firstTime)
+//        {
+//            firstTime = false
+//            //val shopId = viewModel.stateNewShop.value.newShop!!.success
+//            //val info = 1
+//            navController.navigate("${Screen.MyShop.route}")
+//        }
+        if(!viewModel.stateNewShop.value.isLoading && viewModel.stateNewShop.value.error.isNotEmpty())
         {
             coroutineScope.launch {
                 toastHostState.showToast(

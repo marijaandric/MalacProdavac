@@ -56,7 +56,7 @@ class MyShopViewModel @Inject constructor(
         }
     }
 
-    fun newShop(shop: NewShopDTO, imagePart : MultipartBody.Part) {
+    fun newShop(shop: NewShopDTO, imagePart : MultipartBody.Part?) {
         viewModelScope.launch {
             try {
                 val response = repository.newShop(shop)
@@ -66,7 +66,10 @@ class MyShopViewModel @Inject constructor(
                         newShop = response.body(),
                         error = ""
                     )
-                    stateNewShop.value!!.newShop!!.success?.let { uploadImage(2,it,imagePart) }
+                    if(imagePart != null)
+                    {
+                        stateNewShop.value!!.newShop!!.success?.let { uploadImage(2,it,imagePart) }
+                    }
                 }
                 else{
                     _stateNewShop.value = _stateNewShop.value.copy(

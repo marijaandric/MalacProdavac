@@ -622,15 +622,17 @@ class OneShopViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val response = repository.deleteShop(shopId)
-                Log.d("DELEYE", response.toString())
                 if (response.isSuccessful) {
                     val shopp = response.body()
                     _stateDeleteShop.value = _stateDeleteShop.value.copy(
                         isLoading = false,
-                        success = shopp
+                        success = shopp,
+                        error=""
                     )
                 } else {
                     _stateDeleteShop.value = _stateDeleteShop.value.copy(
+                        isLoading = false,
+                        success = null,
                         error = "You cannot delete the store now! Try it later."
                     )
                 }

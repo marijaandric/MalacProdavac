@@ -60,7 +60,6 @@ fun MyShopScreen(navController : NavHostController, myShopViewModel: MyShopViewM
             val shopId = myShopViewModel.state.value.shopId?.id
             if (shopId != null && shopId != 0) {
                 val x = 1
-                Log.d("USAP","1")
                 navController.navigate("${Screen.Shop.route}/$shopId/$x")
             }
         }
