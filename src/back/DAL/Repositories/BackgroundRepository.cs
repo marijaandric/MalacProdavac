@@ -79,7 +79,7 @@ namespace back.DAL.Repositories
             List<PendingReview> pending = new List<PendingReview>();
             
             //za dostavljace
-            var deliveryPeople = await _context.DeliveryRequests.Where(x => ((DateTime)x.PickupDate).AddDays(1) <= DateTime.Now)
+            var deliveryPeople = await _context.DeliveryRequests.Where(x => ((DateTime)x.PickupDate).AddDays(1) <= DateTime.Now && x.ChosenPersonId != null)
             .Join(_context.Orders, dr => dr.OrderId, o => o.Id, (dr, o) => new { dr, o })
             .Where(x => !_context.Ratings.Any(y => y.RaterId == x.dr.ChosenPersonId && y.RatedId == x.o.UserId))
             .Select(x => new PendingReview
