@@ -67,9 +67,12 @@ import com.example.front.model.DTO.ImageDataDTO
 import com.example.front.model.product.ProductReviewUserInfo
 import com.example.front.navigation.Screen
 import com.example.front.screens.myshop.getMultipartBodyPart
+import com.example.front.screens.shop.AddProductDialog
 import com.example.front.ui.theme.DarkBlue
 import com.example.front.ui.theme.Typography
+import com.example.front.viewmodels.oneshop.OneShopViewModel
 import com.example.front.viewmodels.product.ProductViewModel
+import com.example.front.viewmodels.requestsshop.RequestsForShopViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -83,6 +86,7 @@ import java.lang.Integer.max
 fun ProductPage(
     navHostController: NavHostController,
     productViewModel: ProductViewModel,
+    oneShopViewModel: OneShopViewModel,
     productID: Int
 ) {
 
@@ -93,6 +97,8 @@ fun ProductPage(
     var selectedSizeId by remember { mutableStateOf<Int?>(null) }
     val context = LocalContext.current
     var isToggled by remember { mutableStateOf(false) }
+
+    var showAddProduct by remember { mutableStateOf(false) }
 
     val reviews = productViewModel.stateReview.value.reviews
     var currentPage = 1
@@ -208,6 +214,7 @@ fun ProductPage(
                                 .size(50.dp)
                                 .padding(5.dp)
                                 .align(Alignment.TopEnd)
+                                .clickable{ showAddProduct = true}
                         )
                     }
 
@@ -619,6 +626,9 @@ fun ProductPage(
             }
 
         }
+    }
+    if (showAddProduct) {
+        EditProduct(onDismiss = { showAddProduct = false }, oneShopViewModel, productViewModel.state.value.product!!)
     }
     ToastHost(hostState = toastHostState)
 }

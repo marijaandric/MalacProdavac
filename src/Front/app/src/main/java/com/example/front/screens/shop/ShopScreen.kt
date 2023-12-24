@@ -36,6 +36,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
@@ -83,6 +84,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.zIndex
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
@@ -117,8 +119,11 @@ import com.example.front.screens.myshop.DayOfWeekItem
 import com.example.front.screens.myshop.getMultipartBodyPart
 import com.example.front.screens.sellers.FilterCard
 import com.example.front.viewmodels.oneshop.OneShopViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.MultipartBody
 import rememberToastHostState
 import java.text.SimpleDateFormat
@@ -496,7 +501,6 @@ fun Products(
     if (showSortDialog) {
         SortDialog(onDismiss = { showSortDialog = false }, shopViewModel, shopId)
     }
-    //showAddProduct
     if (showAddProduct) {
         AddProductDialog(onDismiss = { showAddProduct = false }, shopViewModel, shopId)
     }
@@ -553,73 +557,69 @@ fun AddProductDialog(onDismiss: () -> Unit, shopViewModel: OneShopViewModel, sho
 
 @Composable
 fun contentOfAddNewImage(shopViewModel: OneShopViewModel, onNextClicked: () -> Unit) {
-
-    var selectedImageUris by remember { mutableStateOf(emptyList<Uri>()) }
-    val imagePickerLauncher =
-        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-            uri?.let {
-                selectedImageUris = selectedImageUris + it
-                Log.d("ImagePicker", "New image added: $it")
-            }
-        }
-
-    Column {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(10.dp),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    "Add images for product",
-                    style = MaterialTheme.typography.titleMedium.copy(color = MaterialTheme.colorScheme.onBackground),
-                    modifier = Modifier
-                )
-            }
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(10.dp),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.upload_image),
-                    contentDescription = "Placeholder",
-                    modifier = Modifier
-                        .size(150.dp)
-                        .padding(20.dp)
-                        .clickable {
-                            imagePickerLauncher.launch("image/*")
-                        },
-                    contentScale = ContentScale.FillWidth,
-                    alignment = Alignment.Center
-                )
-            }
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(10.dp),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Button(
-                    onClick = {
-                        selectedImageUris.forEach { uri ->
-                            shopViewModel.uploadImage(1, 17, uri)
-                            Log.d("ImagePicker", "New image added: $uri")
-                        }
+    val context = LocalContext.current
+    val photoPicker = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetMultipleContents()
+    ) { uris ->
+        uris?.let { selectedUris ->
+            shopViewModel.viewModelScope.launch(Dispatchers.IO) {
+                val pictures = selectedUris.mapNotNull { uri ->
+                    try {
+                        getMultipartBodyPart(context, uri)
+                    } catch (e: Exception) {
+                        null
                     }
-                ) {
-                    Text("Upload Images")
                 }
+                shopViewModel.setPictures(pictures)
             }
         }
     }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            "Add images for product",
+            style = MaterialTheme.typography.titleMedium.copy(color = MaterialTheme.colorScheme.onBackground),
+            modifier = Modifier.padding(bottom = 24.dp)
+        )
+
+        Image(
+            painter = painterResource(id = R.drawable.upload_image),
+            contentDescription = "Upload Image Placeholder",
+            modifier = Modifier
+                .size(150.dp)
+                .padding(10.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .border(1.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(8.dp))
+                .clickable { photoPicker.launch("image/*") },
+            contentScale = ContentScale.Fit,
+            alignment = Alignment.Center
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(
+            onClick = { shopViewModel.uploadAllImages() },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Upload Images")
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        OutlinedButton(
+            onClick = onNextClicked,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Go Back")
+        }
+    }
 }
+
 
 
 @Composable
@@ -630,9 +630,9 @@ fun contentOfAddNewProduct(shopViewModel: OneShopViewModel, onNextClicked: () ->
     var productDescription by remember { mutableStateOf("") }
     var selectedMetric by remember { mutableStateOf(MetricsDTO(1, "Piece")) }
     var selectedCategory by remember { mutableStateOf(CategoriesDTO(1, "Food")) }
-    var price by remember { mutableStateOf(0) }
-    var salePercentage by remember { mutableStateOf(0) }
-    var saleMinQuantity by remember { mutableStateOf(0) }
+    var price by remember { mutableStateOf(0f) }
+    var salePercentage by remember { mutableStateOf(0f) }
+    var saleMinQuantity by remember { mutableStateOf(0f) }
     var saleMessage by remember { mutableStateOf("") }
     var shopId by remember { mutableStateOf(0) }
     var weight by remember { mutableStateOf(0f) }
@@ -683,12 +683,11 @@ fun contentOfAddNewProduct(shopViewModel: OneShopViewModel, onNextClicked: () ->
                             labelValue = "Quantity in stock",
                             value = quantity.toString(),
                             onValueChange = {
-                                // Update the state variable when the value changes
                                 quantity = it.toInt()
                             },
                             modifier = Modifier
                                 .weight(1f)
-                                .padding(end = 2.dp) // Add padding to the end of the first TextField
+                                .padding(end = 2.dp)
                         )
                     }
                 }
@@ -702,7 +701,7 @@ fun contentOfAddNewProduct(shopViewModel: OneShopViewModel, onNextClicked: () ->
                             value = price.toString(),
                             onValueChange = {
                                 // Update the state variable when the value changes
-                                price = it.toInt()
+                                price = it.toFloat()
                             },
                             modifier = Modifier
                                 .weight(1f)
@@ -748,7 +747,7 @@ fun contentOfAddNewProduct(shopViewModel: OneShopViewModel, onNextClicked: () ->
                                 value = salePercentage.toString(),
                                 onValueChange = {
                                     // Update the state variable when the value changes
-                                    salePercentage = it.toInt()
+                                    salePercentage = it.toFloat()
                                 },
                                 modifier = Modifier
                                     .weight(1f)
@@ -759,7 +758,7 @@ fun contentOfAddNewProduct(shopViewModel: OneShopViewModel, onNextClicked: () ->
                                 value = saleMinQuantity.toString(),
                                 onValueChange = {
                                     // Update the state variable when the value changes
-                                    saleMinQuantity = it.toInt()
+                                    saleMinQuantity = it.toFloat()
                                 },
                                 modifier = Modifier
                                     .weight(1f)
@@ -806,7 +805,7 @@ fun contentOfAddNewProduct(shopViewModel: OneShopViewModel, onNextClicked: () ->
                             value = price.toString(),
                             onValueChange = {
                                 // Update the state variable when the value changes
-                                price = it.toInt()
+                                price = it.toFloat()
                             },
                             modifier = Modifier
                                 .weight(1f)

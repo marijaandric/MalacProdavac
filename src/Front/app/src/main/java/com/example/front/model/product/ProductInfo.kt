@@ -27,8 +27,9 @@ data class ProductInfo(
     @SerializedName("categoryId") val categoryId: Int?,
     @SerializedName("subcategoryId") val subcategoryId: Int?,
     @SerializedName("salePercentage") val salePercentage: Float?,
-    @SerializedName("saleMinQuantity") val saleMinQuantity: Int?,
+    @SerializedName("saleMinQuantity") val saleMinQuantity: Float?,
     @SerializedName("saleMessage") val saleMessage: String?,
-    @SerializedName("shop") val shop: Any?
+    @SerializedName("shop") val shop: Any?,
+    @SerializedName("mass") val mass: Float?
 )
 

@@ -215,7 +215,7 @@ class Repository @Inject constructor(private val api: Api) {
         return api.getMetrics()
     }
 
-    suspend fun postNewProduct(product: NewProductDTO): Response<Int> {
+    suspend fun postNewProduct(product: NewProductDTO): Response<Id> {
         return api.postNewProduct(product)
     }
 
