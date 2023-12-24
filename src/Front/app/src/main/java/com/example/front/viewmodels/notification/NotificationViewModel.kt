@@ -189,6 +189,18 @@ class NotificationViewModel @Inject constructor(
     fun ChangePage(userId: Int,page: Int){
         getNotifications(userId, _stateCurrentList.value.lista, page)
     }
+
+    suspend fun markAsRead(notId: Int): Boolean {
+        try {
+            val response = repository.markNotificationAsRead(notId)
+            println(response)
+            println(response.success)
+            return response.success
+        } catch (e: Exception) {
+            println(e.message.toString())
+        }
+        return false
+    }
 }
 
 data class NotificationState (

@@ -35,7 +35,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -184,10 +183,10 @@ fun NotificationScreen(navController: NavHostController, viewModel: Notification
                             text = "Today",
                             style = Typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
                         )
-                        Text(
-                            text = "Clear all",
-                            style = Typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold)
-                        )
+//                        Text(
+//                            text = "Clear all",
+//                            style = Typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold)
+//                        )
                     }
                     Column(
                         modifier = Modifier
@@ -209,7 +208,8 @@ fun NotificationScreen(navController: NavHostController, viewModel: Notification
                                 refId = notification.referenceId,
                                 viewModel = viewModel,
                                 userId = userId,
-                                notId = notification.id
+                                notId = notification.id,
+                                isRead = notification.read
                             )
                             {
                                 viewModel.deleteNotification(notification.id)
@@ -275,7 +275,9 @@ fun ItemType(listOfIds: List<Int>, text: String, viewModel: NotificationViewMode
                 Image(
                     painterResource(id = R.drawable.crtica),
                     contentDescription = null,
-                    modifier = Modifier.size(40.dp).padding(16.dp, top=0.dp)
+                    modifier = Modifier
+                        .size(40.dp)
+                        .padding(16.dp, top = 0.dp)
                 )
             }
         }
@@ -292,8 +294,11 @@ fun NotificationCard(
     viewModel: NotificationViewModel,
     userId: Int,
     notId: Int,
+    isRead: Boolean,
     onDismissed: () -> Unit
 ) {
+    val coroutineScope = rememberCoroutineScope()
+    val read = remember { mutableStateOf(false) }
     var showViewDialog by remember {
         mutableStateOf(false)
     }
@@ -315,12 +320,12 @@ fun NotificationCard(
                     orientation = Orientation.Horizontal
                 ),
             shape = RoundedCornerShape(10.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            colors = CardDefaults.cardColors(containerColor = if(isRead || read.value) MaterialTheme.colorScheme.surface else Color(0xFFF4E5E0)),
         ) {
             Column(
                 modifier = Modifier
                     .padding(16.dp)
-                    .background(color = MaterialTheme.colorScheme.surface)
+                    .background(color = if(isRead || read.value) MaterialTheme.colorScheme.surface else Color(0xFFF4E5E0))
             ) {
                 Row(
                     modifier = Modifier
@@ -336,12 +341,15 @@ fun NotificationCard(
                         tint = MaterialTheme.colorScheme.primary
                     )
                     Text(text = "$title")
-                    Icon(
-                        painter = painterResource(id = R.drawable.carbon_dot_mark),
-                        contentDescription = "Right Icon",
-                        modifier = Modifier.size(24.dp),
-                        tint = MaterialTheme.colorScheme.secondary
-                    )
+                    if (isRead || read.value)
+                        Box(modifier = Modifier.size(24.dp))
+                    else
+                        Icon(
+                            painter = painterResource(id = R.drawable.carbon_dot_mark),
+                            contentDescription = "Right Icon",
+                            modifier = Modifier.size(24.dp),
+                            tint = MaterialTheme.colorScheme.secondary
+                        )
                 }
 
                 Text(
@@ -361,7 +369,12 @@ fun NotificationCard(
                         text = "View",
                         modifier = Modifier
                             .padding(0.dp, top = 16.dp, bottom = 5.dp)
-                            .clickable { showViewDialog = true },
+                            .clickable {
+                                coroutineScope.launch {
+                                    read.value = viewModel.markAsRead(notId)
+                                }
+                                showViewDialog = true
+                            },
                         style = MaterialTheme.typography.displaySmall.copy(
                             color = MaterialTheme.colorScheme.secondary,
                             fontSize = 16.sp

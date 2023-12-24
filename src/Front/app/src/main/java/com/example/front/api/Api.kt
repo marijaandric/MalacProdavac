@@ -1,6 +1,7 @@
 package com.example.front.api
 
 import com.example.front.model.DTO.AddProductReviewDTO
+import com.example.front.model.DTO.ApiResponse
 import com.example.front.model.DTO.CategoriesDTO
 import com.example.front.model.DTO.CheckAvailabilityReqDTO
 import com.example.front.model.DTO.CheckAvailabilityResDTO
@@ -368,5 +369,10 @@ interface Api {
     suspend fun declineReq(
         @Query("reqId") reqId: Int,
     ):Response<SuccessBoolean>
+
+    @PUT("back/Notification/MarkAsRead")
+    suspend fun notificationMarkAsRead(
+        @Query("notificationId") notificationId: Int
+    ):ApiResponse
 
 }

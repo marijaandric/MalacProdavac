@@ -3,6 +3,7 @@ package com.example.front.repository
 import android.util.Log
 import com.example.front.api.Api
 import com.example.front.model.DTO.AddProductReviewDTO
+import com.example.front.model.DTO.ApiResponse
 import com.example.front.model.DTO.CategoriesDTO
 import com.example.front.model.DTO.CheckAvailabilityReqDTO
 import com.example.front.model.DTO.CheckAvailabilityResDTO
@@ -346,5 +347,9 @@ class Repository @Inject constructor(private val api: Api) {
     suspend fun declineRequest(reqId:Int): Response<SuccessBoolean>
     {
         return api.declineReq(reqId)
+    }
+
+    suspend fun markNotificationAsRead(notificationId: Int): ApiResponse{
+        return api.notificationMarkAsRead(notificationId)
     }
 }
