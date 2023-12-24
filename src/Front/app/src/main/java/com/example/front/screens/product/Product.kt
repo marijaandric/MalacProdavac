@@ -21,9 +21,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -36,14 +34,11 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,7 +48,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -69,7 +63,6 @@ import com.example.front.components.CommentsTextBox
 import com.example.front.components.GalleryComponent
 import com.example.front.components.ImageItem
 import com.example.front.components.MyDropdownWorkingHours
-import com.example.front.components.Paginator
 import com.example.front.components.ProductImage
 import com.example.front.components.ReviewCard
 import com.example.front.components.Sidebar
@@ -376,8 +369,23 @@ fun ProductPage(
                                                     color = if (it.size == selectedSize) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.background
                                                 )
                                                 .clickable {
-                                                    selectedSize = it.size
-                                                    selectedSizeId = it.sizeId
+                                                    coroutineScope.launch {
+                                                        val result: CheckAvailabilityResDTO? = productViewModel.isAvailable(productInfo.productId!!, it.size ?: "None", quantity)
+                                                        if(result != null && result.available >= result.quantity) {
+                                                            selectedSize = it.size
+                                                            selectedSizeId = it.sizeId
+                                                        } else if (result != null){
+                                                            try {
+                                                                quantity = if (result.available > 0) result.available else 1
+                                                                toastHostState.showToast(
+                                                                    "Currently available: ${result.available}",
+                                                                    Icons.Default.Clear
+                                                                )
+                                                            } catch (e: Exception) {
+                                                                Log.e("ToastError", "Error showing toast", e)
+                                                            }
+                                                        }
+                                                    }
                                                 }
                                                 .padding(4.dp)
                                         ) {
@@ -466,49 +474,48 @@ fun ProductPage(
                                                         (selectedSize != null && selectedSizeId != null)
                                                 )
                                     ) {
-
                                         ////proverava da li je na stanju
-                                        if (selectedSize != null && selectedSize != ""){
-                                            coroutineScope.launch {
-                                                val result: CheckAvailabilityResDTO? = productViewModel.isAvailable(productInfo.productId!!, selectedSize!!, quantity)
-                                                if(result != null && result.available >= result.quantity){
-                                                    productViewModel.addToCart(
-                                                        productID,
-                                                        productInfo.name,
-                                                        productInfo.price,
-                                                        quantity,
-                                                        productInfo.shopId,
-                                                        productInfo.shopName,
-                                                        productInfo.images[0].image,
-                                                        productInfo.metric,
-                                                        selectedSize ?: "None",
-                                                        selectedSizeId ?: 0
-                                                    )
+                                        coroutineScope.launch {
+                                            val result: CheckAvailabilityResDTO? = productViewModel.isAvailable(productInfo.productId!!, selectedSize ?: "None", quantity)
+                                            if(result != null && result.available >= result.quantity){
+                                                productViewModel.addToCart(
+                                                    productID,
+                                                    productInfo.name,
+                                                    productInfo.price,
+                                                    quantity,
+                                                    productInfo.shopId,
+                                                    productInfo.shopName,
+                                                    productInfo.images[0].image,
+                                                    productInfo.metric,
+                                                    selectedSize ?: "None",
+                                                    selectedSizeId ?: 0
+                                                )
 
-                                                    coroutineScope.launch {
-                                                        try {
-                                                            toastHostState.showToast(
-                                                                "Product added to cart",
-                                                                Icons.Default.Check
-                                                            )
-                                                        } catch (e: Exception) {
-                                                            Log.e("ToastError", "Error showing toast", e)
-                                                        }
+                                                coroutineScope.launch {
+                                                    try {
+                                                        toastHostState.showToast(
+                                                            "Product added to cart",
+                                                            Icons.Default.Check
+                                                        )
+                                                    } catch (e: Exception) {
+                                                        Log.e("ToastError", "Error showing toast", e)
                                                     }
-                                                } else if (result != null){
-                                                    coroutineScope.launch {
-                                                        try {
-                                                            toastHostState.showToast(
-                                                                "Currently available: ${result.available}",
-                                                                Icons.Default.Check
-                                                            )
-                                                        } catch (e: Exception) {
-                                                            Log.e("ToastError", "Error showing toast", e)
-                                                        }
+                                                }
+                                            } else if (result != null){
+                                                coroutineScope.launch {
+                                                    try {
+                                                        quantity = if (result.available > 0) result.available else 1
+                                                        toastHostState.showToast(
+                                                            "Currently available: ${result.available}",
+                                                            Icons.Default.Clear
+                                                        )
+                                                    } catch (e: Exception) {
+                                                        Log.e("ToastError", "Error showing toast", e)
                                                     }
                                                 }
                                             }
                                         }
+
                                     } else if (productInfo?.sizes?.isNotEmpty() == true || selectedSize != null) {
                                         coroutineScope.launch {
                                             try {

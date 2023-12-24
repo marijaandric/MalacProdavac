@@ -250,7 +250,7 @@ namespace back.DAL.Repositories
 
         public async Task<bool> InsertShopCategories(List<ShopCategory> shopCategories, int shopId)
         {
-            _context.ShopCategories.RemoveRange(shopCategories);
+            await _context.ShopCategories.AddRangeAsync(shopCategories);
             return await _context.SaveChangesAsync() > 0;
         }
 
