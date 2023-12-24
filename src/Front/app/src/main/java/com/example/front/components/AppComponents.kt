@@ -1272,7 +1272,7 @@ fun GalleryComponent(
             .then(modifier),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        items(images) { image ->
+        items(images, key = { image -> image.id }) { image ->
             ImageItem(image = image, isSelected = image == selectedImage) {
                 onImageClick(image)
             }
@@ -1284,7 +1284,9 @@ fun GalleryComponent(
 fun ImageItem(image: ImageDataDTO, isSelected: Boolean, onImageClick: () -> Unit) {
     Box(
         modifier = Modifier
-            .clickable { onImageClick() }
+            .clickable {
+                onImageClick()
+            }
             .border(2.dp, if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent, shape = RoundedCornerShape(10.dp))
             .clip(RoundedCornerShape(10.dp))
     ) {
@@ -1296,7 +1298,6 @@ fun ImageItem(image: ImageDataDTO, isSelected: Boolean, onImageClick: () -> Unit
             contentDescription = null,
             modifier = Modifier
                 .size(60.dp)
-                //.clip(RoundedCornerShape(10.dp))
         )
     }
 }

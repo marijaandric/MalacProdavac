@@ -161,7 +161,7 @@ namespace back.BLL.Services
             user.Password = passwordHash;
             user.PasswordSalt = passwordSalt;
 
-            if (File.Exists(defaultImagePath)) user.Image = "default.png";
+            user.Image = "default.png";
 
             if (user.Address != null)
             {

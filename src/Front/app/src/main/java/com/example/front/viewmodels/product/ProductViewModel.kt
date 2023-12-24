@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.front.helper.DataStore.DataStoreManager
 import com.example.front.model.DTO.CheckAvailabilityReqDTO
 import com.example.front.model.DTO.CheckAvailabilityResDTO
+import com.example.front.model.DTO.ImageDataDTO
 import com.example.front.model.product.ProductInCart
 import com.example.front.repository.MongoRepository
 import com.example.front.repository.Repository
@@ -36,9 +37,6 @@ class ProductViewModel @Inject constructor(
 
     private val _stateReviewSubmit = mutableStateOf(SubmitReviewState())
     var stateReviewSubmit: State<SubmitReviewState> = _stateReviewSubmit;
-
-    private val _stateimage = mutableStateOf(ImageState())
-    var stateimage: State<ImageState> = _stateimage;
 
 
     suspend fun getProductInfo(productID: Int, userID: Int) {
@@ -155,31 +153,6 @@ class ProductViewModel @Inject constructor(
             println("Exception in isAvailable(): $e")
         }
         return null
-    }
-
-    fun uploadImages(type: Int, id: Int, imageParts: List<MultipartBody.Part>) {
-        viewModelScope.launch {
-            val uploadResults = imageParts.map { imagePart ->
-                try {
-                    val response = repository.uploadImage2(type, id, imagePart)
-                    if (response.isSuccessful) {
-                        Result.success(response.body())
-                    } else {
-                        Result.failure(Exception("Upload failed with error code: ${response.code()}"))
-                    }
-                } catch (e: Exception) {
-                    Result.failure(e)
-                }
-            }
-            val successfulUploads = uploadResults.count { it.isSuccess }
-            val failedUploads = uploadResults.size - successfulUploads
-
-            _stateimage.value = _stateimage.value.copy(
-                isLoading = false,
-                image = null,
-                error = if (failedUploads > 0) "Some uploads failed" else ""
-            )
-        }
     }
 
     fun submitReview(productID: Int,  rating: Int, comment: String, currentPage: Int) {
