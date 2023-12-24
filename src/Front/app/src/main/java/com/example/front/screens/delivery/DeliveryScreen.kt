@@ -20,6 +20,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -27,8 +28,10 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
@@ -36,6 +39,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,6 +48,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -57,12 +62,18 @@ import com.example.front.model.DTO.ReqForDeliveryPersonDTO
 import com.example.front.model.DTO.Trip
 import com.example.front.navigation.Screen
 import com.example.front.ui.theme.Typography
+import com.example.front.screens.checkout.ModalDatePicker
 import com.example.front.viewmodels.delivery.DeliveryViewModel
-import com.example.front.viewmodels.oneshop.OneShopViewModel
+import kotlinx.coroutines.launch
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun DeliveryScreen(navHostController: NavHostController, deliveryViewModel: DeliveryViewModel) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val coroutineScope = rememberCoroutineScope()
     var selectedColumnIndex by remember {
         mutableStateOf(true)
     }
@@ -87,6 +98,113 @@ fun DeliveryScreen(navHostController: NavHostController, deliveryViewModel: Deli
                 .background(Color.White)
         ) {
             SmallElipseAndTitle("Deliveries", drawerState)
+
+            LazyColumn() {
+
+                item {
+                    val startDate = remember { mutableStateOf(LocalDate.now()) }
+                    val endDate = remember { mutableStateOf(LocalDate.now()) }
+                    val isOpenStart = remember { mutableStateOf(false) }
+                    val isOpenEnd = remember { mutableStateOf(false) }
+                    Row {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(top = 16.dp, start = 16.dp, end = 16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            //datum od
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Center,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(bottom = 8.dp)
+                            ) {
+                                OutlinedTextField(
+                                    readOnly = true,
+                                    value = startDate.value.format(DateTimeFormatter.ISO_DATE)
+                                        ?: "",
+                                    label = { Text("Start Date") },
+                                    onValueChange = {},
+                                    shape = RoundedCornerShape(20.dp)
+                                )
+
+                                IconButton(
+                                    onClick = { isOpenStart.value = true }
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.DateRange,
+                                        contentDescription = "Calendar"
+                                    )
+                                }
+                                if (isOpenStart.value == true) {
+                                    ModalDatePicker(
+                                        onAccept = {
+                                            isOpenStart.value = false
+
+                                            if (it != null) { // Set the date
+                                                startDate.value = Instant
+                                                    .ofEpochMilli(it)
+                                                    .atZone(ZoneId.of("UTC"))
+                                                    .toLocalDate()
+                                            }
+                                        },
+                                        onCancel = {
+                                            isOpenStart.value = false //close dialog
+                                        }
+                                    )
+                                }
+                            }
+                            //vreme
+
+
+                            // Prvo polje za unos teksta
+                            var adresaOd by remember { mutableStateOf(TextFieldValue()) }
+                            OutlinedTextField(
+                                value = adresaOd,
+                                onValueChange = {
+                                    adresaOd = it
+                                },
+                                label = { Text("Start address (street, city):") },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(bottom = 8.dp)
+                            )
+
+                            // Drugo polje za unos teksta
+                            var adresaDo by remember { mutableStateOf(TextFieldValue()) }
+                            OutlinedTextField(
+                                value = adresaDo,
+                                onValueChange = {
+                                    adresaDo = it
+                                },
+                                label = { Text("End address (street, city):") },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(bottom = 16.dp)
+                            )
+
+                            // Dugme "Add Route"
+                            Button(
+                                onClick = {
+                                    coroutineScope.launch {
+                                        deliveryViewModel.addNewRoute(
+                                            startDate.value,
+                                            "00:00:00",
+                                            adresaOd.text,
+                                            adresaDo.text,
+                                            350
+                                        )
+                                    }
+                                }
+                            ) {
+                                Text("Add Route")
+                            }
+                        }
+                    }
+                }
+            }
 
             Tabs(
                 onShopsSelected = { selectedColumnIndex=true },

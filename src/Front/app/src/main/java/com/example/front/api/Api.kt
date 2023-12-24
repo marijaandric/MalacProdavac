@@ -15,6 +15,7 @@ import com.example.front.model.DTO.MetricsDTO
 import com.example.front.model.DTO.NewOrder
 import com.example.front.model.DTO.NewProductDTO
 import com.example.front.model.DTO.NewProductDisplayDTO
+import com.example.front.model.DTO.NewRoute
 import com.example.front.model.DTO.NewShopDTO
 import com.example.front.model.DTO.NotificationDTO
 import com.example.front.model.DTO.OrderInfoDTO
@@ -379,5 +380,10 @@ interface Api {
     suspend fun notificationMarkAsRead(
         @Query("notificationId") notificationId: Int
     ):ApiResponse
+
+    @POST("back/Delivery/InsertDeliveryRoute")
+    suspend fun newRoute(
+        @Body newRoute: NewRoute
+    ): ApiResponse
 
 }

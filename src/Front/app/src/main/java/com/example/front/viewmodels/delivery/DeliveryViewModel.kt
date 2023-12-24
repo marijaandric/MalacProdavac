@@ -6,13 +6,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.front.helper.DataStore.DataStoreManager
-import com.example.front.model.DTO.RouteDetails
+import com.example.front.model.DTO.NewRoute
 import com.example.front.model.DTO.Trip
 import com.example.front.repository.Repository
 import com.example.front.screens.delivery.state.DeclineState
 import com.example.front.screens.delivery.state.ReqForDeliveryState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 @HiltViewModel
@@ -126,6 +128,26 @@ class DeliveryViewModel @Inject constructor(
         } catch (e: Exception) {
             _state.value.error = e.message.toString()
         }
+    }
+
+    suspend fun addNewRoute(startDate: LocalDate, time:String, adresaOd: String, adresaDo: String, cena: Int): Boolean {
+        try {
+            val model = NewRoute(
+                2,
+                startDate.format(DateTimeFormatter.ISO_DATE),
+                time,
+                adresaOd+", Srbija",
+                adresaDo+", Srbija",
+                cena
+            )
+            val response = repository.addNewRoute(model)
+            println(response)
+            println(response.success)
+            return response.success
+        } catch (e: Exception) {
+            println(e.message.toString())
+        }
+        return false
     }
 
     suspend fun getUserId(): Int?

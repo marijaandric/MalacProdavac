@@ -17,6 +17,7 @@ import com.example.front.model.DTO.MetricsDTO
 import com.example.front.model.DTO.NewOrder
 import com.example.front.model.DTO.NewProductDTO
 import com.example.front.model.DTO.NewProductDisplayDTO
+import com.example.front.model.DTO.NewRoute
 import com.example.front.model.DTO.NewShopDTO
 import com.example.front.model.DTO.NotificationDTO
 import com.example.front.model.DTO.OrderInfoDTO
@@ -355,5 +356,8 @@ class Repository @Inject constructor(private val api: Api) {
     }
     suspend fun markNotificationAsRead(notificationId: Int): ApiResponse{
         return api.notificationMarkAsRead(notificationId)
+    }
+    suspend fun addNewRoute(newRoute: NewRoute): ApiResponse{
+        return api.newRoute(newRoute)
     }
 }
