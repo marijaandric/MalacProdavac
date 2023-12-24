@@ -741,13 +741,12 @@ fun ProductPage(
                     }
                 }
         }
-
-    }
     if (showAddProduct) {
         EditProduct(onDismiss = { showAddProduct = false }, oneShopViewModel, productViewModel.state.value.product!!)
     }
     ToastHost(hostState = toastHostState)
-}
+    }
+
 
 @Composable
 fun NumberPicker(value: Int, onValueChange: (Int) -> Unit, modifier: Modifier) {

@@ -339,4 +339,10 @@ interface Api {
         @Query("requestId") requestId: Int,
         @Query("chosenPersonId") chosenPersonId: Int
     ): Response<Boolean>
+
+    @POST("back/Product/ToggleLike")
+    suspend fun toggleLikeProduct(
+        @Query("productId") shopId: Int,
+        @Query("userId") userId: Int,
+    ): Response<ToggleLikeDTO>
 }
