@@ -15,9 +15,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -91,7 +94,6 @@ fun RouteDetailsScreen(
             val scrollState = rememberScrollState()
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
                     .background(Color.White)
             ) {
                 SmallElipseAndTitle("Route details", drawerState)
@@ -367,7 +369,7 @@ fun RouteStopsSection(
                 fontSize = 14.sp,
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier
-                    .clickable { showRouteDetailCard = !showRouteDetailCard ; details= !details }
+                    .clickable { showRouteDetailCard = !showRouteDetailCard; details = !details }
                     .padding(vertical = 8.dp)
             )
             androidx.compose.material3.Icon(
@@ -375,18 +377,72 @@ fun RouteStopsSection(
                 contentDescription = null,
                 modifier = Modifier
                     .size(20.dp)
-                    .clickable { details != details },
+                    .clickable { details = !details },
                 tint = MaterialTheme.colorScheme.secondary
             )
-            if(details)
-            {
+        }
+        if(details)
+        {
+            val deliveryInfo = viewModel.state.value.details!!
 
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+            ) {
+                deliveryInfo.stops.forEach { stop ->
+                    StopItem(stop = stop)
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
             }
         }
 
         // Show or hide the RouteDetailCard based on the state
         if (showRouteDetailCard) {
             RouteDetailCard(viewModel.state.value.details!!)
+        }
+    }
+}
+
+data class Stop(
+    val latitude: Double,
+    val longitude: Double,
+    val address: String,
+    val shopName: String?,
+    val items: List<Item>?
+)
+
+data class Item(
+    val name: String,
+    val quantity: Int,
+    val metric: String
+)
+
+
+@Composable
+fun StopItem(stop: Stop) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+    ) {
+        if(stop.shopName != null)
+        {
+            RouteStopItem(stop.address, stop.shopName)
+        }
+        else{
+
+            RouteStopItem(stop.address, "Unknown Shop")
+        }
+
+        if (stop.items != null && stop.items.isNotEmpty()) {
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(text = "Items:")
+            stop.items.forEach { item ->
+                Text(
+                    text = "- ${item.name} - ${item.quantity} ${item.metric}",
+                    modifier = Modifier.padding(start = 16.dp)
+                )
+            }
         }
     }
 }
