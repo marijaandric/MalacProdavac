@@ -17,10 +17,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -31,6 +34,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Star
@@ -58,15 +63,19 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.example.front.R
+import com.example.front.components.CardButton
+import com.example.front.components.CommentsTextBox
 import com.example.front.components.GalleryComponent
 import com.example.front.components.MyDropdownWorkingHours
 import com.example.front.components.Paginator
 import com.example.front.components.ProductImage
+import com.example.front.components.ReviewCard
 import com.example.front.components.Sidebar
 import com.example.front.model.DTO.ImageDataDTO
 import com.example.front.model.product.ProductReviewUserInfo
 import com.example.front.navigation.Screen
 import com.example.front.screens.myshop.getMultipartBodyPart
+import com.example.front.screens.shop.StarRating
 import com.example.front.ui.theme.DarkBlue
 import com.example.front.ui.theme.Typography
 import com.example.front.viewmodels.product.ProductViewModel
@@ -85,7 +94,9 @@ fun ProductPage(
     productViewModel: ProductViewModel,
     productID: Int
 ) {
-
+    var showReviews by remember { mutableStateOf(false) }
+    var toast by remember { mutableStateOf(false) }
+    var reviewPage by remember { mutableStateOf(0) }
     var quantity by remember { mutableStateOf(1) }
     val toastHostState = rememberToastHostState()
     val coroutineScope = rememberCoroutineScope()
@@ -93,7 +104,13 @@ fun ProductPage(
     var selectedSizeId by remember { mutableStateOf<Int?>(null) }
     val context = LocalContext.current
     var isToggled by remember { mutableStateOf(false) }
+    var leaveAReview by remember { mutableStateOf(false) }
+    var comment by remember {
+        mutableStateOf("")
+    }
+    var feedback by remember { mutableStateOf(false) }
 
+    var selectedRating by remember { mutableStateOf(0) }
     val reviews = productViewModel.stateReview.value.reviews
     var currentPage = 1
 
@@ -252,7 +269,7 @@ fun ProductPage(
                     ) {
                         productInfo?.images?.let { images ->
                             GalleryComponent(
-                                modifier = Modifier.padding(20.dp),
+                                modifier = Modifier.padding(0.dp, top=10.dp,bottom=20.dp, end =16.dp),
                                 images = images,
                                 selectedImage = selectedImage
                             ) { selectedImage = it }
@@ -281,19 +298,20 @@ fun ProductPage(
                                 productInfo?.shopName?.let {
                                     Text(
                                         text = it,
-                                        modifier = Modifier
-                                            .padding(5.dp),
+                                        modifier = Modifier,
                                         style = Typography.titleSmall,
                                         textAlign = TextAlign.Center,
-                                        color = Color(0xFF457FA8)
+                                        color = MaterialTheme.colorScheme.tertiary
                                     )
                                 }
 
-                                Image(
+                                Icon(
                                     painter = painterResource(R.drawable.strelicaproduct),
                                     contentDescription = "",
                                     modifier = Modifier
-                                        .size(20.dp)
+                                        .size(22.dp)
+                                        .padding(start = 5.dp),
+                                    tint = MaterialTheme.colorScheme.tertiary
                                 )
                             }
                         }
@@ -301,7 +319,7 @@ fun ProductPage(
                         Text(
                             text = "${productInfo?.price} rsd",
                             modifier = Modifier
-                                .padding(20.dp)
+                                .padding(16.dp)
                                 .fillMaxWidth(),
                             style = Typography.titleLarge,
                             color = DarkBlue,
@@ -318,6 +336,15 @@ fun ProductPage(
                             )
                         }
 
+                        Divider(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(1.dp)
+                                .padding(horizontal = 16.dp),
+                            color = Color.Gray
+                        )
+
+
                         productInfo?.description?.let {
                             Text(
                                 text = it,
@@ -326,7 +353,7 @@ fun ProductPage(
                                     .fillMaxWidth(),
                                 style = Typography.bodyLarge,
                                 textAlign = TextAlign.Center,
-                                color = Color(0xFF2E2E2E)
+                                color = MaterialTheme.colorScheme.onSurface
                             )
                         }
 
@@ -334,16 +361,21 @@ fun ProductPage(
                             LazyRow(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(20.dp),
+                                    .padding(16.dp),
                                 horizontalArrangement = Arrangement.Center
                             ) {
                                 productInfo.sizes.forEach {
                                     item {
                                         Box(
                                             modifier = Modifier
-                                                .border(1.dp, Color.Gray, RectangleShape)
+                                                .clip(RoundedCornerShape(10.dp))
+                                                .border(
+                                                    2.dp,
+                                                    MaterialTheme.colorScheme.primary,
+                                                    shape = RoundedCornerShape(10.dp)
+                                                )
                                                 .background(
-                                                    color = if (it.size == selectedSize) Color.Gray else Color.White
+                                                    color = if (it.size == selectedSize) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.background
                                                 )
                                                 .clickable {
                                                     selectedSize = it.size
@@ -358,6 +390,8 @@ fun ProductPage(
                                                     .padding(4.dp)
                                             )
                                         }
+
+                                        Spacer(modifier = Modifier.width(4.dp))
                                     }
                                 }
                             }
@@ -367,7 +401,7 @@ fun ProductPage(
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(10.dp),
+                                .padding(16.dp,end=10.dp),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -379,19 +413,19 @@ fun ProductPage(
                             )
                             val workingHoursStrings =
                                 productInfo?.workingHours?.map { workingHours ->
-                                    "${getDayName(workingHours.day)} ${workingHours.openingHours} - ${workingHours.closingHours}"
+                                    "${getDayName(workingHours.day)} ${workingHours.openingHours.substring(0, 5)} - ${workingHours.closingHours.substring(0, 5)}"
                                 }
                             MyDropdownWorkingHours(
                                 workingHoursStrings?.get(0) ?: "",
                                 workingHoursStrings ?: listOf(),
-                                modifier = Modifier.weight(1f)
+                                modifier = Modifier.fillMaxWidth(0.6f)
                             )
                         }
 
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(10.dp),
+                                .padding(16.dp),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -471,51 +505,23 @@ fun ProductPage(
                                     }
                                 },
                                 modifier = Modifier
-                                    .height(100.dp)
-                                    .width(350.dp)
+                                    .height(90.dp)
+                                    .fillMaxWidth()
                                     .padding(20.dp),
+                                shape = RoundedCornerShape(30),
                                 colors = ButtonDefaults.buttonColors(Color(0xFFE48359))
                             ) {
                                 Text(
                                     text = "Add To Cart",
-                                    style = Typography.titleSmall,
+                                    style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.background),
                                     color = Color.White
                                 )
                             }
                         }
-                        Divider(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(1.dp)
-                                .padding(horizontal = 16.dp),
-                            color = Color.Gray
-                        )
                         Column(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            if (productInfo.rating != 0f) {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(30.dp),
-                                    horizontalArrangement = Arrangement.SpaceBetween
-                                ) {
-                                    Text(text = "Product reviews", style = Typography.bodyLarge)
-                                    Row {
-                                        if (productInfo != null) {
-                                            Text(
-                                                text = "${productInfo.rating}",
-                                                style = Typography.bodyLarge
-                                            )
-                                        }
-                                        Icon(
-                                            imageVector = Icons.Default.Star,
-                                            contentDescription = "Star icon"
-                                        )
-                                    }
-                                }
-                            }
                             Divider(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -526,101 +532,191 @@ fun ProductPage(
 
                             if (!productInfo.isOwner!!) {
                                 Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(30.dp),
-                                    horizontalArrangement = Arrangement.SpaceBetween
-                                ) {
-                                    Text(text = "Leave a review", style = Typography.bodyLarge)
-                                    Icon(
-                                        imageVector = Icons.Default.Star,
-                                        contentDescription = "Star icon"
-                                    )
-                                }
-                                var reviewText by remember { mutableStateOf("") }
-
-                                Column {
-                                    OutlinedTextField(
-                                        value = reviewText,
-                                        onValueChange = { reviewText = it },
-                                        label = { Text("Leave a review") },
-                                        placeholder = { Text("Type your review here...") },
-                                        modifier = Modifier.fillMaxWidth()
-                                    )
-
-                                    Spacer(modifier = Modifier.height(16.dp))
-                                    var rating by remember { mutableStateOf(0) }
-
-                                    Row {
-                                        for (i in 1..5) {
-                                            Icon(
-                                                imageVector = if (i <= rating) Icons.Filled.Star else Icons.Outlined.Star,
-                                                contentDescription = "Star $i",
-                                                tint = if (i <= rating) Color.Yellow else Color.Gray,
-                                                modifier = Modifier
-                                                    .width(32.dp)
-                                                    .clickable {
-                                                        rating = i
-                                                    }
-                                            )
-                                            Spacer(modifier = Modifier.width(4.dp))
-                                        }
-                                    }
-
-                                    Button(
-                                        onClick = {
-                                            productViewModel.submitReview(productID, 3, reviewText)
-                                        },
-                                        enabled = reviewText.isNotBlank()
-                                    ) {
-                                        Text("Submit Review")
-                                    }
-                                }
-                            }
-
-                            Row(modifier = Modifier.padding(10.dp)) {
-
-                                if (reviews.isNullOrEmpty()) {
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                )
+                                {
                                     Text(
-                                        "Be first to leave a review!",
-                                        style = Typography.bodyLarge,
-                                        modifier = Modifier.padding(10.dp)
+                                        text = "Leave a review",
+                                        modifier = Modifier
+                                            .padding(start = 16.dp, top = 8.dp)
+                                            .clickable {
+                                                leaveAReview = !leaveAReview
+                                            },
+                                        style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onSurface)
                                     )
-                                } else {
-                                    Column(modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(530.dp)) {
-                                        reviews.forEach { review ->
-                                            ReviewCard(productReviewUserInfo = review)
-                                        }
-                                    }
-                                    Paginator(
-                                        currentPage = currentPage,
-                                        totalPages = 2,
-                                        onPageSelected = { newPage ->
-                                            if (newPage in 1..2) {
-                                                currentPage = newPage
-                                                productViewModel.ChangePage(currentPage)
+                                    Icon(
+                                        imageVector = if (leaveAReview) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                                        contentDescription = null,
+                                        modifier = Modifier
+                                            .clickable {
+                                                leaveAReview = !leaveAReview
                                             }
-                                        }
+                                            .padding(top = 8.dp, end = 5.dp)
+                                            .size(30.dp),
+                                        tint = MaterialTheme.colorScheme.onBackground
                                     )
                                 }
-                            }
-                            Divider(
+
+                                if (leaveAReview) {
+                                    if ((productViewModel.state.value.product!!.bought == true && productViewModel.state.value.product!!.rated == true) || feedback) {
+                                        Text(
+                                            "A review from you has already been submitted.",
+                                            style = MaterialTheme.typography.titleSmall,
+                                            modifier = Modifier
+                                                .align(Alignment.CenterHorizontally)
+                                                .padding(top = 20.dp, start = 16.dp)
+                                        )
+                                    }
+                                    else if (productViewModel.state.value.product!!.bought == false ) {
+                                        Text(
+                                            "You must buy something in order to leave a review!",
+                                            style = MaterialTheme.typography.titleSmall,
+                                            modifier = Modifier
+                                                .align(Alignment.CenterHorizontally)
+                                                .padding(top = 20.dp, start = 16.dp)
+                                        )
+                                    }
+                                  else {
+                                        StarRating { rating ->
+                                            selectedRating = rating
+                                        }
+                                        CommentsTextBox(
+                                            onReviewTextChanged = { newText -> comment = newText },
+                                            placeholder = "Leave a review"
+                                        )
+                                        CardButton(
+                                            "Submit review", onClick = {
+                                                productViewModel.submitReview(
+                                                    productID,
+                                                    selectedRating,
+                                                    comment,
+                                                    currentPage
+                                                )
+
+                                                feedback=true
+                                            }, 0.9f,
+                                            Modifier
+                                                .align(Alignment.CenterHorizontally)
+                                                .height(50.dp), MaterialTheme.colorScheme.secondary
+                                        )
+                                    }
+
+                                        if (!productViewModel.stateReviewSubmit.value.isLoading && toast) {
+                                            feedback = true
+                                            coroutineScope.launch {
+                                                try {
+                                                    feedback = true
+                                                    toastHostState.showToast(
+                                                        "Review successfully submitted",
+                                                        Icons.Default.Clear
+                                                    )
+                                                } catch (e: Exception) {
+                                                    Log.e("ToastError", "Error showing toast", e)
+                                                }
+                                            }
+                                            productViewModel.getReviewsForProduct(
+                                                productID,
+                                                reviewPage
+                                            )
+                                            toast = false
+                                        } else if (productViewModel.stateReviewSubmit.value.error.isNotEmpty() && toast) {
+                                            coroutineScope.launch {
+                                                try {
+                                                    toastHostState.showToast("Error", Icons.Default.Clear)
+                                                } catch (e: Exception) {
+                                                    Log.e("ToastError", "Error showing toast", e)
+                                                }
+                                            }
+                                            toast = false
+                                        }
+
+                                    }
+                                }
+                        }
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        )
+                        {
+                            Text(
+                                text = "View all reviews",
                                 modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(1.dp)
-                                    .padding(horizontal = 16.dp),
-                                color = Color.Gray
+                                    .padding(start = 16.dp, top = 8.dp)
+                                    .clickable {
+                                        showReviews = !showReviews
+                                    },
+                                style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onSurface)
+                            )
+                            Icon(
+                                imageVector = if (showReviews) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .clickable {
+                                        showReviews = !showReviews
+                                    }
+                                    .padding(top = 8.dp, end = 5.dp)
+                                    .size(30.dp),
+                                tint = MaterialTheme.colorScheme.onBackground
                             )
                         }
+                        if (showReviews) {
+                            var rev = productViewModel.stateReview.value.reviews
+                            if (rev != null) {
+                                if (rev.isEmpty()) {
+                                    Text(
+                                        "No reviews found for this store.",
+                                        style = MaterialTheme.typography.titleSmall,
+                                        modifier = Modifier
+                                            .align(Alignment.CenterHorizontally)
+                                            .padding(top = 20.dp)
+                                    )
+                                }
+                            }
+                            Column(
+                                modifier = Modifier
+                                    .heightIn(100.dp, 1000.dp)
+                            ) {
+                                if (rev != null) {
+                                    rev.forEach { review ->
+                                        ReviewCard(
+                                            username = review.username,
+                                            imageRes = review.image,
+                                            comment = review.comment,
+                                            rating = review.rating
+                                        )
+                                    }
+                                }
+                            }
+
+                        if (!productViewModel.stateReview.value.error.isNotEmpty()) {
+                            Text("See more",
+                                style = MaterialTheme.typography.titleSmall,
+                                modifier = Modifier
+                                    .clickable {
+                                        reviewPage++; productViewModel.getReviewsForProduct(
+                                        productID,
+                                        reviewPage
+                                    )
+                                    }
+                                    .align(Alignment.CenterHorizontally))
+                        }
+                        }
+                        Divider(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(1.dp)
+                                .padding(horizontal = 16.dp),
+                            color = Color.Gray
+                        )
                     }
                 }
-            }
-
+                    }
+                }
         }
-    }
-    ToastHost(hostState = toastHostState)
+
 }
 
 @Composable
@@ -629,21 +725,22 @@ fun NumberPicker(value: Int, onValueChange: (Int) -> Unit, modifier: Modifier) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-            .then(modifier)
+            .padding()
+            .then(modifier),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Button(
-            onClick = {
-                val newValue = max(value - 1, 1)
-                onValueChange(newValue)
-            },
+        Box(
             modifier = Modifier
-                .height(30.dp)
-                .weight(0.7f)
-                .border(1.dp, Color.Black),
-            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+                .height(40.dp)
+                .weight(0.8f)
+                .clickable {
+                    val newValue = max(value - 1, 1)
+                    onValueChange(newValue)
+                }
+                .border(2.dp, MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(10.dp))         ,
+            contentAlignment = Alignment.Center
         ) {
-            Text(text = "-", color = MaterialTheme.colorScheme.onSurface)
+            Text(text = "-", color = MaterialTheme.colorScheme.primary, fontSize = 17.sp)
         }
 
         BasicTextField(
@@ -655,24 +752,24 @@ fun NumberPicker(value: Int, onValueChange: (Int) -> Unit, modifier: Modifier) {
             keyboardOptions = KeyboardOptions.Default.copy(
                 keyboardType = KeyboardType.Number
             ),
-            textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
+            textStyle = MaterialTheme.typography.titleMedium.copy(textAlign = TextAlign.Center),
             modifier = Modifier
                 .padding(8.dp)
                 .weight(1f)
         )
 
-        Button(
-            onClick = {
-                val newValue = value + 1
-                onValueChange(newValue)
-            },
+        Box(
             modifier = Modifier
-                .height(30.dp)
-                .weight(0.7f)
-                .border(1.dp, Color.Black),
-            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+                .height(40.dp)
+                .weight(0.8f)
+                .clickable {
+                    val newValue = value + 1
+                    onValueChange(newValue)
+                }
+                .border(2.dp, MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(10.dp))         ,
+                contentAlignment = Alignment.Center
         ) {
-            Text(text = "+", color = MaterialTheme.colorScheme.onSurface)
+            Text(text = "+", color = MaterialTheme.colorScheme.primary, fontSize = 17.sp)
         }
     }
 }
@@ -680,17 +777,19 @@ fun NumberPicker(value: Int, onValueChange: (Int) -> Unit, modifier: Modifier) {
 
 fun getDayName(day: Int): String {
     return when (day) {
-        1 -> "Monday"
-        2 -> "Tuesday"
-        3 -> "Wednesday"
-        4 -> "Thursday"
-        5 -> "Friday"
+        1 -> "Mon"
+        2 -> "Tue"
+        3 -> "Wed"
+        4 -> "Thu"
+        5 -> "Fri"
+        6 -> "Sat"
+        7 -> "Sun"
         else -> "Unknown Day"
     }
 }
 
 @Composable
-fun ReviewCard(productReviewUserInfo: ProductReviewUserInfo) {
+fun ReviewCard2(productReviewUserInfo: ProductReviewUserInfo) {
     Card(
         modifier = Modifier
             .width(350.dp)

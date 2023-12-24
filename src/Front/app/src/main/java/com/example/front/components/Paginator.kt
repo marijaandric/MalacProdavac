@@ -3,14 +3,19 @@ package com.example.front.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -27,7 +32,7 @@ fun Paginator(
     totalPages: Int,
     onPageSelected: (Int) -> Unit
 ) {
-    if(totalPages != 1)
+    if(totalPages > 1)
     {
         Column(
             modifier = Modifier.padding(bottom=16.dp),
@@ -37,7 +42,7 @@ fun Paginator(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp, top=0.dp),
+                    .padding(16.dp, top = 0.dp),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -92,13 +97,29 @@ fun PageIndicator(
     onPageSelected: (Int) -> Unit
 ) {
     val textColor = if (page == currentPage) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.tertiary
-    Text(
-        text = page.toString(),
-        color = textColor,
+    Card(
+        shape = CircleShape,
         modifier = Modifier
-            .clickable { onPageSelected(page) }
-            .padding(8.dp)
-    )
+            .width(40.dp)
+            .height(40.dp)
+    ){
+        Box(
+            modifier = Modifier
+                .background(color = if (page == currentPage) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.background)
+                .width(40.dp)
+                .height(40.dp),
+            contentAlignment = Alignment.Center
+        ){
+            Text(
+                text = page.toString(),
+                color = textColor,
+                modifier = Modifier
+                    .clickable { onPageSelected(page) }
+                    .padding(8.dp)
+            )
+        }
+    }
+
 }
 
 private fun calculateVisiblePages(currentPage: Int, totalPages: Int): List<Int> {

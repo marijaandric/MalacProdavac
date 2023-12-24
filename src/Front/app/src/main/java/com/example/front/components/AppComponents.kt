@@ -187,9 +187,9 @@ fun MyDropdownCategories(
         onValueChange = {},
         label = { Text(text = labelValue) },
         colors = TextFieldDefaults.outlinedTextFieldColors(
-            focusedBorderColor = Color.Blue,
+            focusedBorderColor = MaterialTheme.colorScheme.primary,
             focusedLabelColor = Color.Blue,
-            cursorColor = Color.Blue
+            cursorColor = MaterialTheme.colorScheme.primary
         ),
         keyboardOptions = KeyboardOptions.Default.copy(
             keyboardType = KeyboardType.Text,
@@ -284,15 +284,15 @@ fun MyDropdownWorkingHours(
         value = labelValue,
         onValueChange = { /* No action needed */ },
         colors = TextFieldDefaults.outlinedTextFieldColors(
-            focusedBorderColor = Color.Blue,
-            focusedLabelColor = Color.Blue,
-            cursorColor = Color.Blue
+            focusedBorderColor = MaterialTheme.colorScheme.secondary,
+            focusedLabelColor = MaterialTheme.colorScheme.secondary,
+            cursorColor = MaterialTheme.colorScheme.secondary
         ),
         keyboardOptions = KeyboardOptions.Default.copy(
             keyboardType = KeyboardType.Text,
             imeAction = ImeAction.Done
         ),
-        shape = RoundedCornerShape(20.dp)
+        shape = RoundedCornerShape(10.dp)
     )
 
     DropdownMenu(
@@ -1191,8 +1191,9 @@ fun GalleryComponent(
 fun ImageItem(image: ImageDataDTO, isSelected: Boolean, onImageClick: () -> Unit) {
     Box(
         modifier = Modifier
-            .border(1.dp, if (isSelected) Color.Gray else Color.Transparent)
             .clickable { onImageClick() }
+            .border(2.dp, if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent, shape = RoundedCornerShape(10.dp))
+            .clip(RoundedCornerShape(10.dp))
     ) {
         val imageUrl = "http://softeng.pmf.kg.ac.rs:10015/images/${image.image}"
 
@@ -1201,8 +1202,8 @@ fun ImageItem(image: ImageDataDTO, isSelected: Boolean, onImageClick: () -> Unit
             painter = painter,
             contentDescription = null,
             modifier = Modifier
-                .size(100.dp)
-                .clip(RoundedCornerShape(10.dp))
+                .size(60.dp)
+                //.clip(RoundedCornerShape(10.dp))
         )
     }
 }

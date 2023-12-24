@@ -1148,7 +1148,7 @@ fun Info(
                             )
                         }
                     }
-                    if (!shopViewModel.stateReview.value.error.contains("NotFound")) {
+                    if (!shopViewModel.stateReview.value.error.isNotEmpty()) {
                         Text("See more",
                             style = MaterialTheme.typography.titleSmall,
                             modifier = Modifier

@@ -2,6 +2,7 @@ package com.example.front.repository
 
 import android.util.Log
 import com.example.front.api.Api
+import com.example.front.model.DTO.AddProductReviewDTO
 import com.example.front.model.DTO.CategoriesDTO
 import com.example.front.model.DTO.CheckAvailabilityReqDTO
 import com.example.front.model.DTO.CheckAvailabilityResDTO
@@ -295,8 +296,9 @@ class Repository @Inject constructor(private val api: Api) {
         return api.productReview(productReview)
     }
 
-    suspend fun submitReview(productID: Int, userID: Int, rating: Int, comment: String): Response<Boolean> {
-        return api.submitReview(productID, userID, rating, comment)
+    suspend fun submitReview(productID: Int, userID: Int, rating: Int, comment: String): Response<SuccessBoolean> {
+        val x = AddProductReviewDTO(id=productID, userId = userID, rating=rating, comment = comment)
+        return api.submitReview(x)
     }
     suspend fun deleteNotification(notificationId: Int):Response<SuccessBoolean>
     {

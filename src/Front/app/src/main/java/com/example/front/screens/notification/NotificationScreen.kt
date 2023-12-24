@@ -75,7 +75,7 @@ import rememberToastHostState
 fun NotificationScreen(navController: NavHostController, viewModel: NotificationViewModel) {
 
     var userId by remember { mutableStateOf(0) }
-    val currentPage by remember { derivedStateOf { viewModel.stateCurrentPage.value } }
+    var currentPage by remember { mutableStateOf(viewModel.stateCurrentPage.value) }//{ derivedStateOf { viewModel.stateCurrentPage.value } }
     val totalPages by remember { derivedStateOf { viewModel.statePageCount.value.pageCount?.count ?:0 } }
     val toastHostState = rememberToastHostState()
     val coroutineScope = rememberCoroutineScope()
@@ -221,6 +221,7 @@ fun NotificationScreen(navController: NavHostController, viewModel: Notification
                         onPageSelected = { newPage ->
                             if (newPage in 1..totalPages!!) {
                                 viewModel.ChangePage(userId, newPage)
+                                currentPage = newPage
                             }
                         }
                     )

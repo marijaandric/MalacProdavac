@@ -1,5 +1,6 @@
 package com.example.front.api
 
+import com.example.front.model.DTO.AddProductReviewDTO
 import com.example.front.model.DTO.CategoriesDTO
 import com.example.front.model.DTO.CheckAvailabilityReqDTO
 import com.example.front.model.DTO.CheckAvailabilityResDTO
@@ -304,13 +305,11 @@ interface Api {
         @Body userRate: UserRateDTO
     ):Response<SuccessBoolean>
 
+    @Headers("Content-Type: application/json")
     @POST("/back/Product/Review")
     suspend fun submitReview(
-        @Query("id") id : Int,
-        @Query("userId") userId : Int,
-        @Query("rating") rating : Int,
-        @Query("comment") comment : String,
-    ): Response<Boolean>
+        @Body data : AddProductReviewDTO
+    ): Response<SuccessBoolean>
     @DELETE("/back/Notification/DeleteNotification")
     suspend fun deleteNotification(
         @Query("notificationId") notificationId: Int

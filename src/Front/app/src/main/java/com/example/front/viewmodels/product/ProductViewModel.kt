@@ -12,6 +12,7 @@ import com.example.front.repository.Repository
 import com.example.front.screens.myshop.state.ImageState
 import com.example.front.screens.product.ProductProductState
 import com.example.front.screens.product.ReviewProductState
+import com.example.front.screens.product.SubmitReviewState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -29,7 +30,10 @@ class ProductViewModel @Inject constructor(
     var state: State<ProductProductState> = _state;
 
     private val _stateReview = mutableStateOf(ReviewProductState())
-    var stateReview: State<ReviewProductState> = _stateReview;
+    var stateReview: State<ReviewProductState> = _stateReview;//
+
+    private val _stateReviewSubmit = mutableStateOf(SubmitReviewState())
+    var stateReviewSubmit: State<SubmitReviewState> = _stateReviewSubmit;
 
     private val _stateimage = mutableStateOf(ImageState())
     var stateimage: State<ImageState> = _stateimage;
@@ -54,7 +58,7 @@ class ProductViewModel @Inject constructor(
         }
     }
 
-    suspend fun getReviewsForProduct(productID: Int, pageNumber: Int) {
+    fun getReviewsForProduct(productID: Int, pageNumber: Int) {
         viewModelScope.launch {
             try {
                 val response = repository.getReviewsForProduct(productID, pageNumber)
@@ -63,9 +67,14 @@ class ProductViewModel @Inject constructor(
                     val reviewsResponse = response.body()
                     _stateReview.value = _stateReview.value.copy(
                         isLoading = false,
-                        reviews = reviewsResponse
+                        reviews = reviewsResponse,
+                        error=""
                     )
                 } else {
+                    _stateReview.value = _stateReview.value.copy(
+                        isLoading = false,
+                        error="NotFound"
+                    )
                 }
             } catch (e: Exception) {
                 Log.d("Error", e.message.toString())
@@ -146,10 +155,26 @@ class ProductViewModel @Inject constructor(
         }
     }
 
-    fun submitReview(productID: Int,  rating: Int, comment: String) {
+    fun submitReview(productID: Int,  rating: Int, comment: String, currentPage: Int) {
         viewModelScope.launch {
             try {
                 val response = repository.submitReview(productID, dataStoreManager.getUserIdFromToken()!!, rating, comment)
+                Log.d("SUBMIT REVIEW", response.toString())
+                if (response.isSuccessful) {
+                    val res = response.body()
+                    _stateReviewSubmit.value = _stateReviewSubmit.value.copy(
+                        isLoading = false,
+                        review = res,
+                        error = ""
+                    )
+                    getReviewsForProduct(productID, currentPage)
+                } else {
+                    _stateReviewSubmit.value = _stateReviewSubmit.value.copy(
+                        isLoading = false,
+                        review = null,
+                        error = "NotFound"
+                    )
+                }
             } catch (e: Exception) {
                 Log.d("Error", e.message.toString())
             }
