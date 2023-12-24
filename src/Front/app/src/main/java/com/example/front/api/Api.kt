@@ -195,7 +195,7 @@ interface Api {
     @POST("/back/Product/AddProduct")
     suspend fun postNewProduct(
         @Body data: NewProductDTO,
-    ): Response<Int>
+    ): Response<Id>
 
     @GET("back/Shop/GetShopid")
     suspend fun getShopId(

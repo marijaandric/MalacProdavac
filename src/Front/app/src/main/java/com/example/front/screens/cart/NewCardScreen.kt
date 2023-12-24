@@ -226,11 +226,10 @@ fun CreditCardInput(viewModel: CheckoutViewModel, navController: NavHostControll
                     // Ubacivanje kartice u Realm bazu
                     coroutineScope.launch {
                         viewModel.insertCreditCard(creditCard)
-                        //// navigira na checkout
+                        // navigira na checkout
                         navController.popBackStack()
                     }
                 } else {
-                    // Implementirajte odgovarajuću logiku za slučaj kada neka od vrednosti nije uneta
                 }
             }, modifier = Modifier.weight(0.5f)) {
                 Text("Add Card")

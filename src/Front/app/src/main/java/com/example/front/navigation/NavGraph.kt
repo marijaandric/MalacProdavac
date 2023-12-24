@@ -95,7 +95,7 @@ fun SetupNavGraph(
         ) { navBackStackEntry ->
             val arguments = requireNotNull(navBackStackEntry.arguments)
             val productId = arguments.getInt("id")
-            ProductPage(navController, productViewModel, productId)
+            ProductPage(navController, productViewModel, oneShopViewModel,productId)
         }
 
         composable(

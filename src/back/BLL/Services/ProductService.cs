@@ -132,7 +132,7 @@ namespace back.BLL.Services
 
             foreach (StockDto size in product.Sizes)
             {
-                if (!await _repository.AddProductSize(newProduct.Id, size.SizeId, size.Quantity))
+                if (!await _repository.AddProductSize(new ProductSize { ProductId = newProduct.Id, SizeId = size.SizeId, Stock = size.Quantity }))
                 {
                     await _repository.DeleteProduct(newProduct.Id);
                     throw new ArgumentException("Error on saving sizes, deleting product!");
@@ -176,10 +176,7 @@ namespace back.BLL.Services
 
             if (productDto.Sizes != null && productDto.Sizes.Count > 0)
             {
-                foreach (var size in productDto.Sizes)
-                {
-                    if (!await _repository.EditProductSize(productDto.Id, size.SizeId, size.Quantity)) throw new ArgumentException("Error on updating sizes!");
-                }
+                if (!await _repository.EditProductSizes(productDto.Id, productDto.Sizes.Select(x => new ProductSize { ProductId = productDto.Id, SizeId = x.SizeId, Stock = x.Quantity}).ToList())) throw new ArgumentException("Error on updating sizes!");
             }
 
             Product editedProduct = await _repository.GetProduct(productDto.Id);
@@ -195,7 +192,7 @@ namespace back.BLL.Services
                     if (editedProduct.SaleMinQuantity > 1)
                         if (await _notificationRepository.InsertNotification(user, 2, editedProduct.Name + " on sale!", shopName + " is having " + editedProduct.SalePercentage + "% off on all " + editedProduct.Name.ToLower() + " orders over " + editedProduct.SaleMinQuantity + " " + await _repository.GetMetric(editedProduct.MetricId) + "s.\nTap to learn more.", editedProduct.Id)) Console.WriteLine("Notification sent!");
                     else if (editedProduct.SaleMinQuantity == 1)
-                            if (await _notificationRepository.InsertNotification(user, 2, editedProduct.Name + " on sale!", shopName + " is having " + editedProduct.SalePercentage + "% off on all " + editedProduct.Name.ToLower() + " orders over 1 " + await _repository.GetMetric(editedProduct.MetricId) + ".\nTap to learn more.", editedProduct.Id)) Console.WriteLine("Notification sent!");
+                        if (await _notificationRepository.InsertNotification(user, 2, editedProduct.Name + " on sale!", shopName + " is having " + editedProduct.SalePercentage + "% off on all " + editedProduct.Name.ToLower() + " orders over 1 " + await _repository.GetMetric(editedProduct.MetricId) + ".\nTap to learn more.", editedProduct.Id)) Console.WriteLine("Notification sent!");
                 }
             }
 

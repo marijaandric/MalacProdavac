@@ -71,6 +71,7 @@ import com.example.front.components.Paginator
 import com.example.front.components.ProductImage
 import com.example.front.components.ReviewCard
 import com.example.front.components.Sidebar
+import com.example.front.model.DTO.CheckAvailabilityResDTO
 import com.example.front.model.DTO.ImageDataDTO
 import com.example.front.model.product.ProductReviewUserInfo
 import com.example.front.navigation.Screen
@@ -78,10 +79,10 @@ import com.example.front.screens.myshop.getMultipartBodyPart
 import com.example.front.screens.shop.StarRating
 import com.example.front.ui.theme.DarkBlue
 import com.example.front.ui.theme.Typography
+import com.example.front.viewmodels.oneshop.OneShopViewModel
 import com.example.front.viewmodels.product.ProductViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import rememberToastHostState
@@ -92,6 +93,7 @@ import java.lang.Integer.max
 fun ProductPage(
     navHostController: NavHostController,
     productViewModel: ProductViewModel,
+    oneShopViewModel: OneShopViewModel,
     productID: Int
 ) {
     var showReviews by remember { mutableStateOf(false) }
@@ -111,6 +113,8 @@ fun ProductPage(
     var feedback by remember { mutableStateOf(false) }
 
     var selectedRating by remember { mutableStateOf(0) }
+    var showAddProduct by remember { mutableStateOf(false) }
+
     val reviews = productViewModel.stateReview.value.reviews
     var currentPage = 1
 
@@ -225,6 +229,7 @@ fun ProductPage(
                                 .size(50.dp)
                                 .padding(5.dp)
                                 .align(Alignment.TopEnd)
+                                .clickable{ showAddProduct = true}
                         )
                     }
 
@@ -468,27 +473,47 @@ fun ProductPage(
                                                         (selectedSize != null && selectedSizeId != null)
                                                 )
                                     ) {
-                                        productViewModel.addToCart(
-                                            productID,
-                                            productInfo.name,
-                                            productInfo.price,
-                                            quantity,
-                                            productInfo.shopId,
-                                            productInfo.shopName,
-                                            productInfo.images[0].image,
-                                            productInfo.metric,
-                                            selectedSize ?: "None",
-                                            selectedSizeId ?: 0
-                                        )
 
-                                        coroutineScope.launch {
-                                            try {
-                                                toastHostState.showToast(
-                                                    "Product added to cart",
-                                                    Icons.Default.Check
-                                                )
-                                            } catch (e: Exception) {
-                                                Log.e("ToastError", "Error showing toast", e)
+                                        ////proverava da li je na stanju
+                                        if (selectedSize != null && selectedSize != ""){
+                                            coroutineScope.launch {
+                                                val result: CheckAvailabilityResDTO? = productViewModel.isAvailable(productInfo.productId!!, selectedSize!!, quantity)
+                                                if(result != null && result.available >= result.quantity){
+                                                    productViewModel.addToCart(
+                                                        productID,
+                                                        productInfo.name,
+                                                        productInfo.price,
+                                                        quantity,
+                                                        productInfo.shopId,
+                                                        productInfo.shopName,
+                                                        productInfo.images[0].image,
+                                                        productInfo.metric,
+                                                        selectedSize ?: "None",
+                                                        selectedSizeId ?: 0
+                                                    )
+
+                                                    coroutineScope.launch {
+                                                        try {
+                                                            toastHostState.showToast(
+                                                                "Product added to cart",
+                                                                Icons.Default.Check
+                                                            )
+                                                        } catch (e: Exception) {
+                                                            Log.e("ToastError", "Error showing toast", e)
+                                                        }
+                                                    }
+                                                } else if (result != null){
+                                                    coroutineScope.launch {
+                                                        try {
+                                                            toastHostState.showToast(
+                                                                "Currently available: ${result.available}",
+                                                                Icons.Default.Check
+                                                            )
+                                                        } catch (e: Exception) {
+                                                            Log.e("ToastError", "Error showing toast", e)
+                                                        }
+                                                    }
+                                                }
                                             }
                                         }
                                     } else if (productInfo?.sizes?.isNotEmpty() == true || selectedSize != null) {
@@ -717,6 +742,11 @@ fun ProductPage(
                 }
         }
 
+    }
+    if (showAddProduct) {
+        EditProduct(onDismiss = { showAddProduct = false }, oneShopViewModel, productViewModel.state.value.product!!)
+    }
+    ToastHost(hostState = toastHostState)
 }
 
 @Composable

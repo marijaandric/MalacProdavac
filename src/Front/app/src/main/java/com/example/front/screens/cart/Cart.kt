@@ -260,7 +260,6 @@ fun Cart(
                                     coroutineScope.launch {
                                         viewModel.isAvailable(cartProducts)
                                         //da proveri da li svaki ima na stanju, ako ima ide na checkout
-                                        ////PROVERITI DA LI LEPO RACUNA DA LI IMA NA STANJU
                                         var br = 0
                                         cartProducts.forEach {
                                             if (it.available < it.quantity){ br ++}

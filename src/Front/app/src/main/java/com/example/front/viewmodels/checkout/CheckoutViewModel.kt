@@ -11,7 +11,6 @@ import com.example.front.model.user.CreditCardModel
 import com.example.front.repository.MongoRepository
 import com.example.front.repository.Repository
 import com.example.front.viewmodels.cart.CartState
-import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -88,18 +87,8 @@ class CheckoutViewModel @Inject constructor(
 
     suspend fun insertOrders(orders: List<NewOrder>): Boolean {
         val response = repository.insertOrders(orders)
-        ////
-
-        val gson = Gson()
-        val jsonRequest = gson.toJson(orders)
-        println("JSON zahtev: $jsonRequest")
-
-
-        println("RESPONSE:  BODY: ${response.body().toString()}")
-        println("RESPONSE:  MESSAGE: ${response.message()}")
 
         if (response.isSuccessful) {
-            ////brisanje korpe
             mongoRepository.clearAllData()
         }
         return response.isSuccessful
@@ -116,7 +105,6 @@ class CheckoutViewModel @Inject constructor(
         try {
             mongoRepository.getAllCreditCards().collect() {creditCards ->
                 _creditCards.value = creditCards
-                println("CREDITNE KARTICE: ${this.creditCards.value}")
             }
         } catch (e: Exception) {
             Log.e("CheckoutViewModel", "Error fetching credit cards: ${e.message}")

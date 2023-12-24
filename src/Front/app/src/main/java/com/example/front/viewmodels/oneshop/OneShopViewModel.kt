@@ -36,7 +36,6 @@ import java.io.File
 import javax.inject.Inject
 
 
-
 @HiltViewModel
 class OneShopViewModel @Inject constructor(
     private val repository: Repository,
@@ -103,6 +102,23 @@ class OneShopViewModel @Inject constructor(
     private val _stateimage = mutableStateOf(ImageState())
     var stateimage: State<ImageState> = _stateimage;
 
+    private val _stateProductID = mutableStateOf(1)
+    var stateProductID: State<Int> = _stateProductID;
+
+    private val _pictures = mutableStateOf<List<MultipartBody.Part>>(listOf())
+    val pictures: State<List<MultipartBody.Part>> = _pictures
+    fun setPictures(newPictures: List<MultipartBody.Part>) {
+        _pictures.value = newPictures
+    }
+
+    fun uploadAllImages() {
+        viewModelScope.launch {
+            pictures.value.forEach { picture ->
+                uploadImage(1, stateProductID.value, picture)
+            }
+        }
+    }
+
     fun getShopDetails(userId: Int, shopId: Int) {
         viewModelScope.launch {
             try {
@@ -126,7 +142,7 @@ class OneShopViewModel @Inject constructor(
         }
     }
 
-    fun editShop(editShop:EditShopDTO) {
+    fun editShop(editShop: EditShopDTO) {
         viewModelScope.launch {
             try {
                 Log.d("EDITSHOPDTO", editShop.toString())
@@ -465,9 +481,10 @@ class OneShopViewModel @Inject constructor(
             }
         }
     }
-    fun postNewProduct(newProd: NewProductDTO){
+
+    fun postNewProduct(newProd: NewProductDTO) {
         viewModelScope.launch {
-            repository.postNewProduct(newProd)
+            _stateProductID.value = repository.postNewProduct(newProd).body()?.id!!
         }
     }
 
@@ -525,7 +542,7 @@ class OneShopViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 var x = 0
-                if(id != null) {
+                if (id != null) {
                     x = id
                     val response = repository.deleteProductDisplay(x)
                     if (response.isSuccessful) {
@@ -551,8 +568,7 @@ class OneShopViewModel @Inject constructor(
         }
     }
 
-    fun inicijalnoStanjeNewPD()
-    {
+    fun inicijalnoStanjeNewPD() {
         _stateNewProductDisplay.value = _stateNewProductDisplay.value.copy(
             isLoading = true,
             newProductDisplay = null,
@@ -610,7 +626,7 @@ class OneShopViewModel @Inject constructor(
         }
     }
 
-    fun uploadImage(type: Int, id: Int, imagePart : MultipartBody.Part) {
+    fun uploadImage(type: Int, id: Int, imagePart: MultipartBody.Part) {
         viewModelScope.launch {
             try {
                 val response = repository.uploadImage2(type, id, imagePart)

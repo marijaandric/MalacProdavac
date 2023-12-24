@@ -6,6 +6,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.front.helper.DataStore.DataStoreManager
+import com.example.front.model.DTO.CheckAvailabilityReqDTO
+import com.example.front.model.DTO.CheckAvailabilityResDTO
 import com.example.front.model.product.ProductInCart
 import com.example.front.repository.MongoRepository
 import com.example.front.repository.Repository
@@ -130,6 +132,20 @@ class ProductViewModel @Inject constructor(
             }
         }
     }
+    suspend fun isAvailable(id:Int, size: String, quantity: Int): CheckAvailabilityResDTO? {
+        val list = listOf(CheckAvailabilityReqDTO(id, size, quantity))
+
+        try {
+            val response = repository.checkProductsAvailability(list)
+            if (response.isSuccessful) {
+                return response.body()!![0]
+            }
+        } catch (e: Exception) {
+            println("Exception in isAvailable(): $e")
+        }
+        return null
+    }
+
     fun uploadImages(type: Int, id: Int, imageParts: List<MultipartBody.Part>) {
         viewModelScope.launch {
             val uploadResults = imageParts.map { imagePart ->
