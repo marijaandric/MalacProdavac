@@ -123,13 +123,14 @@ fun CheckoutScreen(
 
     val cartProducts = viewModel.stateProducts.value.products.groupBy { it.shopId }
     val date = remember { mutableStateOf(LocalDate.now()) }
-    val isOpen = remember { mutableStateOf(false) }
+    val enableButton = remember { mutableStateOf(true) }
 //    val isOpenMap = remember { mutableStateMapOf<Int, Boolean>() }
 //    val isOpenMap = remember { mutableStateMapOf<Int, MutableState<Boolean>>() }
 //    val dateMap = remember { mutableStateMapOf<Int, MutableState<LocalDate>>() }
     val isOpenMap = remember { mutableStateMapOf<Int, Boolean>() }
     val dateMap = remember { mutableStateMapOf<Int, LocalDate>() }
     var payUsingCard by remember { mutableStateOf(false) }
+    val allSelfPickup = remember{ mutableStateOf(false) }
 
     val checkoutState = viewModel.state.value
     val shops = viewModel.shopsForCheckout.value
@@ -340,7 +341,7 @@ fun CheckoutScreen(
                                     checked = shop.selfpickup,
                                     onCheckedChange = {
                                         viewModel.updateSelfPickup(shop.id, it)
-                                        println(shop.selfpickup)
+                                        allSelfPickup.value = viewModel.shopsForCheckout.value.all { it.selfpickup }
                                     },
                                     colors = SwitchDefaults.colors(
                                         uncheckedTrackColor = Color.White,
@@ -412,50 +413,54 @@ fun CheckoutScreen(
                         var address by remember { mutableStateOf("") }
                         var city by remember { mutableStateOf("") }
 
-                        OutlinedTextField(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(5.dp))
-                                .padding(horizontal = 16.dp, vertical = 0.dp)
-                            ,
-                            value = address,
-                            label = { Text("Shipping Address") },
-                            onValueChange = {address = it},
-                            keyboardOptions = KeyboardOptions.Default.copy(
-                                imeAction = ImeAction.Next
-                            ),
-                            shape = RoundedCornerShape(20.dp)
-                        )
-                        OutlinedTextField(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(5.dp))
-                                .padding(horizontal = 16.dp, vertical = 0.dp)
-                            ,
-                            value = city,
-                            label = { Text("City") },
-                            onValueChange = {city = it},
-                            keyboardOptions = KeyboardOptions.Default.copy(
-                                imeAction = ImeAction.Done
-                            ),
-                            shape = RoundedCornerShape(20.dp)
-                        )
+                        if (allSelfPickup.value == false) {
+                            OutlinedTextField(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(5.dp))
+                                    .padding(horizontal = 16.dp, vertical = 0.dp),
+                                value = address,
+                                label = { Text("Shipping Address") },
+                                onValueChange = { address = it },
+                                keyboardOptions = KeyboardOptions.Default.copy(
+                                    imeAction = ImeAction.Next
+                                ),
+                                shape = RoundedCornerShape(20.dp)
+                            )
+                            OutlinedTextField(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(5.dp))
+                                    .padding(horizontal = 16.dp, vertical = 0.dp),
+                                value = city,
+                                label = { Text("City") },
+                                onValueChange = { city = it },
+                                keyboardOptions = KeyboardOptions.Default.copy(
+                                    imeAction = ImeAction.Done
+                                ),
+                                shape = RoundedCornerShape(20.dp)
+                            )
+                        }
 
                         Button(
-                            enabled = address.isNotEmpty() && city.isNotEmpty(),
+                            enabled = (allSelfPickup.value || (address.isNotEmpty() && city.isNotEmpty())) && enableButton.value,
                             onClick = {
+                                enableButton.value = false
                                 var userId: Int?
+                                var addressForOrders: String? = null
+                                if (!allSelfPickup.value) {
+                                    addressForOrders = "$address, $city, Srbija"
+                                }
                                 coroutineScope.launch {
                                     userId = viewModel.dataStoreManager.getUserIdFromToken()
                                     if (userId != null) {
-                                        //// izmeniti polja za newOrder
                                         val orders: List<NewOrder> = shops.map { shop ->
                                             NewOrder(
                                                 userId = userId!!,
                                                 shopId = shop.id,
                                                 paymentMethod = if (payUsingCard) 3 else 1, // 3-kartica, 1-pouzecem
                                                 deliveryMethod = if (shop.selfpickup) 1 else 2, // 1-self, 2-delivery
-                                                shippingAddress = "$address, $city, Srbija",
+                                                shippingAddress = addressForOrders,
                                                 pickupTime = if (shop.selfpickup) dateMap[shop.id].toString()+"T10:00:00" else null,
                                                 products = cartProducts[shop.id]!!.map {
                                                     ProductInOrder(it.id, it.sizeId, it.quantity)
@@ -467,8 +472,6 @@ fun CheckoutScreen(
 
                                         val successful = viewModel.insertOrders(orders)
                                         if (successful) {
-                                            //// brise korpu vraca na pocetnu ili na orders
-                                            println("USPESNO SLANJE")
                                             coroutineScope.launch {
                                                 try {
                                                     toastHostState.showToast("Orders placed successfully", Icons.Default.Check)
@@ -476,7 +479,6 @@ fun CheckoutScreen(
                                                     Log.e("ToastError", "Error showing toast", e)
                                                 }
                                             }
-                                            ////navController na orders ili home
                                             navController.navigate(Screen.Home.route) {
                                                 popUpTo(route = "ordering"){
                                                     inclusive = true
@@ -495,6 +497,7 @@ fun CheckoutScreen(
                                         }
 
                                     }
+                                    enableButton.value = true
                                 }
 
                             },

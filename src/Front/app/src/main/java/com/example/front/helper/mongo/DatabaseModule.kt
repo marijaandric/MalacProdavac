@@ -26,8 +26,8 @@ object DatabaseModule {
             )
         )
             .schemaVersion(2)
-            //// obrisati
-            .deleteRealmIfMigrationNeeded()
+            // obrisati .deleteRealm....
+            //.deleteRealmIfMigrationNeeded()
             .compactOnLaunch()
 //            .initialData()
             .build()
