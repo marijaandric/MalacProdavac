@@ -241,9 +241,11 @@ var selectedId by remember { mutableStateOf(0) }
                                     selectedId = id
                                     value = deliveryInfo.id
                                 }
+                                Spacer(modifier = Modifier.height(16.dp))
                             }
                         }
                     }
+                    Spacer(modifier = Modifier.height(16.dp))
                     if(selectedId != 0)
                     {
                         CardButton(text = "Accept", onClick = { viewModel.acceptReq(reqId,selectedId, userId);onDismiss() }, width = 1f, modifier = Modifier.height(40.dp), color = MaterialTheme.colorScheme.primary)
