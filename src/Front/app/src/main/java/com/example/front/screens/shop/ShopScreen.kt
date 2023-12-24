@@ -270,7 +270,6 @@ fun ShopScreen(
 
         }
     }
-    ToastHost(hostState = toastHostState)
 }
 
 
@@ -539,7 +538,7 @@ fun AddProductDialog(onDismiss: () -> Unit, shopViewModel: OneShopViewModel, sho
             ) {
                 when (currentStep) {
                     0 -> {
-                        contentOfAddNewProduct(shopViewModel, shopId, onNextClicked = { currentStep = 1 })
+                        contentOfAddNewProduct(shopViewModel, shopId!!, onNextClicked = { currentStep = 1 })
                     }
 
                     1 -> {
@@ -559,18 +558,10 @@ fun contentOfAddNewImage(shopViewModel: OneShopViewModel, onNextClicked: () -> U
         contract = ActivityResultContracts.GetMultipleContents()
     ) { uris ->
         uris?.let { selectedUris ->
-            shopViewModel.viewModelScope.launch(Dispatchers.IO) {
-                val pictures = selectedUris.mapNotNull { uri ->
-                    try {
-                        getMultipartBodyPart(context, uri)
-                    } catch (e: Exception) {
-                        null
-                    }
-                }
-                shopViewModel.setPictures(pictures)
-            }
+            shopViewModel.processSelectedImages(selectedUris, context)
         }
     }
+
 
     Column(
         modifier = Modifier
@@ -620,7 +611,7 @@ fun contentOfAddNewImage(shopViewModel: OneShopViewModel, onNextClicked: () -> U
 
 
 @Composable
-fun contentOfAddNewProduct(shopViewModel: OneShopViewModel, shopId: Int?, onNextClicked: () -> Unit) {
+fun contentOfAddNewProduct(shopViewModel: OneShopViewModel, shopId: Int, onNextClicked: () -> Unit) {
 
     var productName by remember { mutableStateOf("") }
     var productDescription by remember { mutableStateOf("") }
@@ -628,13 +619,17 @@ fun contentOfAddNewProduct(shopViewModel: OneShopViewModel, shopId: Int?, onNext
     var selectedCategory by remember { mutableStateOf(CategoriesDTO(1, "Food")) }
     var price by remember { mutableStateOf(0f) }
     var salePercentage by remember { mutableStateOf(0f) }
-    var saleMinQuantity by remember { mutableStateOf(0f) }
+    var saleMinQuantity by remember { mutableStateOf(0) }
     var saleMessage by remember { mutableStateOf("") }
     var weight by remember { mutableStateOf(0f) }
     val sizeOptions = createSizeList()
     var selectedSize by remember { mutableStateOf<Pair<Int, String>?>(null) }
     var quantity by remember { mutableStateOf(0) }
     var sizes by remember { mutableStateOf(listOf<Size>()) }
+
+    val toastHostState = rememberToastHostState()
+    val coroutineScope = rememberCoroutineScope()
+
 
 
     Column {
@@ -811,7 +806,7 @@ fun contentOfAddNewProduct(shopViewModel: OneShopViewModel, shopId: Int?, onNext
                                 labelValue = "If quantity over ...",
                                 value = saleMinQuantity.toString(),
                                 onValueChange = {
-                                    saleMinQuantity = it.toFloat()
+                                    saleMinQuantity = it.toInt()
                                 },
                                 modifier = Modifier
                                     .weight(1f)
@@ -850,32 +845,61 @@ fun contentOfAddNewProduct(shopViewModel: OneShopViewModel, shopId: Int?, onNext
                 item {
                     Button(
                         onClick = {
-                            val newProductDTO = NewProductDTO(
-                                name = productName,
-                                description = productDescription,
-                                metricId = selectedMetric.id,
-                                price = price,
-                                salePercentage = salePercentage,
-                                saleMinQuantity = saleMinQuantity.toInt(),
-                                saleMessage = saleMessage,
-                                categoryId = selectedCategory.id,
-                                shopId = shopId!!,
-                                weight = weight,
-                                sizes = sizes.toList()
-                            )
-                            shopViewModel.postNewProduct(newProductDTO)
-                            onNextClicked()
+                            val errorMess = when {
+                                productName?.isBlank() == true -> "Product name is required"
+                                productDescription?.isBlank() == true -> "Product description is required"
+                                selectedMetric.id == 0 -> "Metric ID is required"
+                                price == null || price == 0f -> "Valid price is required"
+                                salePercentage == null || salePercentage == 0f -> "Valid sale percentage is required"
+                                saleMinQuantity == null || saleMinQuantity == 0 -> "Valid sale minimum quantity is required"
+                                saleMessage?.isBlank() == true -> "Sale message is required"
+                                selectedCategory.id == 0 -> "Category ID is required"
+                                shopId == null || shopId == 0 -> "Shop ID is required"
+                                weight == null || weight == 0f -> "Valid weight is required"
+                                sizes.isEmpty() -> "At least one size is required"
+                                else -> null
+                            }
+
+
+
+                            if (errorMess != null) {
+                                // Showing toast for the first error encountered
+                                coroutineScope.launch {
+                                    try {
+                                        toastHostState.showToast(errorMess, Icons.Default.Clear)
+                                    } catch (e: Exception) {
+                                        Log.e("ToastError", "Error showing toast", e)
+                                    }
+                                }
+                            } else {
+                                val newProductDTO = NewProductDTO(
+                                    name = productName,
+                                    description = productDescription,
+                                    metricId = selectedMetric.id,
+                                    price = price,
+                                    salePercentage = salePercentage,
+                                    saleMinQuantity = saleMinQuantity.toInt(),
+                                    saleMessage = saleMessage,
+                                    categoryId = selectedCategory.id,
+                                    shopId = shopId,
+                                    weight = weight,
+                                    sizes = sizes.toList()
+                                )
+                                shopViewModel.postNewProduct(newProductDTO)
+                                onNextClicked()
+                            }
                         },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(16.dp)
                     ) {
-                        Text("Proceed", style = MaterialTheme.typography.bodyMedium,color = Color.White)
+                        Text("Proceed", style = MaterialTheme.typography.bodyMedium, color = Color.White)
                     }
                 }
             }
         }
     }
+    ToastHost(hostState = toastHostState)
 }
 
 

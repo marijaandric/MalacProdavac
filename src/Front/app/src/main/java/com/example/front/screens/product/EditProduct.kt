@@ -1,7 +1,5 @@
 package com.example.front.screens.product
 
-import android.net.Uri
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -390,16 +388,7 @@ fun contentOfAddNewImageOnEdit(
         contract = ActivityResultContracts.GetMultipleContents()
     ) { uris ->
         uris?.let { selectedUris ->
-            shopViewModel.viewModelScope.launch(Dispatchers.IO) {
-                val pictures = selectedUris.mapNotNull { uri ->
-                    try {
-                        getMultipartBodyPart(context, uri)
-                    } catch (e: Exception) {
-                        null
-                    }
-                }
-                shopViewModel.setPictures(pictures)
-            }
+            shopViewModel.processSelectedImages(selectedUris, context)
         }
     }
 
