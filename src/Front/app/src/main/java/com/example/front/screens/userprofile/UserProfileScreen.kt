@@ -756,8 +756,6 @@ fun EditDialog(onDismiss: () -> Unit,myProfileViewModel: MyProfileViewModel) {
                         myProfileViewModel.inicijalnoStanje()
                         onDismiss()
                     }
-
-
                 }
 
             }

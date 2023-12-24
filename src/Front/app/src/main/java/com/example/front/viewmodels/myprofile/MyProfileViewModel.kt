@@ -124,7 +124,7 @@ class MyProfileViewModel @Inject constructor(
 
     fun inicijalnoStanje(){
         _stateEdit.value = _stateEdit.value!!.copy(
-            isLoading = false,
+            isLoading = true,
             info = null,
             error = ""
         )
