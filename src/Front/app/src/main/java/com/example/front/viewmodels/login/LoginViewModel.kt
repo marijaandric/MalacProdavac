@@ -31,7 +31,7 @@ class LoginViewModel @Inject constructor(
     @ApplicationContext private val context: Context
 ) : ViewModel() {
     val jwtToken: MutableLiveData<String?> = MutableLiveData()
-    val errorMessage: MutableLiveData<String> = MutableLiveData()
+    val errorMessage: MutableLiveData<String?> = MutableLiveData()
 
     private val _state = mutableStateOf(LoginState())
     var state : State<LoginState> = _state;
@@ -40,6 +40,8 @@ class LoginViewModel @Inject constructor(
     fun getLoginInfo(login: LoginDTO) : Job {
         return viewModelScope.launch {
             try {
+                errorMessage.value = null
+                jwtToken.value = null
                 val response = repository.getLogin(login)
 
                 if (response.isSuccessful) {
@@ -104,11 +106,11 @@ class LoginViewModel @Inject constructor(
             }
         } catch (e: Exception) {
             e.printStackTrace()
+            _state.value = _state.value.copy(
+                loginState = false,
+                error = "An exception occurred: ${e.message}"
+            )
         }
-        _state.value = _state.value.copy(
-            loginState = false,
-            error = errorMessage.toString()
-        )
         return false
     }
 

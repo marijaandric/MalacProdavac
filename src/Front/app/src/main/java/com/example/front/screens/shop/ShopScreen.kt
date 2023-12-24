@@ -848,12 +848,10 @@ fun contentOfAddNewProduct(shopViewModel: OneShopViewModel, shopId: Int, onNextC
                             val errorMess = when {
                                 productName?.isBlank() == true -> "Product name is required"
                                 productDescription?.isBlank() == true -> "Product description is required"
-                                selectedMetric.id == 0 -> "Metric ID is required"
                                 price == null || price == 0f -> "Valid price is required"
-                                salePercentage == null || salePercentage == 0f -> "Valid sale percentage is required"
-                                saleMinQuantity == null || saleMinQuantity == 0 -> "Valid sale minimum quantity is required"
+                                salePercentage == null -> "Valid sale percentage is required"
+                                saleMinQuantity == null -> "Valid sale minimum quantity is required"
                                 saleMessage?.isBlank() == true -> "Sale message is required"
-                                selectedCategory.id == 0 -> "Category ID is required"
                                 shopId == null || shopId == 0 -> "Shop ID is required"
                                 weight == null || weight == 0f -> "Valid weight is required"
                                 sizes.isEmpty() -> "At least one size is required"
@@ -863,7 +861,6 @@ fun contentOfAddNewProduct(shopViewModel: OneShopViewModel, shopId: Int, onNextC
 
 
                             if (errorMess != null) {
-                                // Showing toast for the first error encountered
                                 coroutineScope.launch {
                                     try {
                                         toastHostState.showToast(errorMess, Icons.Default.Clear)
