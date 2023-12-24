@@ -71,6 +71,7 @@ import com.example.front.viewmodels.oneshop.OneShopViewModel
 import com.example.front.viewmodels.products.ProductsViewModel
 import com.example.front.viewmodels.shops.ShopsViewModel
 import kotlinx.coroutines.launch
+import java.text.DecimalFormat
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -207,7 +208,7 @@ fun Products(viewModel: ProductsViewModel, navController: NavHostController, isF
     val products = state.products?.mapIndexed { index, productsState ->
         CardData(
             title = productsState.name,
-            description = productsState.price.toString() + " din",
+            description = DecimalFormat("0.00").format(productsState.price).toString() + " din",
             imageResource = productsState.image,
             id = productsState.id,
             isLiked = false

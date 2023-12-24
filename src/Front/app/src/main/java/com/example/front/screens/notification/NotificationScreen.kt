@@ -1,6 +1,7 @@
 package com.example.front.screens.notification
 
 import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
@@ -259,12 +260,25 @@ fun ItemType(listOfIds: List<Int>, text: String, viewModel: NotificationViewMode
         shape = RoundedCornerShape(10.dp),
         modifier = Modifier
             .padding(8.dp)
-            .clickable{
+            .clickable {
                 viewModel.getNotifications(userId, listOfIds, 1)
-            },
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFF1F1F1))
+            }
     ) {
-        Text(text = text, modifier = Modifier.padding(16.dp))
+        Column(
+            modifier = Modifier.background(color=MaterialTheme.colorScheme.background),
+            horizontalAlignment = Alignment.CenterHorizontally
+        )
+        {
+            Text(text = text, modifier = Modifier.padding(16.dp, bottom=0.dp))
+            if(listOfIds == viewModel.stateCurrentList.value.lista)
+            {
+                Image(
+                    painterResource(id = R.drawable.crtica),
+                    contentDescription = null,
+                    modifier = Modifier.size(40.dp).padding(16.dp, top=0.dp)
+                )
+            }
+        }
     }
 }
 

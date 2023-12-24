@@ -88,6 +88,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import rememberToastHostState
 import java.lang.Integer.max
+import java.text.DecimalFormat
 
 @SuppressLint("SuspiciousIndentation")
 @Composable
@@ -327,7 +328,7 @@ fun ProductPage(
                         }
 
                         Text(
-                            text = "${productInfo?.price} rsd",
+                            text = "${DecimalFormat("0.00").format(productInfo?.price)} rsd",
                             modifier = Modifier
                                 .padding(16.dp)
                                 .fillMaxWidth(),

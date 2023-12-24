@@ -101,7 +101,7 @@ fun Products(viewModel: HomeViewModel, navController: NavHostController) {
         CardData(
             id = productsState.id,
             title = productsState.name,
-            description = String.format("%.2f", productsState.price)+ " din",
+            description = String.format("%.2f", productsState.price)+ " rsd",
             imageResource = productsState.image,
             isLiked = false
         )
