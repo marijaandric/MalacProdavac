@@ -369,4 +369,10 @@ interface Api {
         @Query("reqId") reqId: Int,
     ):Response<SuccessBoolean>
 
+    @PUT("/back/Delivery/AddToRoute")
+    suspend fun acceptReq(
+        @Query("reqId") reqId: Int,
+        @Query("routeId") routeId: Int,
+    ):Response<SuccessBoolean>
+
 }

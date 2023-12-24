@@ -30,12 +30,14 @@ class DeliveryViewModel @Inject constructor(
     private val _stateDecline = mutableStateOf(DeclineState())
     var stateDecline: State<DeclineState> = _stateDecline;
 
+    private val _stateAccept = mutableStateOf(DeclineState())
+    var stateAccept: State<DeclineState> = _stateAccept;
+
     fun declineReq(reqId: Int, userId: Int)
     {
         viewModelScope.launch {
             try {
                 val response = repository.declineRequest(reqId)
-                Log.d("RES DEL", response.body().toString())
                 if (response.isSuccessful) {
                     _stateDecline.value = _stateDecline.value.copy(
                         isLoading = false,
@@ -56,33 +58,60 @@ class DeliveryViewModel @Inject constructor(
         }
     }
 
-    suspend fun getReqForDelivery(userId: Int) {
-        try {
-            val response = repository.getReqForDelivery(userId)
-            Log.d("RES DEL", response.body().toString())
-            if (response.isSuccessful) {
-                _stateReq.value = _stateReq.value.copy(
-                    isLoading = false,
-                    req = response.body(),
-                    error=""
-                )
-            } else {
-                _stateReq.value = _stateReq.value.copy(
-                    isLoading = false,
-                    req = null,
-                    error="Error"
-                )
+    fun getReqForDelivery(userId: Int) {
+        viewModelScope.launch {
+            try {
+                val response = repository.getReqForDelivery(userId)
+                Log.d("RES Acc", response.body().toString())
+                if (response.isSuccessful) {
+                    _stateReq.value = _stateReq.value.copy(
+                        isLoading = false,
+                        req = response.body(),
+                        error = ""
+                    )
+                } else {
+                    _stateReq.value = _stateReq.value.copy(
+                        isLoading = false,
+                        req = null,
+                        error = "Error"
+                    )
+                }
+            } catch (e: Exception) {
+                _state.value.error = e.message.toString()
             }
-        } catch (e: Exception) {
-            _state.value.error = e.message.toString()
         }
+    }
+
+    fun acceptReq(userId: Int, routerId:Int, x: Int) {
+        viewModelScope.launch {
+            try {
+                val response = repository.acceptReq(userId, routerId)
+                Log.d("RES ACCC", response.toString())
+                if (response.isSuccessful) {
+                    _stateAccept.value = _stateAccept.value.copy(
+                        isLoading = false,
+                        decline = response.body(),
+                        error=""
+                    )
+                    getReqForDelivery(x)
+                } else {
+                    _stateAccept.value = _stateAccept.value.copy(
+                        isLoading = false,
+                        decline = null,
+                        error="Error"
+                    )
+                }
+            } catch (e: Exception) {
+                _stateAccept.value.error = e.message.toString()
+            }
+        }
+
     }
 
     suspend fun getRouteDetails(userId: Int?) {
         try {
             val response = userId?.let { repository.GetRoutesForDeliveryPerson(it) }
             if (response != null) {
-                Log.d("RES DEL", response.body().toString())
             }
             if (response != null) {
                 if (response.isSuccessful) {
