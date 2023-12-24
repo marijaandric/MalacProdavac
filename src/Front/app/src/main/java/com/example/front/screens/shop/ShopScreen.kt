@@ -46,6 +46,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DateRangePicker
@@ -562,7 +563,6 @@ fun contentOfAddNewImage(shopViewModel: OneShopViewModel, onNextClicked: () -> U
         }
     }
 
-
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -571,7 +571,7 @@ fun contentOfAddNewImage(shopViewModel: OneShopViewModel, onNextClicked: () -> U
     ) {
         Text(
             "Add images for product",
-            style = MaterialTheme.typography.titleMedium.copy(color = MaterialTheme.colorScheme.onBackground),
+            style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.padding(bottom = 24.dp)
         )
 
@@ -582,9 +582,8 @@ fun contentOfAddNewImage(shopViewModel: OneShopViewModel, onNextClicked: () -> U
                 .size(150.dp)
                 .padding(10.dp)
                 .clip(RoundedCornerShape(8.dp))
-                .border(1.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(8.dp))
                 .clickable { photoPicker.launch("image/*") },
-            contentScale = ContentScale.Fit,
+            contentScale = ContentScale.Crop,
             alignment = Alignment.Center
         )
 
@@ -592,21 +591,25 @@ fun contentOfAddNewImage(shopViewModel: OneShopViewModel, onNextClicked: () -> U
 
         Button(
             onClick = { shopViewModel.uploadAllImages() },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(8.dp),
+            colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.secondary)
         ) {
-            Text("Upload Images")
+            Text("Upload Images", color = MaterialTheme.colorScheme.onSecondary)
         }
 
         Spacer(modifier = Modifier.height(8.dp))
 
         OutlinedButton(
             onClick = onNextClicked,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(8.dp)
         ) {
             Text("Go Back")
         }
     }
 }
+
 
 
 
@@ -623,7 +626,7 @@ fun contentOfAddNewProduct(shopViewModel: OneShopViewModel, shopId: Int, onNextC
     var saleMessage by remember { mutableStateOf("") }
     var weight by remember { mutableStateOf(0f) }
     val sizeOptions = createSizeList()
-    var selectedSize by remember { mutableStateOf<Pair<Int, String>?>(null) }
+    var selectedSize by remember { mutableStateOf<Pair<Int, String>?>(Pair(0, "None - No size (eg. Chair)")) }
     var quantity by remember { mutableStateOf(0) }
     var sizes by remember { mutableStateOf(listOf<Size>()) }
 
@@ -852,6 +855,7 @@ fun contentOfAddNewProduct(shopViewModel: OneShopViewModel, shopId: Int, onNextC
                                 salePercentage == null -> "Valid sale percentage is required"
                                 saleMinQuantity == null -> "Valid sale minimum quantity is required"
                                 saleMessage?.isBlank() == true -> "Sale message is required"
+                                selectedCategory.id == 0 -> "Category ID is required"
                                 shopId == null || shopId == 0 -> "Shop ID is required"
                                 weight == null || weight == 0f -> "Valid weight is required"
                                 sizes.isEmpty() -> "At least one size is required"
@@ -861,6 +865,7 @@ fun contentOfAddNewProduct(shopViewModel: OneShopViewModel, shopId: Int, onNextC
 
 
                             if (errorMess != null) {
+                                // Showing toast for the first error encountered
                                 coroutineScope.launch {
                                     try {
                                         toastHostState.showToast(errorMess, Icons.Default.Clear)

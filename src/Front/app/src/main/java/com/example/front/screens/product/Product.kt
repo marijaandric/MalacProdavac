@@ -67,6 +67,7 @@ import com.example.front.R
 import com.example.front.components.CardButton
 import com.example.front.components.CommentsTextBox
 import com.example.front.components.GalleryComponent
+import com.example.front.components.ImageItem
 import com.example.front.components.MyDropdownWorkingHours
 import com.example.front.components.Paginator
 import com.example.front.components.ProductImage
@@ -117,36 +118,9 @@ fun ProductPage(
     var selectedRating by remember { mutableStateOf(0) }
     var showAddProduct by remember { mutableStateOf(false) }
 
-    val reviews = productViewModel.stateReview.value.reviews
     var currentPage = 1
 
-    var selectedImage by remember {
-        mutableStateOf(
-            ImageDataDTO(0, "placeholder.png")
-        )
-    }
-
-    val photoPicker = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetMultipleContents()
-    ) { uris ->
-        uris?.let { selectedUris ->
-            CoroutineScope(Dispatchers.IO).launch {
-                val pictures = selectedUris.mapNotNull { uri ->
-                    try {
-                        getMultipartBodyPart(context, uri)
-                    } catch (e: Exception) {
-                        null
-                    }
-                }
-
-                withContext(Dispatchers.Main) {
-                    productViewModel.uploadImages(1, productID, pictures)
-                }
-            }
-        }
-    }
-
-
+    var selectedImage by remember { mutableStateOf<ImageDataDTO>(ImageDataDTO(-1,"placeholder.png")) }
 
     var userId by remember {mutableStateOf(0)}
     LaunchedEffect(Unit) {
@@ -182,18 +156,9 @@ fun ProductPage(
                 var x = productViewModel.state.value.product!!.liked==true
                 val productInfo = productViewModel.state.value.product
 
-                if (productInfo?.images?.size != 0) {
+                if (productInfo?.images?.size != 0 && selectedImage.image == "placeholder.png") {
                     selectedImage = productInfo?.images?.get(0)!!
                 }
-
-
-                LaunchedEffect(productInfo)
-                {
-                    if (productInfo?.images?.size != 0) {
-                        selectedImage = productInfo.images[0];
-                    }
-                }
-
 
                 Box(
                     modifier = Modifier
@@ -210,7 +175,7 @@ fun ProductPage(
                         }
                     }
 
-                    if (productInfo.isOwner != true) {
+                    if (productInfo?.isOwner != true) {
                         val currentImage = if (isToggled) painterResource(id = R.drawable.srcefull)
                         else painterResource(id = R.drawable.srce)
 
@@ -279,12 +244,34 @@ fun ProductPage(
                             .verticalScroll(rememberScrollState())
                     ) {
                         productInfo?.images?.let { images ->
-                            GalleryComponent(
-                                modifier = Modifier.padding(0.dp, top=10.dp,bottom=20.dp, end =16.dp),
-                                images = images,
-                                selectedImage = selectedImage
-                            ) { selectedImage = it }
+                            LazyRow(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(0.dp, top = 10.dp, bottom = 20.dp, end = 16.dp),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                items(images) { image ->
+                                    Box(
+                                        modifier = Modifier
+                                            .clickable {
+                                                selectedImage = image
+                                            }
+                                            .border(2.dp, if (image == selectedImage) MaterialTheme.colorScheme.primary else Color.Transparent, shape = RoundedCornerShape(10.dp))
+                                            .clip(RoundedCornerShape(10.dp))
+                                    ) {
+                                        val imageUrl = "http://softeng.pmf.kg.ac.rs:10015/images/${image.image}"
+
+                                        val painter: Painter = rememberAsyncImagePainter(model = imageUrl)
+                                        Image(
+                                            painter = painter,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(60.dp)
+                                        )
+                                    }
+                                }
+                            }
                         }
+
 
                         productInfo?.name?.let {
                             Text(
@@ -446,7 +433,7 @@ fun ProductPage(
                                 color = Color.Black,
                                 modifier = Modifier.weight(1f)
                             )
-                            if (productInfo.sizes?.all { it.quantity == 0 } != true)
+                            if (productInfo?.sizes?.all { it.quantity == 0 } != true)
                                 NumberPicker(
                                     value = quantity,
                                     onValueChange = { newValue -> quantity = newValue },
@@ -561,7 +548,7 @@ fun ProductPage(
                                 color = Color.Gray
                             )
 
-                            if (!productInfo.isOwner!!) {
+                            if (!productInfo?.isOwner!!) {
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.SpaceBetween,
