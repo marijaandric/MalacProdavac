@@ -9,7 +9,7 @@ data class ProductInfo(
     @SerializedName("metric") val metric: String?,
     @SerializedName("category") val category: String?,
     @SerializedName("subcategory") val subcategory: String?,
-    @SerializedName("liked") val liked: Boolean?,
+    @SerializedName("liked") var liked: Boolean?,
     @SerializedName("bought") val bought: Boolean?,
     @SerializedName("rated") val rated: Boolean?,
     @SerializedName("isOwner") val isOwner: Boolean?,

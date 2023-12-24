@@ -84,6 +84,17 @@ class ProductViewModel @Inject constructor(
         }
     }
 
+    fun toggleLike(productID: Int, userID: Int) {
+        viewModelScope.launch {
+            try {
+                val response = repository.toggleLikeProduct(productID, userID)
+                Log.d("TOGGLE LIKE", response.toString())
+            } catch (e: Exception) {
+                Log.d("Error", e.message.toString())
+            }
+        }
+    }
+
     fun ChangePage(currentPage: Int) {
         viewModelScope.launch {
             _state.value.product!!.productId?.let { getReviewsForProduct(it, currentPage) }
@@ -175,7 +186,6 @@ class ProductViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val response = repository.submitReview(productID, dataStoreManager.getUserIdFromToken()!!, rating, comment)
-                Log.d("SUBMIT REVIEW", response.toString())
                 if (response.isSuccessful) {
                     val res = response.body()
                     _stateReviewSubmit.value = _stateReviewSubmit.value.copy(
@@ -195,6 +205,11 @@ class ProductViewModel @Inject constructor(
                 Log.d("Error", e.message.toString())
             }
         }
+    }
+
+    fun updateLikeStatus(isToggled: Boolean)
+    {
+        this.state.value.product!!.liked = isToggled
     }
 
 }

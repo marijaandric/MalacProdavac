@@ -43,6 +43,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -105,7 +106,7 @@ fun ProductPage(
     var selectedSize by remember { mutableStateOf<String?>(null) }
     var selectedSizeId by remember { mutableStateOf<Int?>(null) }
     val context = LocalContext.current
-    var isToggled by remember { mutableStateOf(false) }
+    var isToggled by remember { mutableStateOf (false) }
     var leaveAReview by remember { mutableStateOf(false) }
     var comment by remember {
         mutableStateOf("")
@@ -146,8 +147,9 @@ fun ProductPage(
 
 
 
+    var userId by remember {mutableStateOf(0)}
     LaunchedEffect(Unit) {
-        productViewModel.getUserId()?.let { productViewModel.getProductInfo(productID, it) }
+        productViewModel.getUserId()?.let { productViewModel.getProductInfo(productID, it); userId = it }
         productViewModel.getReviewsForProduct(productID, currentPage)
     }
 
@@ -176,6 +178,7 @@ fun ProductPage(
                     CircularProgressIndicator()
                 }
             } else {
+                var x = productViewModel.state.value.product!!.liked==true
                 val productInfo = productViewModel.state.value.product
 
                 if (productInfo?.images?.size != 0) {
@@ -219,6 +222,8 @@ fun ProductPage(
                                 .align(Alignment.TopEnd)
                                 .clickable {
                                     isToggled = !isToggled
+                                    productViewModel.updateLikeStatus(isToggled)
+                                    productViewModel.toggleLike(productID, userId)
                                 }
                         )
                     } else {
