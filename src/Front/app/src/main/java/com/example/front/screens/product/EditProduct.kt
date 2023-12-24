@@ -6,22 +6,30 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -31,23 +39,33 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.lifecycle.viewModelScope
 import com.example.front.R
 import com.example.front.components.CommentsTextBox
 import com.example.front.components.MyDropdownCategories
 import com.example.front.components.MyDropdownMetrics
+import com.example.front.components.MyDropdownSizes
 import com.example.front.components.MyTextFieldWithoutIcon
 import com.example.front.model.DTO.CategoriesDTO
 import com.example.front.model.DTO.MetricsDTO
 import com.example.front.model.DTO.NewProductDTO
+import com.example.front.model.DTO.Size
 import com.example.front.model.product.ProductInfo
-import com.example.front.screens.shop.contentOfAddNewImage
+import com.example.front.model.product.Stock
+import com.example.front.screens.myshop.getMultipartBodyPart
+import com.example.front.screens.shop.createSizeList
+import com.example.front.ui.theme.Typography
 import com.example.front.viewmodels.oneshop.OneShopViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
 fun EditProduct(onDismiss: () -> Unit, shopViewModel: OneShopViewModel, productInfo: ProductInfo) {
@@ -88,7 +106,7 @@ fun EditProduct(onDismiss: () -> Unit, shopViewModel: OneShopViewModel, productI
                     }
 
                     1 -> {
-                        contentOfAddNewImage(shopViewModel, onNextClicked = { currentStep = 0 })
+                        contentOfAddNewImageOnEdit(shopViewModel, onNextClicked = { currentStep = 0 }, productInfo.productId)
                     }
                 }
             }
@@ -108,6 +126,11 @@ fun contentOfAddEditProduct(shopViewModel: OneShopViewModel, productInfo: Produc
     var saleMessage by remember { mutableStateOf(productInfo.saleMessage) }
     var shopId by remember { mutableStateOf(productInfo.shopId) }
     var weight by remember { mutableStateOf(productInfo.mass) }
+
+    val sizeOptions = createSizeList()
+    var selectedSize by remember { mutableStateOf<Pair<Int, String>?>(null) }
+    var quantity by remember { mutableStateOf(0) }
+    var sizes by remember { mutableStateOf(productInfo.sizes) }
 
 
     Column {
@@ -146,7 +169,12 @@ fun contentOfAddEditProduct(shopViewModel: OneShopViewModel, productInfo: Produc
                     }
                 }
                 item {
-                    CommentsTextBox(onReviewTextChanged = {}, "Product Description")
+                    CommentsTextBox(
+                        onReviewTextChanged = { newText ->
+                            productDescription = newText
+                        },
+                        placeholder = "Product Description"
+                    )
                 }
                 item {
                     Row(
@@ -175,6 +203,74 @@ fun contentOfAddEditProduct(shopViewModel: OneShopViewModel, productInfo: Produc
                                     .weight(1f)
                                     .padding(end = 2.dp)
                             )
+                        }
+                    }
+                }
+                item{
+
+                    Column(modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 10.dp, bottom = 10.dp)) {
+                        MyDropdownSizes(
+                            labelValue = "Select Size",
+                            selectedSize = selectedSize,
+                            sizesList = sizeOptions,
+                            onSizeSelected = { sizePair ->
+                                selectedSize = sizePair
+                            },
+                            isEnabled = selectedMetric.id == 1,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+
+                        com.example.front.screens.shop.NumberPicker(
+                            labelValue = "Quantity",
+                            value = quantity,
+                            onValueChange = { newQuantity -> quantity = newQuantity },
+                            enabled = selectedMetric.id == 1,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+
+                        Button(
+                            onClick = {
+                                selectedSize?.let { size ->
+                                    val existingIndex = sizes.indexOfFirst { it.sizeId == size.first }
+                                    if (existingIndex != -1) {
+                                        val existingSize = sizes[existingIndex]
+                                        val updatedSize = existingSize.copy(quantity = existingSize.quantity + quantity)
+                                        sizes = sizes.toMutableList().apply { set(existingIndex, updatedSize) }
+                                    } else {
+                                        sizes = sizes + Stock("",size.first,quantity)
+                                    }
+                                    quantity = 0
+                                }
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            enabled = selectedMetric.id == 1
+                        ) {
+                            Text("Add Size", style = MaterialTheme.typography.bodyMedium,color = Color.White)
+                        }
+
+                        sizes.forEachIndexed { index, size ->
+                            Row(
+                                modifier = Modifier.padding(5.dp)
+                            ) {
+                                Text(
+                                    "Size: ${size.sizeId}, Quantity: ${size.quantity}",
+                                    style = Typography.bodyLarge,
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .padding(end = 8.dp)
+                                )
+
+                                IconButton(
+                                    onClick = {
+                                        sizes = sizes.toMutableList().apply { removeAt(index) }
+                                    }
+                                ) {
+                                    Icon(
+                                        Icons.Filled.Delete,
+                                        contentDescription = "Delete"
+                                    )
+                                }
+                            }
                         }
                     }
                 }
@@ -248,22 +344,6 @@ fun contentOfAddEditProduct(shopViewModel: OneShopViewModel, productInfo: Produc
                     }
                 }
                 item {
-                    Row(
-                        modifier = Modifier
-                            .padding(start = 16.dp, end = 16.dp)
-                    ) {
-                        MyTextFieldWithoutIcon(
-                            labelValue = "Price",
-                            value = price.toString(),
-                            onValueChange = {
-                                price = it.toFloat()
-                            },
-                            modifier = Modifier
-                                .weight(1f)
-                        )
-                    }
-                }
-                item {
                     Button(
                         onClick = {
                             val newProductDTO = NewProductDTO(
@@ -272,20 +352,21 @@ fun contentOfAddEditProduct(shopViewModel: OneShopViewModel, productInfo: Produc
                                 metricId = selectedMetric.id,
                                 price = price!!,
                                 salePercentage = salePercentage!!,
-                                saleMinQuantity = saleMinQuantity!!,
+                                saleMinQuantity = saleMinQuantity!!.toInt(),
                                 saleMessage = saleMessage!!,
                                 categoryId = selectedCategory.id,
                                 shopId = shopId!!,
-                                weight = weight!!
+                                weight = weight!!,
+                                sizes = convertStockListToSizeList(sizes.toList())
                             )
-                            shopViewModel.postNewProduct(newProductDTO)
+                            shopViewModel.editProduct(newProductDTO)
                             onNextClicked()
                         },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(16.dp)
                     ) {
-                        Text("Proceed")
+                        Text("Proceed", style = MaterialTheme.typography.bodyMedium,color = Color.White)
                     }
                 }
             }
@@ -293,72 +374,77 @@ fun contentOfAddEditProduct(shopViewModel: OneShopViewModel, productInfo: Produc
     }
 }
 
-@Composable
-fun contentOfAddNewImageOnEdit(shopViewModel: OneShopViewModel, onNextClicked: () -> Unit) {
+fun convertStockListToSizeList(stockList: List<Stock>): List<Size> {
+    return stockList.map { stock ->
+        Size(sizeId = stock.sizeId, quantity = stock.quantity)
+    }
+}
 
-    var selectedImageUris by remember { mutableStateOf(emptyList<Uri>()) }
-    val imagePickerLauncher =
-        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-            uri?.let {
-                selectedImageUris = selectedImageUris + it
-                Log.d("ImagePicker", "New image added: $it")
+@Composable
+fun contentOfAddNewImageOnEdit(
+    shopViewModel: OneShopViewModel,
+    onNextClicked: () -> Unit,
+    productId: Int?){
+    val context = LocalContext.current
+    val photoPicker = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetMultipleContents()
+    ) { uris ->
+        uris?.let { selectedUris ->
+            shopViewModel.viewModelScope.launch(Dispatchers.IO) {
+                val pictures = selectedUris.mapNotNull { uri ->
+                    try {
+                        getMultipartBodyPart(context, uri)
+                    } catch (e: Exception) {
+                        null
+                    }
+                }
+                shopViewModel.setPictures(pictures)
             }
         }
+    }
 
-    Column {
-        Column(
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            "Add images for product",
+            style = MaterialTheme.typography.titleMedium.copy(color = MaterialTheme.colorScheme.onBackground),
+            modifier = Modifier.padding(bottom = 24.dp)
+        )
+
+        Image(
+            painter = painterResource(id = R.drawable.upload_image),
+            contentDescription = "Upload Image Placeholder",
             modifier = Modifier
-                .fillMaxWidth()
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(10.dp),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    "Add images for product",
-                    style = MaterialTheme.typography.titleMedium.copy(color = MaterialTheme.colorScheme.onBackground),
-                    modifier = Modifier
-                )
-            }
+                .size(150.dp)
+                .padding(10.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .border(1.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(8.dp))
+                .clickable { photoPicker.launch("image/*") },
+            contentScale = ContentScale.Fit,
+            alignment = Alignment.Center
+        )
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(10.dp),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.upload_image),
-                    contentDescription = "Placeholder",
-                    modifier = Modifier
-                        .size(150.dp)
-                        .padding(20.dp)
-                        .clickable {
-                            imagePickerLauncher.launch("image/*")
-                        },
-                    contentScale = ContentScale.FillWidth,
-                    alignment = Alignment.Center
-                )
-            }
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(10.dp),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Button(
-                    onClick = {
-                        selectedImageUris.forEach { uri ->
-                            shopViewModel.uploadImage(1, 17, uri)
-                            Log.d("ImagePicker", "New image added: $uri")
-                        }
-                    }
-                ) {
-                    Text("Upload Images")
-                }
-            }
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(
+            onClick = { shopViewModel.uploadAllImagesEdit(productId!!) },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Upload Images")
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        OutlinedButton(
+            onClick = onNextClicked,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Go Back")
         }
     }
 }

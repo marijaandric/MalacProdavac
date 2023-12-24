@@ -345,4 +345,9 @@ interface Api {
         @Query("productId") shopId: Int,
         @Query("userId") userId: Int,
     ): Response<ToggleLikeDTO>
+
+    @PUT("/back/Product/EditProduct")
+    suspend fun editProduct(
+        @Body editedProduct : NewProductDTO
+    ): Response<Boolean>
 }
