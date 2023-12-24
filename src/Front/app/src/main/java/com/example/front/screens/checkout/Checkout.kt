@@ -273,15 +273,17 @@ fun CheckoutScreen(
                                 .fillMaxWidth()
                                 .padding(8.dp)
                                 .shadow(4.dp)
-                                .clip(RoundedCornerShape(5.dp))
-                            ,
+                                .background(
+                                    color = Color.White,
+                                    shape = RoundedCornerShape(15.dp)
+                                )
                         ) {
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(50.dp)
-                                    .padding(horizontal = 4.dp, vertical = 0.dp)
-                                    .background(Color(0xff4a7da5))
+                                    .background(Color(0xff4a7da5), shape= RoundedCornerShape(topStart = 15.dp, topEnd = 15.dp))
+
                             ) {
                                 Column(modifier =Modifier
                                     ) {
@@ -348,6 +350,7 @@ fun CheckoutScreen(
                                     )
                                 )
                                 Text(text = "Self pickup")
+                                Spacer(modifier = Modifier.height(5.dp))
                             }
                             // opciono datepicker
                             if (shop.selfpickup) {
