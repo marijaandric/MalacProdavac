@@ -747,7 +747,6 @@ fun CardForOneOrderWithoutButton(
             .clip(RoundedCornerShape(20.dp))
             .fillMaxWidth(1f)
             .padding(bottom = 15.dp, end = 16.dp, start = 16.dp)
-            .clickable(onClick = onClick)
     ) {
         val imageUrl = "http://softeng.pmf.kg.ac.rs:10015/images/${imageResource}"
 

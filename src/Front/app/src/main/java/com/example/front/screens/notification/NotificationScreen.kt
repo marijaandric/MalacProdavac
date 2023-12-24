@@ -71,7 +71,7 @@ fun NotificationScreen(navController: NavHostController, viewModel: Notification
 
     var userId by remember { mutableStateOf(0) }
     var currentPage by remember { mutableStateOf(viewModel.stateCurrentPage.value) }//{ derivedStateOf { viewModel.stateCurrentPage.value } }
-    val totalPages by remember { derivedStateOf { viewModel.statePageCount.value.pageCount?.count ?:0 } }
+    var totalPages by remember { mutableStateOf (viewModel.statePageCount.value.pageCount?.count ?:0 ) }
     val toastHostState = rememberToastHostState()
     val coroutineScope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -79,6 +79,12 @@ fun NotificationScreen(navController: NavHostController, viewModel: Notification
     LaunchedEffect(Unit) {
         userId = viewModel.dataStoreManager.getUserIdFromToken()!!
         viewModel.getNotifications(userId, listOf(), currentPage)
+    }
+
+    if(viewModel.statePageCount.value.pageCount != null)
+    {
+        currentPage=1
+        totalPages = viewModel.statePageCount.value.pageCount!!.count
     }
 
     if (viewModel.stateUserRate.value.userRate != null) {
@@ -253,7 +259,7 @@ fun ItemType(listOfIds: List<Int>, text: String, viewModel: NotificationViewMode
         shape = RoundedCornerShape(10.dp),
         modifier = Modifier
             .padding(8.dp)
-            .clickable {
+            .clickable{
                 viewModel.getNotifications(userId, listOfIds, 1)
             },
         colors = CardDefaults.cardColors(containerColor = Color(0xFFF1F1F1))

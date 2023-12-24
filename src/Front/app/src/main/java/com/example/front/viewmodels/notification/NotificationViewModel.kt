@@ -11,6 +11,7 @@ import com.example.front.model.DTO.NotificationDTO
 import com.example.front.model.DTO.PageCountDTO
 import com.example.front.model.DTO.UserRateDTO
 import com.example.front.repository.Repository
+import com.example.front.screens.notification.state.ListaTabovaState
 import com.example.front.screens.notification.state.ProductReviewState
 import com.example.front.screens.notification.state.UserRateState
 import com.example.front.screens.shop.state.PostReviewState
@@ -41,6 +42,9 @@ class NotificationViewModel @Inject constructor(
 
     private val _stateCurrentPage = mutableStateOf(1)
     var stateCurrentPage: State<Int> = _stateCurrentPage;
+
+    private val _stateCurrentList = mutableStateOf(ListaTabovaState())
+    var stateCurrentList: State<ListaTabovaState> = _stateCurrentList;
 
     fun inicijalnoStanje()
     {
@@ -134,6 +138,11 @@ class NotificationViewModel @Inject constructor(
     }
 
     fun getNotifications(userId: Int, type: List<Int>?, page: Int){
+        _stateCurrentList.value = type?.let {
+            stateCurrentList.value.copy(
+                lista = it
+            )
+        }!!
         viewModelScope.launch {
             try {
                 val response = repository.getNotifications(userId, type, page)
@@ -167,6 +176,7 @@ class NotificationViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val response = repository.getNotificationPageCount(userId, type)
+                Log.d("Res", response.toString())
                 _statePageCount.value = _statePageCount.value.copy(
                     isLoading = false,
                     pageCount = response.body()
@@ -177,7 +187,7 @@ class NotificationViewModel @Inject constructor(
         }
     }
     fun ChangePage(userId: Int,page: Int){
-        getNotifications(userId, listOf(), page)
+        getNotifications(userId, _stateCurrentList.value.lista, page)
     }
 }
 
