@@ -64,7 +64,7 @@ namespace back.DAL.Repositories
 
         public async Task<List<PendingReview>> PendingDeliveryPersonReviews()
         {
-            return await _context.DeliveryRequests.Where(x => ((DateTime)x.PickupDate).AddDays(1) <= DateTime.Now)
+            return await _context.DeliveryRequests.Where(x => ((DateTime)x.PickupDate).AddDays(1) <= DateTime.Now && x.ChosenPersonId != null)
             .Join(_context.Orders, dr => dr.OrderId, o => o.Id, (dr, o) => new { dr, o })
             .Where(x => !_context.Ratings.Any(y => y.RaterId == x.o.UserId && y.RatedId == x.dr.ChosenPersonId))
             .Select(x => new PendingReview
