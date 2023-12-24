@@ -77,19 +77,19 @@ fun OrdersScreen(navController: NavHostController,ordersViewModel: OrdersViewMod
         )
         {
             item{
-                SmallElipseAndTitle(title = "Orders", drawerState = drawerState)
+                SmallElipseAndTitle(title = "My orders", drawerState = drawerState)
             }
             item {
                 FourTabs(
                     onFirstTabSelected = { selectedTabIndex = 0 },
-                    onSecondTabSelected = { selectedTabIndex = 1 },
-                    onThirdTabSelected = { selectedTabIndex = 2 },
-                    onFourthTabSelected = { selectedTabIndex = 3},
+                    onSecondTabSelected = { selectedTabIndex = 2 },
+                    onThirdTabSelected = { selectedTabIndex = 4 },
+                    onFourthTabSelected = { selectedTabIndex = 1},
                     selectedColumnIndex = selectedTabIndex,
                     firstTab = "All",
-                    secondTab = "Delivered",
-                    thirdTab = "Pending",
-                    fourthTab = "Ready for pickup",
+                    secondTab = "Pending",
+                    thirdTab = "Processing",
+                    fourthTab = "Delivered",
                     isFilters = true
                 )
             }

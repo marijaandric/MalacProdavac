@@ -1494,7 +1494,7 @@ fun FourTabs(
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
 
-            if (selectedColumnIndex == 1) {
+            if (selectedColumnIndex == 2) {
                 Image(
                     painter = painterResource(id = R.drawable.crtica),
                     contentDescription = "Crtica",
@@ -1521,7 +1521,7 @@ fun FourTabs(
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
 
-            if (selectedColumnIndex == 2) {
+            if (selectedColumnIndex == 4) {
                 Image(
                     painter = painterResource(id = R.drawable.crtica),
                     contentDescription = "Crtica",
@@ -1548,7 +1548,7 @@ fun FourTabs(
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
 
-            if (selectedColumnIndex == 3) {
+            if (selectedColumnIndex == 1) {
                 Image(
                     painter = painterResource(id = R.drawable.crtica),
                     contentDescription = "Crtica",
