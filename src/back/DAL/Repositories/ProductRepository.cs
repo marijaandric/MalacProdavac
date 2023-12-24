@@ -232,7 +232,8 @@ namespace back.DAL.Repositories
                 QuestionsAndAnswers = qna,
                 Sizes = sizes,
                 Images = images,
-                Subscribed = _context.ProductSubscriptions.FirstOrDefault(x => x.ProductId == productId && x.UserId == userId) != null
+                Subscribed = _context.ProductSubscriptions.FirstOrDefault(x => x.ProductId == productId && x.UserId == userId) != null,
+                Mass = product.Mass
             };
 
         }

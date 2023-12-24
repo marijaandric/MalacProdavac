@@ -50,7 +50,7 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 enum class ShopTabs {
-    Requests, OrderHistory
+    Requests, Orders
 }
 
 @Composable
@@ -96,7 +96,7 @@ fun RequestsForShopScreen(
 
             when (selectedTab) {
                 ShopTabs.Requests -> RequestsTabContent(viewModel)
-                ShopTabs.OrderHistory -> OrderHistory()
+                ShopTabs.Orders -> Orders()
             }
         }
     }
@@ -111,7 +111,7 @@ data class Order(
 )
 
 @Composable
-fun OrderHistoryScreen(orders: List<Order>) {
+fun OrdersScreen(orders: List<Order>) {
     LazyColumn(modifier = Modifier.fillMaxWidth(0.9f), horizontalAlignment = Alignment.CenterHorizontally) {
         items(orders) { order ->
             OrderCard(order)
@@ -162,7 +162,7 @@ fun OrderCard(order: Order) {
 }
 
 @Composable
-fun OrderHistory() {
+fun Orders() {
     val orders = listOf(
         Order("1037088", "10-19-2023", 2, "1425 RSD", "Processing"),
         Order("1049718", "10-19-2023", 2, "4525 RSD", "Delivered"),
@@ -172,7 +172,7 @@ fun OrderHistory() {
         modifier = Modifier.fillMaxSize().padding(top = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        OrderHistoryScreen(orders = orders)
+        OrdersScreen(orders = orders)
     }
 }
 

@@ -107,6 +107,7 @@ class OneShopViewModel @Inject constructor(
 
     private val _pictures = mutableStateOf<List<MultipartBody.Part>>(listOf())
     val pictures: State<List<MultipartBody.Part>> = _pictures
+
     fun setPictures(newPictures: List<MultipartBody.Part>) {
         _pictures.value = newPictures
     }
@@ -115,6 +116,14 @@ class OneShopViewModel @Inject constructor(
         viewModelScope.launch {
             pictures.value.forEach { picture ->
                 uploadImage(1, stateProductID.value, picture)
+            }
+        }
+    }
+
+    fun uploadAllImagesEdit(productId: Int) {
+        viewModelScope.launch {
+            pictures.value.forEach { picture ->
+                uploadImage(1, productId, picture)
             }
         }
     }
@@ -484,32 +493,21 @@ class OneShopViewModel @Inject constructor(
 
     fun postNewProduct(newProd: NewProductDTO) {
         viewModelScope.launch {
-            _stateProductID.value = repository.postNewProduct(newProd).body()?.id!!
+            val response = repository.postNewProduct(newProd)
+            val responseBody = response.body()
+
+            if (responseBody != null) {
+                _stateProductID.value = responseBody.id
+            } else {
+                Log.e("NEWPROD", "Response body or ID is null")
+            }
         }
     }
 
-    fun uploadImage(type: Int, id: Int, imageUri: Uri) {
+    fun editProduct(newProd: NewProductDTO) {
         viewModelScope.launch {
-            try {
-                _uploadStatus.value = UploadStatus.InProgress
-
-                // Convert imageUri to MultipartBody.Part
-                val file = File(imageUri.path!!)
-                val requestFile = file.asRequestBody("multipart/form-data".toMediaTypeOrNull())
-                val imagePart = MultipartBody.Part.createFormData("file", file.name, requestFile)
-
-                // Call the repository method
-                val response = repository.uploadImage(type, id, imagePart)
-
-                // Update the status based on the response
-                if (response.isSuccessful) {
-                    _uploadStatus.value = UploadStatus.Success(response.body()!!)
-                } else {
-                    _uploadStatus.value = UploadStatus.Error("Upload failed")
-                }
-            } catch (e: Exception) {
-                _uploadStatus.value = UploadStatus.Error("Upload failed: ${e.message}")
-            }
+            Log.d("EDITPRODUCT", newProd.toString())
+            repository.editProduct(newProd)
         }
     }
 

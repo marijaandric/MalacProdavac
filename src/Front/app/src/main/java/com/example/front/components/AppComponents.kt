@@ -217,6 +217,64 @@ fun MyDropdownCategories(
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
+fun MyDropdownSizes(
+    labelValue: String,
+    selectedSize: Pair<Int, String>?,
+    sizesList: List<Pair<Int, String>>,
+    onSizeSelected: (Pair<Int, String>) -> Unit,
+    isEnabled: Boolean = true,
+    modifier: Modifier
+) {
+    var currentSelectedSize by remember { mutableStateOf(selectedSize) }
+    var isPressed by remember { mutableStateOf(false) }
+
+    OutlinedTextField(
+        modifier = modifier
+            .pointerInteropFilter { event ->
+                if (isEnabled) {
+                    isPressed = event.action == MotionEvent.ACTION_DOWN
+                }
+                false
+            },
+        readOnly = true,
+        value = currentSelectedSize?.second ?: "",
+        onValueChange = {},
+        label = { Text(text = labelValue) },
+        colors = TextFieldDefaults.outlinedTextFieldColors(
+            focusedBorderColor = Color.Blue,
+            focusedLabelColor = Color.Blue,
+            cursorColor = Color.Blue
+        ),
+        keyboardOptions = KeyboardOptions.Default.copy(
+            keyboardType = KeyboardType.Text,
+            imeAction = ImeAction.Done
+        ),
+        shape = RoundedCornerShape(20.dp),
+        enabled = isEnabled
+    )
+
+    if (isEnabled) {
+        DropdownMenu(
+            expanded = isPressed,
+            onDismissRequest = { isPressed = false },
+            modifier = Modifier.background(MaterialTheme.colorScheme.surface)
+        ) {
+            sizesList.forEach { size ->
+                DropdownMenuItem(onClick = {
+                    currentSelectedSize = size
+                    onSizeSelected(size)
+                    isPressed = false
+                }) {
+                    Text(text = size.second)
+                }
+            }
+        }
+    }
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
+@Composable
 fun MyDropdownMetrics(
     labelValue: String,
     selectedMetric: MetricsDTO?,
@@ -339,6 +397,39 @@ fun MyTextFieldWithoutIcon(
             imeAction = if (isLast) ImeAction.Done else ImeAction.Next
         ),
         shape = RoundedCornerShape(20.dp)
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MyTextFieldWithoutIconEnabled(
+    labelValue: String,
+    value: String,
+    onValueChange: (String) -> Unit,
+    isPassword: Boolean = false,
+    isLast: Boolean = false,
+    modifier: Modifier,
+    enabled: Boolean
+) {
+    OutlinedTextField(
+        modifier = Modifier
+            .clip(RoundedCornerShape(5.dp))
+            .then(modifier),
+        label = { Text(text = labelValue) },
+        colors = TextFieldDefaults.outlinedTextFieldColors(
+            focusedBorderColor = LightBlue,
+            focusedLabelColor = LightBlue,
+            cursorColor = LightBlue
+        ),
+        value = value,
+        onValueChange = onValueChange,
+        visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
+        keyboardOptions = KeyboardOptions.Default.copy(
+            keyboardType = if (isPassword) KeyboardType.Password else KeyboardType.Text,
+            imeAction = if (isLast) ImeAction.Done else ImeAction.Next
+        ),
+        shape = RoundedCornerShape(20.dp),
+        enabled = enabled
     )
 }
 
@@ -842,8 +933,7 @@ fun SellerCard(
                 val imageUrl = "http://softeng.pmf.kg.ac.rs:10015/images/${imageResource}"
 
                 val painter: Painter = rememberAsyncImagePainter(model = imageUrl)
-                if(imageUrl == null)
-                {
+                if (imageUrl == null) {
                     Image(
                         painter = painterResource(id = R.drawable.imageplaceholder),
                         contentDescription = null,
@@ -854,8 +944,7 @@ fun SellerCard(
                             .padding(13.dp)
                             .clip(RoundedCornerShape(10.dp))
                     )
-                }
-                else{
+                } else {
                     Image(
                         painter = painter,
                         contentDescription = null,
@@ -867,7 +956,7 @@ fun SellerCard(
                             .clip(RoundedCornerShape(10.dp))
                     )
                 }
-                
+
 
                 Image(
                     painter = painterResource(if (isLiked) R.drawable.srcefull else R.drawable.srce),

@@ -5,7 +5,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.animateDpAsState
@@ -53,6 +52,7 @@ import androidx.compose.material3.DateRangePicker
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TimeInput
 import androidx.compose.material3.TimePickerState
@@ -96,8 +96,8 @@ import com.example.front.components.FilterDialogProducts
 import com.example.front.components.ImageItemForProfilePic
 import com.example.front.components.MyDropdownCategories
 import com.example.front.components.MyDropdownMetrics
+import com.example.front.components.MyDropdownSizes
 import com.example.front.components.MyNumberField
-import com.example.front.components.MyTextField
 import com.example.front.components.MyTextFieldWithoutIcon
 import com.example.front.components.ReviewCard
 import com.example.front.components.SearchTextField
@@ -111,23 +111,20 @@ import com.example.front.model.DTO.EditShopDTO
 import com.example.front.model.DTO.MetricsDTO
 import com.example.front.model.DTO.NewProductDTO
 import com.example.front.model.DTO.NewProductDisplayDTO
-import com.example.front.model.DTO.WorkingHoursDTO
+import com.example.front.model.DTO.Size
 import com.example.front.model.DTO.WorkingHoursNewShopDTO
 import com.example.front.navigation.Screen
 import com.example.front.screens.myshop.ChangeTime
-import com.example.front.screens.myshop.DayOfWeekItem
 import com.example.front.screens.myshop.getMultipartBodyPart
 import com.example.front.screens.sellers.FilterCard
+import com.example.front.ui.theme.Typography
 import com.example.front.viewmodels.oneshop.OneShopViewModel
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import okhttp3.MultipartBody
 import rememberToastHostState
 import java.text.SimpleDateFormat
-import java.time.LocalTime
 import java.util.Date
 import java.util.Locale
 
@@ -542,7 +539,7 @@ fun AddProductDialog(onDismiss: () -> Unit, shopViewModel: OneShopViewModel, sho
             ) {
                 when (currentStep) {
                     0 -> {
-                        contentOfAddNewProduct(shopViewModel, onNextClicked = { currentStep = 1 })
+                        contentOfAddNewProduct(shopViewModel, shopId, onNextClicked = { currentStep = 1 })
                     }
 
                     1 -> {
@@ -623,10 +620,9 @@ fun contentOfAddNewImage(shopViewModel: OneShopViewModel, onNextClicked: () -> U
 
 
 @Composable
-fun contentOfAddNewProduct(shopViewModel: OneShopViewModel, onNextClicked: () -> Unit) {
+fun contentOfAddNewProduct(shopViewModel: OneShopViewModel, shopId: Int?, onNextClicked: () -> Unit) {
 
     var productName by remember { mutableStateOf("") }
-    var quantity by remember { mutableStateOf(0) }
     var productDescription by remember { mutableStateOf("") }
     var selectedMetric by remember { mutableStateOf(MetricsDTO(1, "Piece")) }
     var selectedCategory by remember { mutableStateOf(CategoriesDTO(1, "Food")) }
@@ -634,8 +630,11 @@ fun contentOfAddNewProduct(shopViewModel: OneShopViewModel, onNextClicked: () ->
     var salePercentage by remember { mutableStateOf(0f) }
     var saleMinQuantity by remember { mutableStateOf(0f) }
     var saleMessage by remember { mutableStateOf("") }
-    var shopId by remember { mutableStateOf(0) }
     var weight by remember { mutableStateOf(0f) }
+    val sizeOptions = createSizeList()
+    var selectedSize by remember { mutableStateOf<Pair<Int, String>?>(null) }
+    var quantity by remember { mutableStateOf(0) }
+    var sizes by remember { mutableStateOf(listOf<Size>()) }
 
 
     Column {
@@ -667,7 +666,6 @@ fun contentOfAddNewProduct(shopViewModel: OneShopViewModel, onNextClicked: () ->
                             labelValue = "Product name",
                             value = productName,
                             onValueChange = {
-                                // Update the state variable when the value changes
                                 productName = it
                             },
                             modifier = Modifier
@@ -675,21 +673,12 @@ fun contentOfAddNewProduct(shopViewModel: OneShopViewModel, onNextClicked: () ->
                     }
                 }
                 item {
-                    CommentsTextBox(onReviewTextChanged = {}, "Product Description")
-                }
-                item {
-                    Row(modifier = Modifier.padding(start = 16.dp, end = 16.dp)) {
-                        MyTextFieldWithoutIcon(
-                            labelValue = "Quantity in stock",
-                            value = quantity.toString(),
-                            onValueChange = {
-                                quantity = it.toInt()
-                            },
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(end = 2.dp)
-                        )
-                    }
+                    CommentsTextBox(
+                        onReviewTextChanged = { newText ->
+                            productDescription = newText
+                        },
+                        placeholder = "Product Description"
+                    )
                 }
                 item {
                     Row(
@@ -700,12 +689,11 @@ fun contentOfAddNewProduct(shopViewModel: OneShopViewModel, onNextClicked: () ->
                             labelValue = "Unity price",
                             value = price.toString(),
                             onValueChange = {
-                                // Update the state variable when the value changes
                                 price = it.toFloat()
                             },
                             modifier = Modifier
                                 .weight(1f)
-                                .padding(end = 2.dp) // Add padding to the end of the first TextField
+                                .padding(end = 2.dp)
                         )
                         shopViewModel.stateGetMetrics.value.metrics?.let {
                             MyDropdownMetrics(
@@ -722,6 +710,74 @@ fun contentOfAddNewProduct(shopViewModel: OneShopViewModel, onNextClicked: () ->
                         }
                     }
                 }
+                item{
+
+                    Column(modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 10.dp, bottom = 10.dp)) {
+                        MyDropdownSizes(
+                            labelValue = "Select Size",
+                            selectedSize = selectedSize,
+                            sizesList = sizeOptions,
+                            onSizeSelected = { sizePair ->
+                                selectedSize = sizePair
+                            },
+                            isEnabled = selectedMetric.id == 1,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+
+                        NumberPicker(
+                            labelValue = "Quantity",
+                            value = quantity,
+                            onValueChange = { newQuantity -> quantity = newQuantity },
+                            enabled = selectedMetric.id == 1,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+
+                        Button(
+                            onClick = {
+                                selectedSize?.let { size ->
+                                    val existingIndex = sizes.indexOfFirst { it.sizeId == size.first }
+                                    if (existingIndex != -1) {
+                                        val existingSize = sizes[existingIndex]
+                                        val updatedSize = existingSize.copy(quantity = existingSize.quantity + quantity)
+                                        sizes = sizes.toMutableList().apply { set(existingIndex, updatedSize) }
+                                    } else {
+                                        sizes = sizes + Size(size.first, quantity)
+                                    }
+                                    quantity = 0
+                                }
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            enabled = selectedMetric.id == 1
+                        ) {
+                            Text("Add Size", style = MaterialTheme.typography.bodyMedium,color = Color.White)
+                        }
+
+                        sizes.forEachIndexed { index, size ->
+                            Row(
+                                modifier = Modifier.padding(5.dp)
+                            ) {
+                                Text(
+                                    "Size: ${size.sizeId}, Quantity: ${size.quantity}",
+                                    style = Typography.bodyLarge,
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .padding(end = 8.dp)
+                                )
+
+                                IconButton(
+                                    onClick = {
+                                        sizes = sizes.toMutableList().apply { removeAt(index) }
+                                    }
+                                ) {
+                                    Icon(
+                                        Icons.Filled.Delete,
+                                        contentDescription = "Delete"
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
                 item {
                     Row(
                         modifier = Modifier
@@ -731,7 +787,6 @@ fun contentOfAddNewProduct(shopViewModel: OneShopViewModel, onNextClicked: () ->
                             labelValue = "Weight of single piece",
                             value = weight.toString(),
                             onValueChange = {
-                                // Update the state variable when the value changes
                                 weight = it.toFloat()
                             },
                             modifier = Modifier
@@ -746,23 +801,21 @@ fun contentOfAddNewProduct(shopViewModel: OneShopViewModel, onNextClicked: () ->
                                 labelValue = "Discount",
                                 value = salePercentage.toString(),
                                 onValueChange = {
-                                    // Update the state variable when the value changes
                                     salePercentage = it.toFloat()
                                 },
                                 modifier = Modifier
                                     .weight(1f)
-                                    .padding(end = 2.dp) // Add padding to the end of the first TextField
+                                    .padding(end = 2.dp)
                             )
                             MyTextFieldWithoutIcon(
                                 labelValue = "If quantity over ...",
                                 value = saleMinQuantity.toString(),
                                 onValueChange = {
-                                    // Update the state variable when the value changes
                                     saleMinQuantity = it.toFloat()
                                 },
                                 modifier = Modifier
                                     .weight(1f)
-                                    .padding(end = 2.dp) // Add padding to the end of the first TextField
+                                    .padding(end = 2.dp)
                             )
                         }
                         Row() {
@@ -770,12 +823,11 @@ fun contentOfAddNewProduct(shopViewModel: OneShopViewModel, onNextClicked: () ->
                                 labelValue = "Discount message",
                                 value = saleMessage,
                                 onValueChange = {
-                                    // Update the state variable when the value changes
                                     saleMessage = it
                                 },
                                 modifier = Modifier
                                     .weight(1f)
-                                    .padding(end = 2.dp) // Add padding to the end of the first TextField
+                                    .padding(end = 2.dp)
                             )
                         }
                     }
@@ -796,23 +848,6 @@ fun contentOfAddNewProduct(shopViewModel: OneShopViewModel, onNextClicked: () ->
                     }
                 }
                 item {
-                    Row(
-                        modifier = Modifier
-                            .padding(start = 16.dp, end = 16.dp)
-                    ) {
-                        MyTextFieldWithoutIcon(
-                            labelValue = "Price",
-                            value = price.toString(),
-                            onValueChange = {
-                                // Update the state variable when the value changes
-                                price = it.toFloat()
-                            },
-                            modifier = Modifier
-                                .weight(1f)
-                        )
-                    }
-                }
-                item {
                     Button(
                         onClick = {
                             val newProductDTO = NewProductDTO(
@@ -821,11 +856,12 @@ fun contentOfAddNewProduct(shopViewModel: OneShopViewModel, onNextClicked: () ->
                                 metricId = selectedMetric.id,
                                 price = price,
                                 salePercentage = salePercentage,
-                                saleMinQuantity = saleMinQuantity,
+                                saleMinQuantity = saleMinQuantity.toInt(),
                                 saleMessage = saleMessage,
                                 categoryId = selectedCategory.id,
-                                shopId = shopId,
-                                weight = weight
+                                shopId = shopId!!,
+                                weight = weight,
+                                sizes = sizes.toList()
                             )
                             shopViewModel.postNewProduct(newProductDTO)
                             onNextClicked()
@@ -834,7 +870,7 @@ fun contentOfAddNewProduct(shopViewModel: OneShopViewModel, onNextClicked: () ->
                             .fillMaxWidth()
                             .padding(16.dp)
                     ) {
-                        Text("Proceed")
+                        Text("Proceed", style = MaterialTheme.typography.bodyMedium,color = Color.White)
                     }
                 }
             }
@@ -842,6 +878,69 @@ fun contentOfAddNewProduct(shopViewModel: OneShopViewModel, onNextClicked: () ->
     }
 }
 
+
+@Composable
+fun NumberPicker(
+    labelValue: String,
+    value: Int,
+    onValueChange: (Int) -> Unit,
+    enabled: Boolean,
+    modifier: Modifier = Modifier,
+    minValue: Int = 0,
+    maxValue: Int = Int.MAX_VALUE
+) {
+    Row(modifier = modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+        Button(
+            onClick = { if (value > minValue) onValueChange(value - 1) },
+            enabled = enabled && value > minValue
+        ) {
+            Text("-", color = Color.White)
+        }
+
+        Text(
+            text = "$labelValue: $value",
+            modifier = Modifier
+                .align(Alignment.CenterVertically)
+                .padding(16.dp),
+            color = Color.Black
+        )
+
+        Button(
+            onClick = { if (value < maxValue) onValueChange(value + 1) },
+            enabled = enabled && value < maxValue
+        ) {
+            Text("+", color = Color.White)
+        }
+    }
+}
+
+data class CategoriesDTO(val id: Int, val name: String)
+
+
+fun createSizeList(): List<Pair<Int, String>> {
+    return listOf(
+        0 to "None - No size (eg. Chair)",
+        1 to "XS",
+        2 to "S",
+        3 to "M",
+        4 to "L",
+        5 to "XL",
+        6 to "XXL",
+        7 to "35",
+        8 to "36",
+        9 to "37",
+        10 to "38",
+        11 to "39",
+        12 to "40",
+        13 to "41",
+        14 to "42",
+        15 to "43",
+        16 to "44",
+        17 to "45",
+        18 to "46",
+        19 to "47"
+    )
+}
 
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
@@ -1009,9 +1108,11 @@ fun Info(
                     {
                         Text(
                             text = "Leave a review",
-                            modifier = Modifier.padding(top = 8.dp).clickable {
-                                leaveAReview = !leaveAReview
-                            },
+                            modifier = Modifier
+                                .padding(top = 8.dp)
+                                .clickable {
+                                    leaveAReview = !leaveAReview
+                                },
                             style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onBackground)
                         )
                         Icon(

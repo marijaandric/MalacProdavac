@@ -326,4 +326,9 @@ class Repository @Inject constructor(private val api: Api) {
     {
         return api.toggleLikeProduct(productId,userId)
     }
+
+    suspend fun editProduct(product: NewProductDTO):Response<Boolean>
+    {
+        return api.editProduct(product)
+    }
 }

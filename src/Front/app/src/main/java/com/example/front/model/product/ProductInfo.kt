@@ -16,7 +16,7 @@ data class ProductInfo(
     @SerializedName("rating") val rating: Float?,
     @SerializedName("workingHours") val workingHours: List<WorkingHoursDTO>?,
     @SerializedName("questionsAndAnswers") val questionsAndAnswers: List<QuestionWithAnswer>?,
-    @SerializedName("sizes") val sizes: List<Stock>?,
+    @SerializedName("sizes") val sizes: List<Stock>,
     @SerializedName("images") val images: List<ImageDataDTO>?,
     @SerializedName("id") val productId: Int?,
     @SerializedName("shopId") val shopId: Int?,
