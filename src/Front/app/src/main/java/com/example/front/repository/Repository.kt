@@ -342,4 +342,9 @@ class Repository @Inject constructor(private val api: Api) {
     {
         return api.getReqForDelivery(deliveryPersonId)
     }
+
+    suspend fun declineRequest(reqId:Int): Response<SuccessBoolean>
+    {
+        return api.declineReq(reqId)
+    }
 }

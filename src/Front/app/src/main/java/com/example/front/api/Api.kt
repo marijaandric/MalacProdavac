@@ -359,9 +359,14 @@ interface Api {
         @Query("page") page: Int,
     ):Response<List<OrdersDTO>>
 
-    //ReqForDeliveryPersonDTO
     @GET("back/Delivery/GetRequestsForDeliveryPerson")
     suspend fun getReqForDelivery(
         @Query("deliveryPerson") deliveryPerson: Int,
     ):Response<List<ReqForDeliveryPersonDTO>>
+
+    @PUT("/back/Delivery/DeclineRequest")
+    suspend fun declineReq(
+        @Query("reqId") reqId: Int,
+    ):Response<SuccessBoolean>
+
 }

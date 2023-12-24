@@ -3,7 +3,9 @@ package com.example.front.screens.delivery
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -37,9 +39,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
 import com.example.front.R
 import com.example.front.components.CardButton
@@ -50,12 +55,16 @@ import com.example.front.model.DTO.ReqForDeliveryPersonDTO
 import com.example.front.model.DTO.Trip
 import com.example.front.navigation.Screen
 import com.example.front.viewmodels.delivery.DeliveryViewModel
+import com.example.front.viewmodels.oneshop.OneShopViewModel
 
 @Composable
 fun DeliveryScreen(navHostController: NavHostController, deliveryViewModel: DeliveryViewModel) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     var selectedColumnIndex by remember {
         mutableStateOf(true)
+    }
+    var userId by remember {
+        mutableStateOf(0)
     }
     Sidebar(
         drawerState,
@@ -65,7 +74,7 @@ fun DeliveryScreen(navHostController: NavHostController, deliveryViewModel: Deli
         LaunchedEffect(Unit) {
             deliveryViewModel.getRouteDetails(deliveryViewModel.dataStoreManager.getUserIdFromToken())
             deliveryViewModel.dataStoreManager.getUserIdFromToken()
-                ?.let { deliveryViewModel.getReqForDelivery(it) }
+                ?.let { deliveryViewModel.getReqForDelivery(it); userId=it }
         }
         val trips = deliveryViewModel.state.value.details
 
@@ -113,7 +122,7 @@ fun DeliveryScreen(navHostController: NavHostController, deliveryViewModel: Deli
                     {
                         LazyColumn {
                             items(yourDataList) { yourData ->
-                                YourDataCard(yourData = yourData)
+                                YourDataCard(yourData = yourData, deliveryViewModel, userId)
                             }
                         }
                     }
@@ -134,7 +143,10 @@ fun DeliveryScreen(navHostController: NavHostController, deliveryViewModel: Deli
 }
 
 @Composable
-fun YourDataCard(yourData: ReqForDeliveryPersonDTO) {
+fun YourDataCard(yourData: ReqForDeliveryPersonDTO, deliveryViewModel:DeliveryViewModel, userId :Int) {
+    var showDialog by remember {
+        mutableStateOf(false)
+    }
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -160,12 +172,69 @@ fun YourDataCard(yourData: ReqForDeliveryPersonDTO) {
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                CardButton(text = "Accept", onClick = { /*TODO*/ }, width = 0.5f, modifier = Modifier.height(40.dp), color = MaterialTheme.colorScheme.primary)
-                CardButton(text = "Decline", onClick = { /*TODO*/ }, width = 0.9f, modifier = Modifier.height(40.dp), color = MaterialTheme.colorScheme.secondary)
+                CardButton(text = "Accept", onClick = { showDialog = true }, width = 0.5f, modifier = Modifier.height(40.dp), color = MaterialTheme.colorScheme.primary)
+                CardButton(text = "Decline", onClick = { deliveryViewModel.declineReq(yourData.id, userId) }, width = 0.9f, modifier = Modifier.height(40.dp), color = MaterialTheme.colorScheme.secondary)
+            }
+        }
+    }
+    if(showDialog)
+    {
+        AcceptDialog(onDismiss = { showDialog=false }, viewModel = deliveryViewModel)
+    }
+}
+
+
+@Composable
+fun AcceptDialog(onDismiss: () -> Unit, viewModel: DeliveryViewModel) {
+    val overlayColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)
+    var value by remember { mutableStateOf(0) }
+
+    Dialog(
+        properties = DialogProperties(usePlatformDefaultWidth = false),
+        onDismissRequest = { onDismiss() }) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(overlayColor)
+                .pointerInput(Unit) {
+                    detectTapGestures { offset ->
+                        onDismiss()
+                    }
+                }
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.8f)
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(MaterialTheme.colorScheme.background)
+                    .pointerInput(Unit) {
+                        detectTapGestures { offset ->
+
+                        }
+                    }
+                    .padding(top = 5.dp)
+                    .align(Alignment.Center),
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                        .align(Alignment.Center)
+                ) {
+                    Text(
+                        "Accept request", style = MaterialTheme.typography.titleMedium.copy(color = MaterialTheme.colorScheme.onBackground), modifier = Modifier
+                            .padding(bottom = 40.dp)
+                            .align(Alignment.CenterHorizontally)
+                    )
+
+
+                }
             }
         }
     }
 }
+
+
 
 @Composable
 fun DeliveryRouteCard(trip: Trip, navHostController: NavHostController) {
