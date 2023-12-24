@@ -22,11 +22,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
@@ -54,6 +56,7 @@ import com.example.front.components.Tabs
 import com.example.front.model.DTO.ReqForDeliveryPersonDTO
 import com.example.front.model.DTO.Trip
 import com.example.front.navigation.Screen
+import com.example.front.ui.theme.Typography
 import com.example.front.viewmodels.delivery.DeliveryViewModel
 import com.example.front.viewmodels.oneshop.OneShopViewModel
 
@@ -179,16 +182,16 @@ fun YourDataCard(yourData: ReqForDeliveryPersonDTO, deliveryViewModel:DeliveryVi
     }
     if(showDialog)
     {
-        AcceptDialog(onDismiss = { showDialog=false }, viewModel = deliveryViewModel)
+        AcceptDialog(onDismiss = { showDialog=false }, viewModel = deliveryViewModel, userId, yourData.id)
     }
 }
 
 
 @Composable
-fun AcceptDialog(onDismiss: () -> Unit, viewModel: DeliveryViewModel) {
+fun AcceptDialog(onDismiss: () -> Unit, viewModel: DeliveryViewModel, userId: Int, reqId:Int) {
     val overlayColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)
     var value by remember { mutableStateOf(0) }
-
+var selectedId by remember { mutableStateOf(0) }
     Dialog(
         properties = DialogProperties(usePlatformDefaultWidth = false),
         onDismissRequest = { onDismiss() }) {
@@ -226,15 +229,53 @@ fun AcceptDialog(onDismiss: () -> Unit, viewModel: DeliveryViewModel) {
                             .padding(bottom = 40.dp)
                             .align(Alignment.CenterHorizontally)
                     )
-
-
+                    Text(
+                        "Choose route", style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onBackground), modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                    )
+                    val deliveryInfoList = viewModel.state.value.details
+                    if (deliveryInfoList != null) {
+                        LazyColumn {
+                            items(deliveryInfoList) { deliveryInfo ->
+                                DeliveryInfoCard(deliveryInfo, selectedId) { id ->
+                                    selectedId = id
+                                    value = deliveryInfo.id
+                                }
+                            }
+                        }
+                    }
+                    if(selectedId != 0)
+                    {
+                        CardButton(text = "Accept", onClick = { viewModel.acceptReq(reqId,selectedId, userId);onDismiss() }, width = 1f, modifier = Modifier.height(40.dp), color = MaterialTheme.colorScheme.primary)
+                    }
                 }
             }
         }
     }
 }
 
-
+@Composable
+fun DeliveryInfoCard(deliveryInfo: Trip, selectedId: Int?, onRadioButtonClick: (Int) -> Unit) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(shape = RoundedCornerShape(20.dp))
+            //.background(if (deliveryInfo.id == selectedId) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.surface)
+            .clickable {
+                onRadioButtonClick(deliveryInfo.id)
+            }
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(if (deliveryInfo.id == selectedId) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.surface)
+                .padding(16.dp)
+        ) {
+            Text(text = "Locations: ${deliveryInfo.locations}")
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+    }
+}
 
 @Composable
 fun DeliveryRouteCard(trip: Trip, navHostController: NavHostController) {
@@ -243,7 +284,6 @@ fun DeliveryRouteCard(trip: Trip, navHostController: NavHostController) {
             .fillMaxWidth()
             .padding(8.dp)
             .clickable {
-                // Navigate to the detailed view of the route
                 navHostController.navigate("${Screen.Route.route}/${trip.id}")
             },
         colors = CardDefaults.cardColors(containerColor = Color(0xFFF1F1F1))

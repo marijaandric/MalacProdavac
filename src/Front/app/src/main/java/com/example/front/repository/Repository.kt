@@ -349,6 +349,10 @@ class Repository @Inject constructor(private val api: Api) {
         return api.declineReq(reqId)
     }
 
+    suspend fun acceptReq(reqId:Int, routeId: Int): Response<SuccessBoolean>
+    {
+        return api.acceptReq(reqId, routeId)
+    }
     suspend fun markNotificationAsRead(notificationId: Int): ApiResponse{
         return api.notificationMarkAsRead(notificationId)
     }
