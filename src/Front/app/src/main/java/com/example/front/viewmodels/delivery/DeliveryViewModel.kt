@@ -1,5 +1,6 @@
 package com.example.front.viewmodels.delivery
 
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -22,7 +23,9 @@ class DeliveryViewModel @Inject constructor(
     suspend fun getRouteDetails(userId: Int?) {
         try {
             val response = userId?.let { repository.GetRoutesForDeliveryPerson(it) }
-
+            if (response != null) {
+                Log.d("RES DEL", response.body().toString())
+            }
             if (response != null) {
                 if (response.isSuccessful) {
                     _state.value = _state.value.copy(
@@ -36,6 +39,11 @@ class DeliveryViewModel @Inject constructor(
         } catch (e: Exception) {
             _state.value.error = e.message.toString()
         }
+    }
+
+    suspend fun getUserId(): Int?
+    {
+        return dataStoreManager.getUserIdFromToken()
     }
 }
 

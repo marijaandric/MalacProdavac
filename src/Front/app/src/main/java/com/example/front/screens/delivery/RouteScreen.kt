@@ -1,6 +1,7 @@
 package com.example.front.screens.delivery
 
 import android.content.Context
+import android.graphics.drawable.Icon
 import android.util.Log
 import android.view.ViewGroup
 import androidx.compose.foundation.Canvas
@@ -20,6 +21,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Icon
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
@@ -322,6 +328,7 @@ fun RouteStopsSection(
     viewModel: RouteDetailsViewModel
 ) {
     var expanded by remember { mutableStateOf(false) }
+    var details  by remember { mutableStateOf(false) }
 
     Column {
         Text(
@@ -349,14 +356,33 @@ fun RouteStopsSection(
         Divider(color = Color(0xFFDADADA), thickness = 1.dp)
         var showRouteDetailCard by remember { mutableStateOf(false) }
 
-        Text(
-            text = "Delivery details >",
-            fontSize = 14.sp,
-            color = Color.Blue,
-            modifier = Modifier
-                .clickable { showRouteDetailCard = !showRouteDetailCard }
-                .padding(vertical = 8.dp)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
         )
+        {
+            Text(
+                text = "Delivery details",
+                fontSize = 14.sp,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier
+                    .clickable { showRouteDetailCard = !showRouteDetailCard ; details= !details }
+                    .padding(vertical = 8.dp)
+            )
+            androidx.compose.material3.Icon(
+                imageVector = if(details) Icons.Default.KeyboardArrowDown else Icons.Default.KeyboardArrowUp ,
+                contentDescription = null,
+                modifier = Modifier
+                    .size(20.dp)
+                    .clickable { details != details },
+                tint = MaterialTheme.colorScheme.secondary
+            )
+            if(details)
+            {
+
+            }
+        }
 
         // Show or hide the RouteDetailCard based on the state
         if (showRouteDetailCard) {

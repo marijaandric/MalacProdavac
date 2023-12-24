@@ -1,11 +1,13 @@
 package com.example.front.screens.RequestsForShopScreen
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -33,8 +35,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -45,7 +49,9 @@ import androidx.navigation.NavHostController
 import com.example.front.R
 import com.example.front.components.Sidebar
 import com.example.front.components.SmallElipseAndTitle
+import com.example.front.components.Tabs
 import com.example.front.model.DTO.DeliveryPersonDTO
+import com.example.front.model.DTO.OrdersDTO
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -60,62 +66,82 @@ fun RequestsForShopScreen(
 ) {
     LaunchedEffect(Unit) {
         viewModel.dataStoreManager.getUserIdFromToken()?.let { viewModel.getRequestsForShopDTO(it) }
+        viewModel.dataStoreManager.getUserIdFromToken()?.let { viewModel.getShopOrders(it, 1) }
+
     }
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val (selectedTab, setSelectedTab) = remember { mutableStateOf(ShopTabs.Requests) }
-
+    var selectedColumnIndex by remember {
+        mutableStateOf(true)
+    }
     Sidebar(
         drawerState = drawerState,
         navController = navHostController,
         dataStoreManager = viewModel.dataStoreManager
     ) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            SmallElipseAndTitle(title = "Orders", drawerState)
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(8.dp)),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                TabRow(
-                    selectedTabIndex = selectedTab.ordinal,
-                    backgroundColor = Color(0xFFF1F1F1),
-                    modifier = Modifier.fillMaxWidth(0.9f)
-                ) {
-                    ShopTabs.values().forEach { tab ->
-                        Tab(
-                            selected = tab == selectedTab,
-                            onClick = { setSelectedTab(tab) },
-                            text = { Text(tab.name) }
-                        )
-                    }
+        LazyColumn(modifier = Modifier
+            .fillMaxSize()
+            .background(color = MaterialTheme.colorScheme.background)) {
+            item{
+                SmallElipseAndTitle(title = "Orders", drawerState)
+                Tabs(
+                    onShopsSelected = { selectedColumnIndex=true },
+                    onFavoritesSelected = { selectedColumnIndex=false },
+                    selectedColumnIndex = selectedColumnIndex,
+                    firstTab = "Requests",
+                    secondTab = "Orders",
+                    isFilters = false
+                )
+                if(selectedColumnIndex)
+                {
+                    RequestsTabContent(viewModel)
                 }
-            }
-
-
-            when (selectedTab) {
-                ShopTabs.Requests -> RequestsTabContent(viewModel)
-                ShopTabs.Orders -> Orders()
+                else{
+                    Orders(navHostController, viewModel)
+                }
             }
         }
     }
 }
 
 data class Order(
-    val orderNumber: String,
+    val orderNumber: Int,
     val date: String,
     val quantity: Int,
-    val totalAmount: String,
+    val totalAmount: Float,
     val status: String
 )
 
 @Composable
-fun OrdersScreen(orders: List<Order>) {
-    LazyColumn(modifier = Modifier.fillMaxWidth(0.9f), horizontalAlignment = Alignment.CenterHorizontally) {
-        items(orders) { order ->
-            OrderCard(order)
+fun OrdersScreen(orders: List<OrdersDTO>?, navController: NavHostController) {
+    if(orders != null)
+    {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(5.dp, top=16.dp,bottom=16.dp,end=16.dp)
+        ) {
+            orders.forEach { order ->
+                com.example.front.components.OrderCard(
+                    orderid = "Order No${order.id}",
+                    quantity = order.quantity,
+                    amount = order.amount,
+                    date = order.createdOn,
+                    status = order.status,
+                    navController = navController,
+                    order.id
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+            }
         }
+    }
+    else{
+        Image(
+            painter = painterResource(id = R.drawable.nofound),
+            contentDescription = null,
+            modifier = Modifier.padding(top=150.dp).size(200.dp)
+        )
     }
 }
 
@@ -162,17 +188,20 @@ fun OrderCard(order: Order) {
 }
 
 @Composable
-fun Orders() {
-    val orders = listOf(
-        Order("1037088", "10-19-2023", 2, "1425 RSD", "Processing"),
-        Order("1049718", "10-19-2023", 2, "4525 RSD", "Delivered"),
-        Order("2549710", "10-16-2023", 1, "630 RSD", "Pending")
-    )
-    Column(
-        modifier = Modifier.fillMaxSize().padding(top = 16.dp),
+fun Orders(navController : NavHostController, viewModel: RequestsForShopViewModel) {
+//    val orders = listOf(
+//        Order(1037088, "10-19-2023", 2, 1425f, "Processing"),
+//        Order(1049718, "10-19-2023", 2, 4525f, "Delivered"),
+//        Order(2549710, "10-16-2023", 1, 630f, "Pending")
+//    )
+    val orders = viewModel.stateOrders.value.orders
+        Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        OrdersScreen(orders = orders)
+        OrdersScreen(orders = orders, navController)
     }
 }
 
@@ -195,7 +224,7 @@ fun RequestsList(state: State<RequestsForShopState>, viewModel: RequestsForShopV
         Image(
             painter = painterResource(id = R.drawable.requests),
             contentDescription = null,
-            modifier = Modifier.size(200.dp)
+            modifier = Modifier.padding(top=150.dp).size(200.dp)
         )
     else
         LazyColumn {

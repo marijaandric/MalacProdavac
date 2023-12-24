@@ -1,5 +1,6 @@
 package com.example.front.viewmodels.requestsshop
 
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -8,6 +9,7 @@ import com.example.front.helper.DataStore.DataStoreManager
 import com.example.front.model.DTO.DeliveryPersonDTO
 import com.example.front.model.DTO.RequestsForShopDTO
 import com.example.front.repository.Repository
+import com.example.front.screens.orders.state.OrdersState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -22,10 +24,36 @@ class RequestsForShopViewModel @Inject constructor(
     var state: State<RequestsForShopState> = _state;
 
     private val _stateDelivery = mutableStateOf(DeliveryPersonRequestState())
-    var stateDelivery: State<DeliveryPersonRequestState> = _stateDelivery;
+    var stateDelivery: State<DeliveryPersonRequestState> = _stateDelivery;//
+
+    private val _stateOrders = mutableStateOf(OrdersState())
+    var stateOrders: State<OrdersState> = _stateOrders;
 
     private val _showDeliveryModal = mutableStateOf(false)
     val showDeliveryModal: State<Boolean> = _showDeliveryModal
+//getShopOrders
+
+    fun getShopOrders(ownerId: Int,page: Int) {
+        viewModelScope.launch {
+            val response = repository.getShopOrders(ownerId, null, page)
+            Log.d("SHOp ORDERS", response.body().toString())
+            if (response.isSuccessful) {
+                val requestsForShopDTO = response.body()
+                _stateOrders.value = _stateOrders.value.copy(
+                    isLoading = false,
+                    orders = requestsForShopDTO!!,
+                    error = ""
+                )
+            } else {
+                _stateOrders.value = _stateOrders.value.copy(
+                    isLoading = false,
+                    orders = null,
+                    error = response.message()
+                )
+            }
+        }
+    }
+
 
     fun getRequestsForShopDTO(id: Int) {
         viewModelScope.launch {

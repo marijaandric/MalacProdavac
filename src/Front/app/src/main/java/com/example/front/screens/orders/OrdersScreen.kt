@@ -159,17 +159,19 @@ fun Orders(ordersViewModel: OrdersViewModel, navController: NavHostController) {
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        orders.forEach { order ->
-            OrderCard(
-                orderid = "Order No${order.id}",
-                quantity = order.quantity,
-                amount = order.amount,
-                date = order.createdOn,
-                status = order.status,
-                navController = navController,
-                order.id
-            )
-            Spacer(modifier = Modifier.height(16.dp))
+        if (orders != null) {
+            orders.forEach { order ->
+                OrderCard(
+                    orderid = "Order No${order.id}",
+                    quantity = order.quantity,
+                    amount = order.amount,
+                    date = order.createdOn,
+                    status = order.status,
+                    navController = navController,
+                    order.id
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+            }
         }
     }
     //OrderCard(orderid = "Order No1037088", quantity = 2, amount = 300.00f, date = "20.1.2023", status="Delivered")

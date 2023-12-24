@@ -350,4 +350,11 @@ interface Api {
     suspend fun editProduct(
         @Body editedProduct : NewProductDTO
     ): Response<Boolean>
+
+    @GET("back/Order/GetShopOrders")
+    suspend fun getShopOrders(
+        @Query("ownerId") ownerId: Int,
+        @Query("status") status: Int?,
+        @Query("page") page: Int,
+    ):Response<List<OrdersDTO>>
 }

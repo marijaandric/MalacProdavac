@@ -331,4 +331,9 @@ class Repository @Inject constructor(private val api: Api) {
     {
         return api.editProduct(product)
     }
+
+    suspend fun getShopOrders(ownerId: Int, status:Int?, page:Int):Response<List<OrdersDTO>>
+    {
+        return api.getShopOrders(ownerId,status,page)
+    }
 }
