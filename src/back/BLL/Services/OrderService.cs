@@ -72,7 +72,7 @@ namespace back.BLL.Services
                 if (o == null) throw new ArgumentException("Order could not be processed!");
 
                 if (o.DeliveryMethodId == 1 && o.PickupTime != null)
-                    if (await _notificationRepository.InsertNotification((await _shopRepository.GetShop(order.ShopId)).OwnerId, 6, "Order pickup request", "User " + await _userRepository.GetUsername(order.UserId) + " has requested to pick up order #" + o.Id + "on " + ((DateTime)o.PickupTime).ToShortDateString() + ", at " + ((DateTime)o.PickupTime).Hour + ":" + ((DateTime)o.PickupTime).Minute + ".\nTap to respond.", o.Id)) Console.WriteLine("Notification sent!");
+                    if (await _notificationRepository.InsertNotification((await _shopRepository.GetShop(order.ShopId)).OwnerId, 9, "Order pickup request", "User " + await _userRepository.GetUsername(order.UserId) + " has requested to pick up order #" + o.Id + "on " + ((DateTime)o.PickupTime).ToShortDateString() + ", at " + ((DateTime)o.PickupTime).Hour + ":" + ((DateTime)o.PickupTime).Minute + ".\nTap to respond.", o.Id)) Console.WriteLine("Notification sent!");
 
                 if (o.DeliveryMethodId == 2)
                 {
