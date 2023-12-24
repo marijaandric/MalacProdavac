@@ -192,7 +192,7 @@ namespace back.DAL.Repositories
                 Status = order.Status,
                 Items = items,
                 DeliveryMethod = order.DeliveryMethod,
-                PaymentMethod = order.DeliveryMethod,
+                PaymentMethod = order.PaymentMethod,
                 ShippingAddress = order.ShippingAddress,
                 DeliveryPrice = (float)Math.Ceiling(delivery)
             };
