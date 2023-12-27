@@ -75,8 +75,8 @@ fun SetupNavGraph(
 
     NavHost(
         navController = navController,
-        startDestination = "intro"
-        //startDestination = "delivery"
+        //startDestination = "intro"
+        startDestination = "delivery"
     ) {
         composable(
             route = Screen.Home.route
